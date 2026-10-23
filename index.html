@@ -94,7 +94,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 @keyframes fadeA{from{opacity:0;transform:scale(.94)}}@keyframes fadeB{from{opacity:0;transform:translateY(10px)}}
 @media(max-width:1000px){.logo{--s:1.8}}@media(max-width:560px){.logo{--s:1.2;gap:1rem}.logo .name{width:calc(322px*1.05)}}
 @media(max-width:380px){.logo{--s:1.05}.logo .name{width:92vw}}
-.logo canvas.mono{width:calc(468px*var(--s));margin:calc(-70px*var(--s)) calc(-90px*var(--s));pointer-events:none;height:auto;image-rendering:pixelated;animation:none;transition:filter .6s}
+.logo canvas.mono{pointer-events:none;height:auto;image-rendering:pixelated;animation:none;transition:filter .6s}
 .logo canvas.mono.done{animation:glowPulse 1.4s ease-out}
 @keyframes glowPulse{40%{filter:drop-shadow(0 0 3px rgba(214,170,255,1)) drop-shadow(0 0 28px rgba(170,100,255,.85))}}
 
@@ -191,42 +191,86 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 <footer>© <span id="y">2026</span> LLC · made with pixels &amp; love</footer>
 <script>
 
-(function(){const cv=document.getElementById('mono');if(!cv)return;const ctx=cv.getContext('2d'),PX=90,PY=70,W=288,H=122;
-cv.width=W+PX*2;cv.height=H+PY*2;
+(function(){const cv=document.getElementById('mono');if(!cv)return;let ctx=cv.getContext('2d');const W=288,H=122;let PX,PY;
 const RMm=matchMedia('(prefers-reduced-motion: reduce)').matches;
-// viewport-relative, half-integer scale so pixels stay crisp
-function fit(){const raw=Math.min(innerWidth*.84/W,innerHeight*.5/H);const s=raw>=2?Math.floor(raw*2)/2:Math.max(1,Math.floor(raw*4)/4);cv.closest('.logo').style.setProperty('--s',s)}
-fit();addEventListener('resize',fit);
 const load=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s});
-// faint pixel filigree frame
-const fr=document.createElement('canvas');fr.width=cv.width;fr.height=cv.height;const g=fr.getContext('2d');
-(function(){const x0=PX-22,y0=PY-18,x1=PX+W+22,y1=PY+H+18,dot=(x,y,c)=>{g.fillStyle=c;g.fillRect(x|0,y|0,1,1)};
- const A='rgba(140,80,210,.2)',B='rgba(140,80,210,.1)';
- for(let x=x0+22;x<=x1-22;x+=2){dot(x,y0,A);dot(x,y1,A)}for(let y=y0+22;y<=y1-22;y+=2){dot(x0,y,A);dot(x1,y,A)}
- for(let x=x0+26;x<=x1-26;x+=4){dot(x,y0+4,B);dot(x,y1-4,B)}for(let y=y0+26;y<=y1-26;y+=4){dot(x0+4,y,B);dot(x1-4,y,B)}
- const curl=(cx,cy,sx,sy)=>{for(let i=0;i<=160;i++){const t=i/160,a=t*Math.PI*3.2,r=14*(1-.8*t);dot(cx+sx*(Math.cos(a)*r),cy+sy*(Math.sin(a)*r),A)}
-  for(let i=0;i<20;i++){dot(cx+sx*(14+i),cy,A);dot(cx,cy+sy*(14+i),A)}};
+// ---- ornament geometry: built once per layout (wide = side scrollwork, narrow = above/below only) ----
+let FR=[],OR=[],cache=null,wide;
+function build(){wide=innerWidth>=640;PX=wide?150:42;PY=wide?96:118;cv.width=W+PX*2;cv.height=H+PY*2;FR=[];OR=[];cache=null;
+ const A='rgba(140,80,210,.24)',B='rgba(140,80,210,.12)',D='rgba(110,50,170,.55)',Lv='rgba(190,150,245,.6)',Lf='rgba(185,140,240,.32)';
+ const x0=PX-22,y0=PY-18,x1=PX+W+22,y1=PY+H+18,cx=(x0+x1)/2,cy=(y0+y1)/2,hw=(x1-x0)/2,hh=(y1-y0)/2;
+ const seen=new Set(),put=(L,x,y,c,k)=>{x=Math.round(x);y=Math.round(y);const id=L.length+':'+x+','+y;if(seen.has(id))return;seen.add(id);L.push({x,y,c,k})};
+ // FRAME: keys 0..1 — centre ornaments (0-.08), top/bottom edges outward (.08-.45), corner spirals unfurl (.45-.6), sides close (.6-1)
+ const F=(x,y,c,k)=>put(FR,x,y,c,k);
+ const mid=(mx,my,d)=>{for(let s=-1;s<=1;s+=2)for(let i=0;i<=60;i++){const t=i/60,a=t*Math.PI*2.4,r=7*(1-.7*t);F(mx+s*(10+Math.cos(a)*r),my+d*Math.sin(a)*r,A,.08*(1-t))}for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)F(mx+a,my+b,A,0)};
+ mid(cx,y0,1);mid(cx,y1,-1);
+ for(let x=x0+22;x<=x1-22;x+=2){const k=.08+.37*Math.abs(x-cx)/(hw-22);F(x,y0,A,k);F(x,y1,A,k)}
+ for(let x=x0+26;x<=x1-26;x+=4){const k=.1+.35*Math.abs(x-cx)/(hw-26);F(x,y0+4,B,k);F(x,y1-4,B,k)}
+ const curl=(qx,qy,sx,sy)=>{for(let i=0;i<20;i++)F(qx+sx*(33-i),qy,A,.45+.03*i/20);
+  for(let i=0;i<=160;i++){const t=i/160,a=t*Math.PI*3.2,r=14*(1-.8*t);F(qx+sx*Math.cos(a)*r,qy+sy*Math.sin(a)*r,A,.6-.12*t)}
+  for(let i=0;i<20;i++)F(qx,qy+sy*(14+i),A,.6+.02*i/20)};
  curl(x0+8,y0+8,1,1);curl(x1-8,y0+8,-1,1);curl(x0+8,y1-8,1,-1);curl(x1-8,y1-8,-1,-1);
- const mid=(cx,cy,d)=>{for(let k=-1;k<=1;k+=2)for(let i=0;i<=60;i++){const t=i/60,a=t*Math.PI*2.4,r=7*(1-.7*t);dot(cx+k*(10+Math.cos(a)*r),cy+d*Math.sin(a)*r,A)}g.fillStyle=A;g.fillRect(cx-1,cy-1,3,3)};
- mid((x0+x1)/2,y0,1);mid((x0+x1)/2,y1,-1);})();
-const motes=Array.from({length:46},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,v:.04+Math.random()*.1,ph:Math.random()*6,s:Math.random()<.2?2:1}));
-function bg(t){ctx.drawImage(fr,0,0);for(const m of motes){if(!RMm){m.y-=m.v;m.x+=Math.sin(t/1700+m.ph)*.06;if(m.y<0){m.y=cv.height;m.x=Math.random()*cv.width}}
- ctx.globalAlpha=.25+.35*Math.abs(Math.sin(t/1100+m.ph));ctx.fillStyle=m.s>1?'#b98cf0':'#8a52d0';ctx.fillRect(m.x|0,m.y|0,m.s,m.s)}ctx.globalAlpha=1}
+ for(let y=y0+22;y<=y1-22;y+=2){const k=.6+.4*(1-Math.abs(y-cy)/(hh-22));F(x0,y,A,k);F(x1,y,A,k)}
+ for(let y=y0+26;y<=y1-26;y+=4){const k=.62+.38*(1-Math.abs(y-cy)/(hh-26));F(x0+4,y,B,k);F(x1-4,y,B,k)}
+ // ORNAMENTS (outside frame): defined in the top-left quadrant and mirrored 4 ways; key = grow order
+ const Q=[];const q=(x,y,c,k)=>Q.push([x,y,c,k]);
+ const spiral=(sx,sy,r0,turns,a0,dir,c,k0,k1)=>{const n=Math.ceil(r0*turns*8);let lx,ly;for(let i=0;i<=n;i++){const t=i/n,a=a0+dir*t*turns*Math.PI*2,r=r0*(1-.85*t);lx=sx+Math.cos(a)*r;ly=sy+Math.sin(a)*r;q(lx,ly,c,k0+(k1-k0)*t)}};
+ const diamond=(x,y,r,c,k)=>{for(let i=-r;i<=r;i++){const w=r-Math.abs(i);q(x-w,y+i,c,k);q(x+w,y+i,c,k)}q(x,y,Lv,k)};
+ const vine=(pts,c,k0,k1)=>{// polyline with gentle sine wobble, sampled per pixel
+  let tot=0;const seg=[];for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(l);tot+=l}
+  let acc=0;for(let i=1;i<pts.length;i++){const [ax,ay]=pts[i-1],[bx,by]=pts[i],l=seg[i-1];for(let s=0;s<=l;s+=.7){const u=s/l;q(ax+(bx-ax)*u,ay+(by-ay)*u,c,k0+(k1-k0)*(acc+s)/tot)}acc+=l}};
+ const ox=x0,oy=y0; // frame corner (top-left)
+ // corner tendril sweeping diagonally out, ending in a curl, with leaf curls and diamonds
+ const tend=[[ox-4,oy-4],[ox-18,oy-10],[ox-30,oy-24],[ox-38,oy-40],[ox-52,oy-50]].filter(p=>p[1]>2&&p[0]>2);
+ vine(tend,D,0,.45);const te=tend[tend.length-1];spiral(te[0]+8,te[1]+2,8,1.1,Math.PI,1,D,.45,.62);
+ spiral(ox-22,oy-24,6,1,0,-1,Lf,.3,.5);diamond(Math.max(4,te[0]-6),Math.max(4,te[1]-6),3,D,.66);
+ for(let i=1;i<=4;i++)q(ox-10-i*9,oy+2+i*2,Lf,.5+i*.05);
+ // top scrollwork: running vine above the top edge with alternating curls, from centre outward
+ const topY=oy-12,span=hw-30;
+ if(PY>40){vine([[cx-6,topY+4],[cx-span*.35,topY-4],[cx-span*.7,topY+2],[cx-span,topY-6]],D,.05,.6);
+  for(let i=1;i<=5;i++){const x=cx-span*i/5.4,up=i%2;spiral(x,topY+(up?-7:6),5,1,up?Math.PI/2:-Math.PI/2,up?1:-1,i%2?D:Lf,.1+i*.09,.2+i*.1)}
+  // radiating rays + diamonds above the top centre ornament
+  for(let r=0;r<5;r++){const a=-Math.PI/2+(r-2)*.32;for(let d=16;d<34+(r%2?0:8);d+=3)q(cx+Math.cos(a)*d,y0-10+Math.sin(a)*d*.7,r%2?Lf:D,.3+d/120);
+   const d=40+(r%2?0:8);diamond(cx+Math.cos(a)*d,y0-10+Math.sin(a)*d*.7,r==2?3:2,D,.75)}
+  for(let i=0;i<9;i++){const a=-Math.PI+i*Math.PI/8;q(cx+Math.cos(a)*(hw+40)*.55,y0-6+Math.sin(a)*(PY-12)*.9,Lv,.8+i*.02)}}
+ // side scrollwork (wide only): horizontal flourish out from the side midpoint with stacked curls
+ if(wide){const sx=x0-6;vine([[sx,cy],[sx-30,cy-6],[sx-62,cy-2],[sx-96,cy-14],[sx-118,cy-30]],D,.05,.55);
+  spiral(sx-122,cy-38,9,1.2,Math.PI/2,1,D,.55,.72);spiral(sx-40,cy-16,7,1,Math.PI/2,-1,Lf,.25,.42);spiral(sx-80,cy-2+9,6,1,-Math.PI/2,1,D,.4,.55);
+  vine([[sx-20,cy-4],[sx-44,cy-34],[sx-50,cy-60]],Lf,.2,.5);spiral(sx-46,cy-66,5,1,0,-1,Lf,.5,.62);
+  diamond(sx-14,cy,3,D,.08);diamond(sx-100,cy-4,2,D,.6);diamond(sx-130,cy-6,2,Lf,.78);
+  for(let i=0;i<6;i++)q(sx-20-i*18,cy+14+(i%2)*4,i%2?Lf:D,.4+i*.07);
+  for(let i=0;i<5;i++){const a=Math.PI+(i-2)*.35;diamond(sx-6+Math.cos(a)*(PX-28),cy-30+Math.sin(a)*40,1,Lv,.82+i*.03)}}
+ // mirror into all four quadrants (clamped inside canvas)
+ const Wc=cv.width,Hc=cv.height;for(const [x,y,c,k] of Q)for(const [mx,my] of [[0,0],[1,0],[0,1],[1,1]]){const X=mx?Wc-1-x:x,Y=my?Hc-1-y:y;if(X>=0&&Y>=0&&X<Wc&&Y<Hc)put(OR,X,Y,c,k)}
+ FR.sort((a,b)=>a.k-b.k);OR.sort((a,b)=>a.k-b.k);
+ const raw=Math.min(innerWidth*.94/cv.width,innerHeight*.78/cv.height);const s=raw>=2?Math.floor(raw*2)/2:Math.max(1,Math.floor(raw*4)/4);
+ cv.style.width=cv.width*s+'px';cv.style.margin=`${-(PY-40)*s}px ${-PX*s}px`;cv.closest('.logo').style.setProperty('--s',s)}
+build();let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{const w=wide;build();if(w!==wide||1)drawAll=true},150)});
+let drawAll=RMm;
+const motes=Array.from({length:46},()=>({x:Math.random(),y:Math.random(),v:.04+Math.random()*.1,ph:Math.random()*6,s:Math.random()<.2?2:1}));
+const pts=(L,p)=>{for(const o of L){if(o.k>p)break;ctx.fillStyle=o.c;ctx.fillRect(o.x,o.y,1,1)}};
+const step=p=>Math.floor(p*40)/40; // pixel-stepped progress
+function deco(fp,op){if(fp>=1&&op>=1){if(!cache){cache=document.createElement('canvas');cache.width=cv.width;cache.height=cv.height;const c=ctx;ctx=cache.getContext('2d');pts(FR,1);pts(OR,1);ctx=c}ctx.drawImage(cache,0,0);return}
+ pts(FR,fp);if(op>0)pts(OR,op)}
+function bg(t){for(const m of motes){if(!RMm){m.y-=m.v/cv.height;m.x+=Math.sin(t/1700+m.ph)*.06/cv.width;if(m.y<0){m.y=1;m.x=Math.random()}}
+ ctx.globalAlpha=.25+.35*Math.abs(Math.sin(t/1100+m.ph));ctx.fillStyle=m.s>1?'#b98cf0':'#8a52d0';ctx.fillRect(m.x*cv.width|0,m.y*cv.height|0,m.s,m.s)}ctx.globalAlpha=1}
 Promise.all([load('logo/L.png'),load('logo/C.png')]).then(([L,C])=>{
  const off=document.createElement('canvas');off.width=W;off.height=H;const o=off.getContext('2d');
  o.drawImage(L,0,0);o.drawImage(L,88,0);o.drawImage(C,180,0);
- if(RMm){bg(0);ctx.drawImage(off,PX,PY);return}
+ if(RMm){const f=()=>{ctx.clearRect(0,0,cv.width,cv.height);deco(1,1);bg(0);ctx.drawImage(off,PX,PY)};f();addEventListener('resize',()=>setTimeout(f,200));return}
  const d=o.getImageData(0,0,W,H).data,P=[];
  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const k=(y*W+x)*4;if(d[k+3]>10){const a=Math.random()*Math.PI*2,r=40+Math.random()*110;
   P.push({x,y,c:`rgb(${d[k]},${d[k+1]},${d[k+2]})`,sx:x+Math.cos(a)*r,sy:y+Math.sin(a)*r*.6-20,rot:(Math.random()-.5)*3,
   delay:(x/W)*680+Math.random()*400})}}
- const DUR=1350,T0=performance.now(),ease=t=>1-Math.pow(1-t,4);let fin=false;
- (function f(now){const t=now-T0;ctx.clearRect(0,0,cv.width,cv.height);bg(now);
+ const DUR=1350,T0=performance.now(),ease=t=>1-Math.pow(1-t,4),FD=1400,OD=1700;let fin=0;
+ (function f(now){const t=now-T0;ctx.clearRect(0,0,cv.width,cv.height);
+  const fp=fin?step(Math.min(1,(now-fin)/FD)):0,op=fin?step(Math.max(0,Math.min(1,(now-fin-FD)/OD))):0;
+  deco(drawAll?1:fp,drawAll?1:op);bg(now);
   if(fin){ctx.drawImage(off,PX,PY);requestAnimationFrame(f);return}let done=true;
   for(const p of P){let u=(t-p.delay)/DUR;if(u<0){done=false;continue}if(u<1)done=false;else u=1;const e=ease(u);
    const x=p.sx+(p.x-p.sx)*e,y=p.sy+(p.y-p.sy)*e;ctx.globalAlpha=Math.min(1,u*1.6);ctx.fillStyle=p.c;
    if(u<1){const s=1+(1-e)*1.2;ctx.save();ctx.translate(x+PX+.5,y+PY+.5);ctx.rotate(p.rot*(1-e));ctx.fillRect(-s/2,-s/2,s,s);ctx.restore()}else ctx.fillRect(p.x+PX,p.y+PY,1,1)}
-  ctx.globalAlpha=1;if(done){fin=true;cv.classList.add('done')}requestAnimationFrame(f)})(T0);
+  ctx.globalAlpha=1;if(done){fin=now;cv.classList.add('done')}requestAnimationFrame(f)})(T0);
 });})();
 document.getElementById('y').textContent=new Date().getFullYear();
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -259,25 +303,40 @@ if(!RM)requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
 // count-up stats (Game of Websites)
 document.querySelectorAll('[data-count]').forEach(el=>{if(RM)return;const n=+el.dataset.count;el.textContent='0';const o=new IntersectionObserver(es=>{if(!es[0].isIntersecting)return;o.disconnect();const t0=performance.now();(function f(t){const u=Math.min(1,(t-t0)/1400),v=Math.round(n*(1-Math.pow(1-u,3)));el.textContent=v.toLocaleString('en-US');if(u<1)requestAnimationFrame(f)})(t0)});o.observe(el)});
-// seams: staggered pixel layers that break one section's palette into the next
-(function(){const bg=getComputedStyle(document.body).backgroundColor;
-const LT=matchMedia('(prefers-color-scheme: light)').matches;
-const P={night:{base:LT?[bg,bg,bg,'#f6e9e6','#ece3f6']:[bg,bg,bg,'#151030','#1c1540'],spark:['#7c6cff','#ff5d8f','#38e1d0','#ffcc4d']},
-basement:{base:['#1b120c','#24180f','#2e1f14','#3a2718','#120c08'],spark:['#4a3020','#5a3a24','#ff8c28']},
-paper:{base:['#f3ecdf','#efe6d6','#e8dcc8','#ddcfbc','#fffaf3'],spark:['#c2412d','#1d6a48','#1a1612']}};
-let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
-function draw(el,i){const c=el.querySelector('canvas'),w=el.clientWidth,h=el.clientHeight,B=w<600?8:12,cols=Math.ceil(w/B),rows=Math.ceil(h/B);
-c.width=cols;c.height=rows;const x=c.getContext('2d'),T=P[el.dataset.top],U=P[el.dataset.bot];seed=97+i*131;
-const pick=a=>a[rnd()*a.length|0];
-// three staggered boundaries made of 2-6 block wide steps, like grass->dirt->stone
-const lines=[.3,.5,.7].map(f=>{const L=[];let k=0;while(k<cols){const run=2+(rnd()*5|0),v=Math.round(rows*f+(rnd()-.5)*rows*.28);for(let j=0;j<run&&k<cols;j++,k++)L.push(v)}return L});
-for(let cx=0;cx<cols;cx++)for(let cy=0;cy<rows;cy++){const a=lines[0][cx],b=lines[1][cx],d=lines[2][cx];let pal;
- if(cy<a)pal=rnd()<.012?T.spark:T.base;
- else if(cy<b)pal=rnd()<.72?T.base:(rnd()<.08?U.spark:U.base);
- else if(cy<d)pal=rnd()<.72?U.base:(rnd()<.08?T.spark:T.base);
- else pal=rnd()<.012?U.spark:U.base;
- x.fillStyle=pick(pal);x.fillRect(cx,cy,1,1)}
-// solid edge rows so seams meet each section flush
-x.fillStyle=T.base[0];x.fillRect(0,0,cols,1);x.fillStyle=U.base[0];x.fillRect(0,rows-1,cols,1)}
-const all=[...document.querySelectorAll('.seam')],go=()=>all.forEach(draw);go();let tm;addEventListener('resize',()=>{clearTimeout(tm);tm=setTimeout(go,150)})})();
+// seams: terrain-strata transitions built from each section's own textures (stars / basement tile / ruled paper)
+(function(){const LT=matchMedia('(prefers-color-scheme: light)').matches;
+const rgb=s=>{const m=s.match(/\d+/g).map(Number);return m.slice(0,3)},hex=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));
+const bg=rgb(getComputedStyle(document.body).backgroundColor);
+let seed=1;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const shade=(c,f)=>c.map(v=>Math.max(0,Math.min(255,v*f|0)));
+let tile=null;const ti=new Image();ti.src='games/ashaad/tile.png';
+const M={
+ night:{edge:LT?[226,214,240]:[38,28,70],px(x,y){const n=rnd();if(n<.006)return hex(['#7c6cff','#ff5d8f','#38e1d0','#ffcc4d','#ffffff'][rnd()*5|0]);return shade(bg,(LT?.98:1)+(rnd()-.5)*.12)}},
+ basement:{edge:[12,8,5],px(x,y){let c=[40,27,18];if(tile){const tx=((x%96)/4|0),ty=((y%96)/4|0),k=(ty*24+tx)*4;c=[tile[k],tile[k+1],tile[k+2]]}
+  if(rnd()<.006)return hex(rnd()<.5?'#ff8c28':'#ffcc4d');return shade(c,.4+rnd()*.1)}},
+ paper:{edge:[221,207,188],px(x,y){if(y%32>=30&&y%32<32)return hex('#ddcfbc');const n=rnd();if(n<.006)return hex('#1a1612');if(n<.009)return hex('#c2412d');return shade(hex('#f3ecdf'),.97+rnd()*.05)}}};
+function walk(cols,base,amp,minRun,maxRun){const L=[];let v=base;while(L.length<cols){v=Math.max(base-amp,Math.min(base+amp,v+Math.round((rnd()-.5)*3)));const run=minRun+(rnd()*(maxRun-minRun+1)|0);for(let j=0;j<run&&L.length<cols;j++)L.push(v)}return L}
+function draw(el,i){const c=el.querySelector('canvas'),w=el.clientWidth,h=el.clientHeight,B=4,cols=Math.ceil(w/B),rows=Math.ceil(h/B);
+ c.width=cols;c.height=rows;const x=c.getContext('2d'),img=x.createImageData(cols,rows),D=img.data,T=M[el.dataset.top],U=M[el.dataset.bot];seed=97+i*131;
+ // strata: a = where top material starts breaking, b = main ragged edge, plus chunk islands & debris
+ const a=walk(cols,rows*.3|0,3,2,7),b=walk(cols,rows*.55|0,6,3,10),cc=walk(cols,rows*.78|0,3,2,6);
+ const grid=new Uint8Array(cols*rows);// 0 top, 1 bottom
+ for(let X=0;X<cols;X++)for(let Y=0;Y<rows;Y++){let m=Y>=b[X]?1:0;
+  if(m===0&&Y>=a[X]&&rnd()<.16*(Y-a[X])/(b[X]-a[X]+1))m=1; // bottom material creeping up
+  if(m===1&&Y<cc[X]&&rnd()<.14*(cc[X]-Y)/(cc[X]-b[X]+1))m=0;  // top material crumbling down
+  grid[Y*cols+X]=m}
+ // irregular chunks: blobs of each material thrown across the edge
+ for(let n=0;n<cols/6;n++){const X=rnd()*cols|0,up=rnd()<.5,Y=b[X]+(up?-(2+rnd()*5|0):(1+rnd()*5|0)),bw=1+(rnd()*4|0),bh=1+(rnd()*2|0);
+  for(let u=0;u<bw;u++)for(let v=0;v<bh;v++){const xx=X+u,yy=Y+v;if(xx<cols&&yy>=0&&yy<rows)grid[yy*cols+xx]=up?1:0}}
+ for(let Y=0;Y<rows;Y++)for(let X=0;X<cols;X++){const m=grid[Y*cols+X],mat=m?U:T;let col=mat.px(X*B,Y*B+el.offsetTop);
+  // shading: bottom material darkens just under top material (overhang shadow); top material gets a lit rim at its lower edge
+  const above=Y>0?grid[(Y-1)*cols+X]:0,below=Y<rows-1?grid[(Y+1)*cols+X]:1;
+  if(m===1&&above===0)col=shade(col,.6);else if(m===1&&Y>1&&grid[(Y-2)*cols+X]===0)col=shade(col,.8);
+  if(m===0&&below===1)col=T.edge.map((e,k)=>(e+col[k])/2|0);
+  if(Y===0)col=mat===T?T.px(X*B,el.offsetTop):col;if(Y===rows-1&&m===0)col=U.px(X*B,0);
+  const k=(Y*cols+X)*4;D[k]=col[0];D[k+1]=col[1];D[k+2]=col[2];D[k+3]=255}
+ x.putImageData(img,0,0)}
+const all=[...document.querySelectorAll('.seam')],go=()=>all.forEach(draw);
+ti.onload=()=>{const t=document.createElement('canvas');t.width=t.height=24;const g=t.getContext('2d');g.drawImage(ti,0,0);try{tile=g.getImageData(0,0,24,24).data}catch(e){}go()};
+go();let tm;addEventListener('resize',()=>{clearTimeout(tm);tm=setTimeout(go,150)})})();
 </script></body></html>
