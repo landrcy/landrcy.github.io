@@ -212,7 +212,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 .bf-board li .rk{color:#8a72b8;font-family:Silkscreen;font-size:.75rem}.bf-board li i{width:14px;height:14px;display:block;box-shadow:inset -3px -3px 0 rgba(0,0,0,.3)}
 .bf-board li small{color:#a58fcf;font-size:.78rem}.bf-board .w{color:#7dffb2}.bf-board .l{color:#ff7b93;min-width:2.6rem;text-align:right}
 .bf-board .reset{display:block;margin:.6rem auto 0;background:none;border:2px solid #4a2584;color:#a58fcf;font-family:Silkscreen;font-size:.65rem;padding:.3rem .6rem;border-radius:5px;cursor:pointer}
-</style></head><body>
+</style><link rel="stylesheet" href="ashaad-intro/ashaad-intro.css"></head><body>
 <canvas id="fx"></canvas><canvas id="trail"></canvas>
 <nav><a class="mark" href="#top"><b>LLC</b></a><ul><li><a href="#games">Games</a></li><li><a href="#channels">Channels</a></li><li><a href="#ballfight">Ball Fight</a></li><li><a href="#contact">GitHub</a></li></ul></nav>
 <main id="top">
@@ -531,4 +531,4 @@ function step(){const alive=balls.filter(b=>b.hp>0);
  if(over){g.fillStyle='rgba(11,6,24,.55)';g.fillRect(0,AH/2-14,AW,28);g.font='16px Silkscreen';g.fillStyle='#ffffff';g.fillText(stEl.textContent,AW/2,AH/2)}}
 newFight();let vis=false,last=0;new IntersectionObserver(es=>{vis=es[0].isIntersecting},{threshold:.05}).observe(cv);
 (function loop(t){requestAnimationFrame(loop);if(!vis||document.hidden)return;if(RMb&&t-last<66)return;last=t;step()})(0);})();
-</script></body></html>
+</script><script src="ashaad-intro/ashaad-intro.js" defer></script></body></html>

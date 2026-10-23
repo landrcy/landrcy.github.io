@@ -1,0 +1,8 @@
+/* The Binding of Ashaad — storybook paper intro (overlay only exists while the intro plays) */
+#ashaad-intro{position:fixed;inset:0;z-index:9000;overflow:hidden;background:transparent;cursor:pointer;opacity:0;transition:opacity .3s ease;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+#ashaad-intro.on{opacity:1}
+#ashaad-intro.out{opacity:0;transition:opacity .25s ease}
+#ashaad-intro canvas{position:absolute;left:0;top:0;display:block;image-rendering:pixelated;image-rendering:-moz-crisp-edges;image-rendering:crisp-edges;image-rendering:pixelated}
+#ashaad-intro .ai-skip{position:absolute;left:0;right:0;bottom:calc(8px + env(safe-area-inset-bottom,0px));text-align:center;font:400 11px Silkscreen,"Pixelify Sans",monospace;letter-spacing:1px;color:#e8c99a;opacity:0;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;animation:aiHint .5s 1.2s forwards;pointer-events:none}
+#ashaad-intro.late .ai-skip{animation:none;opacity:0;transition:opacity .2s}
+@keyframes aiHint{to{opacity:.75}}
