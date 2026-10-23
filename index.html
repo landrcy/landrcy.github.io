@@ -2,9 +2,6 @@
 <link rel="icon" href="favicons/purple-L-32.png" type="image/png" sizes="32x32"><link rel="icon" href="favicon.ico" sizes="any"><link rel="apple-touch-icon" href="favicons/purple-L-180.png"><title>LLC</title><meta name="description" content="Games and websites by Landry.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<script>(function(){var h=document.documentElement;window.__introGate=new Promise(function(r){window.__introGo=r});
-if(matchMedia('(prefers-reduced-motion: reduce)').matches){window.__introGo();return}
-h.classList.add('intro-on');setTimeout(function(){if(!window.__introStarted){h.classList.remove('intro-on');var e=document.getElementById('intro');if(e)e.remove();window.__introGo()}},4000)})()</script>
 <style>
 :root{--bg:#0d0a1a;--fg:#f4eefe;--muted:#b6aacd;--a1:#ff5d8f;--a2:#ffcc4d;--a3:#7c6cff;--a4:#38e1d0;--nav:rgba(13,10,26,.7)}
 @media(prefers-color-scheme:light){:root{--bg:#fff6ee;--fg:#24193a;--muted:#5e5276;--nav:rgba(255,246,238,.75)}}
@@ -215,25 +212,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 .bf-board li .rk{color:#8a72b8;font-family:Silkscreen;font-size:.75rem}.bf-board li i{width:14px;height:14px;display:block;box-shadow:inset -3px -3px 0 rgba(0,0,0,.3)}
 .bf-board li small{color:#a58fcf;font-size:.78rem}.bf-board .w{color:#7dffb2}.bf-board .l{color:#ff7b93;min-width:2.6rem;text-align:right}
 .bf-board .reset{display:block;margin:.6rem auto 0;background:none;border:2px solid #4a2584;color:#a58fcf;font-family:Silkscreen;font-size:.65rem;padding:.3rem .6rem;border-radius:5px;cursor:pointer}
-
-/* ---------- INTRO: illuminated-manuscript intro overlay + permanent hero side border (see intro/intro.js) ---------- */
-html.intro-on{overflow:hidden;scrollbar-gutter:stable}
-#intro{display:none;position:fixed;inset:0;z-index:10000;background:var(--bg);overflow:hidden;touch-action:none}
-html.intro-on #intro{display:block}
-#intro canvas{position:absolute;left:0;top:0;image-rendering:pixelated}
-#intro .skip{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));font:400 .62rem Silkscreen,monospace;letter-spacing:.18em;text-transform:lowercase;color:var(--muted);background:none;border:0;padding:.5rem .6rem;cursor:pointer;opacity:.5;transition:opacity .2s}
-#intro .skip::before{content:"\25C7  "}
-#intro .skip:hover,#intro .skip:focus-visible{opacity:1;outline:none}
-.hero>.hbord{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
-.hbord canvas{position:absolute;left:0;image-rendering:pixelated;display:block}
-html.hb-ok #hlines{display:none}
-html.hb-ok .hbord{clip-path:inset(0 50% 0 50%);transition:clip-path 1.6s steps(32)}
-html.hb-ok .hbord.grow{clip-path:inset(0 0 0 0)}
-html.hb-ok .hbord.now{clip-path:inset(0 0 0 0);transition:none}
-html.intro-on:not(.intro-reveal) .hbord{visibility:hidden}
-</style><link rel="stylesheet" href="scenes/scenes.css">
-</head><body>
-<div id="intro" aria-hidden="true"><canvas></canvas><button class="skip" type="button" tabindex="-1">skip</button></div>
+</style></head><body>
 <canvas id="fx"></canvas><canvas id="trail"></canvas>
 <nav><a class="mark" href="#top"><b>LLC</b></a><ul><li><a href="#games">Games</a></li><li><a href="#channels">Channels</a></li><li><a href="#ballfight">Ball Fight</a></li><li><a href="#contact">GitHub</a></li></ul></nav>
 <main id="top">
@@ -307,8 +286,6 @@ html.intro-on:not(.intro-reveal) .hbord{visibility:hidden}
 </div></section>
 <div class="seam" aria-hidden="true" data-top="arena" data-bot="night"><canvas></canvas></div>
 <footer>© <span id="y">2026</span> LLC · made with pixels &amp; love</footer>
-<script src="intro/intro.js"></script>
-<script src="scenes/core.js"></script><script src="scenes/ashaad.js"></script><script src="scenes/gow.js"></script><script src="scenes/ballfight.js"></script><script src="scenes/channels.js"></script>
 <script>
 
 (function(){const cv=document.getElementById('mono');if(!cv)return;let ctx=cv.getContext('2d');const W=288,H=122;let PX,PY;
@@ -387,7 +364,7 @@ function deco(fp,op){if(fp>=1&&op>=1){if(!cache){cache=document.createElement('c
  pts(FR,fp);if(op>0)pts(OR,op)}
 function bg(t){for(const m of motes){if(!RMm){m.y-=m.v/cv.height;m.x+=Math.sin(t/1700+m.ph)*.06/cv.width;if(m.y<0){m.y=1;m.x=Math.random()}}
  ctx.globalAlpha=.25+.35*Math.abs(Math.sin(t/1100+m.ph));ctx.fillStyle=m.s>1?'#b98cf0':'#8a52d0';ctx.fillRect(m.x*cv.width|0,m.y*cv.height|0,m.s,m.s)}ctx.globalAlpha=1}
-Promise.all([load('logo/L.png'),load('logo/C.png'),window.__introGate||Promise.resolve()]).then(([L,C])=>{
+Promise.all([load('logo/L.png'),load('logo/C.png')]).then(([L,C])=>{
  const off=document.createElement('canvas');off.width=W;off.height=H;const o=off.getContext('2d');
  o.drawImage(L,0,0);o.drawImage(L,88,0);o.drawImage(C,180,0);
  if(RMm){const f=()=>{ctx.clearRect(0,0,cv.width,cv.height);deco(1,1);bg(0);ctx.drawImage(off,PX,PY)};f();addEventListener('resize',()=>setTimeout(f,200));return}
@@ -468,7 +445,6 @@ const M={
   if(rnd()<.006)return hex(rnd()<.5?'#ff8c28':'#ffcc4d');return shade(c,.4+rnd()*.1)}},
  tube:{edge:[30,30,30],px(x,y){if(x%24<2||y%24<2)return rnd()<.6?[26,26,26]:[15,15,15];return rnd()<.004?hex('#ff0033'):shade([15,15,15],.9+rnd()*.25)}},
  arena:{edge:[42,22,80],px(x,y){if(x%24<2||y%24<2)return [31,20,56];return rnd()<.005?hex(['#7a3fc4','#b98cf0','#ff4d6d','#4dc3ff'][rnd()*4|0]):shade([20,12,38],.92+rnd()*.16)}},
-
  paper:{edge:[221,207,188],px(x,y){if(y%32>=30&&y%32<32)return hex('#ddcfbc');const n=rnd();if(n<.006)return hex('#1a1612');if(n<.009)return hex('#c2412d');return shade(hex('#f3ecdf'),.97+rnd()*.05)}}};
 function walk(cols,base,amp,minRun,maxRun){const L=[];let v=base;while(L.length<cols){v=Math.max(base-amp,Math.min(base+amp,v+Math.round((rnd()-.5)*3)));const run=minRun+(rnd()*(maxRun-minRun+1)|0);for(let j=0;j<run&&L.length<cols;j++)L.push(v)}return L}
 const RAMP2=['#f3ecdf','#e6dccb','#cfc3b0','#ada292','#857c70','#5e5750','#3f3a36','#2a2726','#1d1c1b','#151515','#0f0f0f'].map(hex);const RAMP=['#1b120c','#2a1b11','#3d2817','#56381f','#73502f','#937047','#b59268','#d1b48d','#e3d2b4','#ede2cd','#f3ecdf'].map(hex),BY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
