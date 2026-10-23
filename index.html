@@ -131,6 +131,10 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 @media(max-width:860px){.gw-card.a{left:0;bottom:-14%}.gw-card.b{right:0}.gw-cd{right:0}.game--gow .game-media{margin:1.5rem 0 3rem}}
 @media(max-width:480px){.gw-card{width:130px;font-size:.6rem;padding:7px 9px}.gw-card .t{font-size:.85rem}.gw-card.b{top:-12%}.gw-card.a{bottom:-16%}.gw-cd{width:72px;bottom:-14%}.gw-stamp{font-size:.65rem}.gw-card .m{display:none}.gw-stats{gap:1rem}}
 @media(prefers-reduced-motion:reduce){.game--gow *,.game--gow::before{animation:none!important}.gw-note{display:none}}
+
+/* ---------- SEAMS: blocky dithered transitions between sections (Minecraft-layer style) ---------- */
+.seam{position:relative;z-index:1;height:clamp(64px,9vw,112px);margin:-1px 0;line-height:0}
+.seam canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 </style></head><body>
 <canvas id="fx"></canvas><canvas id="trail"></canvas>
 <nav><a class="mark" href="#top"><b>LLC</b></a><ul><li><a href="#games">Games</a></li><li><a href="#contact">GitHub</a></li></ul></nav>
@@ -143,6 +147,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 
 <section id="games"><h2 class="sec-title reveal">&lt; <span>Games</span> /&gt;</h2></section>
 
+<div class="seam" aria-hidden="true" data-top="night" data-bot="basement"><canvas></canvas></div>
 <!-- GAME: The Binding of Ashaad — copy this whole <section> to add a new game (see CSS comment) -->
 <section class="game game--ashaad" id="ashaad"><canvas class="dust" data-fx="basement"></canvas>
 <div class="game-inner reveal" data-tilt>
@@ -156,6 +161,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
  <a class="pedestal" href="https://landrcy.github.io/binding-of-ashaad/"><span class="item ol">PLAY</span><img src="games/ashaad/pedestal.png" alt=""></a></div>
 </div></section>
 
+<div class="seam" aria-hidden="true" data-top="basement" data-bot="paper"><canvas></canvas></div>
 <!-- SITE: Game of Websites -->
 <section class="game game--gow" id="game-of-websites">
 <div class="game-inner reveal" data-tilt>
@@ -176,6 +182,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
  </div>
 </div></section>
 
+<div class="seam" aria-hidden="true" data-top="paper" data-bot="night"><canvas></canvas></div>
 <section class="panel" id="contact"><h2 class="sec-title reveal">&lt; <span>GitHub</span> /&gt;</h2><div class="reveal"><a class="gh" href="https://github.com/landrcy">★ github.com/landrcy</a></div></section>
 </main>
 <footer>© <span id="y">2026</span> LLC · made with pixels &amp; love</footer>
@@ -230,4 +237,25 @@ if(!RM)requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
 // count-up stats (Game of Websites)
 document.querySelectorAll('[data-count]').forEach(el=>{if(RM)return;const n=+el.dataset.count;el.textContent='0';const o=new IntersectionObserver(es=>{if(!es[0].isIntersecting)return;o.disconnect();const t0=performance.now();(function f(t){const u=Math.min(1,(t-t0)/1400),v=Math.round(n*(1-Math.pow(1-u,3)));el.textContent=v.toLocaleString('en-US');if(u<1)requestAnimationFrame(f)})(t0)});o.observe(el)});
+// seams: staggered pixel layers that break one section's palette into the next
+(function(){const bg=getComputedStyle(document.body).backgroundColor;
+const LT=matchMedia('(prefers-color-scheme: light)').matches;
+const P={night:{base:LT?[bg,bg,bg,'#f6e9e6','#ece3f6']:[bg,bg,bg,'#151030','#1c1540'],spark:['#7c6cff','#ff5d8f','#38e1d0','#ffcc4d']},
+basement:{base:['#1b120c','#24180f','#2e1f14','#3a2718','#120c08'],spark:['#4a3020','#5a3a24','#ff8c28']},
+paper:{base:['#f3ecdf','#efe6d6','#e8dcc8','#ddcfbc','#fffaf3'],spark:['#c2412d','#1d6a48','#1a1612']}};
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+function draw(el,i){const c=el.querySelector('canvas'),w=el.clientWidth,h=el.clientHeight,B=w<600?8:12,cols=Math.ceil(w/B),rows=Math.ceil(h/B);
+c.width=cols;c.height=rows;const x=c.getContext('2d'),T=P[el.dataset.top],U=P[el.dataset.bot];seed=97+i*131;
+const pick=a=>a[rnd()*a.length|0];
+// three staggered boundaries made of 2-6 block wide steps, like grass->dirt->stone
+const lines=[.3,.5,.7].map(f=>{const L=[];let k=0;while(k<cols){const run=2+(rnd()*5|0),v=Math.round(rows*f+(rnd()-.5)*rows*.28);for(let j=0;j<run&&k<cols;j++,k++)L.push(v)}return L});
+for(let cx=0;cx<cols;cx++)for(let cy=0;cy<rows;cy++){const a=lines[0][cx],b=lines[1][cx],d=lines[2][cx];let pal;
+ if(cy<a)pal=rnd()<.012?T.spark:T.base;
+ else if(cy<b)pal=rnd()<.72?T.base:(rnd()<.08?U.spark:U.base);
+ else if(cy<d)pal=rnd()<.72?U.base:(rnd()<.08?T.spark:T.base);
+ else pal=rnd()<.012?U.spark:U.base;
+ x.fillStyle=pick(pal);x.fillRect(cx,cy,1,1)}
+// solid edge rows so seams meet each section flush
+x.fillStyle=T.base[0];x.fillRect(0,0,cols,1);x.fillStyle=U.base[0];x.fillRect(0,rows-1,cols,1)}
+const all=[...document.querySelectorAll('.seam')],go=()=>all.forEach(draw);go();let tm;addEventListener('resize',()=>{clearTimeout(tm);tm=setTimeout(go,150)})})();
 </script></body></html>
