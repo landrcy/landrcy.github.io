@@ -94,13 +94,16 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 @keyframes fadeA{from{opacity:0;transform:scale(.94)}}@keyframes fadeB{from{opacity:0;transform:translateY(10px)}}
 @media(max-width:1000px){.logo{--s:1.8}}@media(max-width:560px){.logo{--s:1.2;gap:1rem}.logo .name{width:calc(322px*1.05)}}
 @media(max-width:380px){.logo{--s:1.05}.logo .name{width:92vw}}
+.logo canvas.mono{width:calc(473px*var(--s));margin:calc(-70px*var(--s)) calc(-90px*var(--s));pointer-events:none;height:auto;image-rendering:pixelated;animation:none;transition:filter .6s}
+.logo canvas.mono.done{animation:glowPulse 1.4s ease-out}
+@keyframes glowPulse{40%{filter:drop-shadow(0 0 3px rgba(214,170,255,1)) drop-shadow(0 0 28px rgba(170,100,255,.85))}}
 </style></head><body>
 <canvas id="fx"></canvas><canvas id="trail"></canvas>
 <nav><a class="mark" href="#top"><b>LLC</b></a><ul><li><a href="#games">Games</a></li><li><a href="#contact">GitHub</a></li></ul></nav>
 <main id="top">
 <header class="hero"><div>
 <h1 class="logo"><span class="sr">LLC</span>
-<span class="mono" aria-hidden="true"><img src="logo/L.png" alt="" width="94" height="122"><img src="logo/L.png" alt="" width="94" height="122"><img class="c" src="logo/C.png" alt="" width="113" height="102"></span></h1>
+<canvas class="mono" id="mono" width="473" height="262" aria-hidden="true"></canvas></h1>
 </div>
 <span class="scrollhint">▼ scroll ▼</span></header>
 
@@ -123,6 +126,25 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 </main>
 <footer>© <span id="y">2026</span> LLC · made with pixels &amp; love</footer>
 <script>
+
+(function(){const cv=document.getElementById('mono');if(!cv)return;const ctx=cv.getContext('2d'),PX=90,PY=70,W=293,H=122;
+const RMm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const load=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s});
+Promise.all([load('logo/L.png'),load('logo/C.png')]).then(([L,C])=>{
+ const off=document.createElement('canvas');off.width=W;off.height=H;const o=off.getContext('2d');
+ o.drawImage(L,0,0);o.drawImage(L,88,0);o.drawImage(C,180,14);
+ if(RMm){ctx.drawImage(off,PX,PY);return}
+ const d=o.getImageData(0,0,W,H).data,P=[];
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){const k=(y*W+x)*4;if(d[k+3]>10){const a=Math.random()*Math.PI*2,r=40+Math.random()*110;
+  P.push({x,y,c:`rgb(${d[k]},${d[k+1]},${d[k+2]})`,sx:x+Math.cos(a)*r,sy:y+Math.sin(a)*r*.6-20,rot:(Math.random()-.5)*3,
+  delay:(x/W)*500+Math.random()*300})}}
+ const DUR=1000,T0=performance.now(),ease=t=>1-Math.pow(1-t,4);
+ (function f(now){const t=now-T0;ctx.clearRect(0,0,cv.width,cv.height);let done=true;
+  for(const p of P){let u=(t-p.delay)/DUR;if(u<0){done=false;continue}if(u<1)done=false;else u=1;const e=ease(u);
+   const x=p.sx+(p.x-p.sx)*e,y=p.sy+(p.y-p.sy)*e;ctx.globalAlpha=Math.min(1,u*1.6);ctx.fillStyle=p.c;
+   if(u<1){const s=1+(1-e)*1.2;ctx.save();ctx.translate(x+PX+.5,y+PY+.5);ctx.rotate(p.rot*(1-e));ctx.fillRect(-s/2,-s/2,s,s);ctx.restore()}else ctx.fillRect(p.x+PX,p.y+PY,1,1)}
+  ctx.globalAlpha=1;if(!done)requestAnimationFrame(f);else{ctx.clearRect(0,0,cv.width,cv.height);ctx.drawImage(off,PX,PY);cv.classList.add('done')}})(T0);
+});})();
 document.getElementById('y').textContent=new Date().getFullYear();
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // reveals
