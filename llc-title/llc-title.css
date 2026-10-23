@@ -1,0 +1,15 @@
+/* LLC pixel title: dungeon-stone L, water L, matrix C + infinity. Played from delta-frame packs (llc-title.js). */
+.hero{background:#080a12;padding:3rem 0;overflow:hidden}
+.hero::before{display:none}
+.hero>div{width:100%}
+h1.logo.llc5{display:flex;flex-direction:column;align-items:center;gap:.6rem;margin:0;width:100%;--s:1}
+h1.logo.llc5 canvas{display:block;width:960px;max-width:none;height:auto;aspect-ratio:16/9;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;background:#080a12;
+ -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent),linear-gradient(180deg,transparent,#000 10%,#000 90%,transparent);
+ -webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent),linear-gradient(180deg,transparent,#000 10%,#000 90%,transparent);mask-composite:intersect}
+h1.logo.llc5.playing canvas{cursor:pointer}
+.llc5-skip{font:400 .72rem Silkscreen,monospace;letter-spacing:.06em;color:#6f82ad;background:none;border:1px solid rgba(111,130,173,.35);padding:.35rem .7rem;cursor:pointer;min-height:1.9rem;transition:opacity .6s,color .2s}
+.llc5-skip:hover,.llc5-skip:focus-visible{color:#cfe0ff;border-color:#9ab4e8}
+.llc5-skip.off{opacity:0;pointer-events:none;visibility:hidden}
+.hero .scrollhint{color:#7d8fb8}
+@media(max-width:700px){.hero{min-height:0;padding:3.5rem 0 5rem}}
+@media(prefers-reduced-motion:reduce){.llc5-skip{display:none}}
