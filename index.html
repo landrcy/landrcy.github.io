@@ -97,6 +97,40 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 .logo canvas.mono{width:calc(473px*var(--s));margin:calc(-70px*var(--s)) calc(-90px*var(--s));pointer-events:none;height:auto;image-rendering:pixelated;animation:none;transition:filter .6s}
 .logo canvas.mono.done{animation:glowPulse 1.4s ease-out}
 @keyframes glowPulse{40%{filter:drop-shadow(0 0 3px rgba(214,170,255,1)) drop-shadow(0 0 28px rgba(170,100,255,.85))}}
+
+/* ---------- THEME: Game of Websites (paper catalogue, ink + stamp red) ---------- */
+.game--gow{--paper:#f3ecdf;--ink:#1a1612;--gm:#6f655c;--line:#ddcfbc;--card:#fffaf3;--stamp:#c2412d;--proj:#1d6a48;color:var(--ink);font-family:"Segoe UI","Avenir Next",Inter,sans-serif;background:radial-gradient(circle at 12% -10%,#fff 0,transparent 42%),var(--paper)}
+.game--gow::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.5;background:repeating-linear-gradient(0deg,transparent 0 31px,rgba(221,207,188,.55) 31px 32px);animation:gwPaper 30s linear infinite}
+@keyframes gwPaper{to{background-position:0 320px}}
+.gw-kicker{margin:0 0 .6rem;color:var(--stamp);font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.game--gow h2{font-family:Palatino,"Palatino Linotype","Iowan Old Style",Georgia,serif;font-weight:600;font-size:clamp(2.4rem,5.4vw,4rem);letter-spacing:-.04em;line-height:.95;margin:0 0 .9rem}
+.game--gow h2 em{font-style:italic;color:var(--stamp)}
+.gw-lede{color:var(--gm);font-size:1.05rem;line-height:1.5;margin:0 0 1rem;max-width:34rem}
+.gw-pills{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 1.2rem;padding:0;list-style:none}
+.gw-pills li{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-weight:700;font-size:.9rem;animation:gwPill 6s infinite}
+.gw-pills li:nth-child(2){animation-delay:1.5s}.gw-pills li:nth-child(3){animation-delay:3s}.gw-pills li:nth-child(4){animation-delay:4.5s}
+@keyframes gwPill{0%,20%{background:var(--ink);color:var(--paper);border-color:var(--ink)}25%,100%{background:var(--card);color:var(--ink)}}
+.gw-stats{display:flex;gap:1.6rem;margin:0 0 1.5rem;font-size:.9rem;color:var(--gm)}.gw-stats b{display:block;font-family:Palatino,Georgia,serif;font-size:1.8rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.gw-open{display:inline-flex;align-items:center;gap:.6rem;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:700;padding:14px 24px;border-radius:999px;box-shadow:0 6px 0 var(--stamp);transition:transform .15s,box-shadow .15s}
+.gw-open:hover{transform:translateY(-3px);box-shadow:0 9px 0 var(--stamp)}.gw-open:active{transform:translateY(4px);box-shadow:0 2px 0 var(--stamp)}
+.gw-open:focus-visible{outline:2px solid var(--stamp);outline-offset:4px}.gw-open span{transition:transform .2s}.gw-open:hover span{transform:translateX(4px)}
+.gw-frame{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;box-shadow:0 24px 50px rgba(26,22,18,.18);position:relative;z-index:1}
+.gw-frame .bar{display:flex;gap:6px;padding:2px 4px 10px}.gw-frame .bar i{width:10px;height:10px;border-radius:50%;background:var(--line)}.gw-frame .bar i:first-child{background:var(--stamp)}
+.gw-frame img.shot{border-radius:10px;border:1px solid var(--line)}
+.gw-card{position:absolute;z-index:2;width:clamp(150px,17vw,200px);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:0 10px 24px rgba(26,22,18,.15);font-size:.75rem;animation:gwFloat 5s ease-in-out infinite}
+.gw-card .t{display:block;font-family:Palatino,Georgia,serif;font-weight:700;font-size:1rem;margin:2px 0}.gw-card .k{font-size:.62rem;font-weight:700;letter-spacing:.08em;color:var(--stamp)}.gw-card .k.p{color:var(--proj)}.gw-card .m{color:var(--gm)}
+.gw-card.a{left:-4%;bottom:-8%;--r:-5deg}.gw-card.b{right:-3%;top:-9%;--r:4deg;animation-delay:-2.5s}
+@keyframes gwFloat{0%,100%{transform:translateY(0) rotate(var(--r))}50%{transform:translateY(-10px) rotate(var(--r))}}
+.gw-cd{position:absolute;z-index:3;right:-5%;bottom:-10%;width:clamp(90px,11vw,140px);border-radius:50%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.25));animation:gwSpin 4s linear infinite}
+@keyframes gwSpin{to{transform:rotate(360deg)}}
+.gw-stamp{position:absolute;z-index:3;left:4%;top:-6%;font-weight:800;letter-spacing:.12em;font-size:.8rem;color:var(--stamp);border:3px solid var(--stamp);border-radius:6px;padding:.3em .6em;transform:rotate(-10deg);background:rgba(255,250,243,.85);animation:gwStamp 4s 1s ease-in-out infinite}
+@keyframes gwStamp{0%,70%,100%{transform:rotate(-10deg) scale(1)}75%{transform:rotate(-10deg) scale(1.25)}80%{transform:rotate(-10deg) scale(.95)}}
+.gw-note{position:absolute;color:var(--stamp);font-size:1.4rem;opacity:0;animation:gwNote 3s linear infinite;pointer-events:none}
+.gw-note.n2{animation-delay:1s;color:var(--proj)}.gw-note.n3{animation-delay:2s}
+@keyframes gwNote{0%{opacity:0;transform:translate(0,0)}20%{opacity:.9}100%{opacity:0;transform:translate(-30px,-90px) rotate(-20deg)}}
+@media(max-width:860px){.gw-card.a{left:0;bottom:-14%}.gw-card.b{right:0}.gw-cd{right:0}.game--gow .game-media{margin:1.5rem 0 3rem}}
+@media(max-width:480px){.gw-card{width:130px;font-size:.6rem;padding:7px 9px}.gw-card .t{font-size:.85rem}.gw-card.b{top:-12%}.gw-card.a{bottom:-16%}.gw-cd{width:72px;bottom:-14%}.gw-stamp{font-size:.65rem}.gw-card .m{display:none}.gw-stats{gap:1rem}}
+@media(prefers-reduced-motion:reduce){.game--gow *,.game--gow::before{animation:none!important}.gw-note{display:none}}
 </style></head><body>
 <canvas id="fx"></canvas><canvas id="trail"></canvas>
 <nav><a class="mark" href="#top"><b>LLC</b></a><ul><li><a href="#games">Games</a></li><li><a href="#contact">GitHub</a></li></ul></nav>
@@ -120,6 +154,26 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
  <ul><li style="--ic:url(games/ashaad/ashaad.png)">Multiple playable characters</li><li style="--ic:url(games/ashaad/pedestal.png)">Q5 items to find</li><li style="--ic:url(games/ashaad/finley.png)">A secret Finley boss</li><li style="--ic:url(games/ashaad/fire0.png)">4 floors to descend</li></ul></div>
  <div class="cast"><img src="games/ashaad/ashaad.png" alt="Ashaad"><img src="games/ashaad/emmanuel.png" alt="Emmanuel"><img src="games/ashaad/julian_good.png" alt="Julian"><img src="games/ashaad/julian.png" alt="Julian"><img class="boss" src="games/ashaad/finley.png" alt="Finley, secret boss"></div>
  <a class="pedestal" href="https://landrcy.github.io/binding-of-ashaad/"><span class="item ol">PLAY</span><img src="games/ashaad/pedestal.png" alt=""></a></div>
+</div></section>
+
+<!-- SITE: Game of Websites -->
+<section class="game game--gow" id="game-of-websites">
+<div class="game-inner reveal" data-tilt>
+ <div class="game-media">
+  <span class="gw-stamp">UNBLOCKED</span>
+  <div class="gw-frame"><div class="bar"><i></i><i></i><i></i></div><img class="shot" src="sites/gow/screenshot.png" alt="Game of Websites home page: a searchable catalogue of site cards" loading="lazy"></div>
+  <div class="gw-card b" aria-hidden="true"><span class="k">UNBLOCKED · VERY COMPLEX</span><span class="t">Night Arena</span><span class="m">11,433 lines · Open</span></div>
+  <div class="gw-card a" aria-hidden="true"><span class="k p">PROJECT · COMPLEX</span><span class="t">Archive of Things</span><span class="m">14,255 lines · Open</span></div>
+  <img class="gw-cd" src="sites/gow/cd.png" alt=""><span class="gw-note" style="right:8%;bottom:8%" aria-hidden="true">♪</span><span class="gw-note n2" style="right:12%;bottom:4%" aria-hidden="true">♫</span><span class="gw-note n3" style="right:4%;bottom:12%" aria-hidden="true">♪</span>
+ </div>
+ <div class="game-info">
+  <p class="gw-kicker">coopercitywebsites.github.io</p>
+  <h2>Game of <em>Websites</em></h2>
+  <p class="gw-lede">A searchable catalogue of every site in the collection — unblocked games, NeoForge mods, old builds and the trash pile — ranked by how much code went into each one. Comes with its own soundtrack.</p>
+  <ul class="gw-pills"><li>Unblocked</li><li>1.21.1 NeoForge</li><li>Old</li><li>Trash</li></ul>
+  <div class="gw-stats"><div><b data-count="20">20</b>unblocked sites</div><div><b data-count="25961">25,961</b>lines, biggest</div><div><b>♪</b>built-in player</div></div>
+  <a class="gw-open" href="https://coopercitywebsites.github.io/main/">Open Game of Websites <span>→</span></a>
+ </div>
 </div></section>
 
 <section class="panel" id="contact"><h2 class="sec-title reveal">&lt; <span>GitHub</span> /&gt;</h2><div class="reveal"><a class="gh" href="https://github.com/landrcy">★ github.com/landrcy</a></div></section>
@@ -174,4 +228,6 @@ x.fillStyle='rgba(255,220,170,.55)';for(const p of d.p){p.y-=p.v;p.x+=Math.sin(t
 for(const q of d.t){q.y+=q.v;if(q.y>h){q.y=-10;q.x=Math.random()*w}x.fillStyle='rgba(120,190,255,.55)';x.beginPath();x.arc(q.x,q.y,5,0,7);x.fill();x.fillStyle='rgba(255,255,255,.7)';x.fillRect(q.x-2,q.y-3,2,2)}}
 if(!RM)requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
+// count-up stats (Game of Websites)
+document.querySelectorAll('[data-count]').forEach(el=>{if(RM)return;const n=+el.dataset.count;el.textContent='0';const o=new IntersectionObserver(es=>{if(!es[0].isIntersecting)return;o.disconnect();const t0=performance.now();(function f(t){const u=Math.min(1,(t-t0)/1400),v=Math.round(n*(1-Math.pow(1-u,3)));el.textContent=v.toLocaleString('en-US');if(u<1)requestAnimationFrame(f)})(t0)});o.observe(el)});
 </script></body></html>
