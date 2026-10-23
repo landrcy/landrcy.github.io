@@ -1,0 +1,3 @@
+/* Game of Websites intro overlay: a pixel canvas laid over the section while the intro plays; removed afterwards. */
+.gwi-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:30;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;cursor:pointer;touch-action:manipulation}
+.gwi-skip{position:absolute;right:10px;bottom:8px;z-index:31;font:700 .62rem Silkscreen,monospace;letter-spacing:.08em;color:#fff;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #000}

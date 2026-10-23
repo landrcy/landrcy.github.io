@@ -1,0 +1,3 @@
+/* LLC Powered Channels intro: pixel canvas laid over the card grid while it plays; removed afterwards. */
+.chi-canvas{position:absolute;z-index:30;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;cursor:pointer;touch-action:manipulation}
+.chi-skip{position:absolute;z-index:31;font:700 .62rem Silkscreen,monospace;letter-spacing:.08em;color:#fff;opacity:.5;pointer-events:none;text-shadow:0 1px 0 #000}
