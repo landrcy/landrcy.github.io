@@ -145,9 +145,76 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 /* hero side lines: pixel vines from the logo frame out to the viewport edges */
 #hlines{position:absolute;left:0;top:0;pointer-events:none;image-rendering:pixelated;z-index:0;clip-path:inset(0 50% 0 50%);transition:clip-path 1.6s steps(32)}
 #hlines.grow{clip-path:inset(0 0 0 0)}.hero>div{position:relative;z-index:1}
+
+/* ---------- SECTION: LLC Powered Channels (YouTube-ish dark + red, each card themed) ---------- */
+.channels{position:relative;padding:clamp(3rem,7vw,5.5rem) clamp(1rem,4vw,3rem);background:#0f0f0f;color:#f1f1f1;isolation:isolate}
+.channels::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.35;background-image:linear-gradient(#1a1a1a 2px,transparent 2px),linear-gradient(90deg,#1a1a1a 2px,transparent 2px);background-size:24px 24px}
+.channels .sec-title{display:flex;align-items:center;justify-content:center;gap:.6em;flex-wrap:wrap}.channels .sec-title span{color:#ff0033}
+.yt-play{display:inline-block;width:1.6em;height:1.15em;background:#ff0033;border-radius:.3em;position:relative;box-shadow:0 0 18px rgba(255,0,51,.55);animation:ytPulse 2.4s ease-in-out infinite}
+.yt-play::after{content:"";position:absolute;left:38%;top:24%;border-left:.5em solid #fff;border-top:.3em solid transparent;border-bottom:.3em solid transparent}
+@keyframes ytPulse{50%{transform:scale(1.08)}}
+.ch-grid{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;gap:18px}.ch-grid .ch{flex:1 1 300px;max-width:380px}
+.ch{position:relative;overflow:hidden;border-radius:14px;padding:22px 20px 20px;min-height:250px;display:flex;flex-direction:column;gap:.55rem;border:2px solid rgba(255,255,255,.08);box-shadow:0 14px 30px rgba(0,0,0,.45);transition:transform .2s,box-shadow .2s;isolation:isolate}
+.ch:hover{transform:translateY(-5px);box-shadow:0 20px 40px rgba(0,0,0,.6),0 0 0 2px #ff0033}
+.ch::before,.ch::after{content:"";position:absolute;z-index:-1;pointer-events:none}
+.ch-top{display:flex;align-items:center;gap:12px}.ch-av{width:60px;height:60px;border-radius:50%;border:3px solid #fff;flex:none;object-fit:cover;background:#222}
+.ch h3{margin:0;font-family:Silkscreen;font-size:1.05rem;line-height:1.1;overflow-wrap:anywhere}.ch .handle{font-family:"Pixelify Sans";font-size:.95rem;opacity:.75}
+.ch p{margin:0;line-height:1.45;font-size:.97rem;flex:1}
+.ch .watch{align-self:flex-start;display:inline-flex;align-items:center;gap:.5rem;background:#ff0033;color:#fff;text-decoration:none;font-family:Silkscreen;font-size:.85rem;padding:.6rem 1rem;border-radius:8px;box-shadow:0 4px 0 #8c001c;transition:transform .12s,box-shadow .12s}
+.ch .watch:hover{transform:translateY(-2px);box-shadow:0 6px 0 #8c001c}.ch .watch:active{transform:translateY(3px);box-shadow:0 1px 0 #8c001c}.ch .watch:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.ch .badge-soon{position:absolute;top:14px;right:-34px;transform:rotate(35deg);background:#ffd84d;color:#1b2a1f;font-family:Silkscreen;font-size:.68rem;padding:.3rem 2.4rem;box-shadow:0 3px 0 rgba(0,0,0,.3);animation:soon 2s ease-in-out infinite}
+@keyframes soon{50%{filter:brightness(1.25)}}
+/* 1 arena */
+.ch--arena{background:radial-gradient(circle at 50% 120%,#3a0d4a,#160822 70%);color:#fff}
+.ch--arena::before{width:26px;height:26px;border-radius:50%;background:#ff3b5c;box-shadow:0 0 0 3px #fff;top:30%;left:10%;animation:arenaA 3.2s ease-in-out infinite}
+.ch--arena::after{width:26px;height:26px;border-radius:50%;background:#4dc3ff;box-shadow:0 0 0 3px #fff;top:30%;right:10%;animation:arenaB 3.2s ease-in-out infinite}
+@keyframes arenaA{0%,100%{transform:translate(0,0)}45%{transform:translate(90px,40px)}50%{transform:translate(80px,30px) scale(1.2)}}
+@keyframes arenaB{0%,100%{transform:translate(0,0)}45%{transform:translate(-90px,40px)}50%{transform:translate(-80px,30px) scale(.85)}}
+.ch--arena h3{color:#ff7b93}
+/* 2 donut smp */
+.ch--donut{background:linear-gradient(#5aa63b 0 18px,#3f7d2a 18px 24px,#7a5230 24px) ;color:#fff}
+.ch--donut::before{inset:24px 0 0;opacity:.35;background:conic-gradient(from 90deg at 2px 2px,#5c3b20 25%,transparent 0) 0 0/16px 16px}
+.ch--donut::after{width:70px;height:70px;right:-12px;bottom:-12px;border-radius:50%;background:radial-gradient(circle,transparent 26%,#ff8fc8 27% 60%,#c9874a 61%);box-shadow:inset 0 0 0 4px rgba(0,0,0,.15);animation:spinD 8s linear infinite}
+@keyframes spinD{to{transform:rotate(360deg)}}
+.ch--donut .ch-top{margin-top:8px}.ch--donut h3{color:#ffd1ea;text-shadow:2px 2px 0 #3a2410}
+/* 3 trivia cosmic */
+.ch--trivia{background:radial-gradient(ellipse at 80% 0%,#3b2b8f,#0b0a2a 65%);color:#eef}
+.ch--trivia::before{inset:0;background-image:radial-gradient(#fff 1px,transparent 1.5px),radial-gradient(#9ad 1px,transparent 1.5px);background-size:46px 46px,29px 29px;background-position:0 0,13px 17px;opacity:.55;animation:twk 3s steps(2) infinite}
+.ch--trivia::after{width:54px;height:54px;right:16px;bottom:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffcf8a,#e0603a 70%);box-shadow:0 0 0 6px rgba(255,207,138,.18);animation:orbit 6s linear infinite}
+@keyframes twk{50%{opacity:.25}}@keyframes orbit{50%{transform:translateY(-8px)}}
+.ch--trivia h3{color:#b9a8ff}
+/* 4 campfire */
+.ch--camp{background:linear-gradient(#12090a,#2a1208 70%,#3d1a08);color:#ffe9d0}
+.ch--camp::before{left:50%;bottom:-10px;width:120px;height:90px;margin-left:-60px;background:radial-gradient(ellipse at 50% 100%,#ffd166,#ff7b25 40%,rgba(255,60,0,.25) 65%,transparent 72%);animation:fire .25s steps(2) infinite alternate}
+.ch--camp::after{inset:0;background:radial-gradient(circle at 50% 100%,rgba(255,140,40,.25),transparent 60%)}
+@keyframes fire{to{transform:scaleY(1.12) translateY(-3px);filter:brightness(1.15)}}
+.ch--camp h3{color:#ffb15c}
+/* 5 chalkboard */
+.ch--chalk{background:#244233;color:#f4f4ea;border:8px solid #7a5230;box-shadow:inset 0 0 40px rgba(0,0,0,.4),0 14px 30px rgba(0,0,0,.45)}
+.ch--chalk::before{inset:0;opacity:.12;background:repeating-linear-gradient(-20deg,#fff 0 1px,transparent 1px 7px)}
+.ch--chalk::after{content:"a²+b²=c²   ∫";font-family:"Pixelify Sans";font-size:1.1rem;color:rgba(255,255,255,.18);right:14px;bottom:62px;white-space:nowrap}
+.ch--chalk h3{color:#fff;font-family:"Pixelify Sans";font-weight:700;font-size:1.35rem}
+.ch--chalk .watch{background:#f4f4ea;color:#244233;box-shadow:0 4px 0 #b5b5a5}
+.channels .ch.reveal{transition-delay:var(--d,0s)}
+
+/* ---------- SECTION: Eternal Ball Fight ---------- */
+.ballfight{position:relative;padding:clamp(3rem,7vw,5rem) clamp(1rem,4vw,3rem);background:#140c26;isolation:isolate}
+.ballfight::before{content:"";position:absolute;inset:0;z-index:-1;background-image:linear-gradient(#1f1438 2px,transparent 2px),linear-gradient(90deg,#1f1438 2px,transparent 2px);background-size:24px 24px;opacity:.8}
+.bf-wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(250px,1fr);gap:22px;align-items:start}
+@media(max-width:860px){.bf-wrap{grid-template-columns:1fr}}
+.bf-arena{position:relative;background:#0b0618;border:4px solid #7c3fc4;border-radius:6px;box-shadow:0 0 0 4px #1a0b2e,0 0 30px rgba(124,63,196,.45)}
+.bf-arena canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
+.bf-hud{display:flex;justify-content:space-between;font-family:Silkscreen;font-size:.8rem;color:#c9a6f5;padding:.5rem .7rem;border-top:3px solid #2a1650}
+.bf-board{background:#1a0f33;border:4px solid #4a2584;border-radius:6px;padding:14px 14px 10px;font-family:"Pixelify Sans";color:#efe6ff}
+.bf-board h3{margin:0 0 .6rem;font-family:Silkscreen;font-size:1rem;color:#d9c2ff;text-align:center}
+.bf-board ol{list-style:none;margin:0;padding:0;max-height:430px;overflow:auto}
+.bf-board li{display:grid;grid-template-columns:1.4rem 14px 1fr auto auto;gap:.5rem;align-items:center;padding:.3rem .2rem;border-bottom:2px dashed #2e1b55;font-size:.98rem}
+.bf-board li .rk{color:#8a72b8;font-family:Silkscreen;font-size:.75rem}.bf-board li i{width:14px;height:14px;display:block;box-shadow:inset -3px -3px 0 rgba(0,0,0,.3)}
+.bf-board li small{color:#a58fcf;font-size:.78rem}.bf-board .w{color:#7dffb2}.bf-board .l{color:#ff7b93;min-width:2.6rem;text-align:right}
+.bf-board .reset{display:block;margin:.6rem auto 0;background:none;border:2px solid #4a2584;color:#a58fcf;font-family:Silkscreen;font-size:.65rem;padding:.3rem .6rem;border-radius:5px;cursor:pointer}
 </style></head><body>
 <canvas id="fx"></canvas><canvas id="trail"></canvas>
-<nav><a class="mark" href="#top"><b>LLC</b></a><ul><li><a href="#games">Games</a></li><li><a href="#contact">GitHub</a></li></ul></nav>
+<nav><a class="mark" href="#top"><b>LLC</b></a><ul><li><a href="#games">Games</a></li><li><a href="#channels">Channels</a></li><li><a href="#ballfight">Ball Fight</a></li><li><a href="#contact">GitHub</a></li></ul></nav>
 <main id="top">
 <header class="hero"><div>
 <h1 class="logo"><span class="sr">LLC</span>
@@ -192,9 +259,32 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
  </div>
 </div></section>
 
-<div class="seam" aria-hidden="true" data-top="paper" data-bot="night"><canvas></canvas></div>
+<div class="seam" aria-hidden="true" data-top="paper" data-bot="tube"><canvas></canvas></div>
+<!-- SECTION: LLC Powered Channels — each .ch card is themed by its ch--<theme> class -->
+<section class="channels" id="channels"><h2 class="sec-title reveal"><span class="yt-play" aria-hidden="true"></span>&lt; LLC Powered <span>Channels</span> /&gt;</h2>
+<div class="ch-grid">
+ <article class="ch ch--arena reveal"><div class="ch-top"><img class="ch-av" src="sites/yt/langrino.jpg" alt="" loading="lazy"><div><h3>Langrino</h3><div class="handle">@Langrino</div></div></div>
+  <p>Chaotic weapon-ball battle Shorts: two balls with powers enter, one ball leaves.</p><a class="watch" href="https://www.youtube.com/@Langrino">▶ Watch on YouTube</a></article>
+ <article class="ch ch--donut reveal" style="--d:.08s"><div class="ch-top"><img class="ch-av" src="sites/yt/clutch.jpg" alt="" loading="lazy"><div><h3>clutchclips</h3><div class="handle">@clutchclipscrate</div></div></div>
+  <p>The best DrDonut and Donut SMP moments, clipped into bite-size Shorts.</p><a class="watch" href="https://www.youtube.com/@clutchclipscrate">▶ Watch on YouTube</a></article>
+ <article class="ch ch--trivia reveal" style="--d:.16s"><div class="ch-top"><img class="ch-av" src="sites/yt/trivia.jpg" alt="" loading="lazy"><div><h3>bowlfuloftrivia</h3><div class="handle">@bowlfuloftrivia</div></div></div>
+  <p>Quick "did you know?" fact Shorts — space, animals and everything in between.</p><a class="watch" href="https://www.youtube.com/@bowlfuloftrivia">▶ Watch on YouTube</a></article>
+ <article class="ch ch--camp reveal" style="--d:.24s"><div class="ch-top"><img class="ch-av" src="sites/yt/reddit.jpg" alt="" loading="lazy"><div><h3>RedditStoryADay</h3><div class="handle">@redditstoryaday</div></div></div>
+  <p>Pull up a log: a Reddit story a day, told over satisfying gameplay.</p><a class="watch" href="https://www.youtube.com/channel/UCRegZeMyJ1B5B9n64rfgKAw">▶ Watch on YouTube</a></article>
+ <article class="ch ch--chalk reveal" style="--d:.32s"><span class="badge-soon">Launching Oct 28</span><div class="ch-top"><img class="ch-av" src="sites/yt/sat.jpg" alt="" loading="lazy"><div><h3>SAT in a Minute</h3><div class="handle">@satinaminuteprep</div></div></div>
+  <p>Fast SAT prep tips, each one in under a minute.</p><a class="watch" href="https://www.youtube.com/channel/UCfDhWTThokF3gKW03iEGijg">▶ Watch on YouTube</a></article>
+</div></section>
+<div class="seam" aria-hidden="true" data-top="tube" data-bot="night"><canvas></canvas></div>
 <section class="panel" id="contact"><h2 class="sec-title reveal">&lt; <span>GitHub</span> /&gt;</h2><div class="reveal"><a class="gh" href="https://github.com/landrcy">★ github.com/landrcy</a></div></section>
 </main>
+<div class="seam" aria-hidden="true" data-top="night" data-bot="arena"><canvas></canvas></div>
+<!-- SECTION: Eternal Ball Fight — canvas arena + localStorage leaderboard -->
+<section class="ballfight" id="ballfight"><h2 class="sec-title reveal">&lt; Eternal <span>Ball Fight</span> /&gt;</h2>
+<div class="bf-wrap">
+ <div class="bf-arena"><canvas id="bf" width="320" height="220" aria-label="Weapon balls fighting endlessly"></canvas><div class="bf-hud"><span id="bf-fight">Fight #1</span><span id="bf-status">FIGHT!</span></div></div>
+ <aside class="bf-board" aria-label="Total Ball Standings"><h3>Total Ball Standings</h3><ol id="bf-board"></ol><button type="button" class="reset" id="bf-reset">reset standings</button></aside>
+</div></section>
+<div class="seam" aria-hidden="true" data-top="arena" data-bot="night"><canvas></canvas></div>
 <footer>© <span id="y">2026</span> LLC · made with pixels &amp; love</footer>
 <script>
 
@@ -353,20 +443,22 @@ const M={
  night:{edge:LT?[226,214,240]:[38,28,70],px(x,y){const n=rnd();if(n<.006)return hex(['#7c6cff','#ff5d8f','#38e1d0','#ffcc4d','#ffffff'][rnd()*5|0]);return shade(bg,(LT?.98:1)+(rnd()-.5)*.12)}},
  basement:{edge:[12,8,5],px(x,y){let c=[40,27,18];if(tile){const tx=((x%96)/4|0),ty=((y%96)/4|0),k=(ty*24+tx)*4;c=[tile[k],tile[k+1],tile[k+2]]}
   if(rnd()<.006)return hex(rnd()<.5?'#ff8c28':'#ffcc4d');return shade(c,.4+rnd()*.1)}},
+ tube:{edge:[30,30,30],px(x,y){if(x%24<2||y%24<2)return rnd()<.6?[26,26,26]:[15,15,15];return rnd()<.004?hex('#ff0033'):shade([15,15,15],.9+rnd()*.25)}},
+ arena:{edge:[42,22,80],px(x,y){if(x%24<2||y%24<2)return [31,20,56];return rnd()<.005?hex(['#7a3fc4','#b98cf0','#ff4d6d','#4dc3ff'][rnd()*4|0]):shade([20,12,38],.92+rnd()*.16)}},
  paper:{edge:[221,207,188],px(x,y){if(y%32>=30&&y%32<32)return hex('#ddcfbc');const n=rnd();if(n<.006)return hex('#1a1612');if(n<.009)return hex('#c2412d');return shade(hex('#f3ecdf'),.97+rnd()*.05)}}};
 function walk(cols,base,amp,minRun,maxRun){const L=[];let v=base;while(L.length<cols){v=Math.max(base-amp,Math.min(base+amp,v+Math.round((rnd()-.5)*3)));const run=minRun+(rnd()*(maxRun-minRun+1)|0);for(let j=0;j<run&&L.length<cols;j++)L.push(v)}return L}
-const RAMP=['#1b120c','#2a1b11','#3d2817','#56381f','#73502f','#937047','#b59268','#d1b48d','#e3d2b4','#ede2cd','#f3ecdf'].map(hex),BY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
-function warm(el,i){const c=el.querySelector('canvas'),w=el.clientWidth,h=el.clientHeight,B=4,cols=Math.ceil(w/B),rows=Math.ceil(h/B);
+const RAMP2=['#f3ecdf','#e6dccb','#cfc3b0','#ada292','#857c70','#5e5750','#3f3a36','#2a2726','#1d1c1b','#151515','#0f0f0f'].map(hex);const RAMP=['#1b120c','#2a1b11','#3d2817','#56381f','#73502f','#937047','#b59268','#d1b48d','#e3d2b4','#ede2cd','#f3ecdf'].map(hex),BY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+window.__R1=RAMP;function warm(el,i,RAMP){const c=el.querySelector('canvas'),w=el.clientWidth,h=el.clientHeight,B=4,cols=Math.ceil(w/B),rows=Math.ceil(h/B);
  c.width=cols;c.height=rows;const x=c.getContext('2d'),img=x.createImageData(cols,rows),D=img.data;seed=211+i*71;
  const j1=walk(cols,0,3,3,9),j2=walk(cols,0,2,2,6),N=RAMP.length-1;
  for(let Y=0;Y<rows;Y++)for(let X=0;X<cols;X++){const t=Math.max(0,Math.min(1,(Y+j1[X]+j2[X]*.5)/(rows-1)));
   const f=t*N,th=(BY[(Y&3)*4+(X&3)]+.5)/16;let idx=Math.min(N,Math.floor(f)+(f-Math.floor(f)>th?1:0));
   if(Y===0)idx=0;if(Y===rows-1)idx=N;let col=RAMP[idx];
-  if(idx<4&&tile&&rnd()<.5)col=M.basement.px(X*B,Y*B);if(idx<5&&rnd()<.004)col=hex('#ff8c28');
-  if(idx>=N-1&&((Y*B+el.offsetTop)%32>=30))col=hex('#ddcfbc');
+  if(RAMP===window.__R1){if(idx<4&&tile&&rnd()<.5)col=M.basement.px(X*B,Y*B);if(idx<5&&rnd()<.004)col=hex('#ff8c28')}else if(idx>N-3&&rnd()<.004)col=hex('#ff0033');
+  if(RAMP===window.__R1?idx>=N-1:idx<=1)if((Y*B+el.offsetTop)%32>=30)col=hex('#ddcfbc');
   const k=(Y*cols+X)*4;D[k]=col[0];D[k+1]=col[1];D[k+2]=col[2];D[k+3]=255}
  x.putImageData(img,0,0)}
-function draw(el,i){if(el.dataset.top==='basement'&&el.dataset.bot==='paper')return warm(el,i);const c=el.querySelector('canvas'),w=el.clientWidth,h=el.clientHeight,B=4,cols=Math.ceil(w/B),rows=Math.ceil(h/B);
+function draw(el,i){if(el.dataset.top==='basement'&&el.dataset.bot==='paper')return warm(el,i,RAMP);if(el.dataset.top==='paper'&&el.dataset.bot==='tube')return warm(el,i,RAMP2);const c=el.querySelector('canvas'),w=el.clientWidth,h=el.clientHeight,B=4,cols=Math.ceil(w/B),rows=Math.ceil(h/B);
  c.width=cols;c.height=rows;const x=c.getContext('2d'),img=x.createImageData(cols,rows),D=img.data,T=M[el.dataset.top],U=M[el.dataset.bot];seed=97+i*131;
  // strata: a = where top material starts breaking, b = main ragged edge, plus chunk islands & debris
  const a=walk(cols,rows*.3|0,3,2,7),b=walk(cols,rows*.55|0,6,3,10),cc=walk(cols,rows*.78|0,3,2,6);
@@ -389,4 +481,54 @@ function draw(el,i){if(el.dataset.top==='basement'&&el.dataset.bot==='paper')ret
 const all=[...document.querySelectorAll('.seam')],go=()=>all.forEach(draw);
 ti.onload=()=>{const t=document.createElement('canvas');t.width=t.height=24;const g=t.getContext('2d');g.drawImage(ti,0,0);try{tile=g.getImageData(0,0,24,24).data}catch(e){}go()};
 go();let tm;addEventListener('resize',()=>{clearTimeout(tm);tm=setTimeout(go,150)})})();
+// ===== Eternal Ball Fight =====
+(function(){const cv=document.getElementById('bf');if(!cv)return;const g=cv.getContext('2d'),AW=cv.width,AH=cv.height;g.imageSmoothingEnabled=false;
+const TYPES=[['Slicer','#ff4d6d','sword'],['Pokey','#4dc3ff','spear'],['Stabby','#7dffb2','dagger'],['Robin','#9bd94a','bow'],['Thud','#ff9f3a','hammer'],['Reaper','#b98cf0','scythe'],
+ ['Blade','#ff7bd5','sword'],['Lancer','#5c7cff','spear'],['Shiv','#3ee0c8','dagger'],['Archie','#d6e05a','bow'],['Smash','#e05a3a','hammer'],['Grim','#8f6bff','scythe']];
+const WP={sword:{L:16,dmg:8,spin:.09},spear:{L:24,dmg:6,spin:.055},dagger:{L:9,dmg:4,spin:.17},bow:{L:7,dmg:3,spin:.035},hammer:{L:14,dmg:12,spin:.045},scythe:{L:18,dmg:7,spin:.11}};
+const KEY='llcBallStandings';let S={};try{S=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
+const RMb=matchMedia('(prefers-reduced-motion: reduce)').matches,SPD=RMb?.3:1;
+const board=document.getElementById('bf-board'),fightEl=document.getElementById('bf-fight'),stEl=document.getElementById('bf-status');
+function render(){const rows=TYPES.map(([n,c,w])=>({n,c,w,W:(S[n]||{}).w||0,L:(S[n]||{}).l||0})).sort((a,b)=>b.W-a.W||a.L-b.L||a.n.localeCompare(b.n));
+ board.innerHTML=rows.map((r,i)=>`<li><span class="rk">${i+1}</span><i style="background:${r.c}"></i><span>${r.n} <small>${r.w}</small></span><span class="w">${r.W}W</span><span class="l">${r.L}L</span></li>`).join('')}
+render();document.getElementById('bf-reset').onclick=()=>{S={};try{localStorage.removeItem(KEY)}catch(e){}render()};
+let balls=[],arrows=[],sparks=[],fightN=+(localStorage.getItem(KEY+'N')||0)+1,over=0;
+function newFight(){const n=2+(Math.random()*3|0),pool=[...TYPES].sort(()=>Math.random()-.5).slice(0,n);arrows=[];sparks=[];over=0;
+ balls=pool.map(([name,c,w],i)=>{const a=i/n*Math.PI*2;return{name,c,w,x:AW/2+Math.cos(a)*80,y:AH/2+Math.sin(a)*55,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3,r:13,hp:100,ang:Math.random()*6,dir:Math.random()<.5?1:-1,cd:{},fl:0,sh:60+Math.random()*60}});
+ fightEl.textContent='Fight #'+fightN;stEl.textContent=balls.map(b=>b.name).join(' vs ')}
+const px=(x,y,c,s=1)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),s,s)};
+function line(x0,y0,x1,y1,c,w=1){const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0))|0||1;for(let i=0;i<=n;i++){const t=i/n;px(x0+(x1-x0)*t-(w>1?.5:0),y0+(y1-y0)*t-(w>1?.5:0),c,w)}}
+function disc(x,y,r,c){g.fillStyle=c;for(let dy=-r;dy<=r;dy++){const w=Math.floor(Math.sqrt(r*r-dy*dy));g.fillRect(Math.round(x-w),Math.round(y+dy),w*2+1,1)}}
+function weapon(b){const W=WP[b.w],ca=Math.cos(b.ang),sa=Math.sin(b.ang),bx=b.x+ca*b.r,by=b.y+sa*b.r,tx=b.x+ca*(b.r+W.L),ty=b.y+sa*(b.r+W.L);
+ if(b.w==='sword'){line(bx,by,tx,ty,'#e8e8f5',2);line(bx-sa*4,by+ca*4,bx+sa*4,by-ca*4,'#8a6b3a',2)}
+ else if(b.w==='spear'){line(bx,by,tx,ty,'#9a7040',1);line(tx-ca*5,ty-sa*5,tx,ty,'#dfe6ff',2)}
+ else if(b.w==='dagger'){line(bx,by,tx,ty,'#cfd6ff',2)}
+ else if(b.w==='hammer'){line(bx,by,tx,ty,'#8a6b3a',1);for(let k=-4;k<=4;k++)line(tx+(-sa*k)-ca*2,ty+ca*k-sa*2,tx-sa*k+ca*2,ty+ca*k+sa*2,'#9aa0b5',1)}
+ else if(b.w==='scythe'){line(bx,by,tx,ty,'#6b4a2a',1);for(let i=0;i<=10;i++){const a=b.ang+Math.PI/2*b.dir*(i/10)*1.2,r=9*(1-i/14);px(tx+Math.cos(a)*r,ty+Math.sin(a)*r,'#e0e4ff',2)}}
+ else if(b.w==='bow'){for(let i=-6;i<=6;i++){const a=b.ang+i*.13;px(b.x+Math.cos(a)*(b.r+5),b.y+Math.sin(a)*(b.r+5),'#a8743c',1)}line(b.x+Math.cos(b.ang-.8)*(b.r+5),b.y+Math.sin(b.ang-.8)*(b.r+5),b.x+Math.cos(b.ang+.8)*(b.r+5),b.y+Math.sin(b.ang+.8)*(b.r+5),'#ddd',1)}
+ return[[b.x+ca*(b.r+W.L*.5),b.y+sa*(b.r+W.L*.5)],[tx,ty]]}
+function hit(t,dmg,from,fx,fy){if(t.hp<=0)return;t.hp=Math.max(0,t.hp-dmg);t.fl=6;const a=Math.atan2(t.y-fy,t.x-fx);t.vx+=Math.cos(a)*2.2;t.vy+=Math.sin(a)*2.2;
+ for(let i=0;i<6;i++)sparks.push({x:fx,y:fy,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3,l:14,c:i%2?'#fff':t.c});if(from)from.dir*=-1}
+function step(){const alive=balls.filter(b=>b.hp>0);
+ for(const b of alive){b.x+=b.vx*SPD;b.y+=b.vy*SPD;b.ang+=WP[b.w].spin*b.dir*SPD;const sp=Math.hypot(b.vx,b.vy);if(sp<1.6){b.vx*=1.05;b.vy*=1.05}if(sp>4){b.vx*=.97;b.vy*=.97}
+  if(b.x<b.r){b.x=b.r;b.vx=Math.abs(b.vx)}if(b.x>AW-b.r){b.x=AW-b.r;b.vx=-Math.abs(b.vx)}if(b.y<b.r){b.y=b.r;b.vy=Math.abs(b.vy)}if(b.y>AH-b.r){b.y=AH-b.r;b.vy=-Math.abs(b.vy)}
+  if(b.fl>0)b.fl--;for(const k in b.cd)if(b.cd[k]>0)b.cd[k]-=SPD;
+  if(b.w==='bow'&&(b.sh-=SPD)<=0){b.sh=55;const t=alive.filter(o=>o!==b&&o.hp>0).sort((p,q)=>Math.hypot(p.x-b.x,p.y-b.y)-Math.hypot(q.x-b.x,q.y-b.y))[0];
+   if(t){const a=Math.atan2(t.y-b.y,t.x-b.x);b.ang=a;arrows.push({x:b.x+Math.cos(a)*(b.r+6),y:b.y+Math.sin(a)*(b.r+6),vx:Math.cos(a)*4.5,vy:Math.sin(a)*4.5,o:b,l:90})}}}
+ for(let i=0;i<alive.length;i++)for(let j=i+1;j<alive.length;j++){const a=alive[i],b=alive[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,m=a.r+b.r;
+  if(d<m){const nx=dx/d,ny=dy/d,o=(m-d)/2;a.x-=nx*o;a.y-=ny*o;b.x+=nx*o;b.y+=ny*o;const p=(a.vx-b.vx)*nx+(a.vy-b.vy)*ny;if(p>0){a.vx-=p*nx;a.vy-=p*ny;b.vx+=p*nx;b.vy+=p*ny}}}
+ g.fillStyle='#0b0618';g.fillRect(0,0,AW,AH);g.fillStyle='#160d2b';for(let x=0;x<AW;x+=16)g.fillRect(x,0,1,AH);for(let y=0;y<AH;y+=16)g.fillRect(0,y,AW,1);
+ for(const b of alive){const pts=weapon(b);if(b.w==='bow')continue;for(const t of alive){if(t===b||(b.cd[t.name]>0))continue;for(const[x,y]of pts)if(Math.hypot(x-t.x,y-t.y)<t.r){hit(t,WP[b.w].dmg,b,x,y);b.cd[t.name]=22;break}}}
+ arrows=arrows.filter(a=>{a.x+=a.vx*SPD;a.y+=a.vy*SPD;a.l-=SPD;line(a.x,a.y,a.x-a.vx*1.4,a.y-a.vy*1.4,'#e8d8b0',1);px(a.x,a.y,'#fff',1);
+  for(const t of alive)if(t!==a.o&&Math.hypot(a.x-t.x,a.y-t.y)<t.r){hit(t,WP.bow.dmg,null,a.x,a.y);return false}return a.l>0&&a.x>0&&a.y>0&&a.x<AW&&a.y<AH});
+ for(const b of alive){disc(b.x,b.y,b.r,'#1a0b2e');disc(b.x,b.y,b.r-1,b.fl?'#ffffff':b.c);disc(b.x+3,b.y+3,b.r-5,'rgba(0,0,0,.18)');px(b.x-6,b.y-7,'rgba(255,255,255,.7)',2);
+  g.font='8px Silkscreen';g.textAlign='center';g.textBaseline='middle';g.fillStyle='#1a0b2e';g.fillText(Math.ceil(b.hp),b.x+1,b.y+1);g.fillStyle='#fff';g.fillText(Math.ceil(b.hp),b.x,b.y);
+  g.fillStyle='#d9c2ff';g.fillText(b.name,b.x,b.y-b.r-6)}
+ sparks=sparks.filter(s=>{s.x+=s.vx;s.y+=s.vy;s.l--;px(s.x,s.y,s.c,2);return s.l>0});
+ const left=balls.filter(b=>b.hp>0);
+ if(left.length<=1&&!over){over=1;const w=left[0];for(const b of balls){S[b.name]=S[b.name]||{w:0,l:0};if(b===w)S[b.name].w++;else S[b.name].l++}
+  try{localStorage.setItem(KEY,JSON.stringify(S));localStorage.setItem(KEY+'N',fightN)}catch(e){}render();stEl.textContent=(w?w.name:'Nobody')+' WINS!';fightN++;setTimeout(newFight,1800)}
+ if(over){g.fillStyle='rgba(11,6,24,.55)';g.fillRect(0,AH/2-14,AW,28);g.font='16px Silkscreen';g.fillStyle='#ffffff';g.fillText(stEl.textContent,AW/2,AH/2)}}
+newFight();let vis=false,last=0;new IntersectionObserver(es=>{vis=es[0].isIntersecting},{threshold:.05}).observe(cv);
+(function loop(t){requestAnimationFrame(loop);if(!vis||document.hidden)return;if(RMb&&t-last<66)return;last=t;step()})(0);})();
 </script></body></html>
