@@ -1,8 +1,7 @@
-/* The Binding of Ashaad — storybook paper intro (overlay only exists while the intro plays) */
-#ashaad-intro{position:fixed;inset:0;z-index:9000;overflow:hidden;background:transparent;cursor:pointer;opacity:0;transition:opacity .3s ease;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-#ashaad-intro.on{opacity:1}
-#ashaad-intro.out{opacity:0;transition:opacity .25s ease}
-#ashaad-intro canvas{position:absolute;left:0;top:0;display:block;image-rendering:pixelated;image-rendering:-moz-crisp-edges;image-rendering:crisp-edges;image-rendering:pixelated}
-#ashaad-intro .ai-skip{position:absolute;left:0;right:0;bottom:calc(8px + env(safe-area-inset-bottom,0px));text-align:center;font:400 11px Silkscreen,"Pixelify Sans",monospace;letter-spacing:1px;color:#e8c99a;opacity:0;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;animation:aiHint .5s 1.2s forwards;pointer-events:none}
-#ashaad-intro.late .ai-skip{animation:none;opacity:0;transition:opacity .2s}
-@keyframes aiHint{to{opacity:.75}}
+/* The Binding of Ashaad — "Trapdoor drop" transition overlay (exists only while the transition plays).
+   Pure lead-in: the last frame is the resting page itself (the overlay is fully transparent / removed). */
+#ashaad-intro{position:fixed;inset:0;z-index:9000;overflow:hidden;background:#000;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;opacity:1}
+#ashaad-intro.out{opacity:0!important;transition:opacity .28s ease}
+#ashaad-intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#ashaad-intro .ai-skip{position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));text-align:center;font:400 11px Silkscreen,"Courier New",monospace;letter-spacing:.12em;color:#e8d8b8;opacity:0;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;transition:opacity .4s;pointer-events:none}
+#ashaad-intro .ai-skip.on{opacity:.7}

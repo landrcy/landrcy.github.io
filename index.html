@@ -46,25 +46,7 @@ main,footer{position:relative;z-index:1}
 .game-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(1.5rem,4vw,3.5rem);align-items:center;transition:transform .3s ease}
 .game-media{position:relative}.game-media img.shot{width:100%;display:block}
 @media(max-width:860px){.game-inner{grid-template-columns:1fr}}
-/* ---------- THEME: The Binding of Ashaad ---------- */
-.game--ashaad{color:#fff;font-family:"Pixelify Sans";background:#1b120c url(games/ashaad/tile.png);background-size:96px;image-rendering:pixelated}
-.game--ashaad::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 20%,rgba(0,0,0,.82) 78%,#000 100%);animation:vig 4s ease-in-out infinite}
-.game--ashaad::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 8% 30%,rgba(255,140,40,.28),transparent 30%),radial-gradient(circle at 92% 30%,rgba(255,140,40,.28),transparent 30%);animation:flick .18s steps(2) infinite alternate}
 @keyframes vig{50%{opacity:.88}}@keyframes flick{to{opacity:.7}}
-.ol{text-shadow:-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000,2px 2px 0 #000,0 3px 0 #000}
-.game--ashaad h2{font-family:Silkscreen;font-size:clamp(2rem,4.6vw,3.4rem);line-height:1;margin:0 0 .3rem;letter-spacing:1px}
-.game--ashaad h2 em{font-style:normal;color:#ffd257}.game--ashaad .sub{color:#e8c99a;margin:0 0 1.2rem;font-size:1.15rem}
-.room{padding:6%;background:url(games/ashaad/room_bg.png) center/100% 100%;image-rendering:pixelated;box-shadow:0 20px 50px #000,0 0 0 4px #000;border-radius:4px}
-.room img.shot{border:4px solid #000;image-rendering:auto}
-.torch{position:absolute;width:48px;image-rendering:pixelated;top:-10px;filter:drop-shadow(0 0 14px #ff8a24)}.torch.l{left:-14px}.torch.r{right:-14px}
-.torch img{width:100%;display:none}.torch img.on{display:block}
-.scroll{position:relative;background:linear-gradient(#f1deb1,#e4c88c);color:#3a2412;padding:1.4rem 1.6rem;border-radius:6px;box-shadow:inset 0 0 30px rgba(120,70,20,.45),0 10px 0 #00000055;font-size:1.08rem;line-height:1.5}
-.scroll::before,.scroll::after{content:"";position:absolute;left:-10px;right:-10px;height:18px;background:linear-gradient(#c79a5a,#8d6232);border-radius:9px;box-shadow:0 2px 0 #000}.scroll::before{top:-12px}.scroll::after{bottom:-12px}
-.scroll p{margin:.3rem 0 .8rem}.scroll ul{margin:0;padding-left:0;list-style:none}.scroll li{padding:.25rem 0 .25rem 1.7rem;position:relative}.scroll li::before{content:"";position:absolute;left:0;top:.45rem;width:18px;height:18px;background:var(--ic) center/contain no-repeat;image-rendering:pixelated}
-.cast{display:flex;gap:.6rem;margin:1.6rem 0 .4rem;flex-wrap:wrap;align-items:flex-end}.cast img{width:56px;image-rendering:pixelated;animation:bob 1.6s ease-in-out infinite;filter:drop-shadow(0 4px 0 #0008)}.cast img:nth-child(2){animation-delay:.2s}.cast img:nth-child(3){animation-delay:.4s}.cast img:nth-child(4){animation-delay:.6s}.cast img.boss{width:88px;filter:drop-shadow(0 0 10px #ff2a2a)}
-.pedestal{display:inline-flex;flex-direction:column;align-items:center;text-decoration:none;margin-top:1.4rem}
-.pedestal .item{font-family:Silkscreen;font-size:2rem;color:#fff;background:linear-gradient(#e0302f,#8e0f12);padding:.4rem 1.4rem;border:4px solid #000;border-radius:6px;box-shadow:0 0 25px rgba(255,210,87,.7);animation:float 2.2s ease-in-out infinite;transition:transform .2s}
-.pedestal img{width:120px;image-rendering:pixelated;margin-top:-4px}.pedestal:hover .item{box-shadow:0 0 45px #ffd257;scale:1.08}
 @keyframes bob{50%{transform:translateY(-6px)}}@keyframes float{50%{transform:translateY(-12px)}}
 .game canvas.dust{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}.game-inner{position:relative;z-index:1}
 /* About / contact */
@@ -206,7 +188,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 .bf-board li small{color:#a58fcf;font-size:.78rem}.bf-board .w{color:#7dffb2}.bf-board .l{color:#ff7b93;min-width:2.6rem;text-align:right}
 .bf-board .reset{display:block;margin:.6rem auto 0;background:none;border:2px solid #4a2584;color:#a58fcf;font-family:Silkscreen;font-size:.65rem;padding:.3rem .6rem;border-radius:5px;cursor:pointer}
 footer .also{display:block;margin-top:.7rem;font-size:.82rem;opacity:.62;letter-spacing:.02em;transition:opacity .2s}footer .also:hover{opacity:1}footer .also a{color:inherit;text-decoration:underline dotted;text-underline-offset:4px}footer .also a:hover{color:var(--a2)}footer .also a:focus-visible{outline:2px solid var(--a2);outline-offset:3px}
-</style><link rel="stylesheet" href="ashaad-intro/ashaad-intro.css"><link rel="stylesheet" href="gow-intro/gow.css"><link rel="stylesheet" href="channels-intro/channels.css"><link rel="stylesheet" href="llc-title/llc-title.css"></head><body>
+</style><link rel="stylesheet" href="ashaad-intro/ashaad-page.css"><link rel="stylesheet" href="ashaad-intro/ashaad-intro.css"><link rel="stylesheet" href="gow-intro/gow.css"><link rel="stylesheet" href="channels-intro/channels.css"><link rel="stylesheet" href="llc-title/llc-title.css"></head><body>
 <canvas id="fx"></canvas><canvas id="trail"></canvas>
 <nav><a class="mark" href="#top"><b>LLC</b></a><ul><li><a href="#games">Games</a></li><li><a href="#channels">Channels</a></li><li><a href="#ballfight">Ball Fight</a></li><li><a href="#contact">GitHub</a></li></ul></nav>
 <main id="top">
@@ -219,21 +201,131 @@ footer .also{display:block;margin-top:.7rem;font-size:.82rem;opacity:.62;letter-
 
 <section id="games"><h2 class="sec-title reveal">&lt; <span>Games</span> /&gt;</h2></section>
 
-<div class="seam" aria-hidden="true" data-top="night" data-bot="basement"><canvas></canvas></div>
-<!-- GAME: The Binding of Ashaad — copy this whole <section> to add a new game (see CSS comment) -->
-<section class="game game--ashaad" id="ashaad"><canvas class="dust" data-fx="basement"></canvas>
-<div class="game-inner reveal" data-tilt>
- <div class="game-media"><div class="torch l"><img class="on" src="games/ashaad/fire0.png" alt=""><img src="games/ashaad/fire1.png" alt=""><img src="games/ashaad/fire2.png" alt=""><img src="games/ashaad/fire3.png" alt=""></div>
- <div class="torch r"><img class="on" src="games/ashaad/fire2.png" alt=""><img src="games/ashaad/fire3.png" alt=""><img src="games/ashaad/fire0.png" alt=""><img src="games/ashaad/fire1.png" alt=""></div>
- <div class="room"><img class="shot" src="games/ashaad/screenshot.png" alt="The Binding of Ashaad title screen" loading="lazy"></div></div>
- <div class="game-info"><h2 class="ol">The Binding<br>of <em>Ashaad</em></h2><p class="sub ol">a brainrot roguelike</p>
- <div class="scroll"><p>Descend into the basement, shoot your tears, grab cursed items and survive in this browser roguelike.</p>
- <ul><li style="--ic:url(games/ashaad/ashaad.png)">Multiple playable characters</li><li style="--ic:url(games/ashaad/pedestal.png)">Q5 items to find</li><li style="--ic:url(games/ashaad/finley.png)">A secret Finley boss</li><li style="--ic:url(games/ashaad/fire0.png)">4 floors to descend</li></ul></div>
- <div class="cast"><img src="games/ashaad/ashaad.png" alt="Ashaad"><img src="games/ashaad/emmanuel.png" alt="Emmanuel"><img src="games/ashaad/julian_good.png" alt="Julian"><img src="games/ashaad/julian.png" alt="Julian"><img class="boss" src="games/ashaad/finley.png" alt="Finley, secret boss"></div>
- <a class="pedestal" href="https://landrcy.github.io/binding-of-ashaad/"><span class="item ol">PLAY</span><img src="games/ashaad/pedestal.png" alt=""></a></div>
-</div></section>
+<div class="ashx-seam ashx-seam--top" aria-hidden="true"></div>
+<!-- GAME: The Binding of Ashaad — redesigned section (parchment + planks + candles). Transition: ashaad-intro/ (Trapdoor drop) -->
+<section class="game game--ashaad ashx" id="ashaad" aria-labelledby="ashx-title">
+<svg class="ashx-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
+ <filter id="ashx-rough" x="-4%" y="-4%" width="108%" height="108%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="3" seed="6" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="11" xChannelSelector="R" yChannelSelector="G"/></filter>
+</defs></svg>
+<div class="ashx-bg" aria-hidden="true"><i class="glow g1"></i><i class="glow g2"></i><i class="glow g3"></i><i class="glow g4"></i></div>
+<div class="ashx-stage">
 
-<div class="seam" aria-hidden="true" data-top="basement" data-bot="paper"><canvas></canvas></div>
+<!-- HERO -->
+<div class="ashx-hero">
+ <div class="ashx-copy" data-rise="0,60,.06">
+  <h2 class="ashx-logo" id="ashx-title" aria-label="The Binding of Ashaad">
+   <span class="the" aria-hidden="true">THE</span>
+   <span class="binding" aria-hidden="true"><b data-t="BINDING">BINDING</b><i class="drip" style="--x:7%;--h:46px;--w:7px;--dl:0s"></i><i class="drip" style="--x:21%;--h:30px;--w:6px;--dl:-1.1s"></i><i class="drip" style="--x:38%;--h:60px;--w:8px;--dl:-2.3s"></i><i class="drip" style="--x:52%;--h:34px;--w:6px;--dl:-.6s"></i><i class="drip" style="--x:67%;--h:52px;--w:7px;--dl:-3.1s"></i><i class="drip" style="--x:81%;--h:28px;--w:6px;--dl:-1.8s"></i><i class="drip" style="--x:93%;--h:42px;--w:7px;--dl:-2.7s"></i></span>
+   <span class="of" aria-hidden="true">OF</span>
+   <span class="ashaad" aria-hidden="true"><b data-t="ASHAAD">ASHAAD</b></span>
+  </h2>
+  <p class="ashx-tag">a brainrot roguelike</p>
+  <p class="ashx-lede">Descend into the basement, shoot your tears, grab cursed items and survive in this browser roguelike.</p>
+  <ul class="ashx-pills">
+   <li><b>3</b> playable starters</li>
+   <li><b>6</b> Quality&nbsp;5 items to find</li>
+   <li><b>1</b> secret Finley boss</li>
+   <li><b>4</b> floors to descend</li>
+  </ul>
+  <a class="ashx-play" href="https://landrcy.github.io/binding-of-ashaad/"><span>▶ PLAY</span><small>click or press enter on the title screen</small></a>
+ </div>
+
+ <div class="ashx-shot" data-rise=".18,78,.08">
+  <figure class="ashx-frame">
+   <span class="candle c1"><i></i></span><span class="candle c2"><i></i></span><span class="candle c3"><i></i></span><span class="candle c4"><i></i></span>
+   <div class="ashx-door"><img src="games/ashaad/screenshot.png" alt="The Binding of Ashaad title screen: THE BINDING OF ASHAAD with Ashaad standing between lit candles" width="1280" height="800" loading="lazy"></div>
+   <figcaption>BASEMENT I</figcaption>
+  </figure>
+ </div>
+</div>
+
+<div class="ashx-rest" data-rise=".4,100,.04">
+
+<!-- ITEM COUNTER -->
+<div class="ashx-hud" role="group" aria-label="Item counter">
+ <div class="cell"><span class="lbl">ITEMS</span><span class="num">76</span></div>
+ <div class="cell q5"><span class="lbl">QUALITY 5</span><span class="num">6</span></div>
+ <div class="cell"><span class="lbl">FLOORS</span><span class="num">4<small>+1 secret</small></span></div>
+ <div class="cell"><span class="lbl">STARTERS</span><span class="num">3</span></div>
+</div>
+
+<!-- WHO AM I -->
+<section class="ashx-block" aria-labelledby="ashx-who">
+ <header class="ashx-head"><span class="kick">SELECT SCREEN</span><h3 id="ashx-who">WHO AM I?</h3><p>Three starters. Landry unlocks when you beat him.</p></header>
+ <div class="ashx-cast">
+  <article class="ashx-card ashx-paper">
+   <div class="stand"><img src="games/ashaad/ashaad.png" alt="Ashaad" width="32" height="32"></div>
+   <h4>Ashaad</h4><p class="pass">Aura Farmer</p>
+   <p>Every kill without getting hit adds an Aura stack: +0.2 damage each.</p>
+   <p class="flav">“+1000 aura. Ratio + no cap.”</p>
+  </article>
+  <article class="ashx-card ashx-paper">
+   <div class="stand"><img src="games/ashaad/emmanuel.png" alt="Emmanuel" width="32" height="32"></div>
+   <h4>Emmanuel</h4><p class="pass">Tea Time</p>
+   <p>Every room cleared brews a cuppa: heals ½ heart, or +0.8 tears for 20&nbsp;s.</p>
+   <p class="flav">“Fancy a cuppa, bruv? Mind the gap, innit.”</p>
+  </article>
+  <article class="ashx-card ashx-paper">
+   <div class="stand"><img src="games/ashaad/julian_good.png" alt="Good Julian" width="32" height="32"></div>
+   <h4>Good Julian</h4><p class="pass">Redemption Arc</p>
+   <p>Killed Julians can redeem into mini-Julian familiars that fight for you.</p>
+   <p class="flav">“He was a Julian once. Now he is THE Julian.”</p>
+  </article>
+  <article class="ashx-card ashx-card--boss">
+   <div class="stand"><img src="games/ashaad/finley.png" alt="Finley, the secret boss" width="64" height="64"></div>
+   <h4>???</h4><p class="pass">Finley the Brainrot Overlord</p>
+   <p>The secret final boss. Bomb the cracked wall on the secret floor.</p>
+   <p class="flav">“He cooked. Now YOU get cooked.”</p>
+  </article>
+ </div>
+</section>
+
+<!-- TREASURE ROOM -->
+<section class="ashx-block" aria-labelledby="ashx-treasure">
+ <header class="ashx-head"><span class="kick">TREASURE ROOM</span><h3 id="ashx-treasure">Something sigma awaits</h3><p>76 items in the code. Six of them, straight from the pedestal:</p></header>
+ <div class="ashx-items">
+  <article class="ashx-item" style="--q:#cccccc"><div class="ped"><img class="ico" src="games/ashaad/icons/book_of_sigma.png" alt="" width="32" height="32"><img class="base" src="games/ashaad/pedestal.png" alt="" width="32" height="24"></div><div class="plate ashx-paper"><span class="qb">Q0</span><h4>Sigma Grindset</h4><p class="ashx-cap">No days off. Literally.</p><p class="eff">+1.5 damage</p></div></article>
+  <article class="ashx-item" style="--q:#99ccff"><div class="ped"><img class="ico" src="games/ashaad/icons/fanum_tax_bag.png" alt="" width="32" height="32"><img class="base" src="games/ashaad/pedestal.png" alt="" width="32" height="24"></div><div class="plate ashx-paper"><span class="qb">Q1</span><h4>Fanum Tax</h4><p class="ashx-cap">Your loot? Taxed.</p><p class="eff">Steals extra enemy drops</p></div></article>
+  <article class="ashx-item" style="--q:#99ff99"><div class="ped"><img class="ico" src="games/ashaad/icons/skibidi_toilet.png" alt="" width="32" height="32"><img class="base" src="games/ashaad/pedestal.png" alt="" width="32" height="24"></div><div class="plate ashx-paper"><span class="qb">Q2</span><h4>Skibidi Toilet</h4><p class="ashx-cap">Brrr skibidi dop dop yes yes</p><p class="eff">Tears become splash AoE puddles</p></div></article>
+  <article class="ashx-item" style="--q:#ffdd33"><div class="ped"><img class="ico" src="games/ashaad/icons/gold_glasses.png" alt="" width="32" height="32"><img class="base" src="games/ashaad/pedestal.png" alt="" width="32" height="24"></div><div class="plate ashx-paper"><span class="qb">Q4</span><h4>Gigachad</h4><p class="ashx-cap">Average enjoyer becomes Chad</p><p class="eff">Transformation: +2 dmg, +all, flight</p></div></article>
+  <article class="ashx-item" style="--q:#ffdd33"><div class="ped"><img class="ico" src="games/ashaad/icons/julians_halo.png" alt="" width="32" height="32"><img class="base" src="games/ashaad/pedestal.png" alt="" width="32" height="24"></div><div class="plate ashx-paper"><span class="qb">Q4</span><h4>Rizz God</h4><p class="ashx-cap">Rizz has no limit</p><p class="eff">Bosses charmed; flight + homing</p></div></article>
+  <article class="ashx-item" style="--q:#ffdd33"><div class="ped"><img class="ico" src="games/ashaad/icons/sick_bomb.png" alt="" width="32" height="32"><img class="base" src="games/ashaad/pedestal.png" alt="" width="32" height="24"></div><div class="plate ashx-paper"><span class="qb">Q4</span><h4>Ohio Nuke</h4><p class="ashx-cap">Only in Ohio, but everywhere</p><p class="eff">Active: kills every enemy in room</p></div></article>
+ </div>
+
+ <div class="ashx-q5 ashx-paper">
+  <div class="q5head"><span class="badge">Q5</span><div><span class="kick">ULTRA SECRET ROOM</span><h3>Quality 5. Do not tell anyone.</h3><p>1% chance to replace any item, or guaranteed in an Ultra Secret Room.</p></div></div>
+  <ul>
+   <li style="--h:0"><b>Ohio Singularity</b><span>Tears are black holes</span></li>
+   <li style="--h:60"><b>Ultra Infinite Aura</b><span>Untouchable. Literally.</span></li>
+   <li style="--h:120"><b>Skibidi Rapture</b><span>Flush them all</span></li>
+   <li style="--h:180"><b>Sigma Clone Army</b><span>4 of you. 0 mercy.</span></li>
+   <li style="--h:240"><b>Delete Key</b><span>Ctrl+Alt+Ohio</span></li>
+   <li style="--h:300"><b>Gyatt Nuke</b><span>Every shot is the end</span></li>
+  </ul>
+ </div>
+</section>
+
+<!-- THE DESCENT -->
+<section class="ashx-block" aria-labelledby="ashx-descent">
+ <header class="ashx-head"><span class="kick">THE DESCENT</span><h3 id="ashx-descent">Four floors. One secret.</h3><p>Every boss drops a trapdoor. Take it.</p></header>
+ <ol class="ashx-floors">
+  <li class="fl f1"><span class="n">1</span><div><h4>BASEMENT I</h4><p>Boss: <b>Landry the Snake</b><br><i>Floor boss - certified yapper</i></p></div></li>
+  <li class="fl f2"><span class="n">2</span><div><h4>SKIBIDI SEWERS</h4><p>Boss: <b>Evil Emmanuel, the Tea Tyrant</b><br><i>Floor 2 - something is brewing</i></p></div></li>
+  <li class="fl f3"><span class="n">3</span><div><h4>SIGMA SUMMIT</h4><p>Boss: <b>Mega Julian Hivemind</b><br><i>Floor 3 - the grindset peak</i></p></div></li>
+  <li class="fl f4"><span class="n">4</span><div><h4>CABC HALLWAYS</h4><p>Boss: <b>The Principal, Head of Discipline</b><br><i>Floor 4 - College Academy at Broward College. No running.</i></p></div></li>
+  <li class="fl fv"><span class="n">?</span><div><h4>THE OHIO VOID</h4><p>Secret floor - the Julians got buffed.<br><i>Boss: Finley the Brainrot Overlord</i></p></div></li>
+ </ol>
+</section>
+
+<footer class="ashx-foot">
+ <a class="ashx-play ashx-play--sm" href="https://landrcy.github.io/binding-of-ashaad/"><span>▶ PLAY</span></a>
+ <p>Music by Kevin MacLeod (<a href="https://incompetech.com" rel="noopener">incompetech.com</a>), licensed <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener">CC BY 4.0</a>. Sound effects: Juhani Junkala, CC0.</p>
+</footer>
+
+</div><!-- /rest -->
+</div><!-- /stage -->
+</section>
+<div class="ashx-seam ashx-seam--bot" aria-hidden="true"></div>
 <!-- SITE: Game of Websites -->
 <section class="game game--gow" id="game-of-websites">
 <div class="game-inner reveal" data-tilt>

@@ -195,12 +195,13 @@ function decor(g,s,c,t,dt){const w=c.w,h=c.h,p=c.p,Cx=c.x+c.fx,Cy=c.y+c.fy,k=c.k
  // icon rides the card while it grows
  if(iconOut>0&&p<.999){g.save();g.beginPath();g.rect(c.x,c.y,w,h);g.clip();const sc=iconOut>.6?3:2;drawIcon(g,c.icon,Cx,Cy+bob,sc,0);g.restore()}}
 /* ---------- run ---------- */
-function finish(){if(!running)return;running=false;cancelAnimationFrame(raf);removeEventListener('keydown',skip);removeEventListener('resize',finish);if(cvs&&cvs.parentNode)cvs.remove();if(hint&&hint.parentNode)hint.remove();cvs=null;S=null;window.__chDone=true}
+function finish(){if(!running)return;running=false;cancelAnimationFrame(raf);removeEventListener('keydown',skip);removeEventListener('resize',finish);if(cvs&&cvs.parentNode)cvs.remove();if(hint&&hint.parentNode)hint.remove();cvs=null;S=null;window.__chDone=true;if(window.__llcIntroBusy==='channels')window.__llcIntroBusy=0}
 function skip(){if(!running)return;time=Math.max(time,TLn.out);for(const c of S.cards){c.p=1;c.raw=TLn.expand}}
 function visCheck(){if(!cvs||!S)return;const vh=innerHeight;S.cards.forEach(c=>{const r=c.el.getBoundingClientRect();const o=Math.min(r.bottom,vh)-Math.max(r.top,0);vis[c.i]=o>Math.min(r.height,vh)*.25})}
 function loop(ts){if(!running)return;raf=requestAnimationFrame(loop);if(!last){last=ts;return}const raw=ts-last;last=ts;slow=raw>60?slow+1:Math.max(0,slow-1);if(slow>=8&&time<TLn.out){skip();slow=0}
  if((ts|0)%6===0)visCheck();frame(Math.min(raw,50)/1000)}
-function start(){if(running||window.__chStarted)return;window.__chStarted=true;
+const __ib=n=>window.__llcIntroBusy&&window.__llcIntroBusy!==n,__inV=el=>{const r=el.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight};
+function start(){if(running||window.__chStarted)return;if(__ib('channels')||!__inV(grid)){setTimeout(start,400);return}window.__chStarted=true;window.__llcIntroBusy='channels';
  const go=()=>{try{
   S=build();cvs=document.createElement('canvas');cvs.className='chi-canvas';cvs.width=S.W;cvs.height=S.H;cvs.setAttribute('aria-hidden','true');cvs.style.left=S.gx+'px';cvs.style.top=S.gy+'px';cvs.style.width=S.W*S.SCL+'px';cvs.style.height=S.H*S.SCL+'px';
   ctx=cvs.getContext('2d');ctx.imageSmoothingEnabled=false;sec.appendChild(cvs);hint=document.createElement('span');hint.className='chi-skip';hint.textContent='click to skip';hint.style.left=S.gx+S.gw-90+'px';hint.style.top=S.gy+S.gh-16+'px';sec.appendChild(hint);

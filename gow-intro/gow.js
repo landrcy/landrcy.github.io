@@ -145,7 +145,7 @@ function post(S,gi,t,out){ // RGB split, scanline tears, flicker on the composed
  o.putImageData(S.od,0,0)}
 /* ---------- runner ---------- */
 let cvs,ctx,raf=0,last=0,time=0,running=false,slow=0,hint;
-function finish(){if(!running)return;running=false;cancelAnimationFrame(raf);removeEventListener('keydown',skip);removeEventListener('resize',onResize);if(cvs&&cvs.parentNode)cvs.remove();if(hint&&hint.parentNode)hint.remove();cvs=null;st=null;window.__gwDone=true}
+function finish(){if(!running)return;running=false;cancelAnimationFrame(raf);removeEventListener('keydown',skip);removeEventListener('resize',onResize);if(cvs&&cvs.parentNode)cvs.remove();if(hint&&hint.parentNode)hint.remove();cvs=null;st=null;window.__gwDone=true;if(window.__llcIntroBusy==='gow')window.__llcIntroBusy=0}
 function skip(){if(running&&time<TL.msg+.3)time=TL.msg+.3}
 function onResize(){finish()}
 function frame(dt){time+=dt;if(time>=TL.end){finish();return}
@@ -153,7 +153,8 @@ function frame(dt){time+=dt;if(time>=TL.end){finish();return}
  if(time>TL.msg){const u=clamp((time-TL.msg)/(TL.end-TL.msg),0,1);const m=st.mi.data;for(let y=0;y<st.H;y++)for(let x=0;x<st.W;x++){m[(y*st.W+x)*4+3]=BAY[(y&7)*8+(x&7)]<(1-u)?255:0}
   st.mg.putImageData(st.mi,0,0);ctx.globalCompositeOperation='destination-in';ctx.drawImage(st.mask,0,0);ctx.globalCompositeOperation='source-over'}}
 function loop(ts){if(!running)return;raf=requestAnimationFrame(loop);if(!last){last=ts;return}const raw=ts-last;last=ts;slow=raw>60?slow+1:Math.max(0,slow-1);if(slow>=8){time=Math.max(time,TL.msg+.4);slow=0}frame(Math.min(raw,50)/1000)}
-function start(){if(running||window.__gwStarted)return;window.__gwStarted=true;
+const __ib=n=>window.__llcIntroBusy&&window.__llcIntroBusy!==n,__inV=el=>{const r=el.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight};
+function start(){if(running||window.__gwStarted)return;if(__ib('gow')||!__inV(sec)){setTimeout(start,400);return}window.__gwStarted=true;window.__llcIntroBusy='gow';
  const go=()=>{try{
   const w=sec.clientWidth,h=sec.clientHeight,SC=w>=1700?3:2,W=Math.floor(w/SC),H=Math.floor(h/SC);
   cvs=document.createElement('canvas');cvs.className='gwi-canvas';cvs.width=W;cvs.height=H;cvs.setAttribute('aria-hidden','true');ctx=cvs.getContext('2d');ctx.imageSmoothingEnabled=false;
