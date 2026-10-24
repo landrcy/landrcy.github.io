@@ -1,0 +1,56 @@
+/* Sea of Thought — hub section (pixel / dithered ocean). The ocean is one low-res canvas (.sot-sea) drawn by sea.js;
+   the intro ("rehydration") paints into that same canvas, so its last frame IS the resting page. */
+@font-face{font-family:"SoT VT323";src:url("VT323-Regular.ttf") format("truetype");font-display:block}
+.sot{--n0:#CAF0F8;--n1:#ADE8F4;--n2:#90E0EF;--n3:#48CAE4;--n4:#00B4D8;--n5:#0096C7;--n6:#0077B6;--n7:#023E8A;--n8:#03045E;--ui:#021e5a;
+ --pa:#f3dfae;--pa2:#a8845a;--pa3:#8a6a44;--pa4:#6b4a2a;--ink:#2a1608;--wax:#7a1a1a;
+ position:relative;z-index:1;overflow:hidden;isolation:isolate;background:var(--n8);color:var(--n0);
+ font-family:"SoT VT323","VT323","Courier New",monospace;font-size:1.35rem;line-height:1.15;-webkit-font-smoothing:none}
+.sot-sea{position:absolute;left:0;top:0;z-index:-1;image-rendering:pixelated;image-rendering:crisp-edges;display:block;pointer-events:none}
+.sot-stage{max-width:1240px;margin:0 auto;padding:clamp(1.6rem,4vw,3rem) clamp(1rem,4vw,2.5rem) clamp(3rem,6vw,5rem)}
+.sot.sot-pre [data-sot-in]{visibility:hidden}
+/* hero (sits in the sky, above the waterline) */
+.sot-hero{text-align:center;padding:0 0 clamp(2.2rem,4vw,3.2rem)}
+.sot-kick{margin:0 0 .9rem;font-size:1.25rem;letter-spacing:.18em;text-transform:uppercase;color:var(--n1)}
+.sot-kick b{font-weight:400;color:#fff}
+.sot-title{margin:0;line-height:0}
+.sot-title img{display:inline-block;width:856px;height:auto;max-width:100%;image-rendering:pixelated}
+@media(max-width:1000px){.sot-title img{width:642px}}
+@media(max-width:600px){.sot-title img{width:254px}}
+/* pixel UI box: white-outlined navy, like the real site's tooltips */
+.sot-cta{text-align:center}
+.sot-btn{display:inline-block;font:inherit;font-size:2rem;letter-spacing:.08em;color:var(--n8);background:var(--n0);text-decoration:none;padding:.5rem 1.4rem .6rem;
+ box-shadow:0 0 0 4px var(--n8),0 8px 0 4px var(--n7);transition:transform .12s steps(2),box-shadow .12s steps(2)}
+.sot-btn:hover{background:#fff;transform:translateY(-4px);box-shadow:0 0 0 4px var(--n8),0 12px 0 4px var(--n7)}
+.sot-btn:active{transform:translateY(4px);box-shadow:0 0 0 4px var(--n8),0 4px 0 4px var(--n7)}
+.sot-btn:focus-visible{outline:4px dashed #fff;outline-offset:8px}
+/* parchment scrolls (the real site's "Bottle #N" dialog) */
+.sot-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2.4rem 1.8rem;margin:0 0 3rem}
+.sot-scroll{position:relative;margin:12px 4px;padding:1rem 1.1rem .9rem;background:var(--pa);color:var(--ink);
+ box-shadow:0 0 0 3px var(--pa3),0 0 0 6px var(--ink),6px 10px 0 4px rgba(3,4,94,.6)}
+.sot-scroll::before,.sot-scroll::after{content:"";position:absolute;left:-14px;right:-14px;height:12px;background:var(--pa2);box-shadow:0 0 0 3px var(--ink),inset 0 -4px 0 var(--pa4),inset 0 4px 0 #c9a878}
+.sot-scroll::before{top:-18px}.sot-scroll::after{bottom:-18px}
+.sot-scroll h4{margin:0;font-weight:400;font-size:1.7rem;text-shadow:1px 0 0 var(--ink)}
+.sot-scroll time{display:block;font-size:1.05rem;color:var(--pa4);margin:0 0 .5rem}
+.sot-scroll blockquote{margin:0 0 .6rem;font-size:1.5rem;line-height:1.1;overflow-wrap:anywhere}
+.sot-scroll .from{margin:0;text-align:right;font-size:1.25rem;color:var(--pa4)}
+.sot-scroll .rocks{display:flex;align-items:center;gap:6px;margin:.5rem 0 0;font-size:1.05rem;color:var(--pa4)}
+.sot-scroll .rocks i{width:10px;height:8px;background:#7d7f86;box-shadow:inset -2px -2px 0 #4c4e55,inset 2px 2px 0 #a9abb2}
+.sot-scroll .seal{position:absolute;right:12px;top:12px;width:18px;height:18px;background:var(--wax);box-shadow:inset -3px -3px 0 #4f0e0e,inset 3px 3px 0 #a33030}
+.sot a:not(.sot-btn):focus-visible{outline:3px dashed #fff;outline-offset:3px}
+@media(max-width:1000px){.sot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.sot-grid{grid-template-columns:1fr}.sot{font-size:1.2rem}.sot-one{font-size:1.3rem}}
+@media(max-width:420px){.sot-btn{font-size:1.6rem}}
+/* seams in and out of the section: dithered pixel ramps */
+.sot-seam{position:relative;z-index:1;height:clamp(64px,8vw,104px);margin:-1px 0;line-height:0;overflow:hidden}
+.sot-seam canvas{display:block;image-rendering:pixelated}
+/* intro click-catcher + skip hint (exists only while the intro plays; fully transparent) */
+#sot-intro-catch{position:fixed;inset:0;z-index:9000;background:transparent;cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none}
+#sot-intro-catch .hint{position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));text-align:center;font:400 20px "SoT VT323",monospace;letter-spacing:.1em;color:#CAF0F8;
+ text-shadow:-2px 0 0 #03045E,2px 0 0 #03045E,0 -2px 0 #03045E,0 2px 0 #03045E;opacity:0;pointer-events:none}
+#sot-intro-catch .hint.on{opacity:.85}
+/* compact layout */
+.sot-one{max-width:40rem;margin:0 auto 2.4rem;text-align:center;font-size:1.5rem;color:#fff;text-shadow:2px 2px 0 var(--n8),-2px 0 0 var(--n8),0 -2px 0 var(--n8),2px 0 0 var(--n8)}
+.sot-grid{margin:0 0 2.2rem;align-items:start}
+.sot-cta{text-align:center}
+@media(max-width:700px){.sot-one{font-size:1.3rem;margin-bottom:1.8rem}}
+.sot-front{z-index:2}
