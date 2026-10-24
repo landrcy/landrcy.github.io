@@ -1,0 +1,29 @@
+/* The Void — hub section (purple-and-black pixel space). Everything visual is one low-res canvas (.void-sky) drawn by void.js;
+   the intro ("black hole") paints into that same canvas, so its last frame IS the resting page. */
+@font-face{font-family:"Void VT323";src:url("../sea-intro/VT323-Regular.ttf") format("truetype");font-display:block}
+.void{--ink:#05020d;--violet:#2a0f4d;--mag:#c04df0;--lav:#efe6ff;
+ position:relative;z-index:1;overflow:hidden;isolation:isolate;background:var(--ink);color:#fff;
+ font-family:"Void VT323","VT323","Courier New",monospace;font-size:1.35rem;line-height:1.15;-webkit-font-smoothing:none}
+.void-sky{position:absolute;left:0;top:0;z-index:-1;display:block;pointer-events:none;image-rendering:pixelated;image-rendering:crisp-edges}
+.void-stage{max-width:1240px;margin:0 auto;padding:clamp(2rem,5vw,3.6rem) clamp(1rem,4vw,2.5rem) clamp(3rem,6vw,4.6rem);text-align:center}
+.js-intros .void.void-pre [data-void-in]{visibility:hidden}
+.void-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.void-kick{margin:0 0 1rem;font-size:1.05rem;letter-spacing:.18em;text-transform:uppercase;color:#cdbcf3}
+.void-kick b{font-weight:400;color:#fff}
+.void-title{margin:0 auto 1.6rem;line-height:0}
+.void-tbox{display:block;margin:0 auto}            /* sized by void.js: the stencil title is drawn on the canvas behind it */
+.void-one{max-width:38rem;margin:1.4rem auto 2rem;font-size:1.5rem;color:#fff;
+ text-shadow:2px 0 0 var(--ink),-2px 0 0 var(--ink),0 2px 0 var(--ink),0 -2px 0 var(--ink)}
+.void-btn{display:inline-block;font:inherit;font-size:2rem;letter-spacing:.12em;color:var(--ink);background:var(--lav);text-decoration:none;padding:.45rem 1.6rem .55rem;
+ box-shadow:0 0 0 4px var(--ink),0 0 0 8px var(--mag),0 8px 0 8px #5a14a0;transition:transform .12s steps(2),box-shadow .12s steps(2)}
+.void-btn:hover{background:#fff;transform:translateY(-4px);box-shadow:0 0 0 4px var(--ink),0 0 0 8px var(--mag),0 12px 0 8px #5a14a0}
+.void-btn:active{transform:translateY(4px);box-shadow:0 0 0 4px var(--ink),0 0 0 8px var(--mag),0 4px 0 8px #5a14a0}
+.void-btn:focus-visible{outline:4px dashed #fff;outline-offset:12px}
+@media(max-width:700px){.void{font-size:1.2rem}.void-one{font-size:1.3rem}.void-stage{padding-bottom:4rem}}
+@media(max-width:420px){.void-btn{font-size:1.7rem}}
+.void-seam{position:relative;z-index:1;height:clamp(56px,7vw,96px);margin:-1px 0;line-height:0;overflow:hidden}
+.void-seam canvas{display:block;image-rendering:pixelated}
+#void-intro-catch{position:fixed;inset:0;z-index:9000;background:transparent;cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none}
+#void-intro-catch .hint{position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));text-align:center;font:400 20px "Void VT323",monospace;letter-spacing:.1em;color:#efe6ff;
+ text-shadow:-2px 0 0 #05020d,2px 0 0 #05020d,0 -2px 0 #05020d,0 2px 0 #05020d;opacity:0;pointer-events:none}
+#void-intro-catch .hint.on{opacity:.85}

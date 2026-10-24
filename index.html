@@ -191,7 +191,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 .bf-board li small{color:#a58fcf;font-size:.78rem}.bf-board .w{color:#7dffb2}.bf-board .l{color:#ff7b93;min-width:2.6rem;text-align:right}
 .bf-board .reset{display:block;margin:.6rem auto 0;background:none;border:2px solid #4a2584;color:#a58fcf;font-family:Silkscreen;font-size:.65rem;padding:.3rem .6rem;border-radius:5px;cursor:pointer}
 footer .also{display:block;margin-top:.7rem;font-size:.82rem;opacity:.62;letter-spacing:.02em;transition:opacity .2s}footer .also:hover{opacity:1}footer .also a{color:inherit;text-decoration:underline dotted;text-underline-offset:4px}footer .also a:hover{color:var(--a2)}footer .also a:focus-visible{outline:2px solid var(--a2);outline-offset:3px}
-</style><link rel="stylesheet" href="ashaad-intro/ashaad-page.css"><link rel="stylesheet" href="ashaad-intro/ashaad-intro.css"><link rel="stylesheet" href="gow-intro/gow.css"><link rel="stylesheet" href="channels-intro/channels.css"><link rel="stylesheet" href="llc-title/llc-title.css"><link rel="stylesheet" href="sea-intro/sea.css"></head><body>
+</style><link rel="stylesheet" href="ashaad-intro/ashaad-page.css"><link rel="stylesheet" href="ashaad-intro/ashaad-intro.css"><link rel="stylesheet" href="gow-intro/gow.css"><link rel="stylesheet" href="channels-intro/channels.css"><link rel="stylesheet" href="llc-title/llc-title.css"><link rel="stylesheet" href="sea-intro/sea.css"><link rel="stylesheet" href="void-intro/void.css"></head><body>
 <canvas id="fx"></canvas><canvas id="trail"></canvas>
 <nav><a class="mark" href="#top"><b>LLC</b></a><ul><li><a href="#games">Games</a></li><li><a href="#channels">Channels</a></li><li><a href="#ballfight">Ball Fight</a></li><li><a href="#contact">GitHub</a></li></ul></nav>
 <main id="top">
@@ -346,7 +346,17 @@ footer .also{display:block;margin-top:.7rem;font-size:.82rem;opacity:.62;letter-
  <div class="sot-cta" data-sot-in="btn"><a class="sot-btn" href="https://landrcy.github.io/sea-of-thought/">&#9654; DIVE IN</a></div>
 </div>
 </section>
-<div class="sot-seam" aria-hidden="true" data-from="sea" data-to="#f3ecdf"><canvas></canvas></div>
+<div class="void-seam" aria-hidden="true" data-ramp="#03045E,#0a0430,#05020d"><canvas></canvas></div>
+<!-- PROJECT: The Void (by landrcy) — pixel space game section. Transition: void-intro/ (black hole) -->
+<section class="void void-pre" id="the-void" aria-labelledby="void-title">
+<canvas class="void-sky" aria-hidden="true"></canvas>
+<div class="void-stage">
+ <p class="void-kick" data-void-in>a pixel space game by <b>landrcy</b></p>
+ <h2 class="void-title" id="void-title"><span class="void-sr">The Void</span><span class="void-tbox" aria-hidden="true"></span></h2>
+ <div class="void-cta" data-void-in><a class="void-btn" href="https://landrcy.github.io/the-void/">&#9654; PLAY</a></div>
+</div>
+</section>
+<div class="void-seam" aria-hidden="true" data-ramp="#05020d,#2a0f4d,#5a4a80,#ad98e6,#f3ecdf"><canvas></canvas></div>
 <!-- SITE: Game of Websites -->
 <section class="game game--gow" id="game-of-websites">
 <div class="game-inner reveal" data-tilt>
@@ -498,6 +508,7 @@ go();let tm;addEventListener('resize',()=>{clearTimeout(tm);tm=setTimeout(go,150
 </script>
 <script src="ashaad-intro/ashaad-intro.js" defer></script>
 <script src="sea-intro/sea.js" defer></script>
+<script src="void-intro/void.js" defer></script>
 <script src="gow-intro/gow.js" defer></script>
 <script src="channels-intro/channels.js" defer></script>
 <script src="ballfight-intro/ballfight.js" defer></script>
