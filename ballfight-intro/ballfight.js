@@ -4,6 +4,7 @@
    Intro plays once when the arena scrolls into view; click / any key skips; prefers-reduced-motion = no intro, slow fight. */
 (function(){
 const cv=document.getElementById('bf');if(!cv)return;
+const bfSec=document.getElementById('ballfight');
 const g=cv.getContext('2d');
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches,SPD=RM?.3:1;
 const QS=new URLSearchParams(location.search),MANUAL=QS.has('bfmanual');
@@ -226,7 +227,7 @@ function startFightPhase(){mode='fight';for(const b of balls){const s=startXY(b.
 /* ---------- main loop ---------- */
 function runFrame(raw,rawSlow){
  const dt=Math.min(raw,50);clock+=dt/1000;
- if(mode==='intro'){T+=dt/1000;if(rawSlow>=6||T>9)T=Math.max(T,TL.end);if(T>=TL.end){mode='fight';introDone=true;if(window.__llcIntroBusy==='ballfight')window.__llcIntroBusy=0;startFightPhase()}else{introFrame();return}}
+ if(mode==='intro'){T+=dt/1000;if(rawSlow>=6||T>9)T=Math.max(T,TL.end);if(T>=TL.end){mode='fight';introDone=true;bfSec&&bfSec.classList.add('llc-shown');if(window.__llcIntroBusy==='ballfight')window.__llcIntroBusy=0;startFightPhase()}else{introFrame();return}}
  if(mode==='fight'||mode==='over'){acc+=dt;let n=0;while(acc>=STEP&&n<4){update();acc-=STEP;n++}if(n===4)acc=0;
   if(over){overT+=dt/1000;if(overT>2.6){fightN=fightN;newMatch();mode='announce';annT=0;for(const b of balls){const s=startXY(b.i);b.x=b.px=s.x;b.y=b.py=s.y}}}
   drawFrame(acc/STEP)}
@@ -240,7 +241,7 @@ function skip(){if(mode==='intro'&&T<TL.round-.2){T=TL.round-.2}}
 let last=0,slow=0;
 function loop(ts){requestAnimationFrame(loop);if(!vis||document.hidden){last=0;return}if(!last){last=ts;return}const raw=ts-last;last=ts;slow=raw>60?slow+1:Math.max(0,slow-1);
  if(RM&&raw<30){/* reduced motion: update at ~30 Hz */}runFrame(raw,slow)}
-function begin(){if(mode!=='idle')return;if(!RM&&window.__llcIntroBusy&&window.__llcIntroBusy!=='ballfight'){clearTimeout(begin.w);begin.w=setTimeout(()=>{if(vis)begin()},400);return}newMatch(true);if(RM){mode='fight';introDone=true}else{mode='intro';T=0;window.__llcIntroBusy='ballfight'}}
+function begin(){if(mode!=='idle')return;if(!RM&&window.__llcIntroBusy&&window.__llcIntroBusy!=='ballfight'){clearTimeout(begin.w);begin.w=setTimeout(()=>{if(vis)begin()},400);return}newMatch(true);if(RM){mode='fight';introDone=true;bfSec&&bfSec.classList.add('llc-shown')}else{mode='intro';T=0;window.__llcIntroBusy='ballfight';bfSec&&bfSec.classList.add('llc-run')}}
 function boot(){layout();newMatch(true);mode='idle';g.fillStyle='#07030f';g.fillRect(0,0,AW,AH);
  // never hide content: if intro never triggers, a static arena frame is still drawn when scrolled into view / after 4s idle
  new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis)begin()},{threshold:RM?.05:.45}).observe(arenaEl);

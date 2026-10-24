@@ -3,7 +3,8 @@
    -> dithers away to reveal the normal section. Plays once on scroll-in; click/key skips; reduced-motion = no intro; dt capped at 50 ms; slow-frame self-skip. */
 (function(){
 const sec=document.getElementById('game-of-websites');if(!sec)return;
-if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+const show=()=>sec.classList.add('llc-shown');
+if(matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window)){show();return}
 const QS=new URLSearchParams(location.search),MANUAL=QS.has('gwmanual');
 const clamp=(v,a,b)=>v<a?a:v>b?b:v,lerp=(a,b,t)=>a+(b-a)*t,sm=t=>{t=clamp(t,0,1);return t*t*(3-2*t)},eo=t=>1-Math.pow(1-clamp(t,0,1),3);
 const BAY=[0,32,8,40,2,34,10,42,48,16,56,24,50,18,58,26,12,44,4,36,14,46,6,38,60,28,52,20,62,30,54,22,3,35,11,43,1,33,9,41,51,19,59,27,49,17,57,25,15,47,7,39,13,45,5,37,63,31,55,23,61,29,53,21].map(v=>(v+.5)/64);
@@ -145,7 +146,7 @@ function post(S,gi,t,out){ // RGB split, scanline tears, flicker on the composed
  o.putImageData(S.od,0,0)}
 /* ---------- runner ---------- */
 let cvs,ctx,raf=0,last=0,time=0,running=false,slow=0,hint;
-function finish(){if(!running)return;running=false;cancelAnimationFrame(raf);removeEventListener('keydown',skip);removeEventListener('resize',onResize);if(cvs&&cvs.parentNode)cvs.remove();if(hint&&hint.parentNode)hint.remove();cvs=null;st=null;window.__gwDone=true;if(window.__llcIntroBusy==='gow')window.__llcIntroBusy=0}
+function finish(){show();if(!running)return;running=false;cancelAnimationFrame(raf);removeEventListener('keydown',skip);removeEventListener('resize',onResize);if(cvs&&cvs.parentNode)cvs.remove();if(hint&&hint.parentNode)hint.remove();cvs=null;st=null;window.__gwDone=true;if(window.__llcIntroBusy==='gow')window.__llcIntroBusy=0}
 function skip(){if(running&&time<TL.msg+.3)time=TL.msg+.3}
 function onResize(){finish()}
 function frame(dt){time+=dt;if(time>=TL.end){finish();return}
@@ -160,7 +161,7 @@ function start(){if(running||window.__gwStarted)return;if(__ib('gow')||!__inV(se
   cvs=document.createElement('canvas');cvs.className='gwi-canvas';cvs.width=W;cvs.height=H;cvs.setAttribute('aria-hidden','true');ctx=cvs.getContext('2d');ctx.imageSmoothingEnabled=false;
   st=build(W,H);sec.appendChild(cvs);hint=document.createElement('span');hint.className='gwi-skip';hint.textContent='click to skip';sec.appendChild(hint);
   cvs.addEventListener('pointerdown',skip);addEventListener('keydown',skip);addEventListener('resize',onResize);
-  running=true;time=0;last=0;frame(0);
+  running=true;time=0;last=0;frame(0);show();
   if(MANUAL)window.__gw={adv(ms){let l=ms;while(l>0){const d=Math.min(l,50);frame(d/1000);l-=d;if(!running)break}},time:()=>time,skip};
   else{raf=requestAnimationFrame(loop);setTimeout(finish,15000)}}catch(e){console.warn('gow intro skipped',e);finish()}};
  const fl=['8px Silkscreen','bold 12px Silkscreen','9px "Pixelify Sans"'].map(f=>document.fonts?document.fonts.load(f):Promise.resolve());

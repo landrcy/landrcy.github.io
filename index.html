@@ -2,6 +2,9 @@
 <link rel="icon" href="favicons/llc-infinity-16.png" type="image/png" sizes="16x16"><link rel="icon" href="favicons/llc-infinity-32.png" type="image/png" sizes="32x32"><link rel="icon" href="favicon.ico" sizes="any"><link rel="apple-touch-icon" href="favicons/llc-infinity-180.png"><title>LLC</title><meta name="description" content="Games and websites by Landry.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<script>/* intros: hide each section's final content until its intro reveals it (no JS / reduced motion = normal page) */
+(function(){try{if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)&&('IntersectionObserver' in window))document.documentElement.classList.add('js-intros')}catch(e){}})();</script>
+<style>html.js-intros #ashaad:not(.llc-shown)>*,html.js-intros #game-of-websites:not(.llc-shown)>.game-inner,html.js-intros #channels:not(.llc-shown) .ch-grid>*,html.js-intros #ballfight:not(.llc-shown) .bf-hud,html.js-intros #ballfight:not(.llc-shown) .bf-board,html.js-intros #ballfight:not(.llc-shown):not(.llc-run) #bf{visibility:hidden}</style>
 <style>
 :root{--bg:#0d0a1a;--fg:#f4eefe;--muted:#b6aacd;--a1:#ff5d8f;--a2:#ffcc4d;--a3:#7c6cff;--a4:#38e1d0;--nav:rgba(13,10,26,.7)}
 @media(prefers-color-scheme:light){:root{--bg:#fff6ee;--fg:#24193a;--muted:#5e5276;--nav:rgba(255,246,238,.75)}}

@@ -5,7 +5,8 @@
    Plays once on scroll-in; click/key skips; reduced-motion = off; dt capped 50 ms; slow-frame self-skip; canvas removed at the end. */
 (function(){
 const sec=document.getElementById('channels'),grid=sec&&sec.querySelector('.ch-grid');if(!grid)return;
-if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+const show=()=>sec.classList.add('llc-shown');
+if(matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window)){show();return}
 const MANUAL=new URLSearchParams(location.search).has('chmanual');
 const clamp=(v,a,b)=>v<a?a:v>b?b:v,lerp=(a,b,t)=>a+(b-a)*t,sm=t=>{t=clamp(t,0,1);return t*t*(3-2*t)},eo=t=>1-Math.pow(1-clamp(t,0,1),3),ei=t=>{t=clamp(t,0,1);return t*t};
 const BAY=[0,32,8,40,2,34,10,42,48,16,56,24,50,18,58,26,12,44,4,36,14,46,6,38,60,28,52,20,62,30,54,22,3,35,11,43,1,33,9,41,51,19,59,27,49,17,57,25,15,47,7,39,13,45,5,37,63,31,55,23,61,29,53,21].map(v=>(v+.5)/64);
@@ -195,7 +196,7 @@ function decor(g,s,c,t,dt){const w=c.w,h=c.h,p=c.p,Cx=c.x+c.fx,Cy=c.y+c.fy,k=c.k
  // icon rides the card while it grows
  if(iconOut>0&&p<.999){g.save();g.beginPath();g.rect(c.x,c.y,w,h);g.clip();const sc=iconOut>.6?3:2;drawIcon(g,c.icon,Cx,Cy+bob,sc,0);g.restore()}}
 /* ---------- run ---------- */
-function finish(){if(!running)return;running=false;cancelAnimationFrame(raf);removeEventListener('keydown',skip);removeEventListener('resize',finish);if(cvs&&cvs.parentNode)cvs.remove();if(hint&&hint.parentNode)hint.remove();cvs=null;S=null;window.__chDone=true;if(window.__llcIntroBusy==='channels')window.__llcIntroBusy=0}
+function finish(){show();if(!running)return;running=false;cancelAnimationFrame(raf);removeEventListener('keydown',skip);removeEventListener('resize',finish);if(cvs&&cvs.parentNode)cvs.remove();if(hint&&hint.parentNode)hint.remove();cvs=null;S=null;window.__chDone=true;if(window.__llcIntroBusy==='channels')window.__llcIntroBusy=0}
 function skip(){if(!running)return;time=Math.max(time,TLn.out);for(const c of S.cards){c.p=1;c.raw=TLn.expand}}
 function visCheck(){if(!cvs||!S)return;const vh=innerHeight;S.cards.forEach(c=>{const r=c.el.getBoundingClientRect();const o=Math.min(r.bottom,vh)-Math.max(r.top,0);vis[c.i]=o>Math.min(r.height,vh)*.25})}
 function loop(ts){if(!running)return;raf=requestAnimationFrame(loop);if(!last){last=ts;return}const raw=ts-last;last=ts;slow=raw>60?slow+1:Math.max(0,slow-1);if(slow>=8&&time<TLn.out){skip();slow=0}
@@ -206,7 +207,7 @@ function start(){if(running||window.__chStarted)return;if(__ib('channels')||!__i
   S=build();cvs=document.createElement('canvas');cvs.className='chi-canvas';cvs.width=S.W;cvs.height=S.H;cvs.setAttribute('aria-hidden','true');cvs.style.left=S.gx+'px';cvs.style.top=S.gy+'px';cvs.style.width=S.W*S.SCL+'px';cvs.style.height=S.H*S.SCL+'px';
   ctx=cvs.getContext('2d');ctx.imageSmoothingEnabled=false;sec.appendChild(cvs);hint=document.createElement('span');hint.className='chi-skip';hint.textContent='click to skip';hint.style.left=S.gx+S.gw-90+'px';hint.style.top=S.gy+S.gh-16+'px';sec.appendChild(hint);
   layoutRing(S);cvs.addEventListener('pointerdown',skip);addEventListener('keydown',skip);addEventListener('resize',finish);
-  running=true;time=0;last=0;vis=[];frame(0);
+  running=true;time=0;last=0;vis=[];frame(0);show();
   if(MANUAL)window.__ch={adv(ms){let l=ms;while(l>0&&running){const d=Math.min(l,50);frame(d/1000);l-=d}},time:()=>time,skip};
   else{raf=requestAnimationFrame(loop);setTimeout(finish,60000)}}catch(e){console.warn('channels intro skipped',e);finish()}};
  const fl=['8px Silkscreen','7px Silkscreen'].map(f=>document.fonts?document.fonts.load(f):Promise.resolve());

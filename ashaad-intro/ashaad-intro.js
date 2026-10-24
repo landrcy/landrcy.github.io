@@ -39,6 +39,7 @@ function rgb(r, g, b, k) { k = k == null ? 1 : k; return 'rgb(' + Math.round(r *
 
 /* ---------- state ---------- */
 var S = null, played = false, busy = false;
+function reveal() { SEC.classList.add('llc-shown'); }
 function otherBusy() { return !!window.__llcIntroBusy && window.__llcIntroBusy !== 'ashaad'; }
 
 /* ================================================================= scene geometry */
@@ -544,6 +545,7 @@ function render(s, t) {
   s.t = t;
   if (t >= T.snap && !s.snapped) { s.snapped = true; jump(s.restY); } else if (t < T.snap && s.snapped) { s.snapped = false; jump(s.startY); }
   paint(s, t); applyPage(s, t);
+  if (t >= T.fade) reveal();   /* the overlay is fully opaque from here: the page appears only underneath it */
   s.ov.style.opacity = overlayAlpha(t).toFixed(4);
   s.hint.classList.toggle('on', t > 1.0 && t < 6.3 && !s.manual);
 }
@@ -553,7 +555,7 @@ function finish(s, skipped) {
   removeEventListener('keydown', s.skip, true); removeEventListener('wheel', s.noscroll); removeEventListener('touchmove', s.noscroll); removeEventListener('scroll', s.onscroll); removeEventListener('resize', s.onresize);
   /* the page goes to its resting state; if skipped before the snap, still land exactly where the final page rests */
   if (!s.snapped) { s.snapped = true; jump(s.restY); }
-  clearPage();
+  clearPage(); reveal();
   if (skipped && s.ov.style.opacity !== '0') { s.ov.classList.add('out'); setTimeout(function () { s.ov.remove(); }, 320); } else s.ov.remove();
   busy = false; if (window.__llcIntroBusy === 'ashaad') window.__llcIntroBusy = 0;
 }
@@ -582,7 +584,7 @@ function start(opts) {
 /* ---------- trigger: the section scrolls into view ---------- */
 function inView() { var r = SEC.getBoundingClientRect(), vh = innerHeight; return r.top < vh * .8 && r.bottom > vh * .3; }
 function arm() {
-  if (REDUCED || OFF || !('IntersectionObserver' in window)) return;
+  if (REDUCED || OFF || !('IntersectionObserver' in window)) { reveal(); return; }
   var tmr = 0;
   function tryStart() { if (played) return cleanup(); if (!inView()) return; if (otherBusy() || document.hidden) { clearTimeout(tmr); tmr = setTimeout(tryStart, 400); return; } cleanup(); start(); }
   function cleanup() { removeEventListener('scroll', tryStart); try { io.disconnect(); } catch (e) {} clearTimeout(tmr); }

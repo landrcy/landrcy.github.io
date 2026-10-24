@@ -7,7 +7,7 @@
  font-family:"SoT VT323","VT323","Courier New",monospace;font-size:1.35rem;line-height:1.15;-webkit-font-smoothing:none}
 .sot-sea{position:absolute;left:0;top:0;z-index:-1;image-rendering:pixelated;image-rendering:crisp-edges;display:block;pointer-events:none}
 .sot-stage{max-width:1240px;margin:0 auto;padding:clamp(1.6rem,4vw,3rem) clamp(1rem,4vw,2.5rem) clamp(3rem,6vw,5rem)}
-.sot.sot-pre [data-sot-in]{visibility:hidden}
+.js-intros .sot.sot-pre [data-sot-in]{visibility:hidden}
 /* hero (sits in the sky, above the waterline) */
 .sot-hero{text-align:center;padding:0 0 clamp(2.2rem,4vw,3.2rem)}
 .sot-kick{margin:0 0 .9rem;font-size:1.25rem;letter-spacing:.18em;text-transform:uppercase;color:var(--n1)}
