@@ -515,7 +515,6 @@ function applyPage(s, t) {
     var p = el.getAttribute('data-rise').split(','), dl = +p[0], dist = +p[1], sc = +p[2];
     var q = clamp((t - T.rise0 - dl) / 1.4, 0, 1), e = 1 - Math.pow(1 - q, 3.2), k = 1 - e;
     el.style.willChange = 'transform';
-    if (/ashx-rest/.test(el.className)) el.style.transformOrigin = '50% 0';
     el.style.transform = 'translate3d(0,' + (k * dist * H / 100).toFixed(2) + 'px,0) scale(' + (1 + k * sc).toFixed(4) + ')';
   });
   var st = SEC.querySelector('.ashx-stage');
