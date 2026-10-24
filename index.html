@@ -4,7 +4,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <script>/* intros: hide each section's final content until its intro reveals it (no JS / reduced motion = normal page) */
 (function(){try{if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)&&('IntersectionObserver' in window))document.documentElement.classList.add('js-intros')}catch(e){}})();</script>
-<style>html.js-intros #ashaad:not(.llc-shown)>*,html.js-intros #game-of-websites:not(.llc-shown)>.game-inner,html.js-intros #channels:not(.llc-shown) .ch-grid>*,html.js-intros #ballfight:not(.llc-shown) .bf-hud,html.js-intros #ballfight:not(.llc-shown) .bf-board,html.js-intros #ballfight:not(.llc-shown):not(.llc-run) #bf{visibility:hidden}</style>
+<style>html.js-intros #ashaad:not(.llc-shown)>*:not(#ashaad-intro),html.js-intros #game-of-websites:not(.llc-shown)>.game-inner,html.js-intros #channels:not(.llc-shown) .ch-grid>*,html.js-intros #ballfight:not(.llc-shown) .bf-hud,html.js-intros #ballfight:not(.llc-shown) .bf-board,html.js-intros #ballfight:not(.llc-shown):not(.llc-run) #bf{visibility:hidden}</style>
 <style>
 :root{--bg:#0d0a1a;--fg:#f4eefe;--muted:#b6aacd;--a1:#ff5d8f;--a2:#ffcc4d;--a3:#7c6cff;--a4:#38e1d0;--nav:rgba(13,10,26,.7)}
 @media(prefers-color-scheme:light){:root{--bg:#fff6ee;--fg:#24193a;--muted:#5e5276;--nav:rgba(255,246,238,.75)}}
@@ -191,7 +191,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify S
 .bf-board li small{color:#a58fcf;font-size:.78rem}.bf-board .w{color:#7dffb2}.bf-board .l{color:#ff7b93;min-width:2.6rem;text-align:right}
 .bf-board .reset{display:block;margin:.6rem auto 0;background:none;border:2px solid #4a2584;color:#a58fcf;font-family:Silkscreen;font-size:.65rem;padding:.3rem .6rem;border-radius:5px;cursor:pointer}
 footer .also{display:block;margin-top:.7rem;font-size:.82rem;opacity:.62;letter-spacing:.02em;transition:opacity .2s}footer .also:hover{opacity:1}footer .also a{color:inherit;text-decoration:underline dotted;text-underline-offset:4px}footer .also a:hover{color:var(--a2)}footer .also a:focus-visible{outline:2px solid var(--a2);outline-offset:3px}
-</style><link rel="stylesheet" href="ashaad-intro/ashaad-page.css"><link rel="stylesheet" href="ashaad-intro/ashaad-intro.css"><link rel="stylesheet" href="gow-intro/gow.css"><link rel="stylesheet" href="channels-intro/channels.css"><link rel="stylesheet" href="llc-title/llc-title.css"><link rel="stylesheet" href="sea-intro/sea.css"><link rel="stylesheet" href="void-intro/void.css"></head><body>
+</style><link rel="stylesheet" href="ashaad-intro/ashaad-page.css"><link rel="stylesheet" href="ashaad-intro/ashaad-intro.css"><link rel="stylesheet" href="gow-intro/gow.css"><link rel="stylesheet" href="channels-intro/channels.css"><link rel="stylesheet" href="llc-title/llc-title.css"><link rel="stylesheet" href="sea-intro/sea.css"><link rel="stylesheet" href="void-intro/void.css"><link rel="stylesheet" href="space.css"></head><body>
 <canvas id="fx"></canvas><canvas id="trail"></canvas>
 <nav><a class="mark" href="#top"><b>LLC</b></a><ul><li><a href="#games">Games</a></li><li><a href="#channels">Channels</a></li><li><a href="#ballfight">Ball Fight</a></li><li><a href="#contact">GitHub</a></li></ul></nav>
 <main id="top">
@@ -206,7 +206,7 @@ footer .also{display:block;margin-top:.7rem;font-size:.82rem;opacity:.62;letter-
 
 <div class="ashx-seam ashx-seam--top" aria-hidden="true"></div>
 <!-- GAME: The Binding of Ashaad — redesigned section (parchment + planks + candles). Transition: ashaad-intro/ (Trapdoor drop) -->
-<section class="game game--ashaad ashx" id="ashaad" aria-labelledby="ashx-title">
+<div class="llc-shape" data-shape="ashaad"><section class="game game--ashaad ashx" id="ashaad" aria-labelledby="ashx-title">
 <svg class="ashx-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
  <filter id="ashx-rough" x="-4%" y="-4%" width="108%" height="108%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="3" seed="6" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="11" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
@@ -244,10 +244,10 @@ footer .also{display:block;margin-top:.7rem;font-size:.82rem;opacity:.62;letter-
 </div>
 
 </div><!-- /stage -->
-</section>
+</section></div>
 <div class="sot-seam" aria-hidden="true" data-from="#120504" data-to="sea"><canvas></canvas></div>
 <!-- PROJECT: Sea of Thought (by landrcy) — pixel ocean section. Transition: sea-intro/ (rehydration) -->
-<section class="sot sot-pre" id="sea-of-thought" aria-labelledby="sot-title">
+<div class="llc-shape" data-shape="sea-of-thought"><section class="sot sot-pre" id="sea-of-thought" aria-labelledby="sot-title">
 <canvas class="sot-sea" aria-hidden="true"></canvas>
 <div class="sot-stage">
  <header class="sot-hero" data-sot-in="cloud">
@@ -262,20 +262,20 @@ footer .also{display:block;margin-top:.7rem;font-size:.82rem;opacity:.62;letter-
  </div>
  <div class="sot-cta" data-sot-in="btn"><a class="sot-btn" href="https://landrcy.github.io/sea-of-thought/">&#9654; DIVE IN</a></div>
 </div>
-</section>
+</section></div>
 <div class="void-seam" aria-hidden="true" data-ramp="#03045E,#0a0430,#05020d"><canvas></canvas></div>
 <!-- PROJECT: The Void (by landrcy) — pixel space game section. Transition: void-intro/ (black hole) -->
-<section class="void void-pre" id="the-void" aria-labelledby="void-title">
+<div class="llc-shape" data-shape="the-void"><section class="void void-pre" id="the-void" aria-labelledby="void-title">
 <canvas class="void-sky" aria-hidden="true"></canvas>
 <div class="void-stage">
  <p class="void-kick" data-void-in>a pixel space game by <b>landrcy</b></p>
  <h2 class="void-title" id="void-title"><span class="void-sr">The Void</span><span class="void-tbox" aria-hidden="true"></span></h2>
  <div class="void-cta" data-void-in><a class="void-btn" href="https://landrcy.github.io/the-void/">&#9654; PLAY</a></div>
 </div>
-</section>
+</section></div>
 <div class="void-seam" aria-hidden="true" data-ramp="#05020d,#2a0f4d,#5a4a80,#ad98e6,#f3ecdf"><canvas></canvas></div>
 <!-- SITE: Game of Websites -->
-<section class="game game--gow" id="game-of-websites">
+<div class="llc-shape" data-shape="game-of-websites"><section class="game game--gow" id="game-of-websites"><span class="llc-by" aria-hidden="true">by landrcy</span>
 <div class="game-inner reveal" data-tilt>
  <div class="game-media">
   <span class="gw-stamp">UNBLOCKED</span>
@@ -292,11 +292,11 @@ footer .also{display:block;margin-top:.7rem;font-size:.82rem;opacity:.62;letter-
   <div class="gw-stats"><div><b data-count="20">20</b>unblocked sites</div><div><b data-count="25961">25,961</b>lines, biggest</div><div><b>♪</b>built-in player</div></div>
   <a class="gw-open" href="https://coopercitywebsites.github.io/main/">Open Game of Websites <span>→</span></a>
  </div>
-</div></section>
+</div></section></div>
 
 <div class="seam" aria-hidden="true" data-top="paper" data-bot="tube"><canvas></canvas></div>
 <!-- SECTION: LLC Powered Channels — each .ch card is themed by its ch--<theme> class -->
-<section class="channels" id="channels"><h2 class="sec-title reveal"><span class="yt-play" aria-hidden="true"></span>&lt; LLC Powered <span>Channels</span> /&gt;</h2>
+<div class="llc-shape" data-shape="channels"><section class="channels" id="channels"><span class="llc-by" aria-hidden="true">by landrcy</span><h2 class="sec-title reveal"><span class="yt-play" aria-hidden="true"></span>&lt; LLC Powered <span>Channels</span> /&gt;</h2>
 <div class="ch-grid">
  <article class="ch ch--arena reveal"><div class="ch-top"><img class="ch-av" src="sites/yt/langrino.jpg" alt="" loading="lazy"><div><h3>Langrino</h3><div class="handle">@Langrino</div></div></div>
   <p>Chaotic weapon-ball battle Shorts: two balls with powers enter, one ball leaves.</p><a class="watch" href="https://www.youtube.com/@Langrino">▶ Watch on YouTube</a></article>
@@ -308,17 +308,17 @@ footer .also{display:block;margin-top:.7rem;font-size:.82rem;opacity:.62;letter-
   <p>Pull up a log: a Reddit story a day, told over satisfying gameplay.</p><a class="watch" href="https://www.youtube.com/channel/UCRegZeMyJ1B5B9n64rfgKAw">▶ Watch on YouTube</a></article>
  <article class="ch ch--chalk reveal" style="--d:.32s"><span class="badge-soon">Launching Oct 28</span><div class="ch-top"><img class="ch-av" src="sites/yt/sat.jpg" alt="" loading="lazy"><div><h3>SAT in a Minute</h3><div class="handle">@satinaminuteprep</div></div></div>
   <p>Fast SAT prep tips, each one in under a minute.</p><a class="watch" href="https://www.youtube.com/channel/UCfDhWTThokF3gKW03iEGijg">▶ Watch on YouTube</a></article>
-</div></section>
+</div></section></div>
 <div class="seam" aria-hidden="true" data-top="tube" data-bot="night"><canvas></canvas></div>
-<section class="panel" id="contact"><h2 class="sec-title reveal">&lt; <span>GitHub</span> /&gt;</h2><div class="reveal"><a class="gh" href="https://github.com/landrcy">★ github.com/landrcy</a></div></section>
+<div class="llc-shape" data-shape="contact"><section class="panel" id="contact"><span class="llc-by" aria-hidden="true">by landrcy</span><h2 class="sec-title reveal">&lt; <span>GitHub</span> /&gt;</h2><div class="reveal"><a class="gh" href="https://github.com/landrcy">★ github.com/landrcy</a></div></section></div>
 </main>
 <div class="seam" aria-hidden="true" data-top="night" data-bot="arena"><canvas></canvas></div>
 <!-- SECTION: Eternal Ball Fight — canvas arena + localStorage leaderboard -->
-<section class="ballfight" id="ballfight"><h2 class="sec-title reveal">&lt; Eternal <span>Ball Fight</span> /&gt;</h2>
+<div class="llc-shape" data-shape="ballfight"><section class="ballfight" id="ballfight"><span class="llc-by" aria-hidden="true">by landrcy</span><h2 class="sec-title reveal">&lt; Eternal <span>Ball Fight</span> /&gt;</h2>
 <div class="bf-wrap">
  <div class="bf-arena"><canvas id="bf" width="320" height="220" aria-label="Weapon balls fighting endlessly"></canvas><div class="bf-hud"><span id="bf-fight">Fight #1</span><span id="bf-status">FIGHT!</span></div></div>
  <aside class="bf-board" aria-label="Total Ball Standings"><h3>Total Ball Standings</h3><ol id="bf-board"></ol><button type="button" class="reset" id="bf-reset">reset standings</button></aside>
-</div></section>
+</div></section></div>
 <div class="seam" aria-hidden="true" data-top="arena" data-bot="night"><canvas></canvas></div>
 <footer>© <span id="y">2026</span> LLC · made with pixels &amp; love<span class="also">Also see <a href="https://coopercitywebsites.github.io/" target="_blank" rel="noopener">Cooper City's number one official website</a></span></footer>
 <script>
@@ -429,5 +429,5 @@ go();let tm;addEventListener('resize',()=>{clearTimeout(tm);tm=setTimeout(go,150
 <script src="gow-intro/gow.js" defer></script>
 <script src="channels-intro/channels.js" defer></script>
 <script src="ballfight-intro/ballfight.js" defer></script>
-<script src="llc-title/llc-title.js" defer></script>
+<script src="space-shapes.js" defer></script><script src="llc-title/llc-title.js" defer></script>
 </body></html>

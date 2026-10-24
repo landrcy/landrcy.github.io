@@ -528,7 +528,7 @@ function ensure(opts) {
   var ov = document.createElement('div'); ov.id = 'ashaad-intro'; ov.setAttribute('aria-hidden', 'true');
   var cv = document.createElement('canvas'), hint = document.createElement('div'); hint.className = 'ai-skip';
   hint.textContent = (matchMedia('(pointer:coarse)').matches ? 'tap' : 'click or press any key') + ' to skip';
-  ov.appendChild(cv); ov.appendChild(hint); document.body.appendChild(ov);
+  ov.appendChild(cv); ov.appendChild(hint); SEC.appendChild(ov);
   var s = S = { ov: ov, cv: cv, ctx: cv.getContext('2d'), hint: hint, dead: false, t: 0, startY: window.pageYOffset, restY: restY(), snapped: false, pageDirty: false, manual: !!(opts && opts.manual) };
   build(s); busy = true; window.__llcIntroBusy = 'ashaad';
   s.skip = function (e) { if (e && e.type === 'keydown') { if (e.metaKey || e.ctrlKey || e.altKey || e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta' || /^F\d+$/.test(e.key)) return; if (e.preventDefault) e.preventDefault(); } finish(s, true); };

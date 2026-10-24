@@ -1,0 +1,38 @@
+/* ---------- SPACE: one continuous starfield behind the whole page; every site floats on it as its own panel ---------- */
+:root{--bg:#080a12;--fg:#f4eefe;--muted:#b6aacd;--nav:rgba(8,10,18,.62)}
+html,body{background:#080a12}
+body{background:
+ radial-gradient(1px 1px at 12% 18%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 73% 9%,#cfe0ff 50%,transparent 51%),
+ radial-gradient(1.5px 1.5px at 41% 63%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 88% 47%,#fff 50%,transparent 51%),
+ radial-gradient(1px 1px at 27% 86%,#bcd 50%,transparent 51%),radial-gradient(1.5px 1.5px at 59% 31%,#ffe9c9 50%,transparent 51%),
+ radial-gradient(1px 1px at 6% 52%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 95% 78%,#cfe0ff 50%,transparent 51%),
+ radial-gradient(ellipse 60% 40% at 15% 30%,rgba(90,40,150,.10),transparent 70%),radial-gradient(ellipse 50% 35% at 85% 75%,rgba(40,70,160,.10),transparent 70%),
+ #080a12 fixed;background-size:420px 420px,420px 420px,420px 420px,420px 420px,420px 420px,420px 420px,420px 420px,420px 420px,100% 100%,100% 100%;background-attachment:fixed}
+main{position:relative;z-index:1}
+.hero{background:transparent}
+/* the old colour ramps between sections are gone: the space itself is the transition */
+.seam,.sot-seam,.void-seam,.ashx-seam{position:absolute!important;left:0;right:0;height:48px!important;margin:0!important;visibility:hidden!important;pointer-events:none;opacity:0}
+/* nav: glassy space bar instead of cream */
+nav{background:var(--nav)!important;color:#f4eefe;border-bottom:1px solid rgba(150,170,255,.18);box-shadow:0 8px 30px rgba(0,0,0,.35)}
+nav a,nav .mark{color:#f4eefe!important}
+footer{color:#9aa6c8;border-top:0;position:relative;z-index:1}
+/* floating panels: each site gets its own pixel silhouette (clip-path polygons built by space-shapes.js); the glow follows the shape */
+#games{padding:clamp(2rem,4vw,3rem) 1rem 0}
+.llc-shape{position:relative;filter:drop-shadow(0 0 1px rgba(190,205,255,.55)) drop-shadow(0 18px 40px rgba(0,0,0,.55)) drop-shadow(0 0 26px var(--glow,rgba(110,100,255,.32)))}
+.llc-shape[data-shape=ashaad]{--glow:rgba(255,120,40,.30)}
+.llc-shape[data-shape=sea-of-thought]{--glow:rgba(80,190,255,.34)}
+.llc-shape[data-shape=the-void]{--glow:rgba(160,90,255,.40)}
+.llc-shape[data-shape=game-of-websites]{--glow:rgba(255,236,200,.22)}
+.llc-shape[data-shape=channels]{--glow:rgba(255,0,51,.26)}
+.llc-shape[data-shape=contact]{--glow:rgba(56,225,208,.30)}
+.llc-shape[data-shape=ballfight]{--glow:rgba(124,63,196,.42)}
+#ashaad,#sea-of-thought,#the-void,#game-of-websites,#channels,#contact,#ballfight{
+ width:min(1320px,calc(100% - 2*clamp(10px,3.2vw,56px)));margin:clamp(34px,5.5vw,88px) auto;overflow:hidden;isolation:isolate;position:relative}
+#game-of-websites{padding-top:calc(clamp(3rem,7vw,6rem) + 28px)}
+#channels{padding-bottom:calc(clamp(3rem,7vw,5.5rem) + 22px)}
+#contact{max-width:none;background:#071312;padding-left:3.5rem;padding-right:3.5rem}
+#ballfight{padding-left:calc(clamp(1rem,4vw,3rem) + 30px);padding-right:calc(clamp(1rem,4vw,3rem) + 30px)}
+.llc-by{position:absolute;right:clamp(40px,4vw,70px);bottom:clamp(14px,1.6vw,22px);z-index:20;font:400 .68rem Silkscreen,monospace;letter-spacing:.08em;padding:.25rem .55rem;background:rgba(8,10,18,.6);color:#dfe6ff;pointer-events:none}
+@media(max-width:600px){#ashaad,#sea-of-thought,#the-void,#game-of-websites,#channels,#contact,#ballfight{width:calc(100% - 16px);margin:26px auto}#contact{padding-left:1.8rem;padding-right:1.8rem}#ballfight{padding-left:1.4rem;padding-right:1.4rem}}
+/* Ashaad trapdoor now plays inside its own panel */
+#ashaad-intro{position:absolute!important;inset:0;z-index:30;border-radius:inherit;visibility:visible!important}
