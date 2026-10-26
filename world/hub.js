@@ -330,7 +330,7 @@ function growStep(now){
 // hide (retract back into the logo) / show (draw outward again)
 function retractStrings(){retractAt=performance.now()}function growStrings(){if(retractAt){retractAt=0;growStart=performance.now()}}
 // ---------- camera ----------
-let px=0,py=0,z=1,anim=0,mapMode=false;const ZMIN=.05,ZMAX=3;
+const HZ=()=>Math.min(1,(innerWidth-32)/(2*(FA+BAND+10)*P),(innerHeight-160)/(2*(FB+BAND+10)*P));let px=0,py=0,z=HZ(),anim=0,mapMode=false;const ZMIN=.05,ZMAX=3;
 function draw(){const tx=Math.round(-px*z),ty=Math.round(-py*z);world.style.transform=`translate(${tx}px,${ty}px) scale(${z})`;
  let g=7*z;while(g<6)g*=2;while(g>14)g/=2;vp.style.backgroundSize=g+'px '+g+'px';vp.style.backgroundPosition=`calc(50% + ${tx}px) calc(50% + ${ty}px)`;
  world.style.setProperty('--ms',mapMode?Math.min(8,.32/z):1);
@@ -385,7 +385,7 @@ addEventListener('keydown',e=>{const s=(e.shiftKey?240:60)/z,m={ArrowLeft:[-s,0]
  if(m){e.preventDefault();e.stopImmediatePropagation();to(px+m[0],py+m[1],z,RM?0:180)}
  else if(e.key==='+'||e.key==='='){e.stopImmediatePropagation();to(px,py,Math.min(ZMAX,z*1.25),RM?0:200)}else if(e.key==='-'){e.stopImmediatePropagation();to(px,py,Math.max(ZMIN,z/1.25),RM?0:200)}
  else if(e.key==='m'||e.key==='M'){e.stopImmediatePropagation();setMap(!mapMode)}else if(e.key==='Escape'&&mapMode){e.stopImmediatePropagation();setMap(false)}},true);
-document.getElementById('recenter').onclick=()=>{if(mapMode){mapMode=false;document.body.classList.remove('mapmode');mapBtn.setAttribute('aria-pressed',false)}to(0,0,1)};
+document.getElementById('recenter').onclick=()=>{if(mapMode){mapMode=false;document.body.classList.remove('mapmode');mapBtn.setAttribute('aria-pressed',false)}to(0,0,HZ())};
 // pixel-art map icon
 {const c=document.createElement('canvas');c.width=12;c.height=10;const x=c.getContext('2d');const art=['.##..##..##.','#ee##ff##ee#','#ee#ff#gg#e#','#e##ff#gg#e#','#ee#ffr#gee#','#ee#f#r#g#e#','#e##ff##gee#','#ee#ff#gg#e#','#ee##ff##ee#','.##..##..##.'],pal={'#':'#222','e':'#cfe3b4','f':'#f3e2b0','g':'#9fc9e8','r':'#d33'};
  art.forEach((row,y)=>[...row].forEach((ch,X)=>{if(pal[ch]){x.fillStyle=pal[ch];x.fillRect(X,y,1,1)}}));mapBtn.innerHTML='';mapBtn.appendChild(c)}
