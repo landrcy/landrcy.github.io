@@ -84,15 +84,15 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;const IS=int
  // sprites, back-to-front
  const draw=[];bodies.forEach((b,i)=>draw.push([b,i]));if(sys==='main')MOONS.forEach((m,i)=>draw.push([m,3]));
  draw.sort((a,b)=>pos(a[0])[1]-pos(b[0])[1]);
- for(const[b,i]of draw){const pp=b.id==='sun'||b.id==='oldhub'?1:IS.pop(Math.min(i,7)+(b.moon?.5:0));if(pp<=0)continue;
+ for(const[b,i]of draw){const pp=b.id==='sun'||b.id==='oldhub'?1:IS.pop(Math.min(i,7)+(b.moon?.5:0));if(pp<=0)continue;const dim=focus&&b!==focus&&!(focus.yt&&b.moon)?.28:1;
   const[x,y]=pos(b),[sx,sy]=W2S(x,y),w=b.w*cam.z*pp,h=(b.h||b.w)*cam.z*pp;
   if(sx+w<0||sx-w>W||sy+h<0||sy-h>H)continue;
   const lv=lodLv(),t0=Math.floor(lv),fr=t0>=2?0:Math.max(0,Math.min(1,(lv-t0-.3)/.4)),fs=fr*fr*(3-2*fr);
   const ga=g.globalAlpha,tiers=fs>=1?[[t0+1,1]]:fs>0?[[t0,1],[t0+1,fs]]:[[t0,1]];
   for(const[ti,al]of tiers){const S=b.L[ti];
    if(now>=b.nx[ti]||(b.id==='sun'&&intro)){const o=b.id==='sun'?{ign:IS.ign,L:IS.L}:b.arg;P[b.paint](S,RM?7:now/1000+(b.ph||0)*3,o);if(LOD[ti][1])P.reduce(S,LOD[ti][1]+(b.paint==='sea'||b.paint==='crest'?3:0));b.nx[ti]=RM?Infinity:now+(ti?95:160)+(b.w>140&&ti?-25:0)+Math.random()*30}
-   g.globalAlpha=ga*al;g.drawImage(S.c,Math.round(sx-w/2),Math.round(sy-h/2),Math.round(w),Math.round(h))}
-  g.globalAlpha=ga}
+   g.globalAlpha=ga*al*dim;g.filter=dim<1?'blur(1.5px)':'none';g.drawImage(S.c,Math.round(sx-w/2),Math.round(sy-h/2),Math.round(w),Math.round(h))}
+  g.globalAlpha=ga;g.filter='none'}
  g.globalAlpha=1;if(focus)placeInfo();
  requestAnimationFrame(frame)}
 // ---- hit testing ----
@@ -102,18 +102,20 @@ function hit(sx,sy){const[wx,wy]=S2W(sx,sy);let best=null,bd=1e9;const list=sys=
 let revealT=0;
 const TH={sun:['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#9ab4e8'],ashaad:['#120a0c','#e8dcc0','#ffd23a','#2a1608','Silkscreen','#5a3a20'],sea:['#021e5a','#90E0EF','#48CAE4','#021e5a','VT323','#f3dfae'],
  gow:['#000','#fff','#e01a22','#fff','Anton','#e01a22'],ccold:['#000','#fff','#e01a22','#fff','Anton','#e01a22'],void:['#05020d','#efe6ff','#c04df0','#fff','VT323','#c04df0'],
- yt:['#0f0f0f','#fff','#ff0033','#fff','Roboto','#ff0033'],oldhub:['#120c1e','#f3ecdf','#ff0033','#fff','Silkscreen','#ffcc4d'],ballfight:['#120c1e','#f3ecdf','#ffcc4d','#120c1e','Silkscreen','#ff0033'],
+ yt:['#0f0f0f','#fff','#fff','#0f0f0f','Roboto','#ff0033'],oldhub:['#120c1e','#f3ecdf','#ff0033','#fff','Silkscreen','#ffcc4d'],ballfight:['#120c1e','#f3ecdf','#ffcc4d','#120c1e','Silkscreen','#ff0033'],
  'v-lovely':['#fff8f1','#3a2430','#ff5d8f','#fff','Fredoka','#ffb347'],'v-arcade':['#1a1440','#ffd257','#ff5d8f','#fff','Silkscreen','#7c6cff'],'v-larper':['#1a1440','#ffcc4d','#7c6cff','#fff','Silkscreen','#ff5d8f'],
  'v-purple':['#241640','#ffcc4d','#38e1d0','#0a0814','Silkscreen','#7c6cff'],'v-white':['#080a12','#dde0e8','#9ab4e8','#080a12','Silkscreen','#cfe0ff'],'v-strings':['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#c9ced8']};
 function theme(b){const t=TH[b.moon?'yt':b.id]||TH.sun;return `--bg:${t[0]};--fg:${t[1]};--ac:${t[2]};--bf:${t[3]};--ft:'${t[4]}';--bd:${t[5]}`}
-function infoHTML(b){const a=s=>/^https?:/.test(s)?' target="_blank" rel="noopener"':'';
+const TITLES={void:1,ashaad:1,sea:1,oldhub:1,'v-lovely':1,'v-arcade':1,'v-larper':1,'v-purple':1,'v-white':1,'v-strings':1};
+function infoHTML(b){if(TITLES[b.id]){const ex=/^https?:/.test(b.href)?' target="_blank" rel="noopener"':'';return `<h2 class="sr">${b.title}</h2><a class="tlink" href="${b.href}"${ex} aria-label="${b.title}"><img class="timg" src="world/titles/${b.id}.png" alt="${b.title}"></a><a class="go" href="${b.href}"${ex}>${b.cta}</a>`}
+const a=s=>/^https?:/.test(s)?' target="_blank" rel="noopener"':'';
  if(b.yt)return `<h2>${b.title}</h2><p class="stat"><b>${fmt(TV)}</b> views · <b>${fmt(TS)}</b> subs</p><div class="mlist">${CH.map(c=>`<button class="go sm" data-moon="m-${c.id}">${c.name}</button>`).join('')}</div>`;
  if(b.moon){const c=b.moon;return `<h2>${c.name}</h2><p class="stat"><b>${fmt(c.subs)}</b> subs · <b>${fmt(c.views)}</b> views</p><a class="go" href="${c.url}" target="_blank" rel="noopener">▶ Watch</a>`}
  return `<h2>${b.title}</h2>${b.href?`<a class="go" href="${b.href}"${a(b.href)}>${b.cta}</a>`:''}`}
 function faceR(b){return b.id==='void'?b.w*.12:b.w*(b.paint==='sea'?.3:b.hr)}
 function focusOn(b,push=true){hideTip();if(b.arch){enterArchive();return}if(b.home){warpTo('main');return}
  focus=b;info.className='';info.innerHTML='<div class="txt" style="'+theme(b)+'">'+infoHTML(b)+'</div>';
- const[x,y]=pos(b),fr=faceR(b),need=b.yt||b.id==='sun'||b.id==='oldhub'?300:250,z=Math.max(need/(fr*2*.86),Math.min(W,H)*.66/(fr*2));
+ const[x,y]=pos(b),fr=faceR(b),z=Math.min(W,H)*(W<H?.95:.82)/Math.max(b.w*(b.paint==='sea'?.62:b.id==='void'?.5:b.yt?1.75:.92),1);
  info.querySelectorAll('[data-moon]').forEach(el=>el.onclick=e=>{e.stopPropagation();focusOn(MOONS.find(m=>m.id===el.dataset.moon))});
  to(x,y+(b.paint==='sea'?(b.h||b.w)*.1:0),z,950,()=>{revealT=performance.now();info.classList.add('on')});
  if(push&&!RM)history.pushState({f:b.id},'');}
@@ -121,7 +123,7 @@ function unfocus(){if(!focus)return;focus=null;info.className='';info.innerHTML=
 function placeInfo(){const b=focus,[x,y]=pos(b),[sx,sy]=W2S(x,y+(b.paint==='sea'?(b.h||b.w)*.1:0)),D=Math.min(Math.max(faceR(b)*2*cam.z*.86,230),Math.min(W,H)*.92);
  info.style.cssText=`left:${Math.round(sx-D/2)}px;top:${Math.round(sy-D/2)}px;width:${Math.round(D)}px;height:${Math.round(D)}px`;
  if(!info.classList.contains('on'))return;const p=RM?1:clamp((performance.now()-revealT)/450);
- info.style.setProperty('--rv',p)}
+ const tt=performance.now()/1000;info.style.setProperty('--rv',p);info.style.setProperty('--px',(RM?0:Math.sin(tt*.5)*6).toFixed(1)+'px');info.style.setProperty('--py',(RM?0:Math.cos(tt*.4)*3).toFixed(1)+'px')}
 // ---- archive system ----
 let warp=null;
 function warpTo(to2){if(warp||sys===to2)return;focus=null;info.className='';info.innerHTML='';hideTip();
