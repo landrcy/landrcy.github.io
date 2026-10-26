@@ -39,3 +39,5 @@ canvas.strand{position:absolute;image-rendering:pixelated;image-rendering:crisp-
 .ui:hover{box-shadow:0 -3px 0 #222,0 3px 0 #222,-3px 0 0 #222,3px 0 0 #222}
 .llc5-skip{border:0!important;box-shadow:0 -3px 0 #dde0e8,0 3px 0 #dde0e8,-3px 0 0 #dde0e8,3px 0 0 #dde0e8}
 @media(prefers-reduced-motion:reduce){.rift.open .panel{animation:none!important}}
+.spark{position:absolute;width:3px;height:3px;margin:-1px 0 0 -1px;background:#fff;display:none;pointer-events:none;
+ box-shadow:3px 0 0 #ffe66d,-3px 0 0 #ffe66d,0 3px 0 #ffe66d,0 -3px 0 #ffe66d,3px 3px 0 rgba(255,200,80,.45),-3px -3px 0 rgba(255,200,80,.45),3px -3px 0 rgba(255,200,80,.45),-3px 3px 0 rgba(255,200,80,.45),6px 0 0 rgba(255,220,120,.35),-6px 0 0 rgba(255,220,120,.35),0 6px 0 rgba(255,220,120,.35),0 -6px 0 rgba(255,220,120,.35)}

@@ -28,69 +28,66 @@ const P=3; // screen px per art pixel (at zoom 1) — every string/rift is drawn
 function rnd(seed){return()=>{seed=(seed*16807)%2147483647;return seed/2147483647}}
 const hex=c=>[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)];
 // ---------- string geometry (world px) ----------
+// evenly spaced radial layout; each string is one eased cubic Bézier (gentle S-curve), arc-length resampled
+const ORDER=['gh','gow','void','ashaad','sea','bf','yt-sat','yt-reddit','yt-trivia','yt-clutch','yt-langrino'];
 function strandPts(site,i){
- const r=rnd(1000+i*7919),a=site.ang*Math.PI/180,ex=Math.cos(a)*site.dist,ey=Math.sin(a)*site.dist;
- const sx=Math.cos(a)*400,sy=Math.sin(a)*190,nx=-Math.sin(a),ny=Math.cos(a);
- const bend=(r()-.5)*900,waves=1+r()*1.5,amp=60+r()*70,loopAt=.35+r()*.3,loopR=55+r()*45,dir=r()<.5?-1:1,pts=[],N=400;
- for(let k=0;k<=N;k++){const t=k/N;let x=sx+(ex-sx)*t,y=sy+(ey-sy)*t;
-  const off=bend*Math.sin(Math.PI*t)+amp*Math.sin(t*Math.PI*2*waves)*Math.sin(Math.PI*t);x+=nx*off;y+=ny*off;
-  const u=(t-loopAt)/.12;if(u>0&&u<1){const th=u*Math.PI*2;x+=dir*loopR*Math.sin(th);y+=loopR*(1-Math.cos(th))*dir*.9}
-  pts.push([x,y])}
- site.x=ex;site.y=ey;
- const cum=[0];for(let k=1;k<pts.length;k++)cum.push(cum[k-1]+Math.hypot(pts[k][0]-pts[k-1][0],pts[k][1]-pts[k-1][1]));
- site.pts=pts;site.cum=cum;site.len=cum[cum.length-1]}
+ const k=ORDER.indexOf(site.id),a=(-90+k*360/ORDER.length)*Math.PI/180,D=k%2?1850:1550;
+ const ux=Math.cos(a),uy=Math.sin(a),nx=-uy,ny=ux,sx=ux*390,sy=uy*175,ex=ux*D,ey=uy*D,L=Math.hypot(ex-sx,ey-sy);
+ const bow=(k%2?1:-1)*L*.16; // S-curve: controls pushed to opposite sides
+ const c1=[sx+(ex-sx)*.3+nx*bow,sy+(ey-sy)*.3+ny*bow],c2=[sx+(ex-sx)*.7-nx*bow*.8,sy+(ey-sy)*.7-ny*bow*.8];
+ const B=t=>{const m=1-t;return[m*m*m*sx+3*m*m*t*c1[0]+3*m*t*t*c2[0]+t*t*t*ex,m*m*m*sy+3*m*m*t*c1[1]+3*m*t*t*c2[1]+t*t*t*ey]};
+ const raw=[],rc=[0];for(let j=0;j<=2000;j++){raw.push(B(j/2000));if(j)rc.push(rc[j-1]+Math.hypot(raw[j][0]-raw[j-1][0],raw[j][1]-raw[j-1][1]))}
+ const tot=rc[2000],pts=[],cum=[];let q=0;for(let j=0;j<=400;j++){const l=tot*j/400;while(q<1999&&rc[q+1]<l)q++;const f=(l-rc[q])/((rc[q+1]-rc[q])||1);
+  pts.push([raw[q][0]+(raw[q+1][0]-raw[q][0])*f,raw[q][1]+(raw[q+1][1]-raw[q][1])*f]);cum.push(l)}
+ site.x=ex;site.y=ey;site.pts=pts;site.cum=cum;site.len=tot}
 function pointAt(s,l){const c=s.cum;let lo=0,hi=c.length-1;l=Math.max(0,Math.min(s.len,l));while(hi-lo>1){const m=(lo+hi)>>1;if(c[m]<l)lo=m;else hi=m}
  const k=(l-c[lo])/((c[hi]-c[lo])||1);return{x:s.pts[lo][0]+(s.pts[hi][0]-s.pts[lo][0])*k,y:s.pts[lo][1]+(s.pts[hi][1]-s.pts[lo][1])*k}}
 // ---------- per-site pixel styles: outline, 3 shading tones, radius (art px), pattern + decorations ----------
+// slender lines: 2px core (highlight + body) tapering to 1px toward the rift; one sparse accent every ~700px
 const STY={
- ashaad:{R:3,o:'#1a0305',hi:'#c4505a',mid:'#7a1e24',sh:'#4a0c12',pat:(s,t)=>((s+t*3)%9<2?'sh':null),deco:'blood'},
- sea:{R:2.5,o:'#3d2a12',hi:'#ead2a0',mid:'#c49a5c',sh:'#7d5a2c',pat:(s,t)=>(((s+t*2.5)%5)<1.6?'sh':null),deco:'drips'},
- void:{R:2.5,o:'#7a4dff',hi:'#3b1f73',mid:'#140a24',sh:'#05030a',glow:'#c6a8ff',deco:'stars'},
- gow:{R:1,o:null,hi:'#111111',mid:'#111111',sh:'#111111',deco:'blots'},
- yt:{R:2,o:'#222222',hi:'#ffffff',mid:'#d6d6d6',sh:'#a8a8a8',red:['#ff6b6b','#ff0000','#a30000'],deco:'scrub'},
- gh:{R:1.5,o:'#0d1117',hi:'#57606a',mid:'#24292f',sh:'#0d1117',deco:'commits'},
- bf:{R:2,o:'#5a2a00',hi:'#ffc27a',mid:'#f08a24',sh:'#a24d00',deco:'balls'},
-};
+ ashaad:{hi:'#c4505a',mid:'#6e1a20',acc:'blood'}, sea:{hi:'#9fd3ff',mid:'#2a6fb8',acc:'drop'},
+ void:{hi:'#b48cff',mid:'#2a1650',acc:'star'}, gow:{hi:'#555555',mid:'#111111',acc:'blot'},
+ yt:{hi:'#e6e6e6',mid:'#a8a8a8',red:['#ff6b6b','#e00000'],acc:'scrub'}, gh:{hi:'#6e7781',mid:'#24292f',acc:'commit'},
+ bf:{hi:'#ffc27a',mid:'#d9731a',acc:'ball'}};
 function buildString(s,idx){
- const st=STY[s.s],r=rnd(77+idx*131);
- let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const p of s.pts){a=Math.min(a,p[0]);b=Math.max(b,p[0]);c=Math.min(c,p[1]);d=Math.max(d,p[1])}
- const M=10,ox=Math.floor(a/P)-M,oy=Math.floor(c/P)-M,w=Math.ceil(b/P)-ox+M,h=Math.ceil(d/P)-oy+M,N=w*h;
- const col=new Array(N).fill(null),arc=new Float32Array(N).fill(1e9),kind=new Uint8Array(N); // kind:1 outline/glow 2 body 3 deco
- const set=(x,y,cl,k,ar)=>{if(x<0||y<0||x>=w||y>=h)return;const p=y*w+x;if(k<kind[p])return;if(k===kind[p]&&k!==3&&arc[p]<=ar)return;kind[p]=k;col[p]=cl;arc[p]=Math.min(arc[p],ar)};
- const L=s.len/P,pr=s.s==='yt'?.35+((idx*37)%50)/100:0,R=st.R,LX=-.6,LY=-.8;
- const centres=[];
- for(let l=0;l<=L;l+=.5){const p=pointAt(s,l*P),q=pointAt(s,Math.min(L,l+1)*P),u=p.x/P-ox,v=p.y/P-oy;let tx=q.x-p.x,ty=q.y-p.y;const tl=Math.hypot(tx,ty)||1;tx/=tl;ty/=tl;
-  centres.push([u,v,l,-ty,tx]);
-  const RR=Math.ceil(R+2);
-  for(let dy=-RR;dy<=RR;dy++)for(let dx=-RR;dx<=RR;dx++){const x=Math.round(u)+dx,y=Math.round(v)+dy,ex=x-u,ey=y-v,dd=Math.hypot(ex,ey);
-   if(dd<=R){let tone=(ex*LX+ey*LY)/Math.max(R,1);let k=tone>.35?'hi':tone<-.3?'sh':'mid';
-    const tt=(ex*-ty+ey*tx);const pk=st.pat&&st.pat(l,tt);if(pk&&k!=='hi')k=pk;
-    let cl=st[k];if(st.red&&l<pr*L)cl=st.red[k==='hi'?0:k==='mid'?1:2];
-    set(x,y,cl,2,l)}
-   else if(st.o&&dd<=R+1.1)set(x,y,st.o,1,l)
-   else if(st.glow&&dd<=R+2.2&&((x+y)&1))set(x,y,st.glow,1,l)}}
- // decorations
- const stamp=(u,v,rad,pal,l,k=3)=>{for(let dy=-rad-1;dy<=rad+1;dy++)for(let dx=-rad-1;dx<=rad+1;dx++){const dd=Math.hypot(dx,dy),x=Math.round(u)+dx,y=Math.round(v)+dy;
-  if(dd<=rad){const tone=(dx*LX+dy*LY)/rad;set(x,y,tone>.3?pal[0]:tone<-.3?pal[2]:pal[1],k,l)}else if(dd<=rad+1&&pal[3])set(x,y,pal[3],k-1>0?k:k,l)}};
- centres.forEach((cc,n)=>{const[u,v,l]=cc;
-  if(st.deco==='blood'&&n%46===23){const len=2+((r()*4)|0);for(let k=1;k<=len;k++)set(Math.round(u),Math.round(v)+R+k,k===len?'#ff8a8a':'#8a0f17',3,l);set(Math.round(u)+1,Math.round(v)+R+1,'#5e1218',3,l)}
-  if(st.deco==='drips'&&n%38===19){const len=2+((r()*4)|0);for(let k=1;k<=len;k++)set(Math.round(u),Math.round(v)+R+k,k===len?'#cfeaff':'#4fa3e8',3,l);set(Math.round(u),Math.round(v)+R+len+2,'#4fa3e8',3,l)}
-  if(st.deco==='stars'&&n%7===0){const a2=r()*6.28,d2=4+r()*7,x=Math.round(u+Math.cos(a2)*d2),y=Math.round(v+Math.sin(a2)*d2);const cl=r()<.6?'#c6a8ff':'#ffffff';set(x,y,cl,3,l);if(r()<.25){set(x+1,y,'#7a4dff',3,l);set(x-1,y,'#7a4dff',3,l);set(x,y+1,'#7a4dff',3,l);set(x,y-1,'#7a4dff',3,l)}}
-  if(st.deco==='blots'&&n%60===30){const rad=1.5+r()*1.5;stamp(u+(r()-.5)*2,v+(r()-.5)*2,rad,['#333','#111','#000'],l);if(r()<.6)set(Math.round(u+rad+2),Math.round(v+1),'#111',3,l)}
-  if(st.deco==='commits'&&n%40===20)stamp(u,v,2.2,['#7ee2a0','#2da44e','#116329','#0d1117'],l);
-  if(st.deco==='balls'&&n%44===22){const pal=[['#ffb3b3','#e53935','#8e1b1b','#2b0b0b'],['#b3d4ff','#1e6fe5','#0f3a7a','#0b1a2b'],['#fff0a8','#f2c200','#8a6d00','#2b2300'],['#c8ffb3','#3cb043','#1c5e21','#0b2b0d']][(n/44|0)%4];stamp(u+cc[3]*5,v+cc[4]*5,2.2,pal,l)}
- });
- if(st.deco==='scrub'){const c2=centres[Math.min(centres.length-1,Math.round(pr*L*2))];stamp(c2[0],c2[1],3.6,['#ff8a8a','#ff0000','#a30000','#222222'],pr*L,4)}
- // sort painted pixels by arc so the string can grow in pixel by pixel
+ const st=STY[s.s];let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const p of s.pts){a=Math.min(a,p[0]);b=Math.max(b,p[0]);c=Math.min(c,p[1]);d=Math.max(d,p[1])}
+ const M=8,ox=Math.floor(a/P)-M,oy=Math.floor(c/P)-M,w=Math.ceil(b/P)-ox+M,h=Math.ceil(d/P)-oy+M,N=w*h;
+ const col=new Array(N).fill(null),arc=new Float32Array(N).fill(1e9),kind=new Uint8Array(N);
+ const set=(x,y,cl,k,ar)=>{if(x<0||y<0||x>=w||y>=h)return;const p=y*w+x;if(k<kind[p])return;kind[p]=k;col[p]=cl;arc[p]=Math.min(arc[p],ar)};
+ const L=s.len/P,pr=s.s==='yt'?.3+((idx*37)%45)/100:0;
+ let last=null;
+ for(let l=0;l<=L;l+=.35){const p=pointAt(s,l*P),q=pointAt(s,Math.min(L,l+1)*P);let tx=q.x-p.x,ty=q.y-p.y;const tl=Math.hypot(tx,ty)||1;tx/=tl;ty/=tl;
+  const u=p.x/P-ox,v=p.y/P-oy,x=Math.round(u),y=Math.round(v),red=st.red&&l<pr*L;
+  set(x,y,red?st.red[1]:st.mid,2,l); // core
+  if(l<L*.62){ // 2nd pixel (highlight) on the upper/left side while the line is still thick → tapers to 1px
+   const nx=-ty,ny=tx,sgn=(nx*-.6+ny*-.8)>0?1:-1,hx=Math.round(u+nx*sgn*.9),hy=Math.round(v+ny*sgn*.9);
+   if(hx!==x||hy!==y)set(hx,hy,red?st.red[0]:st.hi,1,l)}}
+ // sparse accents
+ const acc=(l)=>{const p=pointAt(s,l*P),u=Math.round(p.x/P-ox),v=Math.round(p.y/P-oy);return[u,v]};
+ const n=Math.max(1,Math.floor(L/240));
+ for(let j=1;j<=n;j++){const l=L*j/(n+1),[u,v]=acc(l);
+  switch(st.acc){
+   case'blood':set(u,v+1,'#8a0f17',3,l);set(u,v+2,'#8a0f17',3,l);set(u,v+3,'#e0757b',3,l);break;
+   case'drop':set(u,v+2,'#4fa3e8',3,l);set(u,v+3,'#cfeaff',3,l);break;
+   case'star':for(const[dx,dy,cl]of[[0,-3,'#ffffff'],[0,-4,'#b48cff'],[0,-2,'#b48cff'],[-1,-3,'#b48cff'],[1,-3,'#b48cff']])set(u+dx,v+dy,cl,3,l);break;
+   case'blot':for(const[dx,dy]of[[0,0],[1,0],[0,1],[1,1],[-1,0],[0,-1],[2,1]])set(u+dx,v+dy,'#111111',3,l);break;
+   case'commit':for(const[dx,dy,cl]of[[0,0,'#2da44e'],[1,0,'#2da44e'],[0,1,'#116329'],[1,1,'#116329'],[0,-1,'#24292f'],[1,-1,'#24292f'],[-1,0,'#24292f'],[-1,1,'#24292f'],[2,0,'#24292f'],[2,1,'#24292f'],[0,2,'#24292f'],[1,2,'#24292f']])set(u+dx,v+dy,cl,3,l);break;
+   case'ball':for(const[dx,dy,cl]of[[0,-2,'#ffb3b3'],[1,-2,'#e53935'],[0,-1,'#e53935'],[1,-1,'#8e1b1b']])set(u+dx,v+dy,cl,3,l);break;
+  }}
+ if(st.acc==='scrub'){const[u,v]=acc(pr*L);for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const dd=dx*dx+dy*dy;if(dd<=4)set(u+dx,v+dy,dd<=1&&dx<=0&&dy<=0?'#ff8a8a':dd===4||dd===5?'#a30000':'#ff0000',4,pr*L)}}
  const order=[];for(let p=0;p<N;p++)if(kind[p])order.push(p);order.sort((p,q)=>arc[p]-arc[q]);
  const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.className='strand';cv.style.cssText=`left:${ox*P}px;top:${oy*P}px;width:${w*P}px;height:${h*P}px`;
  const cx=cv.getContext('2d'),img=cx.createImageData(w,h);
- const rgb=col.map(c=>c?hex(c):null);
- s.str={cv,cx,img,order,rgb,arc,shown:0,L};
- return cv}
-function growTo(s,frac){const g=s.str,lim=frac*g.L+.01,d=g.img.data;let n=g.shown;
- while(n<g.order.length&&g.arc[g.order[n]]<=lim){const p=g.order[n],c=g.rgb[p],o=p*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255;n++}
- if(n!==g.shown){g.shown=n;g.cx.putImageData(g.img,0,0)}}
+ s.str={cv,cx,img,order,rgb:col.map(c=>c?hex(c):null),arc,shown:0,L,frac:0};
+ const sp=document.createElement('i');sp.className='spark';s.spark=sp;
+ return[cv,sp]}
+function growTo(s,frac){const g=s.str,d=g.img.data;frac=Math.max(0,Math.min(1.001,frac));const lim=frac*g.L+.01;let n=g.shown;
+ if(frac<g.frac){while(n>0&&g.arc[g.order[n-1]]>lim){const o=g.order[n-1]*4;d[o+3]=0;n--}} // retract
+ else while(n<g.order.length&&g.arc[g.order[n]]<=lim){const p=g.order[n],c=g.rgb[p],o=p*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255;n++}
+ g.frac=frac;if(n!==g.shown){g.shown=n;g.cx.putImageData(g.img,0,0)}
+ // glowing pixel spark at the moving tip
+ const moving=frac>0&&frac<1,sp=s.spark;sp.style.display=moving?'block':'none';
+ if(moving){const p=pointAt(s,frac*s.len);sp.style.left=Math.round(p.x/P)*P+'px';sp.style.top=Math.round(p.y/P)*P+'px'}}
 // ---------- rifts: a pixel crack in the white dot-grid surface with the site's world inside ----------
 const RW=150,RH=130; // art px canvas around each rift
 const THEME={
@@ -141,7 +138,7 @@ function themePix(name,th,x,y,t,deep){const b=th.bg;let c;
  return c}
 // ---------- build world ----------
 const strandLayer=document.createElement('div');strandLayer.id='strands';world.prepend(strandLayer);
-SITES.forEach((s,i)=>{strandPts(s,i);strandLayer.appendChild(buildString(s,i));
+SITES.forEach((s,i)=>{strandPts(s,i);strandLayer.append(...buildString(s,i));
  const rf=document.createElement('div');rf.className='rift r-'+s.theme;rf.id='rift-'+s.id;rf.style.left=s.x+'px';rf.style.top=s.y+'px';
  s.rift=makeRift(s,i);
  rf.innerHTML=`<button class="seed" aria-label="Open rift: ${s.title}"></button><div class="panel"><h2>${s.title}</h2><p class="by">${s.by}</p>`+
@@ -150,14 +147,19 @@ SITES.forEach((s,i)=>{strandPts(s,i);strandLayer.appendChild(buildString(s,i));
  rf.querySelector('.seed').addEventListener('click',e=>{e.stopPropagation();if(dragMoved>6)return;if(mapMode)setMap(false,s);else follow(s)});
  world.appendChild(rf);s.el=rf});
 // ---------- intro: strings grow out after the LLC finishes forming ----------
-let growStart=0;
+let growStart=0,retractAt=0;
 function introDone(){const p=window.__llc5&&__llc5.phase;return p==='rest'||p==='static'}
-const GROW=1600,STAG=260;
+const GROW=1400,STAG=180,easeIO=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
 function growStep(now){
- if(!growStart){if(introDone()||(window.__llc5&&__llc5.phase==='skipping'))growStart=now;else return}
- for(let i=0;i<SITES.length;i++){const s=SITES[i],k=RM?1:Math.min(1,Math.max(0,(now-growStart-i*STAG)/GROW));
-  if(s.str.shown<s.str.order.length)growTo(s,k===1?1.01:1-Math.pow(1-k,2));
-  if(k>=1&&s.rift.pop<1){s.rift.pop=RM?1:Math.min(1,s.rift.pop+.12);s.el.classList.add('shown')}}}
+ if(!growStart){if(introDone())growStart=now;else return}
+ for(let i=0;i<SITES.length;i++){const s=SITES[i],o=ORDER.indexOf(s.id);let k;
+  if(retractAt){k=RM?0:1-Math.min(1,Math.max(0,(now-retractAt-(ORDER.length-1-o)*STAG*.5)/(GROW*.7)));}
+  else k=RM?1:Math.min(1,Math.max(0,(now-growStart-o*STAG)/GROW));
+  const f=easeIO(k);if(Math.abs(f-s.str.frac)>1e-4||(k===1&&s.str.frac<1))growTo(s,k>=1?1.001:f);
+  if(k>=1&&!retractAt&&s.rift.pop<1){s.rift.pop=RM?1:Math.min(1,s.rift.pop+.12);s.el.classList.add('shown')}
+  if(retractAt&&k<1){s.rift.pop=0;s.el.classList.remove('shown','open')}}}
+// hide (retract back into the logo) / show (draw outward again)
+function retractStrings(){retractAt=performance.now()}function growStrings(){if(retractAt){retractAt=0;growStart=performance.now()}}
 // ---------- camera ----------
 let px=0,py=0,z=1,anim=0,mapMode=false;const ZMIN=.05,ZMAX=3;
 function draw(){const tx=Math.round(-px*z),ty=Math.round(-py*z);world.style.transform=`translate(${tx}px,${ty}px) scale(${z})`;
@@ -212,7 +214,7 @@ document.getElementById('recenter').onclick=()=>{if(mapMode){mapMode=false;docum
 // pixel-art map icon
 {const c=document.createElement('canvas');c.width=12;c.height=10;const x=c.getContext('2d');const art=['.##..##..##.','#ee##ff##ee#','#ee#ff#gg#e#','#e##ff#gg#e#','#ee#ffr#gee#','#ee#f#r#g#e#','#e##ff##gee#','#ee#ff#gg#e#','#ee##ff##ee#','.##..##..##.'],pal={'#':'#222','e':'#cfe3b4','f':'#f3e2b0','g':'#9fc9e8','r':'#d33'};
  art.forEach((row,y)=>[...row].forEach((ch,X)=>{if(pal[ch]){x.fillStyle=pal[ch];x.fillRect(X,y,1,1)}}));mapBtn.innerHTML='';mapBtn.appendChild(c)}
-window.__pan={get x(){return px},get y(){return py},get z(){return z},set(x,y,zz=z){stop();px=x;py=y;z=zz;draw()},to,follow:id=>follow(SITES.find(s=>s.id===id)),map:setMap,
+window.__pan={get x(){return px},get y(){return py},get z(){return z},set(x,y,zz=z){stop();px=x;py=y;z=zz;draw()},to,follow:id=>follow(SITES.find(s=>s.id===id)),map:setMap,retract:retractStrings,grow:growStrings,
  point:(id,f)=>{const s=SITES.find(s=>s.id===id),p=pointAt(s,s.len*f);return[innerWidth/2+(p.x-px)*z,innerHeight/2+(p.y-py)*z]}};
 addEventListener('resize',draw);draw();
 })();
