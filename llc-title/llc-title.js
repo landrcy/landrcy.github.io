@@ -10,17 +10,40 @@ const img=ctx.createImageData(W,H),buf=img.data;for(let i=3;i<buf.length;i+=4)bu
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // white-page recolour: the art is light-on-#080a12; treat it as light over black and composite onto white
 const WHITE=cv.dataset.white!=null;const out=ctx.createImageData(W,H),ob=out.data;
-const A=new Uint8Array(W*H),L=new Int32Array(W*H),Q=new Int32Array(W*H);
-// label 4-connected regions of value v; call f(size,touchesEdge) and fill with result
-function regions(v,f){L.fill(0);let id=0;for(let s=0;s<A.length;s++){if(A[s]!==v||L[s])continue;id++;let h=0,t=0,edge=false;Q[t++]=s;L[s]=id;
- while(h<t){const p=Q[h++],x=p%W,y=(p/W)|0;if(x===0||y===0||x===W-1||y===H-1)edge=true;
-  const nb=[x>0?p-1:-1,x<W-1?p+1:-1,y>0?p-W:-1,y<H-1?p+W:-1];for(const q of nb)if(q>=0&&A[q]===v&&!L[q]){L[q]=id;Q[t++]=q}}
- if(f(t,edge))for(let k=0;k<t;k++)A[Q[k]]=1-v}}
+// ---- white page: stable silhouette mask from the assembled final frame ----
+// bg = flood fill from the border through dark pixels; unreached = letter (holes filled for free); tiny islands (stars) dropped; dilated 1px.
+let MASK=null,F0=null;
+const keyed=(r,g,b)=>{const m=Math.max(r,g,b),n=Math.min(r,g,b);return m>=46&&!(m-n<28&&m>150)};
+function buildMask(fimg){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(fimg,0,0);
+ const d=x.getImageData(0,0,W,H).data,N=W*H,bg=new Uint8Array(N),Qm=new Int32Array(N);let h=0,t=0;
+ const dark=p=>{const o=p*4,r=d[o],g=d[o+1],b=d[o+2],m=Math.max(r,g,b),n=Math.min(r,g,b);return m<46||(m-n<28&&m>150)}; // bg tolerance (incl. white stars)
+ for(let p=0;p<N;p++){const X=p%W,Y=(p/W)|0;if((X===0||Y===0||X===W-1||Y===H-1)&&dark(p)){bg[p]=1;Qm[t++]=p}}
+ while(h<t){const p=Qm[h++],X=p%W;for(const q of [X>0?p-1:-1,X<W-1?p+1:-1,p-W,p+W])if(q>=0&&q<N&&!bg[q]&&dark(q)){bg[q]=1;Qm[t++]=q}}
+ // enclosed dark regions: big ones are real counters (bg), small ones are holes in the texture (letter)
+ {const seen=new Uint8Array(N);for(let s0=0;s0<N;s0++){if(bg[s0]||seen[s0]||!dark(s0))continue;h=0;t=0;Qm[t++]=s0;seen[s0]=1;
+  while(h<t){const p=Qm[h++],X=p%W;for(const q of [X>0?p-1:-1,X<W-1?p+1:-1,p-W,p+W])if(q>=0&&q<N&&!bg[q]&&!seen[q]&&dark(q)){seen[q]=1;Qm[t++]=q}}
+  if(t>=40)for(let k=0;k<t;k++)bg[Qm[k]]=1}}
+ // drop small letter islands (stars / sparkles not touching letters)
+ const lab=new Int32Array(N);let id=0;
+ for(let s0=0;s0<N;s0++){if(bg[s0]||lab[s0])continue;id++;h=0;t=0;Qm[t++]=s0;lab[s0]=id;
+  while(h<t){const p=Qm[h++],X=p%W;for(const q of [X>0?p-1:-1,X<W-1?p+1:-1,p-W,p+W,X>0?p-W-1:-1,X<W-1?p-W+1:-1,X>0?p+W-1:-1,X<W-1?p+W+1:-1])if(q>=0&&q<N&&!bg[q]&&!lab[q]){lab[q]=id;Qm[t++]=q}}
+  if(t<20)for(let k=0;k<t;k++)bg[Qm[k]]=1}
+ const M=new Uint8Array(N);for(let p=0;p<N;p++)if(!bg[p]){const X=p%W;M[p]=1;if(X>0)M[p-1]=1;if(X<W-1)M[p+1]=1;if(p>=W)M[p-W]=1;if(p+W<N)M[p+W]=1}
+ return M}
+if(WHITE)Promise.resolve().then(()=>{loadImg(BASE+'final.png').then(f=>{MASK=buildMask(f);put()}).catch(()=>{});
+ loadImg(BASE+'frame0.png').then(f=>{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.drawImage(f,0,0);F0=x.getImageData(0,0,W,H).data}).catch(()=>{})})
+const A=new Uint8Array(W*H);
 const put=()=>{if(!WHITE){ctx.putImageData(img,0,0);return}
- for(let p=0,i=0;p<A.length;p++,i+=4){const r=buf[i],g=buf[i+1],b=buf[i+2],m=Math.max(r,g,b),n=Math.min(r,g,b);
-  A[p]=(m>=46&&!(m-n<28&&m>150))?1:0}
- regions(1,(n)=>n<20);            // tiny specks (stars, sparkles) -> background
- regions(0,(n,e)=>!e&&n<80);      // small enclosed gaps inside letters -> letter (opaque)
+ const assembling=phase!=='rest'&&phase!=='static';
+ for(let p=0,i=0;p<A.length;p++,i+=4){const r=buf[i],g=buf[i+1],b=buf[i+2];let on;
+  if(MASK&&MASK[p]){ // inside the letter silhouette
+   on=assembling?(keyed(r,g,b)||(F0&&(Math.abs(r-F0[i])+Math.abs(g-F0[i+1])+Math.abs(b-F0[i+2])>18))):1}
+  else on=keyed(r,g,b)?2:0; // outside: flying pixels / drips, speck-filtered below
+  A[p]=on}
+ // speck filter for outside pixels only (stars)
+ for(let y=0,p=0;y<H;y++)for(let x=0;x<W;x++,p++){if(A[p]!==2)continue;let c=0;
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;const xx=x+dx,yy=y+dy;if(xx>=0&&yy>=0&&xx<W&&yy<H&&A[yy*W+xx])c++}
+  if(c<2)A[p]=0}
  for(let p=0,i=0;p<A.length;p++,i+=4){if(A[p]){ob[i]=buf[i];ob[i+1]=buf[i+1];ob[i+2]=buf[i+2];ob[i+3]=255}else{ob[i]=ob[i+1]=ob[i+2]=255;ob[i+3]=0}}
  ctx.putImageData(out,0,0)};
 const loadImg=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src});
