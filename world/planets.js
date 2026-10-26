@@ -74,17 +74,10 @@ P.ashaad=(S,t,o)=>{const op=Math.max(0,Math.min(1,(o&&o.open)||0)),MET=['#1a1210
  const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const o=(y*W+x)*4,q=hx(c);d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
  const bob=Math.sin(t*1.1)*W*.03,cx=W/2+Math.sin(t*.5)*W*.03,cy=Hh*.6+bob,a=W*.4,bd=W*.15,th=W*.08,ha=a*.7,hb=bd*.62;
  const lit=(x,y)=>Math.max(0,Math.min(1,.7-(x-cx)/W*.9-(y-cy)/Hh*.7));
- const pk=Math.max(0,Math.min(1,(op-.45)/.55)),peek=pk*(.85+.15*Math.sin(t*1.7)),ang=op*(.9+.06*Math.sin(t*2.3)); // lid angle rises when he peeks
- // lid (hinged on hole back edge, rises up/back)
- const lb=cy-hb,Lh=(bd*1.5*Math.sin(ang)+hb*.5)*Math.min(1,op*4);if(op>.02)
- for(let y=Math.floor(lb-Lh);y<=lb;y++){const f=(lb-y)/Lh,hw=ha*(1-.22*f);for(let x=Math.floor(cx-hw);x<=cx+hw;x++){const u=(x-cx)/hw,l=lit(x,y)*.9;let c;
-   if(Math.abs(u)>.9||f>.93)c=dq(MET,l*.8,x,y);else if(Math.abs(f-.3)<.05||Math.abs(f-.72)<.05)c=dq(MET,l*.9+.1,x,y);
-   else{const pl=Math.floor((u+1)*3);c=dq(WD,l*.85+vn(pl*5.1,f*6)*.3-.1+(pl%2)*.05-(Math.abs(((u+1)*3)%1)<.12?.25:0),x,y)}
-   if(Math.hypot(u*hw-hw*.0,(f-.85)*Lh)<W*.045&&Math.hypot(u*hw,(f-.85)*Lh)>W*.025)c=dq(MET,l+.25,x,y);put(x,y,c)}}
- // frame top face + hole
+ const pk=Math.max(0,Math.min(1,(op-.55)/.45)),peek=pk*(.85+.15*Math.sin(t*1.7)),ang=op*(.9+.06*Math.sin(t*2.3)); // frame top face + hole
  for(let y=Math.floor(cy-bd);y<=cy+bd;y++)for(let x=Math.floor(cx-a);x<=cx+a;x++){const u=(x-cx)/a,v=(y-cy)/bd;if(Math.abs(u)>1-Math.max(0,v)*.0||Math.abs(v)>1)continue;
   const inH=Math.abs(x-cx)<ha&&Math.abs(y-cy)<hb;const l=lit(x,y);
-  if(inH&&op<.02){const u2=(x-cx)/ha,pl=Math.floor((u2+1)*3);put(x,y,Math.abs(y-cy)<1||Math.abs(u2)>.9?dq(MET,l*.8,x,y):dq(WD,l*.95+vn(pl*5.1,y*.2)*.3-.05+(pl%2)*.06,x,y));continue}if(inH){put(x,y,dq(['#000000','#08040c','#160a14'],(y-(cy-hb))/(2*hb)*.6,x,y));continue}
+  if(false){const u2=(x-cx)/ha,pl=Math.floor((u2+1)*3);put(x,y,Math.abs(y-cy)<1||Math.abs(u2)>.9?dq(MET,l*.8,x,y):dq(WD,l*.95+vn(pl*5.1,y*.2)*.3-.05+(pl%2)*.06,x,y));continue}if(inH){put(x,y,dq(['#000000','#08040c','#160a14'],(y-(cy-hb))/(2*hb)*.6,x,y));continue}
   const edge=Math.abs(u)>.93||Math.abs(v)>.85;put(x,y,edge?dq(MET,l*.8,x,y):dq(WD,l*.9+vn(x*.3,y*.9)*.25-.1,x,y))}
  // Ashaad peeking (clipped at hole front edge)
  const hs=(ha*1.1)/AHEAD.w,hw2=AHEAD.w*hs,hh=AHEAD.h*hs,hx0=cx-hw2/2+Math.sin(t*.7)*ha*.12,front=cy+hb,top=front-hh*(.25+.75*peek)-hb*.4;
@@ -93,16 +86,25 @@ P.ashaad=(S,t,o)=>{const op=Math.max(0,Math.min(1,(o&&o.open)||0)),MET=['#1a1210
   let r=AHEAD.d[o],g=AHEAD.d[o+1],b=AHEAD.d[o+2];if(blink&&j>=10&&j<=12&&i>3&&i<19){r=150;g=95;b=75}const sh=.55+.45*(1-(y-top)/(front-top));const q=(y*W+Math.round(x))*4;d[q]=r*sh;d[q+1]=g*sh;d[q+2]=b*sh*1.05;d[q+3]=255}
  // front thickness face
  for(let y=Math.floor(cy+bd);y<=cy+bd+th;y++)for(let x=Math.floor(cx-a);x<=cx+a;x++){const l=lit(x,y)*.6;put(x,y,Math.abs(x-cx)>a*.93||y>cy+bd+th-1.5?dq(MET,l*.7,x,y):dq(WD,l+vn(x*.25,3)*.2-.15,x,y))}
+ // lid: hinged on the FRONT edge of the hole, swings toward the viewer and hangs down the front
+ {const th=op*Math.PI*1.38+(op>.9?.04*Math.sin(t*2.3):0),hy=cy+hb,Dv=2*hb*1.9,yf=hy-2*hb*Math.cos(th)-Dv*Math.sin(th),top=yf<hy,y0=Math.min(hy,yf),y1=Math.max(hy,yf),span=Math.max(1,y1-y0);
+  for(let y=Math.floor(y0);y<=Math.ceil(y1);y++){const f2=Math.abs(y-hy)/span,hw=ha*(1+.06*f2*(top?-1:1))+1;for(let x=Math.floor(cx-hw);x<=cx+hw;x++){const u=(x-cx)/hw,l=lit(x,y)*(top?.95:.7);let c;
+   if(Math.abs(u)>.9||f2>.9)c=dq(MET,l*.8,x,y);
+   else if(top&&(Math.abs(f2-.3)<.07||Math.abs(f2-.72)<.07))c=dq(MET,l*.9+.1,x,y);
+   else if(!top&&Math.abs((u+1)/2-f2)<.07)c=dq(WD,l*.7-.05,x,y);
+   else{const pl=Math.floor((u+1)*3);c=dq(WD,l*.85+vn(pl*5.1,f2*6)*.3-.1+(pl%2)*.05-(Math.abs(((u+1)*3)%1)<.12?.25:0),x,y)}
+   if(top&&Math.hypot(u*hw,(f2-.5)*span)<W*.045&&Math.hypot(u*hw,(f2-.5)*span)>W*.025)c=dq(MET,l+.25,x,y);put(x,y,c)}}
+  for(const hx2 of[-.55,.55]){for(let k=-2;k<=2;k++)put(cx+ha*hx2+k,hy,dq(MET,.8,0,0))}}
  // purple shadow tint on lower-right
  for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){const o=(y*W+x)*4;if(!d[o+3])continue;const s2=lit(x,y);if(s2<.25&&bay(x,y)>s2*3){d[o]=d[o]*.8+34*.2;d[o+1]=d[o+1]*.8+24*.2;d[o+2]=d[o+2]*.8+44*.2}}
  S.g.putImageData(S.img,0,0)};
 /* ---------- YOUTUBE planet ---------- */
 const YTR=['#2a0406','#5c0a0e','#99141b','#d0222a','#ff4a4a','#ff9a8a'],WH=['#6a6a72','#b8b8c0','#ffffff'];
 P.yt=(S,t)=>{const W=S.img.width,R=W*.4;
- sphere(S,R,W/2,W/2,t*.3,(lon,lat,lit,x,y,nz,dx,dy)=>{const sh=lit;
-  const band=Math.sin(lat*9+Math.sin(lon*2+t*.1)*1.3);let v=sh*.95+band*.08;
+ sphere(S,R,W/2,W/2,t*.45,(lon,lat,lit,x,y,nz,dx,dy)=>{const sh=lit;
+  const band=Math.sin(lat*9+Math.sin(lon*3)*1.3)+(vn(lon*4+20,lat*5)-.5)*.8;let v=sh*.95+band*.1;
   // play-button continents repeating around the planet
-  const px=(dx+.02)/.5,py=dy/.5,ax=Math.abs(px),ay=Math.abs(py)/.7;
+  let u=((lon%Math.PI)+Math.PI*1.5)%Math.PI-Math.PI/2;const px=u/.62,py=lat/.55,ax=Math.abs(px),ay=Math.abs(py)/.7;
   const box=Math.pow(ax,6)+Math.pow(ay,6)<1,tri=px>-.38&&px<.5&&Math.abs(py)<(.5-px)*.62;
   if(tri)return dq(['#3a0406','#8a0c14','#e0141e','#ff4040'],sh*1.1,x,y);if(box)return dq(WH,sh*1.1+.15,x,y);
   return dq(YTR,v,x,y,Math.abs(lat)>.9?LINE:bay)},{w:Math.max(2,R*.08),r:['#4a0408','#a01018','#ff5050']})};
