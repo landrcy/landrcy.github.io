@@ -136,8 +136,8 @@ function frame(now){if(sys==='archive'&&!warp&&document.body.classList.contains(
  g.globalAlpha=Math.max(0,1-wv*1.6);
  // orbit rings (pixel dashes)
  const ring=(cx,cy,r,prog,col)=>{const ps=Math.max(1,Math.min(3,Math.round(cam.z))),n=Math.max(48,Math.floor(r*cam.z*TAU/(ps*3.5)));g.fillStyle=col;for(let k=0;k<n*prog;k++){if(k%3===2)continue;const a=k/n*TAU-Math.PI/2,[sx,sy]=W2S(cx+Math.cos(a)*r,cy+Math.sin(a)*r*SQ);g.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}};
- {const ps=Math.max(1,Math.min(3,Math.round(cam.z))),ga0=g.globalAlpha;for(const b of bodies){if(b.orb==null||b.moon)continue;const n=Math.max(18,Math.min(60,Math.round(b.orb*cam.z*.9/(ps*3)))),arc=Math.min(1.1,140/b.orb),dr=b.dir||1;g.fillStyle=b.tc||'#c8ccff';
- for(let k=1;k<=n;k++){const f=k/n,an=b.ang-dr*arc*f,[sx,sy]=W2S(Math.cos(an)*b.orb,Math.sin(an)*b.orb*SQ);if(sx<-4||sy<-4||sx>W+4||sy>H+4)continue;const al=Math.pow(1-f,1.6)*.6*IS.orb;if(al<.02||(k%2&&f>.35))continue;g.globalAlpha=ga0*al;g.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}}g.globalAlpha=ga0}
+ {const ps=Math.max(1,Math.min(3,Math.round(cam.z))),ga0=g.globalAlpha;for(const b of bodies){if(b.orb==null||b.moon)continue;const n=Math.max(40,Math.min(130,Math.round(b.orb*cam.z*2.6/(ps*3)))),arc=2.6,dr=b.dir||1;g.fillStyle=b.tc||'#c8ccff';
+ for(let k=1;k<=n;k++){const f=k/n,an=b.ang-dr*arc*f,[sx,sy]=W2S(Math.cos(an)*b.orb,Math.sin(an)*b.orb*SQ);if(sx<-4||sy<-4||sx>W+4||sy>H+4)continue;const al=Math.pow(1-f,1.3)*.6*IS.orb;if(al<.02||(k%2&&f>.35))continue;g.globalAlpha=ga0*al;g.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}}g.globalAlpha=ga0}
  if(sys==='main'){const[yx,yy]=pos(MAIN[3]);}
  {const A=MAIN[1],tg=(hover===A||focus===A)?1:0;A.op=(A.op||0)+(tg-(A.op||0))*Math.min(1,dt*(tg?2.2:3));A.arg={open:RM?tg:A.op}}
  drawBelt(dt,IS.orb);drawShips(now,IS.orb);
