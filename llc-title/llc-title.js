@@ -8,7 +8,11 @@ const W=320,H=180,FPS=30,ASM=285,REST=180,BASE='llc-title/';
 const ctx=cv.getContext('2d',{alpha:false});
 const img=ctx.createImageData(W,H),buf=img.data;for(let i=3;i<buf.length;i+=4)buf[i]=255;
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const put=()=>ctx.putImageData(img,0,0);
+// white-page recolour: the art is light-on-#080a12; treat it as light over black and composite onto white
+const WHITE=cv.dataset.white!=null;const out=ctx.createImageData(W,H),ob=out.data;
+const put=()=>{for(let i=0;i<buf.length;i+=4){const r=buf[i],g=buf[i+1],b=buf[i+2],m=Math.max(r,g,b),n=Math.min(r,g,b);
+ if(!WHITE){ctx.putImageData(img,0,0);return}let a=(m-48)/60;a=a<0?0:a>1?1:a;if(m-n<28&&m>150)a*=Math.max(0,(m-n)/28); // drop near-white stars/sparkle haze
+ ob[i]=255+(r-255)*a;ob[i+1]=255+(g-255)*a;ob[i+2]=255+(b-255)*a;ob[i+3]=255}ctx.putImageData(out,0,0)};
 const loadImg=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src});
 function setFrom(i){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(i,0,0);buf.set(x.getImageData(0,0,W,H).data)}
 // ---- responsive crisp scaling: whole multiples when >=2x, fractional below ----
