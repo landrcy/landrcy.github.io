@@ -49,7 +49,7 @@ const put=()=>{if(!WHITE){ctx.putImageData(img,0,0);return}
 const loadImg=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src});
 function setFrom(i){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(i,0,0);buf.set(x.getImageData(0,0,W,H).data)}
 // ---- responsive crisp scaling: whole multiples when >=2x, fractional below ----
-function size(){const aw=WHITE?innerWidth*.9:(hero.clientWidth||innerWidth),ah=Math.max(240,innerHeight-90);
+function size(){if(cv.dataset.scale){const s=+cv.dataset.scale;cv.style.width=W*s+'px';logo.style.setProperty('--s',s);return}const aw=WHITE?innerWidth*.9:(hero.clientWidth||innerWidth),ah=Math.max(240,innerHeight-90);
  const raw=Math.min(aw/W,ah/H,5);const s=raw>=2?Math.floor(raw):Math.max(1,Math.floor(raw*16)/16);
  cv.style.width=W*s+'px';logo.style.setProperty('--s',s)}
 size();addEventListener('resize',size);
