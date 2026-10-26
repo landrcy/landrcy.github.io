@@ -10,8 +10,6 @@ const SITES=[
   blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play'},
  {id:'gow',theme:'gow',s:'gow',ang:300,dist:1500,title:'Game of Websites',by:'coopercitywebsites.github.io',img:'sites/gow/screenshot.png',
   blurb:'A searchable catalogue of every site in the collection — unblocked games, NeoForge mods, old builds and the trash pile — ranked by how much code went into each one.',href:'https://coopercitywebsites.github.io/main/',cta:'Open'},
- {id:'bf',theme:'bf',s:'bf',ang:100,dist:1450,title:'Eternal Ball Fight',by:'by landrcy',img:'',
-  blurb:'Weapon balls fighting endlessly, with a running Total Ball Standings board.',href:'archive/#ballfight',cta:'▶ Watch'},
 ];
 window.LLC_SITES=SITES;
 const vp=document.getElementById('viewport'),world=document.getElementById('world'),mapBtn=document.getElementById('mapbtn');
@@ -45,7 +43,7 @@ const C32=new Map();function c32(c){let v=C32.get(c);if(v!==undefined)return v;l
  if(c[0]==='#'){if(c.length===4){r=parseInt(c[1]+c[1],16);g=parseInt(c[2]+c[2],16);b=parseInt(c[3]+c[3],16)}else{r=parseInt(c.slice(1,3),16);g=parseInt(c.slice(3,5),16);b=parseInt(c.slice(5,7),16)}}
  else{const m=c.match(/[\d.]+/g);r=+m[0];g=+m[1];b=+m[2];if(m[3]!=null)a=Math.round(+m[3]*255)}
  v=((a<<24)|(b<<16)|(g<<8)|r)>>>0;C32.set(c,v);return v}
-const FA=127,FB=63,BAND=12;
+const FA=160,FB=82,BAND=12;
 function buildFrame(layer){
  const M=30,W=(FA+BAND+M)*2,H=(FB+BAND+M)*2,cx=W/2,cy=H/2,N=W*H;
  const Hm=new Float32Array(N),mat=new Uint8Array(N),tm=new Float32Array(N).fill(99);
@@ -56,7 +54,7 @@ function buildFrame(layer){
  const stamp=(ex,ey,R,hf,m,t0)=>{for(let j=-R-1;j<=R+1;j++)for(let i=-R-1;i<=R+1;i++){const x=Math.round(cx+ex+i),y=Math.round(cy+ey+j);if(x<0||y<0||x>=W||y>=H)continue;
    const h=hf(x-cx-ex,y-cy-ey);if(!(h>0))continue;const p=y*W+x,base=m===4?3:2,v=base+h;if(v>Hm[p]||mat[p]<2){Hm[p]=Math.max(Hm[p],v);mat[p]=m;tm[p]=Math.min(tm[p],t0+ihash(x,y)*.08)}}};
  const rose=(R,rot)=>(dx,dy)=>{const r=Math.hypot(dx,dy),f=Math.atan2(dy,dx),Re=R*(.78+.22*Math.abs(Math.cos(2.5*f+rot)));if(r>Re)return 0;
-  let h=1.3*(1-r/Re)+.35*Math.cos(5*f+rot)*(r/Re);if(Math.abs(r/R-.55)<.09)h-=.35;if(r<R*.28)h+=.6;return h};
+  const cp=Math.cos(5*f+rot);let h=1.3*(1-r/Re)+.35*cp*(r/Re);if(cp<-.8&&r>R*.3)h-=.9;if(Math.abs(r/R-.55)<.08)h-=.7;if(r<R*.28)h+=.8;if(r<R*.12)h-=.4;return h};
  const leaf=(L,Wd,al)=>(dx,dy)=>{const u=dx*Math.cos(al)+dy*Math.sin(al),v=-dx*Math.sin(al)+dy*Math.cos(al);if(u<0||u>L)return 0;const w=Wd*Math.sin(Math.PI*u/L);if(Math.abs(v)>w)return 0;let h=1-(v*v)/(w*w+.01)*.7;if(Math.abs(v)<.6)h-=.3;return h};
  const curl=(sg)=>(dx,dy)=>{const r=Math.hypot(dx,dy);if(r>5.5)return 0;const f=(Math.atan2(dy,dx)*sg+TAU)%TAU;let best=9;for(let k=0;k<3;k++){const rr=1+.55*(f+TAU*k);best=Math.min(best,Math.abs(r-rr))}return best<1.1?1-best/1.1:0};
  const at=(th,off)=>[(FA+off)*Math.cos(th),(FB+off)*Math.sin(th)];
@@ -69,22 +67,19 @@ function buildFrame(layer){
  // knobs: string attachment points on the outer edge, evenly spaced (same anchors the strings use)
  OV.anc.forEach(([wx,wy],k)=>{const ex=wx/P,ey=wy/P;stamp(ex,ey,6,(dx,dy)=>{const r=Math.hypot(dx,dy);return r<4.2?.8+Math.sqrt(1-(r/4.2)**2)*1.6:r<5.6?.5:0},4,1.5+k*.02)});
  // shade the height field (light from top-left), wood ramp, outlines, soft drop shadow
- const RAMP=['#1e0f05','#3a1d0a','#552c12','#6e3c18','#8a4f22','#a8673a','#c98a58','#e0ab78'].map(c32),KN=['#2a1407','#4a2410','#7a4424','#b06a3e','#e09a68','#ffd2a8'].map(c32);
- const WOOD=['#3e2210','#4a2913','#552f17','#61371b','#6d3f20','#7a4826'].map(c32),SEAM=c32('#2a160a'),OUT=c32('#140a03'),SH=c32('rgba(40,20,5,.22)');
+ const RAMP=['#3a2304','#6b4508','#9a6a10','#c08a1c','#dcaa30','#efc84a','#f8e07a','#fff4c0'].map(c32),KN=['#4a2e06','#8a5a0c','#c08a1c','#e8b838','#f8e07a','#ffffff'].map(c32),CREASE=c32('#5a3a06'),GLINT=c32('#ffffff');
+ const WOOD=['#e6dcc6','#ece3cf','#f1e9d8','#f5efe2','#f8f3e9','#fbf8f1'].map(c32),SEAM=c32('#2a160a'),OUT=c32('#2a1802'),SH=c32('rgba(40,20,5,.22)');
  const col=new Uint32Array(N);
  for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){const p=y*W+x,m=mat[p];if(!m){const q=(y-2)*W+(x-1);if(y>2&&x>1&&mat[q]>=2){col[p]=SH;tm[p]=tm[q]}continue}
-  if(m===1){const X=x-cx,Y=y-cy,row=Math.floor((Y+200)/14),rowY=(Y+200)%14,off=(row*37)%60;
-   if(rowY===0||((X+400+off)%70===0)){col[p]=SEAM;continue}
-   const g=Y*1.1+3.2*Math.sin(X*.045+row)+1.6*Math.sin(X*.13+Y*.05+row*2),v=Math.sin(g*1.15)*.5+.5;
-   let i=Math.floor(v*2.4+ihash(x,y)*1.3+1.2);const r=Math.hypot(X/FA,Y/FB);if(r>.9)i-=Math.round((r-.9)*30);if(r<.55)i+=1;
-   for(const[kx,ky]of[[-70,18],[64,-30],[20,40]]){const kd=Math.hypot((X-kx)/2.2,Y-ky);if(kd<5&&((kd|0)%2===0))i-=2}
+  if(m===1){const X=x-cx,Y=y-cy,r=Math.hypot(X/FA,Y/FB);let i=5-(ihash(x>>1,y)>.92?1:0)+Math.round(Math.sin(Y*.35+Math.sin(X*.02)*2)*.4);if(r>.8)i-=Math.round((r-.8)*12);if(r>.96)i-=1;
    col[p]=WOOD[Math.max(0,Math.min(5,i))];continue}
   const gx=Hm[p+1]-Hm[p-1],gy=Hm[p+W]-Hm[p-W],nl=(.5*gx+.6*gy+.62)/Math.hypot(gx,gy,1);
   if(!mat[p-1]||!mat[p+1]||!mat[p-W]||!mat[p+W]){col[p]=OUT;continue}
+  if(m===3&&(mat[p-1]===2||mat[p+1]===2||mat[p-W]===2||mat[p+W]===2)&&Hm[p]>3){col[p]=CREASE;continue}
   const ao=(Hm[p]<(Hm[p-1]+Hm[p+1]+Hm[p-W]+Hm[p+W])/4-.25)?-1.2:0;
   if(m===4){col[p]=KN[Math.max(0,Math.min(5,Math.floor(nl*5.2+ao)))];continue}
   const b=nl*6.4+ao+(ihash(x*3,y)-.5)*.9+(m===3?.5:0)+Math.sin((x*.9+y*.3))*.25;
-  col[p]=RAMP[Math.max(0,Math.min(7,Math.floor(b)))]}
+  col[p]=b>7.6&&ihash(x,y*7)>.8?GLINT:RAMP[Math.max(0,Math.min(7,Math.floor(b)))]}
  const cv=document.createElement('canvas');cv.width=W;cv.height=H;cv.id='oval';cv.style.cssText=`left:${-W/2*P}px;top:${-H/2*P}px;width:${W*P}px;height:${H*P}px`;layer.appendChild(cv);
  const c=cv.getContext('2d'),img=c.createImageData(W,H),u=new Uint32Array(img.data.buffer);
  const order=[];for(let p=0;p<N;p++)if(col[p])order.push(p);order.sort((a,b)=>tm[a]-tm[b]);
@@ -92,10 +87,10 @@ function buildFrame(layer){
  let n=0,last=0;const t0=performance.now();const f=now=>{if(now-last>=80||n===0){last=now;const el=(now-t0)/1000;while(n<order.length&&tm[order[n]]<=el){u[order[n]]=col[order[n]];n++}c.putImageData(img,0,0)}if(n<order.length)requestAnimationFrame(f)};requestAnimationFrame(f)}
 const OVR=[(FA+BAND+2)*P,(FB+BAND+2)*P];
 const OV=(()=>{const n=4000,pt=[],cum=[0];for(let i=0;i<=n;i++){const a=-Math.PI/2+i/n*6.2832;pt.push([Math.cos(a)*OVR[0],Math.sin(a)*OVR[1]]);if(i)cum.push(cum[i-1]+Math.hypot(pt[i][0]-pt[i-1][0],pt[i][1]-pt[i-1][1]))}
- const tot=cum[n],anc=[];for(let k=0;k<6;k++){const l=tot*k/6;let i=0;while(cum[i]<l)i++;anc.push(pt[i])}return{pt,anc}})();
+ const tot=cum[n],anc=[];for(let k=0;k<5;k++){const l=tot*k/5;let i=0;while(cum[i]<l)i++;anc.push(pt[i])}return{pt,anc}})();
 // ---------- string geometry (world px) ----------
 // evenly spaced radial layout; each string is one eased cubic Bézier (gentle S-curve), arc-length resampled
-const ORDER=['gow','void','ashaad','sea','yt','bf'];const TI=ORDER.indexOf('yt');
+const ORDER=['gow','void','ashaad','sea','yt'];const TI=ORDER.indexOf('yt');
 const YT=['yt-langrino','yt-clutch','yt-trivia','yt-reddit','yt-sat'];
 function bez(site,sx,sy,ex,ey,bowf){const L=Math.hypot(ex-sx,ey-sy),ux=(ex-sx)/L,uy=(ey-sy)/L,nx=-uy,ny=ux,bow=bowf*L;
  const c1=[sx+(ex-sx)*.3+nx*bow,sy+(ey-sy)*.3+ny*bow],c2=[sx+(ex-sx)*.7-nx*bow*.8,sy+(ey-sy)*.7-ny*bow*.8];

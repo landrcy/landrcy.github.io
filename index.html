@@ -11,9 +11,9 @@ html,body{margin:0;height:100%;overflow:hidden;background:#fff;color:#1a1a22;ove
 #world{position:absolute;left:50%;top:50%;width:0;height:0;will-change:transform}
 .area{position:absolute;transform:translate(-50%,-50%);z-index:1;pointer-events:none}.area canvas,.area button{pointer-events:auto}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-h1.logo.llc5{display:flex;flex-direction:column;align-items:center;gap:.6rem;margin:0}
+h1.logo.llc5{position:relative;display:flex;flex-direction:column;align-items:center;gap:.6rem;margin:0}
 h1.logo.llc5 canvas{display:block;height:auto;aspect-ratio:16/9;image-rendering:pixelated;background:transparent}
-.llc5-skip{font:400 .72rem Silkscreen,monospace;letter-spacing:.06em;color:#8a8fa0;background:#fff;border:1px solid #dde0e8;padding:.35rem .7rem;cursor:pointer;min-height:1.9rem;transition:opacity .6s}
+.llc5-skip{position:absolute;top:100%;left:50%;transform:translate(-50%,8px);white-space:nowrap;font:400 .72rem Silkscreen,monospace;letter-spacing:.06em;color:#8a8fa0;background:#fff;border:1px solid #dde0e8;padding:.35rem .7rem;cursor:pointer;min-height:1.9rem;transition:opacity .6s}
 .llc5-skip.off{opacity:0;pointer-events:none;visibility:hidden}
 .ui{position:fixed;bottom:1.1rem;font:400 .7rem Silkscreen,monospace;letter-spacing:.08em;color:#8a90a2;text-decoration:none;background:rgba(255,255,255,.85);border:1px solid #e3e6ee;padding:.35rem .6rem;cursor:pointer;z-index:5}
 .ui:hover,.ui:focus-visible{color:#222}.side{right:1.2rem}#recenter{left:1.2rem}
@@ -24,7 +24,7 @@ h1.logo.llc5 canvas{display:block;height:auto;aspect-ratio:16/9;image-rendering:
   <!-- areas are positioned in world coordinates (px from the origin); the LLC sits at 0,0 -->
   <section class="area hero" id="area-llc" data-x="0" data-y="0">
    <h1 class="logo llc5"><span class="sr">LLC</span>
-   <canvas data-white data-delay="1750" data-scale="2" id="llc5c" width="320" height="180" aria-hidden="true"></canvas><noscript><img src="llc-title/final.png" alt="" width="640" style="image-rendering:pixelated"></noscript>
+   <canvas data-white data-delay="1750" data-scale="3" id="llc5c" width="320" height="180" aria-hidden="true"></canvas><noscript><img src="llc-title/final.png" alt="" width="640" style="image-rendering:pixelated"></noscript>
    <button type="button" class="llc5-skip off" id="llc5skip" aria-label="Skip the title animation">click or press any key to skip</button></h1>
   </section>
  </div>
