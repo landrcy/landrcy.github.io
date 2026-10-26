@@ -51,20 +51,17 @@ P.sun=(S,t,o)=>{o=o||{};const W=S.img.width,R=W*.34,cx=W/2,cy=W/2,ign=o.ign??1;c
    for(const[fx,fy,fr]of FLARES){const q=Math.hypot(dx-fx,dy-fy)/fr;if(q<1){const fl=.7+.3*Math.sin(t*6+fx*20)*Math.sin(t*3.7+fy*17);v+=(1-q)*(1-q)*1.8*fl}}
    if(r>.93)v=Math.max(v,.85+(r-.93)*3);col=dq(SUNR,v*ign,x,y);
    const lx=x-lx0,ly=y-ly0;if(Lp>0&&lx>=0&&ly>=0&&lx<Ld&&ly<Ld&&Lmask.m[ly*Ld+lx])col='#000000'}
-  else if(ign>.98&&r<1.42){const h=r-1;let v=0;
-   // faint thin corona
-   if(h<.09&&H(x,y+Math.floor(t*3))>.55+h*5)v=.18-h;
-   // wispy tendrils / spicules
-   const tl=Math.pow(vn(ang*26+3,t*.6),3)*.2+Math.pow(vn(ang*61,t*1.1+9),4)*.12;if(h<tl){const k=1-h/tl;if(H(x,y)<.35+k*.65)v=Math.max(v,.25+k*.55)}
-   // looping prominences
-   for(const[a0,da,hh,sp,ph]of PROMS){let dA=Math.atan2(Math.sin(ang-a0),Math.cos(ang-a0));const sd=dA/da+.5;if(sd<0||sd>1)continue;
-    const cyc=(Math.sin(t*sp+ph)*.5+.5),ht=hh*(.45+.55*cyc),tr=ht*Math.sin(Math.PI*sd),th=.028+.02*Math.sin(Math.PI*sd);
-    const dd=Math.abs(h-tr);if(dd<th){const flow=vn(sd*9-t*2.2*sp+ph*3,h*30);v=Math.max(v,.45+.45*(1-dd/th)+(flow-.5)*.5)}
-    else if(h<tr&&h>0&&H(x+Math.floor(t*4),y)>.86)v=Math.max(v,.3)}
+  else if(ign>.98&&r<1.47){const cs=Math.max(2,Math.round(W/64)),qx=(Math.floor(x/cs)+.5)*cs,qy=(Math.floor(y/cs)+.5)*cs,qdx=(qx-cx)/R,qdy=(qy-cy)/R,h=Math.hypot(qdx,qdy)-1,qa=Math.atan2(qdy,qdx);let v=0;
+   // chunky flame tongues curling off the limb
+   const ca=qa-h*1.6*Math.sin(t*.7+qa*3),tl=.06+Math.pow(vn(ca*7+3,t*.45),2.2)*.34+Math.pow(vn(ca*17,t*.9+9),3)*.1;if(h<tl){const k=1-h/tl;v=Math.max(v,.18+k*.82)}
+   // looping prominences (thick banded arcs)
+   for(const[a0,da,hh,sp,ph]of PROMS){let dA=Math.atan2(Math.sin(qa-a0),Math.cos(qa-a0));const sd=dA/da+.5;if(sd<0||sd>1)continue;
+    const cyc=(Math.sin(t*sp+ph)*.5+.5),ht=hh*1.25*(.45+.55*cyc),tr=ht*Math.sin(Math.PI*sd),th=.05+.035*Math.sin(Math.PI*sd);
+    const dd=Math.abs(h-tr);if(dd<th)v=Math.max(v,.3+.7*(1-dd/th))}
    // bursting flares
-   for(const[a0,per,ph]of BURSTS){const c=((t+ph)%per)/per;if(c>.35)continue;const dA=Math.abs(Math.atan2(Math.sin(ang-a0),Math.cos(ang-a0)));const len=.38*Math.sin(c/.35*Math.PI),wd=.06*(1-h/(len+.001))+.012*vn(h*40,t*5);
-    if(h<len&&dA<wd){const k=1-h/len;v=Math.max(v,.5+k*.5)}}
-   if(v>.12)col=dq(PROMR,v,x,y,h>.12?STAR:bay)}
+   for(const[a0,per,ph]of BURSTS){const c=((t+ph)%per)/per;if(c>.35)continue;const dA=Math.abs(Math.atan2(Math.sin(qa-a0),Math.cos(qa-a0)));const len=.45*Math.sin(c/.35*Math.PI),wd=.09*(1-h/(len+.001));
+    if(h<len&&dA<wd){const k=1-h/len;v=Math.max(v,.4+k*.6)}}
+   if(v>.18)col=v>.82?'#fff4c8':v>.64?'#ffd54a':v>.45?'#ff9a1e':v>.3?'#e8600e':'#b23a0a'}
   const o2=(y*W+x)*4;if(col){const c=hx(col);d[o2]=c[0];d[o2+1]=c[1];d[o2+2]=c[2];d[o2+3]=255}else d[o2+3]=0}
  S.g.putImageData(img,0,0)};
 /* ---------- ASHAAD: basement flesh/brick planet with a trapdoor ---------- */
