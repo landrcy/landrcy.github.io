@@ -33,7 +33,9 @@ const ARCH=[
  B({id:'ballfight',paint:'ballfight',w:46,orb:368,per:124,ph:1,hr:.36,title:'Eternal Ball Fight',by:'from the space hub',blurb:'Balls fight forever and the standings keep count.',href:'archive/#ballfight',cta:'▶ Watch'}),
  B({id:'ccold',paint:'ccold',w:50,orb:412,per:140,ph:4,hr:.4,title:"Cooper City's number one official website",by:'coopercitywebsites.github.io',blurb:'The original Cooper City site, linked from the old LLC footer.',href:'https://coopercitywebsites.github.io/',cta:'Open'}),
  B({id:'sat-home',paint:'satellite',w:64,h:40,orb:458,per:200,ph:5.5,hr:.3,title:'Fly home',home:1})];
-for(const b of [...MAIN,...MOONS,...ARCH]){b.S=P.mk(b.w,b.h||b.w);b.ang=b.ph||0}
+const LOD=[[3.2,4],[1.7,7],[1,0]];
+function lodLv(){return Math.max(0,Math.min(2,Math.log(cam.z/1.1)/Math.log(2)))}
+for(const b of [...MAIN,...MOONS,...ARCH]){b.L=LOD.map(([dv])=>P.mk(Math.max(8,Math.round(b.w/dv)),Math.max(6,Math.round((b.h||b.w)/dv))));b.S=b.L[2];b.nx=[0,0,0];b.ang=b.ph||0}
 let sys='main',bodies=MAIN;
 // ---- camera ----
 const cam={x:0,y:0,z:1};let tw=null,focus=null,hover=null,intro=RM?null:{t0:performance.now()};
@@ -83,9 +85,14 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;const IS=int
  const draw=[];bodies.forEach((b,i)=>draw.push([b,i]));if(sys==='main')MOONS.forEach((m,i)=>draw.push([m,3]));
  draw.sort((a,b)=>pos(a[0])[1]-pos(b[0])[1]);
  for(const[b,i]of draw){const pp=b.id==='sun'||b.id==='oldhub'?1:IS.pop(Math.min(i,7)+(b.moon?.5:0));if(pp<=0)continue;
-  if(now>=b.next||(b.id==='sun'&&intro)){const o=b.id==='sun'?{ign:IS.ign,L:IS.L}:b.arg;P[b.paint](b.S,RM?7:now/1000+(b.ph||0)*3,o);b.next=RM?Infinity:now+(b.w>140?70:95)+Math.random()*30}
   const[x,y]=pos(b),[sx,sy]=W2S(x,y),w=b.w*cam.z*pp,h=(b.h||b.w)*cam.z*pp;
-  if(sx+w<0||sx-w>W||sy+h<0||sy-h>H)continue;g.drawImage(b.S.c,Math.round(sx-w/2),Math.round(sy-h/2),Math.round(w),Math.round(h))}
+  if(sx+w<0||sx-w>W||sy+h<0||sy-h>H)continue;
+  const lv=lodLv(),t0=Math.floor(lv),fr=t0>=2?0:Math.max(0,Math.min(1,(lv-t0-.3)/.4)),fs=fr*fr*(3-2*fr);
+  const ga=g.globalAlpha,tiers=fs>=1?[[t0+1,1]]:fs>0?[[t0,1],[t0+1,fs]]:[[t0,1]];
+  for(const[ti,al]of tiers){const S=b.L[ti];
+   if(now>=b.nx[ti]||(b.id==='sun'&&intro)){const o=b.id==='sun'?{ign:IS.ign,L:IS.L}:b.arg;P[b.paint](S,RM?7:now/1000+(b.ph||0)*3,o);if(LOD[ti][1])P.reduce(S,LOD[ti][1]+(b.paint==='sea'||b.paint==='gow'?3:0));b.nx[ti]=RM?Infinity:now+(ti?95:160)+(b.w>140&&ti?-25:0)+Math.random()*30}
+   g.globalAlpha=ga*al;g.drawImage(S.c,Math.round(sx-w/2),Math.round(sy-h/2),Math.round(w),Math.round(h))}
+  g.globalAlpha=ga}
  g.globalAlpha=1;if(focus)placeInfo();
  requestAnimationFrame(frame)}
 // ---- hit testing ----

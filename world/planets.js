@@ -227,6 +227,9 @@ P.vplanet=(S,t,kind)=>{const W=S.img.width,R=W*.4,pal=VPAL[kind];
  if(kind==='strings'){const img=S.g.getImageData(0,0,W,W),d=img.data,cx=W/2,cy=W/2; // gold frame ring
   for(let y=0;y<W;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=(y+.5-cy)/.32,r=Math.hypot(dx,dy)/R;if(r>1.22&&r<1.42){if(y<cy&&Math.hypot(x+.5-cx,y+.5-cy)<R)continue;const a=Math.atan2(dy,dx),c=hx(dq(['#3a2304','#9a6a10','#efc84a','#fff4c0'],.55+.4*Math.cos(a+2.3)+(Math.sin(a*14)>.8?.2:0),x,y)),o=(y*W+x)*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}}
   S.g.putImageData(img,0,0)}};
-P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
+function reduce(S,n){const im=S.g.getImageData(0,0,S.c.width,S.c.height),d=im.data,cnt=new Map();for(let i=0;i<d.length;i+=4){if(d[i+3]<24)continue;const k=(d[i]>>4)<<8|(d[i+1]>>4)<<4|(d[i+2]>>4);cnt.set(k,(cnt.get(k)||0)+1)}
+ const all=[...cnt.entries()].sort((a,b)=>b[1]-a[1]),pal=[];for(const[k]of all){const c=[(k>>8&15)*17,(k>>4&15)*17,(k&15)*17];if(pal.every(q=>Math.abs(q[0]-c[0])+Math.abs(q[1]-c[1])+Math.abs(q[2]-c[2])>70))pal.push(c);if(pal.length>=n)break}
+ if(!pal.length)return;for(let i=0;i<d.length;i+=4){if(d[i+3]<24){d[i+3]=0;continue}d[i+3]=d[i+3]<150?150:255;let b=0,bd=1e9;for(let j=0;j<pal.length;j++){const q=pal[j],e=(d[i]-q[0])**2*.3+(d[i+1]-q[1])**2*.59+(d[i+2]-q[2])**2*.11;if(e<bd){bd=e;b=j}}d[i]=pal[b][0];d[i+1]=pal[b][1];d[i+2]=pal[b][2];d[i+3]=255}S.g.putImageData(im,0,0)}
+P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
 })();
