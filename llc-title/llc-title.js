@@ -82,7 +82,8 @@ function tick(now){raf=0;
   if(restP){const tot=Math.floor((now-rT0)*FPS/1000);let steps=tot-rTot;rTot=tot;
    if(steps>0){steps%=REST;for(let i=0;i<steps;i++){apply(restP,rcur);rcur=(rcur+1)%REST}if(steps)put()}}
   schedule()}}
-function startAssembly(){if(started)return;started=true;
+function startAssembly(){if(started)return;started=true;const dl=+(cv.dataset.delay||0);if(dl&&!RM){needRest().catch(()=>{});setTimeout(go,dl);return}go()}
+function go(){
  needRest().catch(()=>{});
  needAsm().then(()=>{if(phase!=='idle')return;phase='asm';cur=0;t0=performance.now();setHint(true);schedule()}).catch(showFinalOnly)}
 function showFinalOnly(){ // fallback: no packs available/supported -> final art, still

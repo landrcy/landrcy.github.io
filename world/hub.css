@@ -41,3 +41,11 @@ canvas.strand{position:absolute;image-rendering:pixelated;image-rendering:crisp-
 @media(prefers-reduced-motion:reduce){.rift.open .panel{animation:none!important}}
 .spark{position:absolute;width:3px;height:3px;margin:-1px 0 0 -1px;background:#fff;display:none;pointer-events:none;
  box-shadow:3px 0 0 #ffe66d,-3px 0 0 #ffe66d,0 3px 0 #ffe66d,0 -3px 0 #ffe66d,3px 3px 0 rgba(255,200,80,.45),-3px -3px 0 rgba(255,200,80,.45),3px -3px 0 rgba(255,200,80,.45),-3px 3px 0 rgba(255,200,80,.45),6px 0 0 rgba(255,220,120,.35),-6px 0 0 rgba(255,220,120,.35),0 6px 0 rgba(255,220,120,.35),0 -6px 0 rgba(255,220,120,.35)}
+.panel canvas.icon{display:block;width:96px;height:96px;margin:6px auto;image-rendering:pixelated;padding:12px;background:rgba(0,0,0,.18);box-shadow:0 0 0 3px #222}
+#oval{position:absolute;image-rendering:pixelated;pointer-events:none}
+@keyframes sway{0%,100%{transform:rotate(-.35deg)}50%{transform:rotate(.35deg)}}
+canvas.strand{animation:sway 7s ease-in-out infinite}
+.pulse{position:absolute;left:-3px;top:-3px;width:6px;height:6px;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.55),0 0 8px 3px rgba(255,236,170,.6);pointer-events:none;display:none;z-index:1}
+#viewport::before{content:"";position:absolute;inset:-50%;pointer-events:none;background:radial-gradient(ellipse at center,rgba(255,255,255,0) 0,rgba(255,255,255,.55) 18%,rgba(255,255,255,0) 36%);background-size:900px 900px;animation:gridwave 26s linear infinite;opacity:.6}
+@keyframes gridwave{from{transform:translate(0,0)}to{transform:translate(900px,900px)}}
+@media(prefers-reduced-motion:reduce){canvas.strand,#viewport::before{animation:none!important}#viewport::before{display:none}.pulse{display:none!important}}
