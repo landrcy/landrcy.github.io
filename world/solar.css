@@ -58,26 +58,6 @@ body.arch #back{z-index:40}
 #info.sea .seaplay{display:block;width:26%;aspect-ratio:1;pointer-events:auto;filter:drop-shadow(0 0 6px #48CAE488);transition:transform .15s}
 #info.sea .seaplay svg{width:100%;height:100%;display:block}
 #info.sea .seaplay:hover,#info.sea .seaplay:focus-visible{transform:scale(1.08)}
-#flybtn{right:1rem}
-body.flying #sat,body.flying .ui:not(.fexit){display:none!important}
-#flight{position:fixed;inset:0;z-index:50;background:#010103;font-family:'Silkscreen',monospace;color:#e8ecff;touch-action:none;user-select:none}
-#flight[hidden]{display:none}
-#fcv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
-.fhud{position:absolute;inset:0;pointer-events:none;padding:calc(env(safe-area-inset-top) + 10px) calc(env(safe-area-inset-right) + 12px) calc(env(safe-area-inset-bottom) + 10px) calc(env(safe-area-inset-left) + 12px)}
-.fstat{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#5affb0;text-shadow:1px 1px 0 #000}
-.fmap{position:absolute;right:calc(env(safe-area-inset-right) + 12px);top:calc(env(safe-area-inset-top) + 10px);width:96px;height:96px;image-rendering:pixelated;border:2px solid #3a4058}
-.fprompt{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;pointer-events:auto}
-.fprompt[hidden]{display:none}
-.fname{font-size:clamp(16px,3vw,26px);color:#ffd67a;text-shadow:2px 2px 0 #000}
-.fgo{font:inherit;font-size:13px;color:#010103;background:#5affb0;padding:8px 14px;text-decoration:none;box-shadow:3px 3px 0 #000}
-.fexit{position:absolute;left:calc(env(safe-area-inset-left) + 12px);bottom:calc(env(safe-area-inset-bottom) + 10px);pointer-events:auto;font:inherit;font-size:12px;color:#e8ecff;background:#1c2132;border:2px solid #6a7290;padding:8px 12px;cursor:pointer}
-.fhelp{position:absolute;right:calc(env(safe-area-inset-right) + 12px);bottom:calc(env(safe-area-inset-bottom) + 12px);font-size:10px;color:#8890c0;max-width:46vw;text-align:right}
-.fstick,.fthr,.fbrk{display:none}
-@media (pointer:coarse){.fhelp{display:none}
- .fstick{display:block;position:absolute;left:calc(env(safe-area-inset-left) + 22px);bottom:calc(env(safe-area-inset-bottom) + 70px);width:110px;height:110px;border-radius:50%;border:2px solid #6a729088;background:#1c213255;pointer-events:auto}
- .fstick i{position:absolute;left:35px;top:35px;width:40px;height:40px;border-radius:50%;background:#5affb0aa}
- .fthr,.fbrk{display:block;position:absolute;right:calc(env(safe-area-inset-right) + 22px);width:64px;height:64px;font-size:22px;color:#010103;background:#5affb0cc;border:0;pointer-events:auto}
- .fthr{bottom:calc(env(safe-area-inset-bottom) + 140px)}.fbrk{bottom:calc(env(safe-area-inset-bottom) + 66px);background:#ff8a6acc}}
 
 #info.lg .txt{width:100%;height:100%;max-width:none;justify-content:center;gap:5%;transform:none;left:0;top:0;opacity:var(--rv,1);transition:none;container-type:size;background:none;border:0;box-shadow:none;padding:0}
 #info.lg .lgimg{display:block;width:100%;max-height:60%;min-height:0;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 2px 0 var(--bg))}
@@ -94,3 +74,6 @@ body.flying #sat,body.flying .ui:not(.fexit){display:none!important}
 #info.lg .lgc{font:400 5.5cqw 'Silkscreen',monospace;color:#fff;background:#ff0033;border:0;box-shadow:0 2px 0 #8a0014;padding:1.5cqh 3cqw;cursor:pointer}
 #info.lg .lgc:hover{background:#ff4060}
 #info.lg .lgtx.fb{font-size:15cqw;line-height:.95;color:#ffcf3a;text-shadow:0 .6cqw 0 #ff6464,0 1.2cqw 0 #3a1a06,0 0 6px #000}
+#sndbtn{right:1rem;width:2.4rem;height:2.4rem;padding:.35rem;display:flex;align-items:center;justify-content:center}
+#sndbtn svg{width:100%;height:100%;image-rendering:pixelated}
+#sndbtn[aria-pressed=true]{color:#5affb0}
