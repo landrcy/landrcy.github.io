@@ -70,13 +70,13 @@ P.sun=(S,t,o)=>{o=o||{};const W=S.img.width,R=W*.34,cx=W/2,cy=W/2,ign=o.ign??1;c
 /* ---------- ASHAAD: basement flesh/brick planet with a trapdoor ---------- */
 const BRK=['#1e0d0b','#3d1a14','#64291c','#8a3f27','#b25f3a','#d88a5c'],FL=['#2a0c12','#5a1823','#8f2a36','#c4505a','#e8858a'],WD=['#1f1206','#4a2b0f','#7a4a1b','#a8702e','#d3a056'],MET=['#1c1c22','#4a4a52','#8a8a94','#d4d4dc'];
 const AHEAD={w:23,h:26,d:Uint8Array.from(atob('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'),c=>c.charCodeAt(0))};
-P.ashaad=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);
+P.ashaad=(S,t,o)=>{const op=Math.max(0,Math.min(1,(o&&o.open)||0)),MET=['#1a1210','#3a2a22','#6a5448','#b09478'];const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);
  const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const o=(y*W+x)*4,q=hx(c);d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
  const bob=Math.sin(t*1.1)*W*.03,cx=W/2+Math.sin(t*.5)*W*.03,cy=Hh*.6+bob,a=W*.4,bd=W*.15,th=W*.08,ha=a*.7,hb=bd*.62;
  const lit=(x,y)=>Math.max(0,Math.min(1,.7-(x-cx)/W*.9-(y-cy)/Hh*.7));
- const cyc=(t*.35)%1,peek=cyc<.15?cyc/.15:cyc<.6?1:cyc<.72?1-(cyc-.6)/.12:0,ang=.55+.35*Math.sin(t*.9)*.25+peek*.35; // lid angle rises when he peeks
+ const pk=Math.max(0,Math.min(1,(op-.45)/.55)),peek=pk*(.85+.15*Math.sin(t*1.7)),ang=op*(.9+.06*Math.sin(t*2.3)); // lid angle rises when he peeks
  // lid (hinged on hole back edge, rises up/back)
- const lb=cy-hb,Lh=bd*1.5*Math.sin(ang)+hb*.5;
+ const lb=cy-hb,Lh=(bd*1.5*Math.sin(ang)+hb*.5)*Math.min(1,op*4);if(op>.02)
  for(let y=Math.floor(lb-Lh);y<=lb;y++){const f=(lb-y)/Lh,hw=ha*(1-.22*f);for(let x=Math.floor(cx-hw);x<=cx+hw;x++){const u=(x-cx)/hw,l=lit(x,y)*.9;let c;
    if(Math.abs(u)>.9||f>.93)c=dq(MET,l*.8,x,y);else if(Math.abs(f-.3)<.05||Math.abs(f-.72)<.05)c=dq(MET,l*.9+.1,x,y);
    else{const pl=Math.floor((u+1)*3);c=dq(WD,l*.85+vn(pl*5.1,f*6)*.3-.1+(pl%2)*.05-(Math.abs(((u+1)*3)%1)<.12?.25:0),x,y)}
@@ -84,17 +84,17 @@ P.ashaad=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);
  // frame top face + hole
  for(let y=Math.floor(cy-bd);y<=cy+bd;y++)for(let x=Math.floor(cx-a);x<=cx+a;x++){const u=(x-cx)/a,v=(y-cy)/bd;if(Math.abs(u)>1-Math.max(0,v)*.0||Math.abs(v)>1)continue;
   const inH=Math.abs(x-cx)<ha&&Math.abs(y-cy)<hb;const l=lit(x,y);
-  if(inH){put(x,y,dq(['#000000','#08040c','#160a14'],(y-(cy-hb))/(2*hb)*.6,x,y));continue}
+  if(inH&&op<.02){const u2=(x-cx)/ha,pl=Math.floor((u2+1)*3);put(x,y,Math.abs(y-cy)<1||Math.abs(u2)>.9?dq(MET,l*.8,x,y):dq(WD,l*.95+vn(pl*5.1,y*.2)*.3-.05+(pl%2)*.06,x,y));continue}if(inH){put(x,y,dq(['#000000','#08040c','#160a14'],(y-(cy-hb))/(2*hb)*.6,x,y));continue}
   const edge=Math.abs(u)>.93||Math.abs(v)>.85;put(x,y,edge?dq(MET,l*.8,x,y):dq(WD,l*.9+vn(x*.3,y*.9)*.25-.1,x,y))}
  // Ashaad peeking (clipped at hole front edge)
- const hs=Math.max(1,(ha*1.1)/AHEAD.w),hw2=AHEAD.w*hs,hh=AHEAD.h*hs,hx0=cx-hw2/2+Math.sin(t*.7)*ha*.12,front=cy+hb,top=front-hh*(.25+.75*peek)-hb*.4;
+ const hs=(ha*1.1)/AHEAD.w,hw2=AHEAD.w*hs,hh=AHEAD.h*hs,hx0=cx-hw2/2+Math.sin(t*.7)*ha*.12,front=cy+hb,top=front-hh*(.25+.75*peek)-hb*.4;
  const blink=(t*1.3)%3.2<.14;
- if(peek>.02)for(let y=Math.max(0,Math.floor(top));y<front;y++)for(let x=Math.floor(hx0);x<hx0+hw2;x++){const i=Math.floor((x-hx0)/hs),j=Math.floor((y-top)/hs);if(i<0||j<0||i>=AHEAD.w||j>=AHEAD.h)continue;const o=(j*AHEAD.w+i)*4;if(AHEAD.d[o+3]<128)continue;
+ if(peek>.02&&op>.3)for(let y=Math.max(0,Math.floor(top));y<front;y++)for(let x=Math.floor(hx0);x<hx0+hw2;x++){const i=Math.floor((x-hx0)/hs),j=Math.floor((y-top)/hs);if(Math.abs(x-cx)>ha||i<0||j<0||i>=AHEAD.w||j>=AHEAD.h)continue;const o=(j*AHEAD.w+i)*4;if(AHEAD.d[o+3]<128)continue;
   let r=AHEAD.d[o],g=AHEAD.d[o+1],b=AHEAD.d[o+2];if(blink&&j>=10&&j<=12&&i>3&&i<19){r=150;g=95;b=75}const sh=.55+.45*(1-(y-top)/(front-top));const q=(y*W+Math.round(x))*4;d[q]=r*sh;d[q+1]=g*sh;d[q+2]=b*sh*1.05;d[q+3]=255}
  // front thickness face
  for(let y=Math.floor(cy+bd);y<=cy+bd+th;y++)for(let x=Math.floor(cx-a);x<=cx+a;x++){const l=lit(x,y)*.6;put(x,y,Math.abs(x-cx)>a*.93||y>cy+bd+th-1.5?dq(MET,l*.7,x,y):dq(WD,l+vn(x*.25,3)*.2-.15,x,y))}
  // purple shadow tint on lower-right
- for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){const o=(y*W+x)*4;if(!d[o+3])continue;const s2=lit(x,y);if(s2<.32&&bay(x,y)>s2*2.2){d[o]=d[o]*.6+34*.4;d[o+1]=d[o+1]*.6+28*.4;d[o+2]=d[o+2]*.6+66*.4}}
+ for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){const o=(y*W+x)*4;if(!d[o+3])continue;const s2=lit(x,y);if(s2<.25&&bay(x,y)>s2*3){d[o]=d[o]*.8+34*.2;d[o+1]=d[o+1]*.8+24*.2;d[o+2]=d[o+2]*.8+44*.2}}
  S.g.putImageData(S.img,0,0)};
 /* ---------- YOUTUBE planet ---------- */
 const YTR=['#2a0406','#5c0a0e','#99141b','#d0222a','#ff4a4a','#ff9a8a'],WH=['#6a6a72','#b8b8c0','#ffffff'];
@@ -121,8 +121,8 @@ const SEA=['#04112a','#0a2a5a','#11508a','#1f82b8','#4cb8dc','#a6e6f4'],SAND=['#
 P.sea=(S,t)=>{const W=S.img.width,R=W*.4,cx=W/2,cy=W/2,rot=t*.24;
  sphere(S,R,cx,cy,rot,(lon,lat,lit,x,y,nz)=>{
   const sw=Math.sin(lon*9+lat*4-t*1.8)*.5+Math.sin(lon*5-lat*7+t*1.3)*.35+Math.sin(lon*15+t*2.6)*.15,dep=fbm(lon*2.2+4,lat*2.2);
-  const isl=fbm(lon*1.6+11,lat*1.6+2);if(isl>.72)return dq(SAND,lit+(isl-.72)*2-.15,x,y);
-  if(isl>.68||(sw>.72&&H(x+Math.floor(t*6),y)>.45))return dq(['#6a90b0','#c8e6f2','#ffffff'],lit+.1,x,y);
+  const isl=0;
+  if((sw>.72&&H(x+Math.floor(t*6),y)>.45))return dq(['#6a90b0','#c8e6f2','#ffffff'],lit+.1,x,y);
   return dq(SEA,lit*.9+sw*.1-(dep-.5)*.25,x,y,sw>.5?LINE:bay)},{w:Math.max(2,R*.08),r:['#1a4a8a','#6ad0f4']});
  const d=S.img.data,put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=W)return;const o=(y*W+x)*4,q=hx(c);d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
  const GL=['#0e3a2c','#2e8a6c','#7ad8b0','#d8fff0'],CK=['#4a2a0e','#9a6a2a'],SC=['#8a7a5a','#f4ead0'];
