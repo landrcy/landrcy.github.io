@@ -2,23 +2,61 @@
 <link rel="icon" href="favicons/llc-infinity-16.png" type="image/png" sizes="16x16"><link rel="icon" href="favicons/llc-infinity-32.png" type="image/png" sizes="32x32"><link rel="icon" href="favicon.ico" sizes="any"><link rel="apple-touch-icon" href="favicons/llc-infinity-180.png"><title>LLC</title><meta name="description" content="Games and websites by Landry.">
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap" rel="stylesheet">
 <style>
-html,body{margin:0;height:100%;background:#fff;color:#1a1a22}
-.hero{min-height:100vh;display:grid;place-items:center;padding:0;overflow:hidden}
-.hero>div{width:100%}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-h1.logo.llc5{display:flex;flex-direction:column;align-items:center;gap:.6rem;margin:0;width:100%}
-h1.logo.llc5 canvas{display:block;max-width:100vw;height:auto;aspect-ratio:16/9;image-rendering:pixelated;background:#fff}
-h1.logo.llc5.playing canvas{cursor:pointer}
-.llc5-skip{font:400 .72rem Silkscreen,monospace;letter-spacing:.06em;color:#8a8fa0;background:none;border:1px solid #dde0e8;padding:.35rem .7rem;cursor:pointer;min-height:1.9rem;transition:opacity .6s}
+html,body{margin:0;height:100%;overflow:hidden;background:#fff;color:#1a1a22;overscroll-behavior:none}
+/* infinite pannable world: #viewport fills the screen, #world is translated by the camera */
+#viewport{position:fixed;inset:0;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;outline:none;
+ background-color:#fff;background-image:radial-gradient(circle,#9fb0c8 0.8px,transparent 1.1px);background-size:7px 7px}
+#viewport.drag{cursor:grabbing}
+#world{position:absolute;left:50%;top:50%;width:0;height:0;will-change:transform}
+.area{position:absolute;transform:translate(-50%,-50%)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+h1.logo.llc5{display:flex;flex-direction:column;align-items:center;gap:.6rem;margin:0}
+h1.logo.llc5 canvas{display:block;height:auto;aspect-ratio:16/9;image-rendering:pixelated;background:transparent}
+.llc5-skip{font:400 .72rem Silkscreen,monospace;letter-spacing:.06em;color:#8a8fa0;background:#fff;border:1px solid #dde0e8;padding:.35rem .7rem;cursor:pointer;min-height:1.9rem;transition:opacity .6s}
 .llc5-skip.off{opacity:0;pointer-events:none;visibility:hidden}
-.side{position:fixed;right:1.2rem;bottom:1.1rem;font:400 .7rem Silkscreen,monospace;letter-spacing:.08em;color:#9aa0b0;text-decoration:none}
-.side:hover,.side:focus-visible{color:#333}
+.ui{position:fixed;bottom:1.1rem;font:400 .7rem Silkscreen,monospace;letter-spacing:.08em;color:#8a90a2;text-decoration:none;background:rgba(255,255,255,.85);border:1px solid #e3e6ee;padding:.35rem .6rem;cursor:pointer;z-index:5}
+.ui:hover,.ui:focus-visible{color:#222}.side{right:1.2rem}#recenter{left:1.2rem}
 @media(prefers-reduced-motion:reduce){.llc5-skip{display:none}*{transition:none!important}}
 </style></head><body>
-<main id="top"><header class="hero"><div>
-<h1 class="logo llc5"><span class="sr">LLC</span>
-<canvas data-white id="llc5c" width="320" height="180" aria-hidden="true"></canvas><noscript><img src="llc-title/final.png" alt="" width="640" style="image-rendering:pixelated"></noscript>
-<button type="button" class="llc5-skip off" id="llc5skip" aria-label="Skip the title animation">click or press any key to skip</button></h1>
-</div></header></main>
-<a class="side" href="archive/">archive →</a>
+<div id="viewport" tabindex="0" aria-label="Pannable canvas: drag, scroll or use arrow keys to move around">
+ <div id="world">
+  <!-- areas are positioned in world coordinates (px from the origin); the LLC sits at 0,0 -->
+  <section class="area hero" id="area-llc" data-x="0" data-y="0">
+   <h1 class="logo llc5"><span class="sr">LLC</span>
+   <canvas data-white id="llc5c" width="320" height="180" aria-hidden="true"></canvas><noscript><img src="llc-title/final.png" alt="" width="640" style="image-rendering:pixelated"></noscript>
+   <button type="button" class="llc5-skip off" id="llc5skip" aria-label="Skip the title animation">click or press any key to skip</button></h1>
+  </section>
+ </div>
+</div>
+<button type="button" class="ui" id="recenter">+ recenter</button>
+<a class="ui side" href="archive/">archive →</a>
+<script>
+/* Pan camera. Future sections: add {id,x,y,html} to AREAS (world px, origin = LLC centre). */
+const AREAS=[ /* e.g. {id:'games',x:1400,y:0,html:'<h2>Games</h2>'} */ ];
+(function(){
+const vp=document.getElementById('viewport'),world=document.getElementById('world');
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+for(const a of AREAS){const el=document.createElement('section');el.className='area';el.id='area-'+a.id;el.dataset.x=a.x;el.dataset.y=a.y;el.innerHTML=a.html||'';world.appendChild(el)}
+for(const el of world.querySelectorAll('.area')){el.style.left=(+el.dataset.x||0)+'px';el.style.top=(+el.dataset.y||0)+'px'}
+let cx=0,cy=0,anim=0; // camera offset (world px the view is shifted by)
+function draw(){world.style.transform=`translate(${cx}px,${cy}px)`;vp.style.backgroundPosition=`calc(50% + ${cx}px) calc(50% + ${cy}px)`}
+function stop(){cancelAnimationFrame(anim);anim=0}
+window.__pan={get x(){return cx},get y(){return cy},
+ set(x,y){stop();cx=x;cy=y;draw()},
+ to(x,y,ms=900){stop();if(RM||!ms){cx=x;cy=y;return draw()}const sx=cx,sy=cy,t0=performance.now();
+  const f=t=>{let k=Math.min(1,(t-t0)/ms);k=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;cx=sx+(x-sx)*k;cy=sy+(y-sy)*k;draw();if(k<1)anim=requestAnimationFrame(f)};anim=requestAnimationFrame(f)}};
+let drag=null,moved=0;
+vp.addEventListener('pointerdown',e=>{if(e.target.closest('button,a'))return;stop();drag={x:e.clientX,y:e.clientY,id:e.pointerId};moved=0;vp.setPointerCapture(e.pointerId);vp.classList.add('drag')});
+vp.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;moved+=Math.abs(dx)+Math.abs(dy);cx+=dx;cy+=dy;drag.x=e.clientX;drag.y=e.clientY;draw()});
+const end=()=>{drag=null;vp.classList.remove('drag')};vp.addEventListener('pointerup',end);vp.addEventListener('pointercancel',end);
+// a real drag shouldn't count as a "click to skip" on the title
+vp.addEventListener('click',e=>{if(moved>6)e.stopPropagation()},true);
+vp.addEventListener('wheel',e=>{e.preventDefault();stop();cx-=e.deltaX;cy-=e.deltaY;draw()},{passive:false});
+addEventListener('keydown',e=>{const s=e.shiftKey?240:60,m={ArrowLeft:[s,0],ArrowRight:[-s,0],ArrowUp:[0,s],ArrowDown:[0,-s]}[e.key];
+ if(m){e.preventDefault();e.stopImmediatePropagation();__pan.to(cx+m[0],cy+m[1],RM?0:180)}},true);
+document.getElementById('recenter').onclick=()=>__pan.to(0,0);
+draw();
+})();
+</script>
 <script src="llc-title/llc-title.js" defer></script>
 </body></html>

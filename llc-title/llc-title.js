@@ -5,7 +5,7 @@
 const cv=document.getElementById('llc5c');if(!cv)return;
 const logo=cv.closest('.logo'),hero=cv.closest('.hero'),skipBtn=document.getElementById('llc5skip');
 const W=320,H=180,FPS=30,ASM=285,REST=180,BASE='llc-title/';
-const ctx=cv.getContext('2d',{alpha:false});
+const ctx=cv.getContext('2d',{alpha:!!cv.dataset.white||cv.dataset.white===''});
 const img=ctx.createImageData(W,H),buf=img.data;for(let i=3;i<buf.length;i+=4)buf[i]=255;
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // white-page recolour: the art is light-on-#080a12; treat it as light over black and composite onto white
@@ -21,12 +21,12 @@ const put=()=>{if(!WHITE){ctx.putImageData(img,0,0);return}
   A[p]=(m>=46&&!(m-n<28&&m>150))?1:0}
  regions(1,(n)=>n<20);            // tiny specks (stars, sparkles) -> background
  regions(0,(n,e)=>!e&&n<80);      // small enclosed gaps inside letters -> letter (opaque)
- for(let p=0,i=0;p<A.length;p++,i+=4){if(A[p]){ob[i]=buf[i];ob[i+1]=buf[i+1];ob[i+2]=buf[i+2]}else{ob[i]=ob[i+1]=ob[i+2]=255}ob[i+3]=255}
+ for(let p=0,i=0;p<A.length;p++,i+=4){if(A[p]){ob[i]=buf[i];ob[i+1]=buf[i+1];ob[i+2]=buf[i+2];ob[i+3]=255}else{ob[i]=ob[i+1]=ob[i+2]=255;ob[i+3]=0}}
  ctx.putImageData(out,0,0)};
 const loadImg=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src});
 function setFrom(i){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(i,0,0);buf.set(x.getImageData(0,0,W,H).data)}
 // ---- responsive crisp scaling: whole multiples when >=2x, fractional below ----
-function size(){const aw=hero.clientWidth||innerWidth,ah=Math.max(240,innerHeight-90);
+function size(){const aw=WHITE?innerWidth*.9:(hero.clientWidth||innerWidth),ah=Math.max(240,innerHeight-90);
  const raw=Math.min(aw/W,ah/H,5);const s=raw>=2?Math.floor(raw):Math.max(1,Math.floor(raw*16)/16);
  cv.style.width=W*s+'px';logo.style.setProperty('--s',s)}
 size();addEventListener('resize',size);
