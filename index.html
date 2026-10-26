@@ -1,37 +1,12 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" href="favicons/llc-infinity-16.png" type="image/png" sizes="16x16"><link rel="icon" href="favicons/llc-infinity-32.png" type="image/png" sizes="32x32"><link rel="icon" href="favicon.ico" sizes="any"><link rel="apple-touch-icon" href="favicons/llc-infinity-180.png"><title>LLC</title><meta name="description" content="Games and websites by Landry.">
-<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<style>
-html,body{margin:0;height:100%;overflow:hidden;background:#fff;color:#1a1a22;overscroll-behavior:none}
-/* infinite pannable world: #viewport fills the screen, #world is translated by the camera */
-#viewport{position:fixed;inset:0;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;outline:none;
- background-color:#fff;background-image:radial-gradient(circle,#9fb0c8 0.8px,transparent 1.1px);background-size:7px 7px}
-#world{transform-origin:0 0}
-#viewport.drag{cursor:grabbing}
-#world{position:absolute;left:50%;top:50%;width:0;height:0;will-change:transform}
-.area{position:absolute;transform:translate(-50%,-50%);z-index:1;pointer-events:none}.area canvas,.area button{pointer-events:auto}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-h1.logo.llc5{position:relative;display:flex;flex-direction:column;align-items:center;gap:.6rem;margin:0}
-h1.logo.llc5 canvas{display:block;height:auto;aspect-ratio:16/9;image-rendering:pixelated;background:transparent}
-.llc5-skip{position:absolute;top:100%;left:50%;transform:translate(-50%,8px);white-space:nowrap;font:400 .72rem Silkscreen,monospace;letter-spacing:.06em;color:#8a8fa0;background:#fff;border:1px solid #dde0e8;padding:.35rem .7rem;cursor:pointer;min-height:1.9rem;transition:opacity .6s}
-.llc5-skip.off{opacity:0;pointer-events:none;visibility:hidden}
-.ui{position:fixed;bottom:1.1rem;font:400 .7rem Silkscreen,monospace;letter-spacing:.08em;color:#8a90a2;text-decoration:none;background:rgba(255,255,255,.85);border:1px solid #e3e6ee;padding:.35rem .6rem;cursor:pointer;z-index:5}
-.ui:hover,.ui:focus-visible{color:#222}.side{right:1.2rem}#recenter{left:1.2rem}
-@media(prefers-reduced-motion:reduce){.llc5-skip{display:none}*{transition:none!important}}
-</style><link rel="stylesheet" href="world/hub.css"></head><body>
-<div id="viewport" tabindex="0" aria-label="Pannable canvas: drag, scroll or use arrow keys to move around">
- <div id="world">
-  <!-- areas are positioned in world coordinates (px from the origin); the LLC sits at 0,0 -->
-  <section class="area hero" id="area-llc" data-x="0" data-y="0">
-   <h1 class="logo llc5"><span class="sr">LLC</span>
-   <canvas data-white data-delay="1750" data-scale="3" id="llc5c" width="320" height="180" aria-hidden="true"></canvas><noscript><img src="llc-title/final.png" alt="" width="640" style="image-rendering:pixelated"></noscript>
-   <button type="button" class="llc5-skip off" id="llc5skip" aria-label="Skip the title animation">click or press any key to skip</button></h1>
-  </section>
- </div>
-</div>
-<button type="button" id="mapbtn" aria-pressed="false" aria-label="Map: zoom out to see every string and rift (M)"><svg viewBox="0 0 26 26" fill="none" stroke="#222" stroke-width="2"><path d="M2 5l7-3 8 3 7-3v19l-7 3-8-3-7 3z"/><path d="M9 2v19M17 5v19"/></svg></button>
-<button type="button" class="ui" id="recenter">+ recenter</button>
-<a class="ui side" href="archive/">archive →</a>
-<script src="world/hub.js"></script>
-<script src="llc-title/llc-title.js" defer></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="favicons/llc-infinity-16.png" type="image/png" sizes="16x16"><link rel="icon" href="favicons/llc-infinity-32.png" type="image/png" sizes="32x32"><link rel="icon" href="favicon.ico" sizes="any"><link rel="apple-touch-icon" href="favicons/llc-infinity-180.png"><title>LLC</title><meta name="description" content="Games and websites by Landry: a pixel solar system.">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="world/solar.css"></head><body>
+<canvas id="sky" aria-label="LLC solar system: each planet is one of Landry's sites. Drag to pan, scroll or pinch to zoom, click a planet to fly to it."></canvas>
+<div id="info" aria-live="polite"></div><div id="tip" role="tooltip"></div>
+<button type="button" class="ui" id="home">⌂ overview</button>
+<button type="button" class="ui" id="back">🛰 fly home</button>
+<button type="button" class="ui" id="archbtn">🛰 archive</button>
+<nav class="sr" aria-label="Sites"><a href="https://landrcy.github.io/binding-of-ashaad/">The Binding of Ashaad</a><a href="https://landrcy.github.io/sea-of-thought/">Sea of Thought</a><a href="https://coopercitywebsites.github.io/main/">Game of Websites</a><a href="https://landrcy.github.io/the-void/">The Void</a><a href="https://www.youtube.com/@Langrino">Langrino</a><a href="https://www.youtube.com/@clutchclipscrate">clutchclips</a><a href="https://www.youtube.com/@bowlfuloftrivia">bowlfuloftrivia</a><a href="https://www.youtube.com/channel/UCRegZeMyJ1B5B9n64rfgKAw">RedditStoryADay</a><a href="https://www.youtube.com/channel/UCfDhWTThokF3gKW03iEGijg">SAT in a Minute</a><a href="archive/">Archive</a></nav>
+<script src="world/planets.js"></script><script src="world/solar.js"></script>
 </body></html>

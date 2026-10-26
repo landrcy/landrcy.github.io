@@ -1,0 +1,364 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="favicons/purple-L-32.png" type="image/png" sizes="32x32"><link rel="icon" href="favicon.ico" sizes="any"><link rel="apple-touch-icon" href="favicons/purple-L-180.png"><title>LLC</title><meta name="description" content="Games and websites by Landry.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0a1a;--fg:#f4eefe;--muted:#b6aacd;--a1:#ff5d8f;--a2:#ffcc4d;--a3:#7c6cff;--a4:#38e1d0;--nav:rgba(13,10,26,.7)}
+@media(prefers-color-scheme:light){:root{--bg:#fff6ee;--fg:#24193a;--muted:#5e5276;--nav:rgba(255,246,238,.75)}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--fg);overflow-x:hidden}
+#fx{position:fixed;inset:0;z-index:0;pointer-events:none}#trail{position:fixed;inset:0;z-index:50;pointer-events:none}
+nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.7rem clamp(1rem,4vw,2.5rem);background:var(--nav);backdrop-filter:blur(10px);border-bottom:1px solid rgba(124,108,255,.25)}
+nav .mark{font-family:Silkscreen;font-weight:700;font-size:1.1rem;text-decoration:none;color:var(--fg)}nav .mark b,nav .mark i,nav .mark u{color:#a77be0;font-style:normal;text-decoration:none}
+nav ul{display:flex;gap:clamp(.6rem,2vw,1.6rem);list-style:none;margin:0;padding:0}nav a{font-family:"Pixelify Sans";color:var(--fg);text-decoration:none;font-size:1.05rem;position:relative}
+nav ul a::after{content:"";position:absolute;left:0;bottom:-3px;height:2px;width:0;background:linear-gradient(90deg,var(--a1),var(--a3));transition:width .25s}nav ul a:hover::after{width:100%}
+main,footer{position:relative;z-index:1}
+/* HERO */
+.hero{min-height:88vh;display:grid;place-items:center;text-align:center;padding:4rem 1rem;position:relative}
+.logo{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:.2em .5em;font-size:clamp(1rem,3.4vw,2.3rem);margin:0;font-weight:400}
+.word{display:inline-flex;align-items:baseline;white-space:nowrap}
+.cap{font-family:Silkscreen;font-weight:700;font-size:3.6em;line-height:.9;background:linear-gradient(120deg,var(--a1),var(--a2) 35%,var(--a4) 60%,var(--a3) 85%,var(--a1));background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 12px rgba(255,93,143,.55)) drop-shadow(4px 4px 0 rgba(0,0,0,.35));animation:shimmer 5s linear infinite,capIn .9s cubic-bezier(.2,1.6,.4,1) both}
+.rest{font-family:"Pixelify Sans";font-weight:600;font-size:1.5em;font-style:italic;transform:skewX(-10deg);display:inline-block;margin-left:.05em;color:var(--fg);text-shadow:0 0 14px rgba(124,108,255,.6);animation:restIn .8s ease both}
+.word:nth-child(2) .cap,.word:nth-child(2) .rest{animation-delay:.25s,.25s}.word:nth-child(3) .cap,.word:nth-child(3) .rest{animation-delay:.5s,.5s}.word:nth-child(2) .rest{animation-delay:.45s}.word:nth-child(3) .rest{animation-delay:.7s}.word:nth-child(1) .rest{animation-delay:.2s}
+.badge{align-self:center;font-family:Silkscreen;font-size:.9em;padding:.25em .55em;border:3px solid var(--a2);color:var(--a2);border-radius:6px;transform:rotate(-8deg);box-shadow:0 0 14px rgba(255,204,77,.5),inset 0 0 8px rgba(255,204,77,.3);animation:restIn .6s 1s both,wob 3s 1.6s ease-in-out infinite}
+@keyframes shimmer{to{background-position:-250% 0}}@keyframes capIn{from{opacity:0;transform:translateY(-60px) scale(.4) rotate(-20deg)}}
+@keyframes restIn{from{opacity:0;transform:translateX(-20px) skewX(-10deg)}}@keyframes wob{50%{transform:rotate(4deg) scale(1.08)}}
+.tag{font-family:"Pixelify Sans";font-size:clamp(1.05rem,2.4vw,1.45rem);color:var(--muted);margin:1.6rem 0 2rem;animation:restIn .8s 1.1s both}
+.cta{display:inline-block;font-family:Silkscreen;color:#fff;text-decoration:none;padding:.8rem 1.6rem;border-radius:10px;background:linear-gradient(90deg,var(--a1),var(--a3));box-shadow:0 6px 0 #3b2a8a,0 0 24px rgba(124,108,255,.5);transition:transform .15s,box-shadow .15s}
+.cta:hover{transform:translateY(-3px)}.cta:active{transform:translateY(4px);box-shadow:0 2px 0 #3b2a8a}
+.scrollhint{position:absolute;bottom:1.5rem;left:50%;font-family:Silkscreen;font-size:.75rem;color:var(--muted);animation:bob 1.8s ease-in-out infinite;translate:-50% 0}
+.sec-title{font-family:Silkscreen;font-size:clamp(1.6rem,4vw,2.6rem);text-align:center;margin:0 0 2rem}.sec-title span{color:var(--a1)}
+/* reveal */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s,transform .8s cubic-bezier(.2,.8,.2,1)}.reveal.in{opacity:1;transform:none}
+#games{padding:3rem 0 2rem}
+/* ============================================================
+   GAME SHOWCASE SYSTEM — to add a game:
+   1. Put its assets in games/<slug>/ (screenshot.png + any sprites).
+   2. Copy a <section class="game game--<slug>"> block below
+      (keep the inner .game-inner / .game-media / .game-info structure,
+      data-tilt for hover tilt, .reveal for scroll-in).
+   3. Add a ".game--<slug>{...}" theme block in CSS that sets its
+      background, fonts, colours and any special effects.
+   4. Add a link to it in the nav's Games list if you like.
+   Shared base styles (.game, .game-inner, .game-media, .game-info)
+   handle layout, responsiveness, reveals and tilt automatically.
+   ============================================================ */
+.game{position:relative;overflow:hidden;padding:clamp(3rem,7vw,6rem) clamp(1rem,4vw,3rem);isolation:isolate}
+.game-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(1.5rem,4vw,3.5rem);align-items:center;transition:transform .3s ease}
+.game-media{position:relative}.game-media img.shot{width:100%;display:block}
+@media(max-width:860px){.game-inner{grid-template-columns:1fr}}
+/* ---------- THEME: The Binding of Ashaad ---------- */
+.game--ashaad{color:#fff;font-family:"Pixelify Sans";background:#1b120c url(games/ashaad/tile.png);background-size:96px;image-rendering:pixelated}
+.game--ashaad::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 20%,rgba(0,0,0,.82) 78%,#000 100%);animation:vig 4s ease-in-out infinite}
+.game--ashaad::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 8% 30%,rgba(255,140,40,.28),transparent 30%),radial-gradient(circle at 92% 30%,rgba(255,140,40,.28),transparent 30%);animation:flick .18s steps(2) infinite alternate}
+@keyframes vig{50%{opacity:.88}}@keyframes flick{to{opacity:.7}}
+.ol{text-shadow:-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000,2px 2px 0 #000,0 3px 0 #000}
+.game--ashaad h2{font-family:Silkscreen;font-size:clamp(2rem,4.6vw,3.4rem);line-height:1;margin:0 0 .3rem;letter-spacing:1px}
+.game--ashaad h2 em{font-style:normal;color:#ffd257}.game--ashaad .sub{color:#e8c99a;margin:0 0 1.2rem;font-size:1.15rem}
+.room{padding:6%;background:url(games/ashaad/room_bg.png) center/100% 100%;image-rendering:pixelated;box-shadow:0 20px 50px #000,0 0 0 4px #000;border-radius:4px}
+.room img.shot{border:4px solid #000;image-rendering:auto}
+.torch{position:absolute;width:48px;image-rendering:pixelated;top:-10px;filter:drop-shadow(0 0 14px #ff8a24)}.torch.l{left:-14px}.torch.r{right:-14px}
+.torch img{width:100%;display:none}.torch img.on{display:block}
+.scroll{position:relative;background:linear-gradient(#f1deb1,#e4c88c);color:#3a2412;padding:1.4rem 1.6rem;border-radius:6px;box-shadow:inset 0 0 30px rgba(120,70,20,.45),0 10px 0 #00000055;font-size:1.08rem;line-height:1.5}
+.scroll::before,.scroll::after{content:"";position:absolute;left:-10px;right:-10px;height:18px;background:linear-gradient(#c79a5a,#8d6232);border-radius:9px;box-shadow:0 2px 0 #000}.scroll::before{top:-12px}.scroll::after{bottom:-12px}
+.scroll p{margin:.3rem 0 .8rem}.scroll ul{margin:0;padding-left:0;list-style:none}.scroll li{padding:.25rem 0 .25rem 1.7rem;position:relative}.scroll li::before{content:"";position:absolute;left:0;top:.45rem;width:18px;height:18px;background:var(--ic) center/contain no-repeat;image-rendering:pixelated}
+.cast{display:flex;gap:.6rem;margin:1.6rem 0 .4rem;flex-wrap:wrap;align-items:flex-end}.cast img{width:56px;image-rendering:pixelated;animation:bob 1.6s ease-in-out infinite;filter:drop-shadow(0 4px 0 #0008)}.cast img:nth-child(2){animation-delay:.2s}.cast img:nth-child(3){animation-delay:.4s}.cast img:nth-child(4){animation-delay:.6s}.cast img.boss{width:88px;filter:drop-shadow(0 0 10px #ff2a2a)}
+.pedestal{display:inline-flex;flex-direction:column;align-items:center;text-decoration:none;margin-top:1.4rem}
+.pedestal .item{font-family:Silkscreen;font-size:2rem;color:#fff;background:linear-gradient(#e0302f,#8e0f12);padding:.4rem 1.4rem;border:4px solid #000;border-radius:6px;box-shadow:0 0 25px rgba(255,210,87,.7);animation:float 2.2s ease-in-out infinite;transition:transform .2s}
+.pedestal img{width:120px;image-rendering:pixelated;margin-top:-4px}.pedestal:hover .item{box-shadow:0 0 45px #ffd257;scale:1.08}
+@keyframes bob{50%{transform:translateY(-6px)}}@keyframes float{50%{transform:translateY(-12px)}}
+.game canvas.dust{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}.game-inner{position:relative;z-index:1}
+/* About / contact */
+.panel{max-width:820px;margin:0 auto;padding:clamp(3rem,7vw,5rem) 1.25rem;text-align:center}
+.panel .box{background:rgba(124,108,255,.08);border:2px solid rgba(124,108,255,.35);border-radius:18px;padding:2rem;transition:transform .3s,box-shadow .3s}.panel .box:hover{box-shadow:0 0 40px rgba(124,108,255,.35)}
+.panel p{font-size:1.15rem;line-height:1.6;color:var(--muted)}
+.gh{display:inline-flex;gap:.6rem;align-items:center;font-family:Silkscreen;color:var(--fg);text-decoration:none;border:2px solid var(--a4);padding:.7rem 1.3rem;border-radius:10px;transition:.2s}.gh:hover{background:var(--a4);color:#0d0a1a;box-shadow:0 0 24px var(--a4)}
+footer{text-align:center;padding:2rem;color:var(--muted);font-family:"Pixelify Sans";border-top:1px solid rgba(124,108,255,.25)}footer a{color:inherit}
+@media(max-width:560px){nav ul{gap:.6rem}nav a{font-size:.85rem}nav .mark{font-size:.7rem}.logo{flex-direction:column;align-items:center}.badge{margin-top:.4rem}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}html{scroll-behavior:auto}}
+
+/* stitched pixel-calligraphy logo (caps traced from cross-stitch alphabet) */
+.logo{--c:clamp(3px,.62vw,8px);gap:calc(var(--c)*2) calc(var(--c)*5);align-items:flex-end}
+.word{display:inline-block;line-height:0}.word svg{display:block;overflow:visible;height:auto}
+.word rect{opacity:0;transform-box:fill-box;transform-origin:center;animation:stitch .35s cubic-bezier(.2,1.8,.4,1) forwards}
+.word .lc{transform:skewX(-12deg);transform-box:fill-box;transform-origin:50% 100%}.word .lc rect{fill:#6e0d1c}.word .lc{filter:url(#glow)}.word .cp{filter:url(#glow)}
+@keyframes stitch{from{opacity:0;transform:scale(2.4) rotate(45deg)}to{opacity:1;transform:none}}
+@media(max-width:700px){.logo{--c:clamp(3px,1.45vw,7px);flex-direction:column;align-items:center}}
+
+/* pixel-art monogram logo */
+.logo{display:flex;flex-direction:column;align-items:center;gap:1.4rem;--s:2.2}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.logo img{image-rendering:pixelated;height:auto;display:block}
+.mono{display:flex;align-items:flex-end;filter:drop-shadow(0 0 2px rgba(196,150,255,.8)) drop-shadow(0 0 14px rgba(150,90,230,.45));animation:fadeA 1.6s ease-out both}
+.mono img{width:calc(94px*var(--s))}.mono img+img{margin-left:calc(-6px*var(--s))}.mono img.c{width:calc(113px*var(--s));margin-left:calc(-2px*var(--s));margin-bottom:calc(6px*var(--s))}
+.logo .name{width:calc(322px*var(--s)*.62);filter:drop-shadow(0 0 2px rgba(196,150,255,.85)) drop-shadow(0 0 10px rgba(150,90,230,.45));animation:fadeB 1.4s 1.5s ease-out both}
+@keyframes fadeA{from{opacity:0;transform:scale(.94)}}@keyframes fadeB{from{opacity:0;transform:translateY(10px)}}
+@media(max-width:1000px){.logo{--s:1.8}}@media(max-width:560px){.logo{--s:1.2;gap:1rem}.logo .name{width:calc(322px*1.05)}}
+@media(max-width:380px){.logo{--s:1.05}.logo .name{width:92vw}}
+.logo canvas.mono{pointer-events:none;height:auto;image-rendering:pixelated;animation:none;transition:filter .6s}
+.logo canvas.mono.done{animation:glowPulse 1.4s ease-out}
+@keyframes glowPulse{40%{filter:drop-shadow(0 0 3px rgba(214,170,255,1)) drop-shadow(0 0 28px rgba(170,100,255,.85))}}
+
+/* ---------- THEME: Game of Websites (paper catalogue, ink + stamp red) ---------- */
+.game--gow{--paper:#f3ecdf;--ink:#1a1612;--gm:#6f655c;--line:#ddcfbc;--card:#fffaf3;--stamp:#c2412d;--proj:#1d6a48;color:var(--ink);font-family:"Segoe UI","Avenir Next",Inter,sans-serif;background:radial-gradient(circle at 12% -10%,#fff 0,transparent 42%),var(--paper)}
+.game--gow::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.5;background:repeating-linear-gradient(0deg,transparent 0 31px,rgba(221,207,188,.55) 31px 32px);animation:gwPaper 30s linear infinite}
+@keyframes gwPaper{to{background-position:0 320px}}
+.gw-kicker{margin:0 0 .6rem;color:var(--stamp);font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.game--gow h2{font-family:Palatino,"Palatino Linotype","Iowan Old Style",Georgia,serif;font-weight:600;font-size:clamp(2.4rem,5.4vw,4rem);letter-spacing:-.04em;line-height:.95;margin:0 0 .9rem}
+.game--gow h2 em{font-style:italic;color:var(--stamp)}
+.gw-lede{color:var(--gm);font-size:1.05rem;line-height:1.5;margin:0 0 1rem;max-width:34rem}
+.gw-pills{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 1.2rem;padding:0;list-style:none}
+.gw-pills li{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-weight:700;font-size:.9rem;animation:gwPill 6s infinite}
+.gw-pills li:nth-child(2){animation-delay:1.5s}.gw-pills li:nth-child(3){animation-delay:3s}.gw-pills li:nth-child(4){animation-delay:4.5s}
+@keyframes gwPill{0%,20%{background:var(--ink);color:var(--paper);border-color:var(--ink)}25%,100%{background:var(--card);color:var(--ink)}}
+.gw-stats{display:flex;gap:1.6rem;margin:0 0 1.5rem;font-size:.9rem;color:var(--gm)}.gw-stats b{display:block;font-family:Palatino,Georgia,serif;font-size:1.8rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.gw-open{display:inline-flex;align-items:center;gap:.6rem;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:700;padding:14px 24px;border-radius:999px;box-shadow:0 6px 0 var(--stamp);transition:transform .15s,box-shadow .15s}
+.gw-open:hover{transform:translateY(-3px);box-shadow:0 9px 0 var(--stamp)}.gw-open:active{transform:translateY(4px);box-shadow:0 2px 0 var(--stamp)}
+.gw-open:focus-visible{outline:2px solid var(--stamp);outline-offset:4px}.gw-open span{transition:transform .2s}.gw-open:hover span{transform:translateX(4px)}
+.gw-frame{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;box-shadow:0 24px 50px rgba(26,22,18,.18);position:relative;z-index:1}
+.gw-frame .bar{display:flex;gap:6px;padding:2px 4px 10px}.gw-frame .bar i{width:10px;height:10px;border-radius:50%;background:var(--line)}.gw-frame .bar i:first-child{background:var(--stamp)}
+.gw-frame img.shot{border-radius:10px;border:1px solid var(--line)}
+.gw-card{position:absolute;z-index:2;width:clamp(150px,17vw,200px);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:0 10px 24px rgba(26,22,18,.15);font-size:.75rem;animation:gwFloat 5s ease-in-out infinite}
+.gw-card .t{display:block;font-family:Palatino,Georgia,serif;font-weight:700;font-size:1rem;margin:2px 0}.gw-card .k{font-size:.62rem;font-weight:700;letter-spacing:.08em;color:var(--stamp)}.gw-card .k.p{color:var(--proj)}.gw-card .m{color:var(--gm)}
+.gw-card.a{left:-4%;bottom:-8%;--r:-5deg}.gw-card.b{right:-3%;top:-9%;--r:4deg;animation-delay:-2.5s}
+@keyframes gwFloat{0%,100%{transform:translateY(0) rotate(var(--r))}50%{transform:translateY(-10px) rotate(var(--r))}}
+.gw-cd{position:absolute;z-index:3;right:-5%;bottom:-10%;width:clamp(90px,11vw,140px);border-radius:50%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.25));animation:gwSpin 4s linear infinite}
+@keyframes gwSpin{to{transform:rotate(360deg)}}
+.gw-stamp{position:absolute;z-index:3;left:4%;top:-6%;font-weight:800;letter-spacing:.12em;font-size:.8rem;color:var(--stamp);border:3px solid var(--stamp);border-radius:6px;padding:.3em .6em;transform:rotate(-10deg);background:rgba(255,250,243,.85);animation:gwStamp 4s 1s ease-in-out infinite}
+@keyframes gwStamp{0%,70%,100%{transform:rotate(-10deg) scale(1)}75%{transform:rotate(-10deg) scale(1.25)}80%{transform:rotate(-10deg) scale(.95)}}
+.gw-note{position:absolute;color:var(--stamp);font-size:1.4rem;opacity:0;animation:gwNote 3s linear infinite;pointer-events:none}
+.gw-note.n2{animation-delay:1s;color:var(--proj)}.gw-note.n3{animation-delay:2s}
+@keyframes gwNote{0%{opacity:0;transform:translate(0,0)}20%{opacity:.9}100%{opacity:0;transform:translate(-30px,-90px) rotate(-20deg)}}
+@media(max-width:860px){.gw-card.a{left:0;bottom:-14%}.gw-card.b{right:0}.gw-cd{right:0}.game--gow .game-media{margin:1.5rem 0 3rem}}
+@media(max-width:480px){.gw-card{width:130px;font-size:.6rem;padding:7px 9px}.gw-card .t{font-size:.85rem}.gw-card.b{top:-12%}.gw-card.a{bottom:-16%}.gw-cd{width:72px;bottom:-14%}.gw-stamp{font-size:.65rem}.gw-card .m{display:none}.gw-stats{gap:1rem}}
+@media(prefers-reduced-motion:reduce){.game--gow *,.game--gow::before{animation:none!important}.gw-note{display:none}}
+
+/* ---------- SEAMS: blocky dithered transitions between sections (Minecraft-layer style) ---------- */
+.seam{position:relative;z-index:1;height:clamp(64px,9vw,112px);margin:-1px 0;line-height:0}
+.seam canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.hero{position:relative}.hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 55% 45% at 50% 48%,rgba(90,40,150,.18),transparent 70%),radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(5,2,10,.55) 100%)}
+.hero>div{position:relative}
+@media(prefers-color-scheme:light){.hero::before{background:radial-gradient(ellipse 55% 45% at 50% 48%,rgba(120,60,190,.10),transparent 70%)}}
+
+/* ---------- CURSOR: pixel-art purple pointer (fine pointers only) ---------- */
+@media(hover:hover) and (pointer:fine){html,body{cursor:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2722%27%20height%3D%2732%27%20shape-rendering%3D%27crispEdges%27%3E%3Crect%20x%3D%270%27%20y%3D%270%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%272%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%272%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%274%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%274%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%274%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%276%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%276%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%276%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%276%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%278%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%278%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%278%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%278%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%278%27%20y%3D%278%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2710%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2710%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2710%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%2710%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%278%27%20y%3D%2710%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2710%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%278%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%278%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%278%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%278%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2716%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%278%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2716%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2718%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%276%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%278%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2724%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2724%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%278%27%20y%3D%2724%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2724%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2724%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2724%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2726%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2726%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2726%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2726%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2716%27%20y%3D%2726%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2728%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2728%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2716%27%20y%3D%2728%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2730%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2730%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3C/svg%3E") 1 1,auto}a,button,[data-tilt] a{cursor:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2722%27%20height%3D%2732%27%20shape-rendering%3D%27crispEdges%27%3E%3Crect%20x%3D%270%27%20y%3D%270%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%272%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%272%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%274%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%274%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%274%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%276%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%276%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%276%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%276%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%278%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%278%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%278%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%278%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%278%27%20y%3D%278%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2710%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2710%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2710%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%2710%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%278%27%20y%3D%2710%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2710%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%278%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2712%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%278%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2714%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%278%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2716%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%278%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2716%27%20y%3D%2718%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23c9a6f5%27/%3E%3Crect%20x%3D%276%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%278%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2716%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2718%27%20y%3D%2720%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%23f1e6ff%27/%3E%3Crect%20x%3D%274%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%276%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%278%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2722%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2724%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%272%27%20y%3D%2724%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%278%27%20y%3D%2724%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2724%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2724%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2724%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%270%27%20y%3D%2726%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2726%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2726%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2726%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2716%27%20y%3D%2726%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2728%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2728%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%237a3fc4%27/%3E%3Crect%20x%3D%2716%27%20y%3D%2728%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2712%27%20y%3D%2730%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3Crect%20x%3D%2714%27%20y%3D%2730%27%20width%3D%272%27%20height%3D%272%27%20fill%3D%27%231a0b2e%27/%3E%3C/svg%3E") 1 1,pointer}input,textarea{cursor:text}}
+</style></head><body>
+<canvas id="fx"></canvas><canvas id="trail"></canvas>
+<nav><a class="mark" href="#top"><b>LLC</b></a><ul><li><a href="#games">Games</a></li><li><a href="#contact">GitHub</a></li></ul></nav>
+<main id="top">
+<header class="hero"><div>
+<h1 class="logo"><span class="sr">LLC</span>
+<canvas class="mono" id="mono" width="473" height="262" aria-hidden="true"></canvas></h1>
+</div>
+<span class="scrollhint">▼ scroll ▼</span></header>
+
+<section id="games"><h2 class="sec-title reveal">&lt; <span>Games</span> /&gt;</h2></section>
+
+<div class="seam" aria-hidden="true" data-top="night" data-bot="basement"><canvas></canvas></div>
+<!-- GAME: The Binding of Ashaad — copy this whole <section> to add a new game (see CSS comment) -->
+<section class="game game--ashaad" id="ashaad"><canvas class="dust" data-fx="basement"></canvas>
+<div class="game-inner reveal" data-tilt>
+ <div class="game-media"><div class="torch l"><img class="on" src="games/ashaad/fire0.png" alt=""><img src="games/ashaad/fire1.png" alt=""><img src="games/ashaad/fire2.png" alt=""><img src="games/ashaad/fire3.png" alt=""></div>
+ <div class="torch r"><img class="on" src="games/ashaad/fire2.png" alt=""><img src="games/ashaad/fire3.png" alt=""><img src="games/ashaad/fire0.png" alt=""><img src="games/ashaad/fire1.png" alt=""></div>
+ <div class="room"><img class="shot" src="games/ashaad/screenshot.png" alt="The Binding of Ashaad title screen" loading="lazy"></div></div>
+ <div class="game-info"><h2 class="ol">The Binding<br>of <em>Ashaad</em></h2><p class="sub ol">a brainrot roguelike</p>
+ <div class="scroll"><p>Descend into the basement, shoot your tears, grab cursed items and survive in this browser roguelike.</p>
+ <ul><li style="--ic:url(games/ashaad/ashaad.png)">Multiple playable characters</li><li style="--ic:url(games/ashaad/pedestal.png)">Q5 items to find</li><li style="--ic:url(games/ashaad/finley.png)">A secret Finley boss</li><li style="--ic:url(games/ashaad/fire0.png)">4 floors to descend</li></ul></div>
+ <div class="cast"><img src="games/ashaad/ashaad.png" alt="Ashaad"><img src="games/ashaad/emmanuel.png" alt="Emmanuel"><img src="games/ashaad/julian_good.png" alt="Julian"><img src="games/ashaad/julian.png" alt="Julian"><img class="boss" src="games/ashaad/finley.png" alt="Finley, secret boss"></div>
+ <a class="pedestal" href="https://landrcy.github.io/binding-of-ashaad/"><span class="item ol">PLAY</span><img src="games/ashaad/pedestal.png" alt=""></a></div>
+</div></section>
+
+<div class="seam" aria-hidden="true" data-top="basement" data-bot="paper"><canvas></canvas></div>
+<!-- SITE: Game of Websites -->
+<section class="game game--gow" id="game-of-websites">
+<div class="game-inner reveal" data-tilt>
+ <div class="game-media">
+  <span class="gw-stamp">UNBLOCKED</span>
+  <div class="gw-frame"><div class="bar"><i></i><i></i><i></i></div><img class="shot" src="sites/gow/screenshot.png" alt="Game of Websites home page: a searchable catalogue of site cards" loading="lazy"></div>
+  <div class="gw-card b" aria-hidden="true"><span class="k">UNBLOCKED · VERY COMPLEX</span><span class="t">Night Arena</span><span class="m">11,433 lines · Open</span></div>
+  <div class="gw-card a" aria-hidden="true"><span class="k p">PROJECT · COMPLEX</span><span class="t">Archive of Things</span><span class="m">14,255 lines · Open</span></div>
+  <img class="gw-cd" src="sites/gow/cd.png" alt=""><span class="gw-note" style="right:8%;bottom:8%" aria-hidden="true">♪</span><span class="gw-note n2" style="right:12%;bottom:4%" aria-hidden="true">♫</span><span class="gw-note n3" style="right:4%;bottom:12%" aria-hidden="true">♪</span>
+ </div>
+ <div class="game-info">
+  <p class="gw-kicker">coopercitywebsites.github.io</p>
+  <h2>Game of <em>Websites</em></h2>
+  <p class="gw-lede">A searchable catalogue of every site in the collection — unblocked games, NeoForge mods, old builds and the trash pile — ranked by how much code went into each one. Comes with its own soundtrack.</p>
+  <ul class="gw-pills"><li>Unblocked</li><li>1.21.1 NeoForge</li><li>Old</li><li>Trash</li></ul>
+  <div class="gw-stats"><div><b data-count="20">20</b>unblocked sites</div><div><b data-count="25961">25,961</b>lines, biggest</div><div><b>♪</b>built-in player</div></div>
+  <a class="gw-open" href="https://coopercitywebsites.github.io/main/">Open Game of Websites <span>→</span></a>
+ </div>
+</div></section>
+
+<div class="seam" aria-hidden="true" data-top="paper" data-bot="night"><canvas></canvas></div>
+<section class="panel" id="contact"><h2 class="sec-title reveal">&lt; <span>GitHub</span> /&gt;</h2><div class="reveal"><a class="gh" href="https://github.com/landrcy">★ github.com/landrcy</a></div></section>
+</main>
+<footer>© <span id="y">2026</span> LLC · made with pixels &amp; love</footer>
+<script>
+
+(function(){const cv=document.getElementById('mono');if(!cv)return;let ctx=cv.getContext('2d');const W=288,H=122;let PX,PY;
+const RMm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const load=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s});
+// ---- ornament geometry: built once per layout (wide = side scrollwork, narrow = above/below only) ----
+let FR=[],OR=[],cache=null,wide;
+function build(){wide=innerWidth>=640;PX=wide?150:42;PY=wide?96:118;cv.width=W+PX*2;cv.height=H+PY*2;FR=[];OR=[];cache=null;
+ const A='rgba(140,80,210,.24)',B='rgba(140,80,210,.12)',D='rgba(110,50,170,.55)',Lv='rgba(190,150,245,.6)',Lf='rgba(185,140,240,.32)';
+ const x0=PX-22,y0=PY-18,x1=PX+W+22,y1=PY+H+18,cx=(x0+x1)/2,cy=(y0+y1)/2,hw=(x1-x0)/2,hh=(y1-y0)/2;
+ const seen=new Set(),put=(L,x,y,c,k)=>{x=Math.round(x);y=Math.round(y);const id=L.length+':'+x+','+y;if(seen.has(id))return;seen.add(id);L.push({x,y,c,k})};
+ // FRAME: keys 0..1 — centre ornaments (0-.08), top/bottom edges outward (.08-.45), corner spirals unfurl (.45-.6), sides close (.6-1)
+ const F=(x,y,c,k)=>put(FR,x,y,c,k);
+ const mid=(mx,my,d)=>{for(let s=-1;s<=1;s+=2)for(let i=0;i<=60;i++){const t=i/60,a=t*Math.PI*2.4,r=7*(1-.7*t);F(mx+s*(10+Math.cos(a)*r),my+d*Math.sin(a)*r,A,.08*(1-t))}for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)F(mx+a,my+b,A,0)};
+ mid(cx,y0,1);mid(cx,y1,-1);
+ for(let x=x0+22;x<=x1-22;x+=2){const k=.08+.37*Math.abs(x-cx)/(hw-22);F(x,y0,A,k);F(x,y1,A,k)}
+ for(let x=x0+26;x<=x1-26;x+=4){const k=.1+.35*Math.abs(x-cx)/(hw-26);F(x,y0+4,B,k);F(x,y1-4,B,k)}
+ const curl=(qx,qy,sx,sy)=>{for(let i=0;i<20;i++)F(qx+sx*(33-i),qy,A,.45+.03*i/20);
+  for(let i=0;i<=160;i++){const t=i/160,a=t*Math.PI*3.2,r=14*(1-.8*t);F(qx+sx*Math.cos(a)*r,qy+sy*Math.sin(a)*r,A,.6-.12*t)}
+  for(let i=0;i<20;i++)F(qx,qy+sy*(14+i),A,.6+.02*i/20)};
+ curl(x0+8,y0+8,1,1);curl(x1-8,y0+8,-1,1);curl(x0+8,y1-8,1,-1);curl(x1-8,y1-8,-1,-1);
+ for(let y=y0+22;y<=y1-22;y+=2){const k=.6+.4*(1-Math.abs(y-cy)/(hh-22));F(x0,y,A,k);F(x1,y,A,k)}
+ for(let y=y0+26;y<=y1-26;y+=4){const k=.62+.38*(1-Math.abs(y-cy)/(hh-26));F(x0+4,y,B,k);F(x1-4,y,B,k)}
+ // ORNAMENTS (outside frame): defined in the top-left quadrant and mirrored 4 ways; key = grow order
+ const Q=[];const q=(x,y,c,k)=>Q.push([x,y,c,k]);
+ const spiral=(sx,sy,r0,turns,a0,dir,c,k0,k1)=>{const n=Math.ceil(r0*turns*8);let lx,ly;for(let i=0;i<=n;i++){const t=i/n,a=a0+dir*t*turns*Math.PI*2,r=r0*(1-.85*t);lx=sx+Math.cos(a)*r;ly=sy+Math.sin(a)*r;q(lx,ly,c,k0+(k1-k0)*t)}};
+ const diamond=(x,y,r,c,k)=>{for(let i=-r;i<=r;i++){const w=r-Math.abs(i);q(x-w,y+i,c,k);q(x+w,y+i,c,k)}q(x,y,Lv,k)};
+ const vine=(pts,c,k0,k1)=>{// polyline with gentle sine wobble, sampled per pixel
+  let tot=0;const seg=[];for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(l);tot+=l}
+  let acc=0;for(let i=1;i<pts.length;i++){const [ax,ay]=pts[i-1],[bx,by]=pts[i],l=seg[i-1];for(let s=0;s<=l;s+=.7){const u=s/l;q(ax+(bx-ax)*u,ay+(by-ay)*u,c,k0+(k1-k0)*(acc+s)/tot)}acc+=l}};
+ const ox=x0,oy=y0; // frame corner (top-left)
+ // corner tendril sweeping diagonally out, ending in a curl, with leaf curls and diamonds
+ const tend=[[ox-4,oy-4],[ox-18,oy-10],[ox-30,oy-24],[ox-38,oy-40],[ox-52,oy-50]].filter(p=>p[1]>2&&p[0]>2);
+ vine(tend,D,0,.45);const te=tend[tend.length-1];spiral(te[0]+8,te[1]+2,8,1.1,Math.PI,1,D,.45,.62);
+ spiral(ox-22,oy-24,6,1,0,-1,Lf,.3,.5);diamond(Math.max(4,te[0]-6),Math.max(4,te[1]-6),3,D,.66);
+ for(let i=1;i<=4;i++)q(ox-10-i*9,oy+2+i*2,Lf,.5+i*.05);
+ // top scrollwork: running vine above the top edge with alternating curls, from centre outward
+ const topY=oy-12,span=hw-30;
+ if(PY>40){vine([[cx-6,topY+4],[cx-span*.35,topY-4],[cx-span*.7,topY+2],[cx-span,topY-6]],D,.05,.6);
+  for(let i=1;i<=5;i++){const x=cx-span*i/5.4,up=i%2;spiral(x,topY+(up?-7:6),5,1,up?Math.PI/2:-Math.PI/2,up?1:-1,i%2?D:Lf,.1+i*.09,.2+i*.1)}
+  // radiating rays + diamonds above the top centre ornament
+  for(let r=0;r<5;r++){const a=-Math.PI/2+(r-2)*.32;for(let d=16;d<34+(r%2?0:8);d+=3)q(cx+Math.cos(a)*d,y0-10+Math.sin(a)*d*.7,r%2?Lf:D,.3+d/120);
+   const d=40+(r%2?0:8);diamond(cx+Math.cos(a)*d,y0-10+Math.sin(a)*d*.7,r==2?3:2,D,.75)}
+  for(let i=0;i<9;i++){const a=-Math.PI+i*Math.PI/8;q(cx+Math.cos(a)*(hw+40)*.55,y0-6+Math.sin(a)*(PY-12)*.9,Lv,.8+i*.02)}}
+ // side scrollwork (wide only): horizontal flourish out from the side midpoint with stacked curls
+ if(wide){const sx=x0-6;vine([[sx,cy],[sx-30,cy-6],[sx-62,cy-2],[sx-96,cy-14],[sx-118,cy-30]],D,.05,.55);
+  spiral(sx-122,cy-38,9,1.2,Math.PI/2,1,D,.55,.72);spiral(sx-40,cy-16,7,1,Math.PI/2,-1,Lf,.25,.42);spiral(sx-80,cy-2+9,6,1,-Math.PI/2,1,D,.4,.55);
+  vine([[sx-20,cy-4],[sx-44,cy-34],[sx-50,cy-60]],Lf,.2,.5);spiral(sx-46,cy-66,5,1,0,-1,Lf,.5,.62);
+  diamond(sx-14,cy,3,D,.08);diamond(sx-100,cy-4,2,D,.6);diamond(sx-130,cy-6,2,Lf,.78);
+  for(let i=0;i<6;i++)q(sx-20-i*18,cy+14+(i%2)*4,i%2?Lf:D,.4+i*.07);
+  for(let i=0;i<5;i++){const a=Math.PI+(i-2)*.35;diamond(sx-6+Math.cos(a)*(PX-28),cy-30+Math.sin(a)*40,1,Lv,.82+i*.03)}}
+ // mirror into all four quadrants (clamped inside canvas)
+ const Wc=cv.width,Hc=cv.height;for(const [x,y,c,k] of Q)for(const [mx,my] of [[0,0],[1,0],[0,1],[1,1]]){const X=mx?Wc-1-x:x,Y=my?Hc-1-y:y;if(X>=0&&Y>=0&&X<Wc&&Y<Hc)put(OR,X,Y,c,k)}
+ FR.sort((a,b)=>a.k-b.k);OR.sort((a,b)=>a.k-b.k);
+ const raw=Math.min(innerWidth*.94/cv.width,innerHeight*.78/cv.height);const s=raw>=2?Math.floor(raw*2)/2:Math.max(1,Math.floor(raw*4)/4);
+ cv.style.width=cv.width*s+'px';cv.style.margin=`${-(PY-40)*s}px ${-PX*s}px`;cv.closest('.logo').style.setProperty('--s',s)}
+build();let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{const w=wide;build();if(w!==wide||1)drawAll=true},150)});
+let drawAll=RMm;
+const motes=Array.from({length:46},()=>({x:Math.random(),y:Math.random(),v:.04+Math.random()*.1,ph:Math.random()*6,s:Math.random()<.2?2:1}));
+const pts=(L,p)=>{for(const o of L){if(o.k>p)break;ctx.fillStyle=o.c;ctx.fillRect(o.x,o.y,1,1)}};
+const step=p=>Math.floor(p*40)/40; // pixel-stepped progress
+function deco(fp,op){if(fp>=1&&op>=1){if(!cache){cache=document.createElement('canvas');cache.width=cv.width;cache.height=cv.height;const c=ctx;ctx=cache.getContext('2d');pts(FR,1);pts(OR,1);ctx=c}ctx.drawImage(cache,0,0);return}
+ pts(FR,fp);if(op>0)pts(OR,op)}
+function bg(t){for(const m of motes){if(!RMm){m.y-=m.v/cv.height;m.x+=Math.sin(t/1700+m.ph)*.06/cv.width;if(m.y<0){m.y=1;m.x=Math.random()}}
+ ctx.globalAlpha=.25+.35*Math.abs(Math.sin(t/1100+m.ph));ctx.fillStyle=m.s>1?'#b98cf0':'#8a52d0';ctx.fillRect(m.x*cv.width|0,m.y*cv.height|0,m.s,m.s)}ctx.globalAlpha=1}
+Promise.all([load('logo/L.png'),load('logo/C.png')]).then(([L,C])=>{
+ const off=document.createElement('canvas');off.width=W;off.height=H;const o=off.getContext('2d');
+ o.drawImage(L,0,0);o.drawImage(L,88,0);o.drawImage(C,180,0);
+ if(RMm){const f=()=>{ctx.clearRect(0,0,cv.width,cv.height);deco(1,1);bg(0);ctx.drawImage(off,PX,PY)};f();addEventListener('resize',()=>setTimeout(f,200));return}
+ const d=o.getImageData(0,0,W,H).data,P=[];
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){const k=(y*W+x)*4;if(d[k+3]>10){const a=Math.random()*Math.PI*2,r=40+Math.random()*110;
+  P.push({x,y,c:`rgb(${d[k]},${d[k+1]},${d[k+2]})`,sx:x+Math.cos(a)*r,sy:y+Math.sin(a)*r*.6-20,rot:(Math.random()-.5)*3,
+  delay:(x/W)*680+Math.random()*400})}}
+ const DUR=1350,T0=performance.now(),ease=t=>1-Math.pow(1-t,4),FD=1400,OD=1700;let fin=0;
+ (function f(now){const t=now-T0;ctx.clearRect(0,0,cv.width,cv.height);
+  const fp=fin?step(Math.min(1,(now-fin)/FD)):0,op=fin?step(Math.max(0,Math.min(1,(now-fin-FD)/OD))):0;
+  deco(drawAll?1:fp,drawAll?1:op);bg(now);
+  if(fin){ctx.drawImage(off,PX,PY);requestAnimationFrame(f);return}let done=true;
+  for(const p of P){let u=(t-p.delay)/DUR;if(u<0){done=false;continue}if(u<1)done=false;else u=1;const e=ease(u);
+   const x=p.sx+(p.x-p.sx)*e,y=p.sy+(p.y-p.sy)*e;ctx.globalAlpha=Math.min(1,u*1.6);ctx.fillStyle=p.c;
+   if(u<1){const s=1+(1-e)*1.2;ctx.save();ctx.translate(x+PX+.5,y+PY+.5);ctx.rotate(p.rot*(1-e));ctx.fillRect(-s/2,-s/2,s,s);ctx.restore()}else ctx.fillRect(p.x+PX,p.y+PY,1,1)}
+  ctx.globalAlpha=1;if(done){fin=now;cv.classList.add('done')}requestAnimationFrame(f)})(T0);
+});})();
+document.getElementById('y').textContent=new Date().getFullYear();
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+// reveals
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>RM?el.classList.add('in'):io.observe(el));
+if(!RM){
+// hover tilt
+document.querySelectorAll('[data-tilt]').forEach(el=>{el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;el.style.transform=`perspective(1200px) rotateY(${x*4}deg) rotateX(${-y*4}deg)`});el.addEventListener('mouseleave',()=>el.style.transform='')});
+// torch frames
+setInterval(()=>document.querySelectorAll('.torch').forEach(t=>{const i=[...t.children],k=i.findIndex(x=>x.classList.contains('on'));i[k].classList.remove('on');i[(k+1)%i.length].classList.add('on')}),140);
+}
+// canvases
+const fx=document.getElementById('fx'),tr=document.getElementById('trail'),fc=fx.getContext('2d'),tc=tr.getContext('2d');
+const dusts=[...document.querySelectorAll('canvas.dust')].map(c=>({c,x:c.getContext('2d'),p:[],t:[]}));
+let W,H,stars=[],DPR=Math.min(devicePixelRatio||1,2);
+const COLS=['#ff5d8f','#ffcc4d','#38e1d0','#7c6cff','#ffffff'];
+function size(){W=innerWidth;H=innerHeight;for(const c of[fx,tr]){c.width=W*DPR;c.height=H*DPR;c.style.width=W+'px';c.style.height=H+'px';c.getContext('2d').setTransform(DPR,0,0,DPR,0,0)}
+stars=Array.from({length:Math.round(W*H/9000)},()=>({x:Math.random()*W,y:Math.random()*H*3,z:Math.random()*.8+.2,s:Math.random()<.15?3:2,c:COLS[Math.random()*5|0],ph:Math.random()*6}));
+dusts.forEach(d=>{const r=d.c.getBoundingClientRect();d.c.width=r.width;d.c.height=r.height;d.p=Array.from({length:50},()=>({x:Math.random()*r.width,y:Math.random()*r.height,v:Math.random()*.3+.1,s:Math.random()*2+1}));d.t=Array.from({length:8},()=>({x:Math.random()*r.width,y:Math.random()*r.height,v:Math.random()*.6+.3}))})}
+size();addEventListener('resize',size);
+// cursor trail: lavender pixel diamonds, dots and curling filigree sparks (section-tinted accents)
+let trail=[];const TRAIL_ON=!RM&&matchMedia('(hover:hover) and (pointer:fine)').matches;
+const TP=['#5a2596','#7a3fc4','#9b6ae0','#b98cf0','#d9c2ff'],TA={ashaad:['#ff8c28','#ff5a1f','#ffb15c'],gow:['#c2412d','#1a1612','#c2412d']};
+let lx=-1,ly=-1,zone=null;
+if(TRAIL_ON)addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;const sec=e.target.closest&&e.target.closest('.game--ashaad,.game--gow');zone=sec?(sec.classList.contains('game--ashaad')?'ashaad':'gow'):null;
+ const d=Math.hypot(e.clientX-lx,e.clientY-ly);if(lx>=0&&d<5)return;const dx=lx<0?0:(e.clientX-lx)/d,dy=lx<0?0:(e.clientY-ly)/d;lx=e.clientX;ly=e.clientY;if(trail.length>160)return;
+ for(let n=0;n<2;n++){const r=Math.random(),acc=zone&&Math.random()<.3;
+ const c=acc?TA[zone][Math.random()*3|0]:TP[1+(Math.random()*4|0)];
+ if(r<.22){const sd=Math.random()<.5?1:-1;trail.push({k:'curl',x:lx+12,y:ly+16,a:Math.atan2(-dy,-dx)+sd*.6,va:sd*(.22+Math.random()*.12),sp:1.6+Math.random(),h:[],l:1,dl:.016,c:TP[3+(Math.random()*2|0)]})}
+ else if(r<.5)trail.push({k:'dia',x:lx+12+(Math.random()-.5)*8,y:ly+16+(Math.random()-.5)*8,vx:-dx*.3+(Math.random()-.5)*.4,vy:-dy*.3+(Math.random()-.5)*.4+(zone==='ashaad'&&acc?-.6:.1),l:1,dl:.016,c,r:Math.random()<.35?2:1});
+ else trail.push({k:'dot',x:lx+12+(Math.random()-.5)*10,y:ly+16+(Math.random()-.5)*10,vx:(Math.random()-.5)*.5,vy:(zone==='ashaad'&&acc?-.8:.25)+Math.random()*.3,l:1,dl:.02,c,s:Math.random()<.3?4:2})}});
+function drawTrail(){tc.clearRect(0,0,W,H);if(!trail.length)return;const P=2,sn=v=>Math.round(v/P)*P;
+ trail=trail.filter(p=>(p.l-=p.dl)>0);
+ for(const p of trail){tc.globalAlpha=p.l>.5?1:p.l*2;tc.fillStyle=p.c;
+  if(p.k==='curl'){p.a+=p.va;p.va*=1.04;p.sp*=.96;p.x+=Math.cos(p.a)*p.sp;p.y+=Math.sin(p.a)*p.sp;p.h.push([sn(p.x),sn(p.y)]);if(p.h.length>12)p.h.shift();
+   p.h.forEach(([x,y],i)=>{tc.globalAlpha=(p.l>.5?1:p.l*2)*(i+1)/p.h.length;tc.fillRect(x,y,P,P)});tc.fillStyle='#f1e6ff';const[hx,hy]=p.h[p.h.length-1];tc.fillRect(hx,hy,P,P)}
+  else if(p.k==='dia'){p.x+=p.vx;p.y+=p.vy;const x=sn(p.x),y=sn(p.y);if(p.r===1){tc.fillRect(x,y-P,P,P);tc.fillRect(x-P,y,P*3,P);tc.fillRect(x,y+P,P,P)}
+   else{tc.fillRect(x,y-2*P,P,P);tc.fillRect(x-P,y-P,P*3,P);tc.fillRect(x-2*P,y,P*5,P);tc.fillRect(x-P,y+P,P*3,P);tc.fillRect(x,y+2*P,P,P);tc.fillStyle='#f1e6ff';tc.fillRect(x,y,P,P)}}
+  else{p.x+=p.vx;p.y+=p.vy;tc.fillRect(sn(p.x),sn(p.y),p.s,p.s)}}
+ tc.globalAlpha=1}
+function frame(t){const sy=scrollY;fc.clearRect(0,0,W,H);
+for(const s of stars){let y=(s.y-sy*s.z*.4)%(H*3);if(y<0)y+=H*3;if(y>H)continue;fc.globalAlpha=.35+.45*Math.abs(Math.sin(t/900+s.ph))*s.z;fc.fillStyle=s.c;fc.fillRect(s.x|0,y|0,s.s,s.s)}
+fc.globalAlpha=1;drawTrail();
+for(const d of dusts){const r=d.c.getBoundingClientRect();if(r.bottom<0||r.top>H)continue;const x=d.x,w=d.c.width,h=d.c.height;x.clearRect(0,0,w,h);
+x.fillStyle='rgba(255,220,170,.55)';for(const p of d.p){p.y-=p.v;p.x+=Math.sin(t/1500+p.y/40)*.3;if(p.y<0)p.y=h;x.fillRect(p.x|0,p.y|0,p.s,p.s)}
+for(const q of d.t){q.y+=q.v;if(q.y>h){q.y=-10;q.x=Math.random()*w}x.fillStyle='rgba(120,190,255,.55)';x.beginPath();x.arc(q.x,q.y,5,0,7);x.fill();x.fillStyle='rgba(255,255,255,.7)';x.fillRect(q.x-2,q.y-3,2,2)}}
+if(!RM)requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+// count-up stats (Game of Websites)
+document.querySelectorAll('[data-count]').forEach(el=>{if(RM)return;const n=+el.dataset.count;el.textContent='0';const o=new IntersectionObserver(es=>{if(!es[0].isIntersecting)return;o.disconnect();const t0=performance.now();(function f(t){const u=Math.min(1,(t-t0)/1400),v=Math.round(n*(1-Math.pow(1-u,3)));el.textContent=v.toLocaleString('en-US');if(u<1)requestAnimationFrame(f)})(t0)});o.observe(el)});
+// seams: terrain-strata transitions built from each section's own textures (stars / basement tile / ruled paper)
+(function(){const LT=matchMedia('(prefers-color-scheme: light)').matches;
+const rgb=s=>{const m=s.match(/\d+/g).map(Number);return m.slice(0,3)},hex=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));
+const bg=rgb(getComputedStyle(document.body).backgroundColor);
+let seed=1;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const shade=(c,f)=>c.map(v=>Math.max(0,Math.min(255,v*f|0)));
+let tile=null;const ti=new Image();ti.src='games/ashaad/tile.png';
+const M={
+ night:{edge:LT?[226,214,240]:[38,28,70],px(x,y){const n=rnd();if(n<.006)return hex(['#7c6cff','#ff5d8f','#38e1d0','#ffcc4d','#ffffff'][rnd()*5|0]);return shade(bg,(LT?.98:1)+(rnd()-.5)*.12)}},
+ basement:{edge:[12,8,5],px(x,y){let c=[40,27,18];if(tile){const tx=((x%96)/4|0),ty=((y%96)/4|0),k=(ty*24+tx)*4;c=[tile[k],tile[k+1],tile[k+2]]}
+  if(rnd()<.006)return hex(rnd()<.5?'#ff8c28':'#ffcc4d');return shade(c,.4+rnd()*.1)}},
+ paper:{edge:[221,207,188],px(x,y){if(y%32>=30&&y%32<32)return hex('#ddcfbc');const n=rnd();if(n<.006)return hex('#1a1612');if(n<.009)return hex('#c2412d');return shade(hex('#f3ecdf'),.97+rnd()*.05)}}};
+function walk(cols,base,amp,minRun,maxRun){const L=[];let v=base;while(L.length<cols){v=Math.max(base-amp,Math.min(base+amp,v+Math.round((rnd()-.5)*3)));const run=minRun+(rnd()*(maxRun-minRun+1)|0);for(let j=0;j<run&&L.length<cols;j++)L.push(v)}return L}
+function draw(el,i){const c=el.querySelector('canvas'),w=el.clientWidth,h=el.clientHeight,B=4,cols=Math.ceil(w/B),rows=Math.ceil(h/B);
+ c.width=cols;c.height=rows;const x=c.getContext('2d'),img=x.createImageData(cols,rows),D=img.data,T=M[el.dataset.top],U=M[el.dataset.bot];seed=97+i*131;
+ // strata: a = where top material starts breaking, b = main ragged edge, plus chunk islands & debris
+ const a=walk(cols,rows*.3|0,3,2,7),b=walk(cols,rows*.55|0,6,3,10),cc=walk(cols,rows*.78|0,3,2,6);
+ const grid=new Uint8Array(cols*rows);// 0 top, 1 bottom
+ for(let X=0;X<cols;X++)for(let Y=0;Y<rows;Y++){let m=Y>=b[X]?1:0;
+  if(m===0&&Y>=a[X]&&rnd()<.16*(Y-a[X])/(b[X]-a[X]+1))m=1; // bottom material creeping up
+  if(m===1&&Y<cc[X]&&rnd()<.14*(cc[X]-Y)/(cc[X]-b[X]+1))m=0;  // top material crumbling down
+  grid[Y*cols+X]=m}
+ // irregular chunks: blobs of each material thrown across the edge
+ for(let n=0;n<cols/6;n++){const X=rnd()*cols|0,up=rnd()<.5,Y=b[X]+(up?-(2+rnd()*5|0):(1+rnd()*5|0)),bw=1+(rnd()*4|0),bh=1+(rnd()*2|0);
+  for(let u=0;u<bw;u++)for(let v=0;v<bh;v++){const xx=X+u,yy=Y+v;if(xx<cols&&yy>=0&&yy<rows)grid[yy*cols+xx]=up?1:0}}
+ for(let Y=0;Y<rows;Y++)for(let X=0;X<cols;X++){const m=grid[Y*cols+X],mat=m?U:T;let col=mat.px(X*B,Y*B+el.offsetTop);
+  // shading: bottom material darkens just under top material (overhang shadow); top material gets a lit rim at its lower edge
+  const above=Y>0?grid[(Y-1)*cols+X]:0,below=Y<rows-1?grid[(Y+1)*cols+X]:1;
+  if(m===1&&above===0)col=shade(col,.6);else if(m===1&&Y>1&&grid[(Y-2)*cols+X]===0)col=shade(col,.8);
+  if(m===0&&below===1)col=T.edge.map((e,k)=>(e+col[k])/2|0);
+  if(Y===0)col=mat===T?T.px(X*B,el.offsetTop):col;if(Y===rows-1&&m===0)col=U.px(X*B,0);
+  const k=(Y*cols+X)*4;D[k]=col[0];D[k+1]=col[1];D[k+2]=col[2];D[k+3]=255}
+ x.putImageData(img,0,0)}
+const all=[...document.querySelectorAll('.seam')],go=()=>all.forEach(draw);
+ti.onload=()=>{const t=document.createElement('canvas');t.width=t.height=24;const g=t.getContext('2d');g.drawImage(ti,0,0);try{tile=g.getImageData(0,0,24,24).data}catch(e){}go()};
+go();let tm;addEventListener('resize',()=>{clearTimeout(tm);tm=setTimeout(go,150)})})();
+</script></body></html>

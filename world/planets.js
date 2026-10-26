@@ -1,0 +1,232 @@
+/* LLC pixel planets: procedural, dithered sprites. Each painter draws into its own small canvas at time t (seconds). */
+(()=>{
+const B4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v=>(v+.5)/16);
+const hx=c=>{const n=parseInt(c.slice(1),16);return[n>>16,n>>8&255,n&255]};
+const bay=(x,y)=>B4[(y&3)*4+(x&3)];
+// pattern thresholds: bayer, line (horizontal stripes), star/cross scatter
+const LINE=(x,y)=>[.1,.6,.35,.85][y&3];
+const STAR=(x,y)=>{const m=((x+2*y)%5+5)%5,k=((x*7+y*13)&7);return m===0?.15:(m===1||m===4)&&k<3?.55:.9};
+// pick a colour from a ramp with v in [0,1] using a threshold function
+function dq(r,v,x,y,th=bay){v=Math.max(0,Math.min(1,v))*(r.length-1);let i=Math.floor(v);if(v-i>th(x,y))i++;return r[Math.min(r.length-1,i)]}
+const H=(a,b)=>{let h=(a*374761393+b*668265263)|0;h=Math.imul(h^h>>>13,1274126177);return((h^h>>>16)>>>0)/4294967296};
+function vn(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),w=yf*yf*(3-2*yf);
+ return(H(xi,yi)*(1-u)+H(xi+1,yi)*u)*(1-w)+(H(xi,yi+1)*(1-u)+H(xi+1,yi+1)*u)*w}
+const fbm=(x,y)=>vn(x,y)*.55+vn(x*2.1,y*2.1)*.3+vn(x*4.3,y*4.3)*.15;
+const LX=-.62,LY=-.5,LZ=.6,SHD=[34,28,66];
+function mk(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');return{c,g,img:g.createImageData(w,h)}}
+// generic sphere painter: fn(lon,lat,lit,x,y,nz) -> '#rrggbb' or null
+function sphere(S,R,cx,cy,rot,fn,atm,shp){const{img}=S,W=img.width,d=img.data;
+ for(let y=0;y<img.height;y++)for(let x=0;x<W;x++){let dx=(x+.5-cx)/R,dy=(y+.5-cy)/R;if(shp){const k=shp(Math.atan2(dy,dx));dx/=k;dy/=k}const r2=dx*dx+dy*dy;let col=null;
+  if(r2<=1){const nz=Math.sqrt(1-r2),raw=Math.max(0,dx*LX+dy*LY+nz*LZ);const lit=Math.max(0,Math.min(1,Math.floor(raw*5+(bay(x,y)-.5)*.6)/5+.1));const lat=Math.asin(dy),lon=Math.atan2(dx,nz)+rot;col=fn(lon,lat,lit,x,y,nz,dx,dy);
+   if(col){let c=typeof col==='string'?hx(col):col;const sv=raw+(bay(x,y)-.5)*.08;
+    if(sv<.36){const k=sv<.16?.62:.4;c=[c[0]+(SHD[0]-c[0])*k,c[1]+(SHD[1]-c[1])*k,c[2]+(SHD[2]-c[2])*k].map(Math.round)}
+    else if(r2>Math.pow(1-1.6/(R),2)&&dx*LX+dy*LY>.35)c=c.map(v=>Math.min(255,Math.round(v*1.18+22)));
+    col=c}}
+  else if(atm){const e=(Math.sqrt(r2)-1)*R;if(e<atm.w){const side=Math.max(0,-(dx*LX+dy*LY))*.0+(.5+.5*(-(dx*LX+dy*LY))/Math.sqrt(r2));const v=(1-e/atm.w)*side*side*1.3;if(v>bay(x,y)*.9+.08)col=dq(atm.r,v,x,y)}}
+  const o=(y*W+x)*4;if(col){const c=typeof col==='string'?hx(col):col;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}else d[o+3]=0}
+ S.g.putImageData(img,0,0)}
+const P={};
+/* ---------- SUN (SDO-style, pixelised) with calligraphic script L ---------- */
+const SUNR=['#2a0402','#5e0c03','#9a1c06','#d23a0c','#f2641a','#fc9a2e','#ffd070','#fff4d0','#ffffff'];
+const GLOW=['#1a0201','#4a0803','#8a1606','#c42a0a'];
+const bz=(p0,p1,p2,p3,t)=>{const u=1-t;return[u*u*u*p0[0]+3*u*u*t*p1[0]+3*u*t*t*p2[0]+t*t*t*p3[0],u*u*u*p0[1]+3*u*u*t*p1[1]+3*u*t*t*p2[1]+t*t*t*p3[1]]};
+// the first capital L of the old LLC title (llc-title/final.png), traced in 960x540 title coordinates; drawn stroke by stroke
+const LSTR=[
+ {w:20,seg:[[[332,148],[290,150],[245,165],[250,200]],[[250,200],[255,225],[320,222],[345,205]]]},
+ {w:58,seg:[[[345,205],[400,160],[465,112],[492,86]],[[492,86],[540,40],[455,30],[440,112]],[[444,108],[402,170],[340,250],[300,295]]]},
+ {w:26,seg:[[[300,295],[240,235],[85,235],[62,290]],[[62,290],[40,345],[200,360],[300,330]],[[300,326],[420,306],[560,380],[680,400]],[[680,400],[730,408],[738,382],[716,368]]]}];
+const LBX=[40,60,745,415];
+let Lmask=null;
+function buildL(D,prog,R){const m=new Uint8Array(D*D),c=D/2;let s=D*.9/(LBX[2]-LBX[0]);
+ const fits=(sc)=>{for(const st of LSTR)for(const sg of st.seg)for(let f=0;f<=1;f+=.02){const p=bz(...sg,f),x=(p[0]-(LBX[0]+LBX[2])/2)*sc,y=(p[1]-(LBX[1]+LBX[3])/2)*sc;if(Math.hypot(x,y)+st.w*sc*.5>R*.94)return false}return true};
+ while(!fits(s))s*=.97;
+ const tot=LSTR.length;
+ LSTR.forEach((st,si)=>{const sp=Math.max(0,Math.min(1,prog*tot-si));if(sp<=0)return;const n=st.seg.length*90,lim=sp*n;
+  for(let i=0;i<=lim;i++){const k=Math.min(st.seg.length-1,Math.floor(i/90)),f=(i-k*90)/90,sg=st.seg[k];const p=bz(...sg,f),q=bz(...sg,Math.min(1,f+.01));
+   const ang=Math.atan2(q[1]-p[1],q[0]-p[0]);const nib=.35+.65*Math.abs(Math.sin(ang-Math.PI*.8));
+   const taper=Math.min(1,i/14+.3,(n-i)/14+.2);const r=Math.max(.6,st.w*nib*taper*s/2);
+   const cx=c+(p[0]-(LBX[0]+LBX[2])/2)*s,cy=c+(p[1]-(LBX[1]+LBX[3])/2)*s;for(let y=Math.floor(cy-r);y<=cy+r;y++)for(let x=Math.floor(cx-r);x<=cx+r;x++)if(x>=0&&y>=0&&x<D&&y<D&&(x+.5-cx)**2+(y+.5-cy)**2<=r*r)m[y*D+x]=1}});
+ return m}
+const FLARES=[[-.36,.22,.11],[.4,-.4,.07],[-.74,-.32,.08],[.22,.6,.05],[.62,.22,.05],[-.1,-.7,.05]];
+P.sun=(S,t,o)=>{o=o||{};const W=S.img.width,R=W*.36,cx=W/2,cy=W/2,ign=o.ign??1;const Ld=Math.round(R*2),Lp=o.L??1;
+ if(!Lmask||Lmask.p!==Lp||Lmask.D!==Ld)Lmask={p:Lp,D:Ld,m:buildL(Ld,Lp,R)};const lx0=Math.round(cx-Ld/2),ly0=Math.round(cy-Ld/2);
+ const{img}=S,d=img.data;
+ for(let y=0;y<W;y++)for(let x=0;x<W;x++){const dx=(x+.5-cx)/R,dy=(y+.5-cy)/R,r=Math.hypot(dx,dy),ang=Math.atan2(dy,dx);let col=null;
+  const prom=vn(ang*5+40,t*.12)>.74?.07*(.6+.4*Math.sin(ang*40+t)):0,edge=1+.02*vn(ang*12+t*.4,t*.3)+prom;
+  if(r<=ign){const nz=Math.sqrt(Math.max(0,1-r*r)),lon=Math.atan2(dx,nz)+t*.03,lat=Math.asin(Math.max(-1,Math.min(1,dy)));
+   const g1=vn(lon*15+Math.sin(t*.8+lat*7)*.45,lat*15+t*.3),g2=vn(lon*29-t*.45,lat*29+Math.cos(t*.7+lon*6)*.4);
+   const gr=Math.abs(g1-.5)*1.5+g2*.5,act=fbm(lon*2.4+t*.02,lat*2.4+3);
+   let v=.12+.66*Math.pow(nz,.5)+(gr-.5)*.42+(act>.6?(act-.6)*1.3:0);
+   for(const[fx,fy,fr]of FLARES){const q=Math.hypot(dx-fx,dy-fy)/fr;if(q<1){const fl=.7+.3*Math.sin(t*6+fx*20)*Math.sin(t*3.7+fy*17);v+=(1-q)*(1-q)*1.8*fl}}
+   col=dq(SUNR,v*ign,x,y);
+   const lx=x-lx0,ly=y-ly0;if(Lp>0&&lx>=0&&ly>=0&&lx<Ld&&ly<Ld&&Lmask.m[ly*Ld+lx])col='#000000'}
+  else if(r<edge*ign)col=dq(SUNR,.38-(r-1)*3,x,y);
+  else if(r<1.45){const e=(r-1)/.45,v=(1-e)*(.82+.18*Math.sin(ang*7+t))*ign;if(v>.1)col=dq(GLOW,v,x,y,e>.45?STAR:bay)}
+  const o2=(y*W+x)*4;if(col){const c=hx(col);d[o2]=c[0];d[o2+1]=c[1];d[o2+2]=c[2];d[o2+3]=255}else d[o2+3]=0}
+ S.g.putImageData(img,0,0)};
+/* ---------- ASHAAD: basement flesh/brick planet with a trapdoor ---------- */
+const BRK=['#1e0d0b','#3d1a14','#64291c','#8a3f27','#b25f3a','#d88a5c'],FL=['#2a0c12','#5a1823','#8f2a36','#c4505a','#e8858a'],WD=['#1f1206','#4a2b0f','#7a4a1b','#a8702e','#d3a056'],MET=['#1c1c22','#4a4a52','#8a8a94','#d4d4dc'];
+P.ashaad=(S,t)=>{const W=S.img.width,R=W*.4;const rot=Math.sin(t*.25)*.35;
+ sphere(S,R,W/2,W/2,rot,(lon,lat,lit,x,y,nz,dx,dy)=>{
+  // trapdoor: square patch centred on lon=0, lat=-.05 in surface coords
+  const u=lon/0.55,v=(lat+.05)/0.5;const sh=lit*1.05;
+  if(Math.abs(u)<1&&Math.abs(v)<1){ // wooden trapdoor
+   if(Math.abs(u)>.86||Math.abs(v)>.86)return dq(MET,sh*.9,x,y);
+   if(Math.abs(u-0)<.07&&Math.abs(v)<.9)return dq(MET,sh*.7,x,y);// centre seam
+   if(Math.abs(v-.0)<.06&&Math.abs(u)<.86)return dq(MET,sh*.8,x,y);// iron strap
+   if(Math.hypot(u-.35,v-.45)<.13)return dq(MET,sh+.1,x,y);// ring handle
+   const plank=Math.floor((u+1)*3.5),grain=vn(plank*7.3,v*9)*.35;return dq(WD,sh*.85+grain-.1+(plank%2)*.06,x,y)}
+  const fl=fbm(lon*2.4+9,lat*2.4),bv=lat*7,row=Math.floor(bv),bu=lon*5+(row%2)*.5,mort=(bv-row<.14)||((bu-Math.floor(bu))<.08);
+  if(fl>.58){const vein=Math.abs(vn(lon*8,lat*8)-.5)<.05;return dq(FL,sh*.95+(fl-.58)*.8-(vein?.3:0),x,y)}
+  if(mort)return dq(BRK,sh*.45,x,y);return dq(BRK,sh*.9+H(Math.floor(bu),row)*.18-.05,x,y)},
+  {w:Math.max(2,R*.09),r:['#3a0c10','#7a1c22','#c4505a']},a=>.9+.16*vn(a*1.6+7,3)+.05*Math.sin(a*5+1))};
+/* ---------- YOUTUBE planet ---------- */
+const YTR=['#2a0406','#5c0a0e','#99141b','#d0222a','#ff4a4a','#ff9a8a'],WH=['#6a6a72','#b8b8c0','#ffffff'];
+P.yt=(S,t)=>{const W=S.img.width,R=W*.4;
+ sphere(S,R,W/2,W/2,t*.12,(lon,lat,lit,x,y,nz,dx,dy)=>{const sh=lit;
+  const band=Math.sin(lat*9+Math.sin(lon*2+t*.1)*1.3);let v=sh*.95+band*.08;
+  // play-button continents repeating around the planet
+  const px=(dx+.02)/.5,py=dy/.5,ax=Math.abs(px),ay=Math.abs(py)/.7;
+  const box=Math.pow(ax,6)+Math.pow(ay,6)<1,tri=px>-.38&&px<.5&&Math.abs(py)<(.5-px)*.62;
+  if(tri)return dq(['#3a0406','#8a0c14','#e0141e','#ff4040'],sh*1.1,x,y);if(box)return dq(WH,sh*1.1+.15,x,y);
+  return dq(YTR,v,x,y,Math.abs(lat)>.9?LINE:bay)},{w:Math.max(2,R*.08),r:['#4a0408','#a01018','#ff5050']})};
+// moons, styled per channel
+const MOON={battle:[['#1c1f26','#3b4252','#6b7488','#a7b0c4','#e7ecf6'],(lon,lat)=>Math.abs(Math.sin(lon*6)*Math.cos(lat*4))>.8?'#c0283a':null],
+ mc:[['#1e2e10','#355a1a','#4f8a26','#78c03a','#b4ec6a'],(lon,lat)=>{const a=Math.floor(lon*4),b=Math.floor(lat*4);return H(a,b)>.7?(['#5b3a1f','#7d5230','#8f8f8f'])[Math.floor(H(b,a)*3)]:null}],
+ cosmic:[['#140a2e','#2e1a5e','#5634a0','#8a62d8','#d0b8ff'],(lon,lat,x,y)=>H(x,y)>.94?'#fff6c0':null],
+ fire:[['#2a0a00','#6a1c00','#b84000','#ff7a10','#ffd040'],(lon,lat,x,y,t)=>vn(lon*6,lat*6-t*1.4)>.68?'#fff2a0':null],
+ chalk:[['#0e1e18','#1a3328','#264a3a','#3a6652','#5d8a74'],(lon,lat)=>{const u=lon*6,v=lat*6;return(Math.abs(u-Math.round(u))<.06&&H(Math.round(u),Math.floor(v))>.5)||Math.abs(Math.sin(u+v*1.7))<.05?'#e8eee8':null}]};
+const MSH={mc:a=>Math.pow(Math.pow(Math.abs(Math.cos(a)),7)+Math.pow(Math.abs(Math.sin(a)),7),-1/7),battle:a=>.86+.16*vn(a*1.9+2,5),cosmic:a=>.92+.1*vn(a*1.3+9,1)};
+P.moon=(S,t,kind)=>{const W=S.img.width,R=W*(kind==='mc'?.34:.4),[ramp,deco]=MOON[kind];
+ sphere(S,R,W/2,W/2,t*.3,(lon,lat,lit,x,y)=>{const d=deco(lon,lat,x,y,t);if(d&&lit>.12)return d;
+  const cr=vn(lon*5,lat*5);return dq(ramp,lit*.95+(cr-.5)*.25,x,y)},null,MSH[kind])};
+/* ---------- SEA OF THOUGHT: a whole water planet sealed inside a glass bottle ---------- */
+const SEA=['#04112a','#0a2a5a','#11508a','#1f82b8','#4cb8dc','#a6e6f4'],SAND=['#5a4a22','#9c8442','#d8c070','#f4e6a8'],GLS=['#0a2a22','#1a5444','#2e8a6c','#6ad0a8','#c8ffe8','#ffffff'];
+P.sea=(S,t)=>{const W=S.img.width,Hh=S.img.height,bx=W/2,by=Hh*.6,bw=W*.42,bh=Hh*.37,R=Math.min(bw,bh)*.68,slosh=Math.sin(t*1.3)*R*.12;
+ const pcx=bx+Math.sin(t*1.3+.6)*1.2,pcy=by+R*.08;
+ sphere(S,R,pcx,pcy,t*.12,(lon,lat,lit,x,y)=>{const isl=fbm(lon*2+3,lat*2.2);if(isl>.66)return dq(SAND,lit+(isl-.66)*1.5-.1,x,y);
+  const wave=Math.sin(lon*14+lat*3-t*1.6)*.5+.5,dep=fbm(lon*3,lat*3);return dq(SEA,lit*.85+(isl>.6?.18:0)+(dep-.5)*.2,x,y,wave>.75?LINE:bay)});
+ const img=S.g.getImageData(0,0,W,Hh),d=img.data;
+ const put=(x,y,c)=>{const o=(y*W+x)*4,q=hx(c);d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
+ const neckW=W*.13,neckTop=Hh*.1,shoulder=by-bh;
+ const inBody=(x,y)=>{const u=(x-bx)/bw,v=(y-by)/bh;return Math.pow(Math.abs(u),4)+Math.pow(Math.abs(v),3.2)<=1};
+ const inNeck=(x,y)=>y>=neckTop&&y<=shoulder+bh*.25&&Math.abs(x-bx)<=neckW*(1+Math.max(0,(y-(shoulder-bh*.05))/(bh*.3))*.8);
+ for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){const px=x+.5,py=y+.5,inside=inBody(px,py)||inNeck(px,py);if(!inside)continue;
+  const edge=!(inBody(px-1.6,py)||inNeck(px-1.6,py))||!(inBody(px+1.6,py)||inNeck(px+1.6,py))||!(inBody(px,py+1.6)||inNeck(px,py+1.6))||!(inBody(px,py-1.6)||inNeck(px,py-1.6));
+  const o=(y*W+x)*4,has=d[o+3]>0,lx=(px-bx)/bw;
+  if(py<neckTop+Hh*.07&&Math.abs(px-bx)<neckW*1.05){put(x,y,dq(['#3a2008','#7a4a1a','#b07a3a','#e0b070'],.85-Math.abs(px-bx)/neckW*.6+(H(x,y)-.5)*.2,x,y));continue} // cork
+  if(edge){put(x,y,dq(GLS,.55+lx*-.25,x,y));continue}
+  const hl=(lx>-.64&&lx<-.58&&py>shoulder+bh*.25&&py<by+bh*.5)||(lx>.46&&lx<.5&&py>by-bh*.3&&py<by+bh*.1)||(Math.abs(px-bx+neckW*.45)<1&&py>neckTop+Hh*.09&&py<shoulder);
+  if(hl){{if((x+y)%2)put(x,y,'#e8fff4')};continue}
+  if(!has){const wl=by+bh*.25+slosh*(px-bx)/bw;
+   if(py>wl){const dep=(py-wl)/(bh*.8);put(x,y,dq(['#5cc4ec','#1f86c8','#0e4c86','#06203c'],dep,x,y,LINE))}
+   else if(H(x,y)>.9)put(x,y,'#14382e'); // faint green glass tint
+  } else if(lx<-.3&&(x+y*2)%7===0)put(x,y,'#c8ffe8'); // glass sheen over the planet
+ }
+ // bubbles rising in the bottle
+ for(let i=0;i<5;i++){const yy=Math.floor(by+bh*.8-((t*9+i*17)%(bh*1.2))),xx=Math.floor(bx-bw*.6+H(i,3)*bw*1.2+Math.sin(t*2+i)*1.5);if(yy>0&&yy<Hh&&inBody(xx+.5,yy+.5)&&d[(yy*W+xx)*4+3]===0)put(xx,yy,'#c4f0ff')}
+ S.g.putImageData(img,0,0)};
+/* ---------- GAME OF WEBSITES: Cooper City, Florida ---------- */
+const GRS=['#16300e','#2a5a18','#3f8a22','#62b032','#9ad85a'],WAT=['#06203c','#0e4c86','#1f86c8','#5cc4ec','#c4f0ff'],ROAD=['#2a2a30','#55555e','#8a8a94'],
+ ROOF=['#4a1606','#8a3010','#c45422','#ec8a4a'],WALLS=[['#5a5248','#a89c88','#e8dcc4','#fffaf0'],['#5a3a28','#a8704a','#f0c8a0','#fff0dc'],['#284a52','#4a8a98','#9cd4e0','#e4fbff'],['#5a3a4a','#a86a8a','#f0b8d0','#fff0f6']],
+ TRK=['#2a1a08','#5a3a14','#8a5a24'],FROND=['#0e2a08','#1e5a12','#36902a','#6ac83a'];
+P.gow=(S,t)=>{const W=S.img.width,R=W*.4;
+ sphere(S,R,W/2,W/2,t*.05,(lon,lat,lit,x,y)=>{const sh=lit*.95+.06,night=lit<.28;
+  const lake=fbm(lon*2.6+11,lat*2.6+4),canal=Math.abs(Math.sin(lat*11))<.1&&fbm(lon*1.3,lat*.7+9)>.42;
+  if(lake>.63||canal){const shim=Math.sin(lon*30+lat*6-t*2.5)>.6;return dq(WAT,sh*.85+(shim?.18:0),x,y,LINE)}
+  const u=lon*9,v=lat*9,cu=Math.floor(u),cv=Math.floor(v),fu=u-cu,fv=v-cv,h=H(cu,cv);
+  if(fu<.12||fv<.1)return dq(ROAD,sh*.9+((fu<.12&&Math.abs(fv-.5)<.1)?.3:0),x,y); // streets with centre dashes
+  if(lake>.58)return dq(['#6a5a2a','#b8a060','#f0e0a0'],sh,x,y); // sandy lake edge
+  if(h>.5){const wall=WALLS[Math.floor(h*97)%4];
+   if(fu>.2&&fu<.9&&fv>.22&&fv<.42)return dq(ROOF,sh+(fv<.3?.12:-.05),x,y);
+   if(fu>.26&&fu<.84&&fv>=.42&&fv<.86){if(Math.abs(fu-.42)<.07&&Math.abs(fv-.6)<.08||Math.abs(fu-.68)<.07&&Math.abs(fv-.6)<.08)
+     return night?(H(cu*3+cv,Math.floor(t*3+h*9))>.25?'#ffe070':'#8a6a20'):'#2a4a62';
+    return dq(wall,sh,x,y)}
+   if(fv>.86&&fu>.3&&fu<.8)return dq(['#1a1a1a','#3a3a3a','#6a6a6a'],sh,x,y); // driveway shadow
+  } else if(h>.22){const sway=Math.sin(t*1.6+h*20)*.1;
+   const ft=fu-.55-sway*(1-fv);if(Math.abs(fu-.55+sway*.4*(fv-.3))<.07&&fv>.32&&fv<.92)return dq(TRK,sh,x,y);
+   const dx=fu-.55-sway,dy=fv-.3;if(Math.abs(dy+dx*dx*1.1)<.09&&Math.abs(dx)<.36||Math.hypot(dx,dy)<.1)return dq(FROND,sh+(dy<0?.15:0),x,y)}
+  if(night&&H(cu,cv*7)>.93)return Math.sin(t*5+h*30)>0?'#ffe8a0':'#806030'; // street lamps
+  const pool=h<.08&&Math.abs(fu-.5)<.22&&Math.abs(fv-.55)<.16;if(pool)return dq(['#0e6a9a','#3ac0e8','#bff4ff'],sh,x,y);
+  return dq(GRS,sh+(vn(lon*40,lat*40)-.5)*.2,x,y)},
+  {w:Math.max(2,R*.08),r:['#0e4c86','#5cc4ec','#e4fbff']},a=>1+.035*vn(a*6,2)+.02*Math.sin(a*13))};
+/* ---------- THE VOID: Gargantua-style black hole, recoloured purple ---------- */
+const VD=['#0a0414','#200838','#3c0e5e','#62188a','#9030b8','#c060e0','#e8b0ff','#fff4ff'];
+const VU=['#0a0414','#1c0630','#34104e','#521a6e'];
+P.void=(S,t)=>{const W=S.img.width,H2=S.img.height,cx=W/2,cy=H2/2,R=W*.12,{img}=S,d=img.data,th=-.28,c=Math.cos(th),s=Math.sin(th);
+ for(let y=0;y<H2;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=y+.5-cy,r=Math.hypot(dx,dy)/R,a=Math.atan2(dy,dx);let col=null;
+  const u=(dx*c+dy*s)/R,v=(-dx*s+dy*c)/R,er=Math.hypot(u,v/.15),ea=Math.atan2(v/.15,u);
+  const streak=.5+.5*Math.sin(er*7-t*2.2+Math.sin(ea*2)*1.5)*Math.sin(ea*3+t*.8),dop=.5-.35*u/Math.max(1,er);
+  const disk=er>1.15&&er<5.4?Math.pow(1-(er-1.15)/4.25,1.3)*(.55+.45*streak)*(.6+.8*dop):0;
+  if(disk>.06&&(v>0||r>1)){col=dq(VD,disk*1.15,x,y,er>3.8?STAR:er>2.6?LINE:bay)}
+  else if(r<=1)col='#000000';
+  if(!col||(v<0&&r>1&&r<1.5)){ // lensed rings: bright arch over the top, dim arc underneath
+   if(v<0&&r>1&&r<2.3){const sh=.85+.15*Math.sin(a*6-t*3);const ring=r<1.16?1:Math.pow(1-(r-1.16)/1.14,1.6)*.75;const q=ring*sh*(.8+.2*Math.sin(r*14-t*2));if(q>.08){const nc=dq(VD,.25+q*.8,x,y,r>1.7?LINE:bay);if(!col||q>disk)col=nc}}
+   else if(!col&&v>0&&r>1&&r<1.35){const q=(1-(r-1)/.35)*(.7+.3*Math.sin(a*5+t*2));if(q>.1)col=dq(VU,q,x,y)}}
+  if(!col&&r<4.2){const q=(1-(r-1)/3.2)*.45;if(q>bay(x,y)*.9+.06)col=dq(['#06020c','#140828','#24103c'],q*2,x,y,STAR)}
+  const o=(y*W+x)*4;if(col){const k=hx(col);d[o]=k[0];d[o+1]=k[1];d[o+2]=k[2];d[o+3]=255}else d[o+3]=0}
+ S.g.putImageData(img,0,0)};
+/* ---------- ARCHIVE: little grey station-moon with a ring dock ---------- */
+const STN=['#141820','#2c3442','#4c586c','#7c8aa0','#b8c4d8','#eef4ff'];
+P.archive=(S,t)=>{const W=S.img.width,R=W*.22,cx=W/2,cy=W/2;
+ sphere(S,R,cx,cy,t*.2,(lon,lat,lit,x,y)=>{const panel=Math.abs(Math.sin(lon*6))<.12||Math.abs(Math.sin(lat*6))<.12;
+  if(H(Math.floor(lon*6),Math.floor(lat*6))>.8&&!panel)return Math.sin(t*3+lon*9)>0?'#ffd46a':'#7a5a20';return dq(STN,lit*(panel?.6:.95),x,y)},null,a=>Math.pow(Math.pow(Math.abs(Math.cos(a)),5)+Math.pow(Math.abs(Math.sin(a)),5),-.2));
+ const g=S.g,img=g.getImageData(0,0,W,W),d=img.data;
+ for(let y=0;y<W;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=(y+.5-cy)/.3,r=Math.hypot(dx,dy)/R;if(r>1.45&&r<1.85){const behind=y<cy&&Math.hypot(x+.5-cx,y+.5-cy)<R;if(behind)continue;
+  const a=Math.atan2(dy,dx),seg=Math.sin(a*12+t*1.2)>.6;const c=hx(seg?'#ffd46a':dq(STN,.55+.4*Math.cos(a+2.2),x,y));const o=(y*W+x)*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}}
+ g.putImageData(img,0,0)};
+/* ---------- ARCHIVE SYSTEM bodies ---------- */
+const BALLC=[['#4a0a0a','#a01c1c','#e84040','#ff9a8a'],['#4a3a04','#a0800c','#f0c828','#fff0a0'],['#08204a','#1446a0','#3a86f0','#a8d0ff'],['#3a3a3a','#9a9a9a','#e8e8e8','#ffffff']];
+P.ballfight=(S,t)=>{const W=S.img.width,R=W*.32,cx=W/2,cy=W/2;
+ sphere(S,R,cx,cy,t*.6,(lon,lat,lit,x,y)=>{if(Math.abs(lat)>1.25)return dq(BALLC[3],lit,x,y);const k=((Math.floor((lon/Math.PI)*3)%4)+4)%4;return dq(BALLC[k],lit*.95+.08,x,y)},{w:2,r:['#3a1040','#a040c0']});
+ const img=S.g.getImageData(0,0,W,W),d=img.data;
+ for(let i=0;i<4;i++){const a=t*(1.2+i*.35)+i*1.7,bounce=Math.abs(Math.sin(t*3+i))*R*.25,rr=R+3+bounce,bx=cx+Math.cos(a)*rr,by=cy+Math.sin(a)*rr*.5,r=2.2+(i%2),front=Math.sin(a)>0;
+  if(!front)continue;for(let y=Math.floor(by-r);y<=by+r;y++)for(let x=Math.floor(bx-r);x<=bx+r;x++){const q=Math.hypot(x+.5-bx,y+.5-by)/r;if(q>1||x<0||y<0||x>=W||y>=W)continue;const c=hx(dq(BALLC[i],1-q*.6-(x-bx+y-by)/r*.25,x,y)),o=(y*W+x)*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}}
+ S.g.putImageData(img,0,0)};
+P.ccold=(S,t)=>{const W=S.img.width,R=W*.4;
+ sphere(S,R,W/2,W/2,t*.1,(lon,lat,lit,x,y)=>{const sh=lit*.95+.05;
+  if(Math.abs(lat)<.16){const st=Math.floor((lon*8+lat*8+t*.5)*1.5)%2;return st?dq(['#3a3004','#a08a10','#f8e030'],sh,x,y):dq(['#000','#1a1a1a','#3a3a3a'].map(c=>c.length===4?'#000000':c),sh,x,y)}
+  const u=Math.floor(lon*5),v=Math.floor(lat*5);if(H(u,v)>.82&&Math.sin(t*4+u*v)>0)return '#ffffff'; // blinking 90s stars
+  return dq((u+v)%2?['#1a0a3a','#3a1a7a','#6a3ac8','#b090ff']:['#04302e','#0a6a64','#20b0a4','#80f0e0'],sh,x,y)},{w:2,r:['#3a1a7a','#80f0e0']})};
+const OLD=['#1a1008','#3a2814','#6a4a24','#9a7440','#c8a468','#ecd8a8'];
+P.oldhub=(S,t)=>{const W=S.img.width,R=W*.34;
+ sphere(S,R,W/2,W/2,t*.04,(lon,lat,lit,x,y,nz)=>dq(OLD,.25+.6*Math.pow(nz,.5)+(vn(lon*14+t*.2,lat*14)-.5)*.35,x,y),{w:Math.max(3,R*.16),r:['#2a1c0c','#6a4a24','#9a7440']})};
+/* ---------- SATELLITE (the way into the archive) ---------- */
+const GOLD=['#3a2604','#7a5410','#c08a1c','#f0c84a','#fff0a0'],PANEL=['#0a1430','#14306a','#2454b0','#5a90f0','#bcd8ff'];
+P.satellite=(S,t)=>{const W=S.img.width,Hh=S.img.height,{img}=S,d=img.data;d.fill(0);const cx=W/2,cy=Hh/2;
+ const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const o=(y*W+x)*4,q=hx(c);d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
+ const bw=W*.16,bh=Hh*.34,pw=W*.3,ph=Hh*.26,gap=W*.05;
+ for(const sd of[-1,1])for(let y=-ph;y<=ph;y++)for(let x=0;x<=pw;x++){const X=cx+sd*(bw+gap+x),Y=cy+y,cell=(x%6===0)||(Math.round(y+ph)%5===0)||Math.abs(y)>=ph-.5||x>=pw-.5;
+  const glint=Math.sin(t*1.4+x*.18-y*.1+sd)>.86;put(X,Y,cell?'#0a0c18':dq(PANEL,.55-y/ph*.25-sd*.1+(glint?.5:0),X,Y))}
+ for(const sd of[-1,1])for(let x=0;x<gap;x++)put(cx+sd*(bw+x),cy,'#8a8a94');
+ for(let y=-bh;y<=bh;y++)for(let x=-bw;x<=bw;x++){const lit=.85-(x/bw)*.3-(y/bh)*.35,edge=Math.abs(x)>=bw-.5||Math.abs(y)>=bh-.5,fold=H(Math.floor((x+bw)/3),Math.floor((y+bh)/3))*.35;
+  put(cx+x,cy+y,edge?'#1a1206':x>bw*.2&&y>-bh*.1?dq(['#20180a','#3a2c18','#5a4426'],lit,cx+x,cy+y):dq(GOLD,lit*.8+fold-.1,cx+x,cy+y))}
+ // dish + antenna
+ const dx0=cx,dy0=cy-bh-1;for(let a=-5;a<=5;a++){put(dx0+a,dy0-Math.round(a*a/7)-1,dq(['#4a4a52','#9a9aa4','#e8e8f0'],.8-a/10,dx0+a,dy0))}
+ for(let k=0;k<Hh*.18;k++)put(dx0+k*.3,dy0-3-k,'#c8c8d0');const blink=Math.sin(t*4)>.3;put(dx0+Hh*.18*.3,dy0-3-Hh*.18,blink?'#ff3030':'#5a1010');put(dx0+Hh*.18*.3+1,dy0-3-Hh*.18,blink?'#ff9090':'#3a0a0a');
+ put(cx+bw-2,cy+bh-2,Math.sin(t*2.6+1)>.5?'#40ff80':'#104020');
+ S.g.putImageData(img,0,0)};
+/* ---------- OLD ITERATIONS of the hub, one planet each ---------- */
+function craters(lon,lat,sc,seed){const u=lon*sc,v=lat*sc,cu=Math.floor(u),cv=Math.floor(v);let best=null;
+ for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const i=cu+a,j=cv+b;if(H(i+seed,j)>.42)continue;const px=i+.2+H(j,i+seed)*.6,py=j+.2+H(i*3,j+seed)*.6,r=.18+H(i,j*7+seed)*.25,dx=u-px,dy=v-py,q=Math.hypot(dx,dy)/r;if(q<1.15&&(!best||q<best.q))best={q,dx:dx/r,dy:dy/r}}
+ if(!best)return 0;if(best.q>1)return best.dx*-.6+best.dy*-.5>0?2:0; // lit outer rim
+ return(best.dx*-.62+best.dy*-.5)>0?-2:-1} // inner: far wall lit, near wall shadow
+const VPAL={lovely:['#4a1830','#8a3a62','#d8709a','#f8b0cc','#fff0f6'],arcade:['#08061a','#1a1240','#2c2068','#4a3a9a','#7a6ad0'],larper:['#1a0606','#3e0e0e','#6a1a18','#9a3226','#c8604a'],
+ purple:['#120624','#2a0e52','#4c1c8a','#7a3ac8','#b88af0'],white:['#5a5e6e','#9aa0b2','#cfd4e0','#eef0f6','#ffffff'],strings:['#6a6a74','#a8a8b4','#dcdce6','#f4f4fa','#ffffff']};
+P.vplanet=(S,t,kind)=>{const W=S.img.width,R=W*.4,pal=VPAL[kind];
+ sphere(S,R,W/2,W/2,t*.1,(lon,lat,lit,x,y)=>{let v=lit*.9+.05;
+  if(kind==='lovely'){const band=Math.floor(lat*4+Math.sin(lon*3)*.4);v+=band%2?.1:-.05;const u=(lon*4)%1,w=(lat*4+.5)%1,hx2=Math.abs(u-.5)*2,hy=(w-.5)*2;if(Math.abs(Math.floor(lon*4))%2===Math.abs(Math.floor(lat*4+.5))%2&&hy<.55-hx2*.9&&hy>-.5+Math.pow(hx2-.5,2)*1.6-.35&&hx2<.8)return dq(['#5a0a22','#b0204a','#ff4a7a','#ffb0c8'],lit+.1,x,y)}
+  if(kind==='arcade'){const gl=Math.abs(Math.sin(lon*8))<.09||Math.abs(Math.sin(lat*8))<.09;if(gl)return (Math.sin(t*3+lon*4)>0)?dq(['#3a0a4a','#c020c0','#ff60ff'],lit+.2,x,y):dq(['#0a3a4a','#20b0c0','#80ffff'],lit+.2,x,y)}
+  if(kind==='larper'||kind==='purple'||kind==='white'){const c=craters(lon,lat,kind==='white'?3:4.5,kind.length);v+=c*.12}
+  if(kind==='purple'){const vine=Math.abs(Math.sin(lon*5+Math.sin(lat*7)*1.5)-lat*.8)<.07;if(vine)return dq(['#0a2a10','#1e6a2a','#4ac05a'],lit+.1,x,y)}
+  if(kind==='larper'&&Math.abs(lat+.3*Math.sin(lon*2))<.08)return dq(['#1a1410','#4a3a2a','#8a7050','#c8a878'],lit,x,y);// stone wall belt
+  if(kind==='white'&&Math.abs(lat-.05)<.14){const k=Math.floor((lon*3/Math.PI+3)*1)%3;return dq([['#2a2622','#6a625a','#a89c8a'],['#0a2a6a','#2a6ad0','#8ac0ff'],['#063a10','#16a040','#7aff8a']][(k+3)%3],lit+.1,x,y)}
+  if(kind==='strings'){if(((Math.floor(lon*24)+Math.floor(lat*24))&1)===0&&((lon*24)%1<.3)&&((lat*24)%1<.3))return dq(['#5a6a80','#8a9ab8','#b0c0dc'],lit,x,y);
+   const st=[['#3a3a3a',.6,1.1],['#2a7ad0',-.2,2],['#7a3ad0',.1,-1.4],['#c02a2a',-.5,.8]];for(const[c,o,f]of st)if(Math.abs(lat-o-Math.sin(lon*f+t*.3)*.25)<.04)return lit>.3?c:'#2a2a3a'}
+  return dq(pal,v,x,y)},{w:Math.max(2,R*.1),r:[pal[1],pal[3],pal[4]]},kind==='larper'?a=>.93+.1*vn(a*2+4,2):null);
+ if(kind==='strings'){const img=S.g.getImageData(0,0,W,W),d=img.data,cx=W/2,cy=W/2; // gold frame ring
+  for(let y=0;y<W;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=(y+.5-cy)/.32,r=Math.hypot(dx,dy)/R;if(r>1.22&&r<1.42){if(y<cy&&Math.hypot(x+.5-cx,y+.5-cy)<R)continue;const a=Math.atan2(dy,dx),c=hx(dq(['#3a2304','#9a6a10','#efc84a','#fff4c0'],.55+.4*Math.cos(a+2.3)+(Math.sin(a*14)>.8?.2:0),x,y)),o=(y*W+x)*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}}
+  S.g.putImageData(img,0,0)}};
+P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
+window.PLANETS=P;
+})();
