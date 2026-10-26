@@ -51,3 +51,5 @@ body.arch #sat{z-index:40}
 @media (max-width:600px){.mhall{grid-template-columns:repeat(2,1fr);gap:20px 10px;padding-inline:10px}.glass{width:120px;height:96px}.ped{width:132px}.mtitle{margin-top:calc(env(safe-area-inset-top) + 12vh)}}
 @media (prefers-reduced-motion:reduce){.mlogo{animation:none}}
 body.arch #back{z-index:40}
+#back,#archbtn{display:none!important}
+.mback{display:block;margin:0 auto calc(30px + env(safe-area-inset-bottom));font:inherit;font-size:13px;color:#e8ecff;background:#1c2132;border:2px solid #6a7290;padding:10px 16px;cursor:pointer;box-shadow:3px 3px 0 #000}.mback:hover,.mback:focus-visible{border-color:#ffd67a;color:#ffd67a}

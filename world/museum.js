@@ -1,13 +1,13 @@
 (()=>{const P=window.PLANETS,A=window.__ARCH;if(!P||!A)return;
 const m=document.createElement('section');m.id='museum';m.setAttribute('aria-label','Archive space museum');
-m.innerHTML='<canvas id="mbg" aria-hidden="true"></canvas><h1 class="mtitle">Archive Museum</h1><div class="mhall"></div>';
+m.innerHTML='<canvas id="mbg" aria-hidden="true"></canvas><h1 class="mtitle">Archive Museum</h1><div class="mhall"></div><button type="button" class="mback">← Back to Landrcyverse</button>';
 document.body.appendChild(m);const hall=m.querySelector('.mhall'),thumbs=[];
 for(const b of A){const a=document.createElement('a');a.className='case';a.href=b.href;if(/^https?:/.test(b.href)){a.target='_blank';a.rel='noopener'}
  a.innerHTML='<span class="glass"></span><span class="ped"></span><span class="plq"></span>';a.querySelector('.plq').textContent=b.title;const gl=a.querySelector('.glass');
  if(/^(oldhub|v-)/.test(b.id)){const i=new Image();i.src='world/titles/'+b.id+'.png';i.alt='';i.className='mlogo';gl.appendChild(i)}
  else{const S=P.mk(48,48);S.c.className='mlogo px';gl.appendChild(S.c);thumbs.push([S,b.paint])}
  hall.appendChild(a)}
-const bg=m.querySelector('#mbg'),x=bg.getContext('2d');let st=[],t0=performance.now(),lt=0;
+m.querySelector('.mback').onclick=()=>window.__museumBack&&window.__museumBack();const bg=m.querySelector('#mbg'),x=bg.getContext('2d');let st=[],t0=performance.now(),lt=0;
 function size(){const w=Math.ceil(innerWidth/4),h=Math.ceil(innerHeight/4);bg.width=w;bg.height=h;st=Array.from({length:60},()=>({x:Math.random()*w,y:Math.random(),s:.2+Math.random()*.8}))}
 addEventListener('resize',size);size();
 function draw(now){requestAnimationFrame(draw);if(!document.body.classList.contains('arch'))return;if(now-lt<50)return;lt=now;const t=(now-t0)/1000,w=bg.width,h=bg.height;

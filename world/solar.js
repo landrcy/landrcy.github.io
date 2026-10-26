@@ -51,7 +51,7 @@ const STARS=[];for(let l=0;l<3;l++)for(let i=0;i<(l===0?260:l===1?110:40);i++)ST
 let neb=null;
 function buildNeb(){if(neb)return;const P0=256,S=P.mk(P0,P0),d=S.img.data,R=['#010103','#03030a','#070614','#0d0a1e','#140e2a'];
  const f=(x,y)=>P.fbm(x/70+3,y/70)*1.2+P.fbm(x/26,y/26+5)*.35-.55;
- for(let y=0;y<P0;y++)for(let x=0;x<P0;x++){const ax=x/P0,ay=y/P0,n=f(x,y)*(1-ax)*(1-ay)+f(x+P0,y)*ax*(1-ay)+f(x,y+P0)*(1-ax)*ay+f(x+P0,y+P0)*ax*ay;
+ for(let y=0;y<P0;y++)for(let x=0;x<P0;x++){const ax=x/P0,ay=y/P0,n=f(x,y)*(1-ax)*(1-ay)+f(x-P0,y)*ax*(1-ay)+f(x,y-P0)*(1-ax)*ay+f(x-P0,y-P0)*ax*ay;
   const v=Math.max(0,n*1.35)*1.4;const c=P.hx(P.dq(R,v,x,y,v>.5?P.STAR:P.bay)),o=(y*P0+x)*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}
  S.g.putImageData(S.img,0,0);neb=S}
 function resize(){const vd=MAIN.find(b=>b.id==='void');if(innerWidth<innerHeight){vd.x=150;vd.y=-560}else{vd.x=520;vd.y=-300}DPR=1;W=innerWidth;H=innerHeight;cv.width=W;cv.height=H;g.imageSmoothingEnabled=false;buildNeb();if(!focus&&!tw){cam.z=intro?cam.z:fitZ();if(!intro){cam.x=fitX();cam.y=fitY()}}}
@@ -63,14 +63,15 @@ function introState(now){if(!intro)return{stars:1,ign:1,L:1,orb:1,pop:()=>1};con
 function skipIntro(){if(!intro)return;intro=null;to(fitX(),fitY(),fitZ(),700)}
 // ---- render ----
 let last=performance.now(),FA=0;
+function clamp2(v,a,b){return v<a?a:v>b?b:v}
 function lens(){if(sys!=='main')return;const b=MAIN.find(q=>q.id==='void'),[sx,sy]=W2S(b.x,b.y),E=b.w*.084*cam.z*1.9,Rr=Math.ceil(E*3.2);
  if(E<3||sx+Rr<0||sy+Rr<0||sx-Rr>W||sy-Rr>H)return;const x0=Math.max(0,Math.floor(sx-Rr)),y0=Math.max(0,Math.floor(sy-Rr)),x1=Math.min(W,Math.ceil(sx+Rr)),y1=Math.min(H,Math.ceil(sy+Rr)),w=x1-x0,h=y1-y0;if(w<2||h<2)return;
  const src=g.getImageData(x0,y0,w,h),out=g.createImageData(w,h),a=src.data,o=out.data,E2=E*E;
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const dx=x0+x+.5-sx,dy=(y0+y+.5-sy)/.8,d2=dx*dx+dy*dy,i=(y*w+x)*4;if(d2>Rr*Rr){o[i]=a[i];o[i+1]=a[i+1];o[i+2]=a[i+2];o[i+3]=255;continue}
   const f=1-E2/Math.max(d2,1),fall=Math.min(1,Math.sqrt(d2)/Rr),k=f*(1-fall*fall)+fall*fall;let X=Math.round(sx+dx*k-x0),Y=Math.round(sy+dy*.8*k-y0);
-  if(f<0){X=Math.round(sx-dx*.6*(E2/d2)-x0);Y=Math.round(sy-dy*.8*.6*(E2/d2)-y0)}X=Math.max(0,Math.min(w-1,X));Y=Math.max(0,Math.min(h-1,Y));const j=(Y*w+X)*4;o[i]=a[j];o[i+1]=a[j+1];o[i+2]=a[j+2];o[i+3]=255}
+  if(f<0){X=Math.round(sx-dx*.6*(E2/d2)-x0);Y=Math.round(sy-dy*.8*.6*(E2/d2)-y0)}X=Math.max(0,Math.min(w-1,X));Y=Math.max(0,Math.min(h-1,Y));const j=(Y*w+X)*4,m=1-fall*fall*fall,m2=m*m*(3-2*m);o[i]=a[i]+(a[j]-a[i])*m2;o[i+1]=a[i+1]+(a[j+1]-a[i+1])*m2;o[i+2]=a[i+2]+(a[j+2]-a[i+2])*m2;o[i+3]=255}
  g.putImageData(out,x0,y0)}
-function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;const IS=introState(now);FA+=((focus?1:0)-FA)*Math.min(1,dt*4);if(mv.on&&!tw){const k=Math.pow(.9,dt*60);mv.x*=k;mv.y*=k;cam.x+=mv.x*dt*60;cam.y+=mv.y*dt*60;if(Math.hypot(mv.x,mv.y)*cam.z<.1)mv.on=0}
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;const IS=introState(now);FA+=((focus?1:0)-FA)*Math.min(1,dt*4);if(mv.on&&!tw){const k=Math.pow(.9,dt*60);mv.x*=k;mv.y*=k;cam.x+=mv.x*dt*60;cam.y+=mv.y*dt*60;if(Math.hypot(mv.x,mv.y)*cam.z<.1)mv.on=0}if(!tw&&!intro&&sys==='main'){const bx=560,by=420;cam.x=clamp2(cam.x,fitX()-bx,fitX()+bx);cam.y=clamp2(cam.y,fitY()-by,fitY()+by)}
  if(intro){if(IS.t<3.9){cam.x=0;cam.y=0;cam.z=Math.min(W,H)*.82/(150*.72)}else if(!intro.zoomed){intro.zoomed=1;to(fitX(),fitY(),fitZ(),1500)}if(IS.t>8.2)intro=null}
  if(tw){const k=ease(clamp((now-tw.t0)/tw.ms));const zl=Math.exp(Math.log(tw.a.z)+(Math.log(tw.b.z)-Math.log(tw.a.z))*k);cam.x=tw.a.x+(tw.b.x-tw.a.x)*k;cam.y=tw.a.y+(tw.b.y-tw.a.y)*k;cam.z=zl;if(k>=1){const d=tw.done;tw=null;d&&d()}}
  // orbit motion: hover/focus slows to a stop
@@ -138,9 +139,9 @@ function warpTo(to2){if(warp||sys===to2)return;focus=null;info.className='';info
  if(RM){sys=to2;bodies=to2==='main'?MAIN:ARCH;cam.x=fitX();cam.y=fitY();cam.z=fitZ();document.body.classList.toggle('arch',to2==='archive');return}
  const sat=bodies.find(b=>b.arch||b.home);if(sat){const[x,y]=pos(sat);to(x,y,cam.z*3,700)}warp={t0:performance.now(),to:to2,swapped:false}}
 function enterArchive(){if(sys==='archive'||warp)return;history.pushState({a:1},'');warpTo('archive')}
-backBtn.onclick=()=>{if(history.state&&history.state.a)history.back();else warpTo('main')};
+window.__museumBack=()=>backBtn.onclick();backBtn.onclick=()=>{if(history.state&&history.state.a)history.back();else warpTo('main')};
 homeBtn.onclick=()=>{skipIntro();if(focus)unfocus();else to(fitX(),fitY(),fitZ(),700)};
-archBtn.onclick=()=>enterArchive();
+if(archBtn)archBtn.onclick=()=>enterArchive();
 addEventListener('popstate',()=>{if(focus)unfocus();else if(sys==='archive')warpTo('main')});
 // ---- input: drag pan, wheel / pinch zoom, tap/click focus ----
 const pts=new Map(),mv={x:0,y:0,t:0,on:0};let moved=0,pinch=null;
