@@ -1,0 +1,4 @@
+<!doctype html><body style="margin:0;background:#0b0820"><canvas id="o" style="image-rendering:pixelated"></canvas><script src="planets.js"></script><script>
+const q=new URLSearchParams(location.search),s=+q.get('s'),k=+q.get('k'),m=q.get('m'),dv=+(q.get('dv')||1),n=+(q.get('n')||0),h=+(q.get('h')||s);
+const S=PLANETS.mk(Math.max(8,Math.round(s/dv)),Math.max(6,Math.round(h/dv)));PLANETS[q.get('p')](S,3,m?m:(q.get('p')==='sun'?{ign:1,L:1}:undefined));if(n)PLANETS.reduce(S,n);
+const o=document.getElementById('o');o.width=s*k;o.height=h*k;const g=o.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(S.c,0,0,s*k,h*k);</script>
