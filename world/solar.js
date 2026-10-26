@@ -17,7 +17,7 @@ const MAIN=[
  B({id:'ashaad',paint:'ashaad',w:74,orb:140,per:50,ph:2.2,hr:.42,title:'The Binding of Ashaad',by:'a brainrot roguelike by landrcy',blurb:'Descend into the basement, shoot your tears, grab cursed items and survive in this browser roguelike. 3 starters, 4 floors, 1 secret Finley boss.',href:'https://landrcy.github.io/binding-of-ashaad/',cta:'▶ Play'}),
  B({id:'sea',paint:'sea',w:96,orb:208,per:72,ph:.4,hr:.4,title:'Sea of Thought',by:'a pixel ocean by landrcy',blurb:'A quiet pixel ocean full of messages in bottles: write one, throw it in, then dive and read what strangers left behind.',href:'https://landrcy.github.io/sea-of-thought/',cta:'▶ Dive in'}),
  B({id:'yt',paint:'yt',w:78,orb:285,per:96,ph:4.1,hr:.42,title:'LLC Powered Channels',by:'YouTube',yt:1}),
- B({id:'gow',paint:'gow',w:124,orb:375,per:140,ph:5.3,hr:.42,title:'Game of Websites',by:'coopercitywebsites.github.io',blurb:'A searchable catalogue of every site in the collection: unblocked games, NeoForge mods, old builds and the trash pile, ranked by how much code went into each one.',href:'https://coopercitywebsites.github.io/main/',cta:'Open'}),
+ B({id:'gow',paint:'crest',w:124,h:100,orb:375,per:140,ph:5.3,hr:.42,title:'Game of Websites',by:'coopercitywebsites.github.io',blurb:'A searchable catalogue of every site in the collection: unblocked games, NeoForge mods, old builds and the trash pile, ranked by how much code went into each one.',href:'https://coopercitywebsites.github.io/main/',cta:'Open'}),
  B({id:'archive',paint:'satellite',w:64,h:40,orb:462,per:210,ph:3.2,hr:.3,title:'Archive satellite',arch:1}),
  B({id:'void',paint:'void',w:210,h:124,x:560,y:-300,hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13})];
 const MOONS=CH.map((c,i)=>B({id:'m-'+c.id,paint:'moon',arg:c.kind,w:Math.round(12+14*Math.sqrt((c.views||0)/MV)),orb:50+i*9,per:9+i*2.6,ph:i*1.3,hr:.42,moon:c,title:c.name}));
@@ -35,7 +35,7 @@ const ARCH=[
  B({id:'sat-home',paint:'satellite',w:64,h:40,orb:458,per:200,ph:5.5,hr:.3,title:'Fly home',home:1})];
 const LOD=[[3.2,4],[1.7,7],[1,0]];
 function lodLv(){return Math.max(0,Math.min(2,Math.log(cam.z/1.1)/Math.log(2)))}
-for(const b of [...MAIN,...MOONS,...ARCH]){b.L=LOD.map(([dv])=>P.mk(Math.max(8,Math.round(b.w/dv)),Math.max(6,Math.round((b.h||b.w)/dv))));b.S=b.L[2];b.nx=[0,0,0];b.ang=b.ph||0}
+for(const b of [...MAIN,...MOONS,...ARCH]){b.L=LOD.map(([dv0])=>{const dv=b.paint==='crest'?Math.min(dv0,2.2):dv0;return P.mk(Math.max(8,Math.round(b.w/dv)),Math.max(6,Math.round((b.h||b.w)/dv)))});b.S=b.L[2];b.nx=[0,0,0];b.ang=b.ph||0}
 let sys='main',bodies=MAIN;
 // ---- camera ----
 const cam={x:0,y:0,z:1};let tw=null,focus=null,hover=null,intro=RM?null:{t0:performance.now()};
@@ -90,7 +90,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;const IS=int
   const lv=lodLv(),t0=Math.floor(lv),fr=t0>=2?0:Math.max(0,Math.min(1,(lv-t0-.3)/.4)),fs=fr*fr*(3-2*fr);
   const ga=g.globalAlpha,tiers=fs>=1?[[t0+1,1]]:fs>0?[[t0,1],[t0+1,fs]]:[[t0,1]];
   for(const[ti,al]of tiers){const S=b.L[ti];
-   if(now>=b.nx[ti]||(b.id==='sun'&&intro)){const o=b.id==='sun'?{ign:IS.ign,L:IS.L}:b.arg;P[b.paint](S,RM?7:now/1000+(b.ph||0)*3,o);if(LOD[ti][1])P.reduce(S,LOD[ti][1]+(b.paint==='sea'||b.paint==='gow'?3:0));b.nx[ti]=RM?Infinity:now+(ti?95:160)+(b.w>140&&ti?-25:0)+Math.random()*30}
+   if(now>=b.nx[ti]||(b.id==='sun'&&intro)){const o=b.id==='sun'?{ign:IS.ign,L:IS.L}:b.arg;P[b.paint](S,RM?7:now/1000+(b.ph||0)*3,o);if(LOD[ti][1])P.reduce(S,LOD[ti][1]+(b.paint==='sea'||b.paint==='crest'?3:0));b.nx[ti]=RM?Infinity:now+(ti?95:160)+(b.w>140&&ti?-25:0)+Math.random()*30}
    g.globalAlpha=ga*al;g.drawImage(S.c,Math.round(sx-w/2),Math.round(sy-h/2),Math.round(w),Math.round(h))}
   g.globalAlpha=ga}
  g.globalAlpha=1;if(focus)placeInfo();
@@ -100,13 +100,19 @@ function hit(sx,sy){const[wx,wy]=S2W(sx,sy);let best=null,bd=1e9;const list=sys=
  for(const b of list){const[x,y]=pos(b),r=b.w*b.hr*(b.id==='void'?1.4:1),d=Math.hypot(wx-x,(wy-y)*(b.id==='void'?1.6:1));if(d<r&&d/r<bd){bd=d/r;best=b}}return best}
 // ---- focus & info ----
 let revealT=0;
+const TH={sun:['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#9ab4e8'],ashaad:['#120a0c','#e8dcc0','#ffd23a','#2a1608','Silkscreen','#5a3a20'],sea:['#021e5a','#90E0EF','#48CAE4','#021e5a','VT323','#f3dfae'],
+ gow:['#000','#fff','#e01a22','#fff','Anton','#e01a22'],ccold:['#000','#fff','#e01a22','#fff','Anton','#e01a22'],void:['#05020d','#efe6ff','#c04df0','#fff','VT323','#c04df0'],
+ yt:['#0f0f0f','#fff','#ff0033','#fff','Roboto','#ff0033'],oldhub:['#120c1e','#f3ecdf','#ff0033','#fff','Silkscreen','#ffcc4d'],ballfight:['#120c1e','#f3ecdf','#ffcc4d','#120c1e','Silkscreen','#ff0033'],
+ 'v-lovely':['#fff8f1','#3a2430','#ff5d8f','#fff','Fredoka','#ffb347'],'v-arcade':['#1a1440','#ffd257','#ff5d8f','#fff','Silkscreen','#7c6cff'],'v-larper':['#1a1440','#ffcc4d','#7c6cff','#fff','Silkscreen','#ff5d8f'],
+ 'v-purple':['#241640','#ffcc4d','#38e1d0','#0a0814','Silkscreen','#7c6cff'],'v-white':['#080a12','#dde0e8','#9ab4e8','#080a12','Silkscreen','#cfe0ff'],'v-strings':['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#c9ced8']};
+function theme(b){const t=TH[b.moon?'yt':b.id]||TH.sun;return `--bg:${t[0]};--fg:${t[1]};--ac:${t[2]};--bf:${t[3]};--ft:'${t[4]}';--bd:${t[5]}`}
 function infoHTML(b){const a=s=>/^https?:/.test(s)?' target="_blank" rel="noopener"':'';
- if(b.yt)return `<h2>${b.title}</h2><p class="by">5 channels on YouTube</p><p class="stat"><b>${fmt(TV)}</b> views · <b>${fmt(TS)}</b> subscribers</p><ul class="mlist">${CH.map(c=>`<li><button data-moon="m-${c.id}">${c.name}</button><span>${fmt(c.views)} views · ${fmt(c.subs)} subs</span></li>`).join('')}</ul><p class="note">Public counts as of Oct 26, 2026; - means not public. Tap a moon.</p>`;
- if(b.moon){const c=b.moon;return `<h2>${c.name}</h2><p class="by">a moon of LLC Powered Channels</p><p class="stat"><b>${fmt(c.subs)}</b> subscribers<br><b>${fmt(c.views)}</b> views</p><a class="go" href="${c.url}" target="_blank" rel="noopener">▶ Watch on YouTube</a><p class="note">as of Oct 26, 2026</p>`}
- return `<h2>${b.title}</h2><p class="by">${b.by||''}</p>${b.blurb?`<p>${b.blurb}</p>`:''}${b.href?`<a class="go" href="${b.href}"${a(b.href)}>${b.cta}</a>`:''}`}
+ if(b.yt)return `<h2>${b.title}</h2><p class="stat"><b>${fmt(TV)}</b> views · <b>${fmt(TS)}</b> subs</p><div class="mlist">${CH.map(c=>`<button class="go sm" data-moon="m-${c.id}">${c.name}</button>`).join('')}</div>`;
+ if(b.moon){const c=b.moon;return `<h2>${c.name}</h2><p class="stat"><b>${fmt(c.subs)}</b> subs · <b>${fmt(c.views)}</b> views</p><a class="go" href="${c.url}" target="_blank" rel="noopener">▶ Watch</a>`}
+ return `<h2>${b.title}</h2>${b.href?`<a class="go" href="${b.href}"${a(b.href)}>${b.cta}</a>`:''}`}
 function faceR(b){return b.id==='void'?b.w*.12:b.w*(b.paint==='sea'?.3:b.hr)}
 function focusOn(b,push=true){hideTip();if(b.arch){enterArchive();return}if(b.home){warpTo('main');return}
- focus=b;info.className='';info.innerHTML='<canvas class="plate" width="40" height="40"></canvas><div class="txt">'+infoHTML(b)+'</div>';
+ focus=b;info.className='';info.innerHTML='<div class="txt" style="'+theme(b)+'">'+infoHTML(b)+'</div>';
  const[x,y]=pos(b),fr=faceR(b),need=b.yt||b.id==='sun'||b.id==='oldhub'?300:250,z=Math.max(need/(fr*2*.86),Math.min(W,H)*.66/(fr*2));
  info.querySelectorAll('[data-moon]').forEach(el=>el.onclick=e=>{e.stopPropagation();focusOn(MOONS.find(m=>m.id===el.dataset.moon))});
  to(x,y+(b.paint==='sea'?(b.h||b.w)*.1:0),z,950,()=>{revealT=performance.now();info.classList.add('on')});
@@ -114,8 +120,7 @@ function focusOn(b,push=true){hideTip();if(b.arch){enterArchive();return}if(b.ho
 function unfocus(){if(!focus)return;focus=null;info.className='';info.innerHTML='';to(fitX(),fitY(),fitZ(),900)}
 function placeInfo(){const b=focus,[x,y]=pos(b),[sx,sy]=W2S(x,y+(b.paint==='sea'?(b.h||b.w)*.1:0)),D=Math.min(Math.max(faceR(b)*2*cam.z*.86,230),Math.min(W,H)*.92);
  info.style.cssText=`left:${Math.round(sx-D/2)}px;top:${Math.round(sy-D/2)}px;width:${Math.round(D)}px;height:${Math.round(D)}px`;
- if(!info.classList.contains('on'))return;const p=RM?1:clamp((performance.now()-revealT)/650),pc=info.querySelector('.plate');if(!pc)return;
- if(pc._p!==p){pc._p=p;const q=pc.getContext('2d');q.clearRect(0,0,40,40);for(let yy=0;yy<40;yy++)for(let xx=0;xx<40;xx++){const r=Math.hypot(xx+.5-20,yy+.5-20)/20;if(r>1)continue;const th=P.bay(xx,yy);if(th>p*1.05)continue;const core=r<.8;if(!core&&(xx+yy)%2)continue;q.fillStyle='#05040c';q.fillRect(xx,yy,1,1)}}
+ if(!info.classList.contains('on'))return;const p=RM?1:clamp((performance.now()-revealT)/450);
  info.style.setProperty('--rv',p)}
 // ---- archive system ----
 let warp=null;
