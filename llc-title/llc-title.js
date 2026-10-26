@@ -10,9 +10,19 @@ const img=ctx.createImageData(W,H),buf=img.data;for(let i=3;i<buf.length;i+=4)bu
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // white-page recolour: the art is light-on-#080a12; treat it as light over black and composite onto white
 const WHITE=cv.dataset.white!=null;const out=ctx.createImageData(W,H),ob=out.data;
-const put=()=>{for(let i=0;i<buf.length;i+=4){const r=buf[i],g=buf[i+1],b=buf[i+2],m=Math.max(r,g,b),n=Math.min(r,g,b);
- if(!WHITE){ctx.putImageData(img,0,0);return}let a=(m-48)/60;a=a<0?0:a>1?1:a;if(m-n<28&&m>150)a*=Math.max(0,(m-n)/28); // drop near-white stars/sparkle haze
- ob[i]=255+(r-255)*a;ob[i+1]=255+(g-255)*a;ob[i+2]=255+(b-255)*a;ob[i+3]=255}ctx.putImageData(out,0,0)};
+const A=new Uint8Array(W*H),L=new Int32Array(W*H),Q=new Int32Array(W*H);
+// label 4-connected regions of value v; call f(size,touchesEdge) and fill with result
+function regions(v,f){L.fill(0);let id=0;for(let s=0;s<A.length;s++){if(A[s]!==v||L[s])continue;id++;let h=0,t=0,edge=false;Q[t++]=s;L[s]=id;
+ while(h<t){const p=Q[h++],x=p%W,y=(p/W)|0;if(x===0||y===0||x===W-1||y===H-1)edge=true;
+  const nb=[x>0?p-1:-1,x<W-1?p+1:-1,y>0?p-W:-1,y<H-1?p+W:-1];for(const q of nb)if(q>=0&&A[q]===v&&!L[q]){L[q]=id;Q[t++]=q}}
+ if(f(t,edge))for(let k=0;k<t;k++)A[Q[k]]=1-v}}
+const put=()=>{if(!WHITE){ctx.putImageData(img,0,0);return}
+ for(let p=0,i=0;p<A.length;p++,i+=4){const r=buf[i],g=buf[i+1],b=buf[i+2],m=Math.max(r,g,b),n=Math.min(r,g,b);
+  A[p]=(m>=46&&!(m-n<28&&m>150))?1:0}
+ regions(1,(n)=>n<20);            // tiny specks (stars, sparkles) -> background
+ regions(0,(n,e)=>!e&&n<80);      // small enclosed gaps inside letters -> letter (opaque)
+ for(let p=0,i=0;p<A.length;p++,i+=4){if(A[p]){ob[i]=buf[i];ob[i+1]=buf[i+1];ob[i+2]=buf[i+2]}else{ob[i]=ob[i+1]=ob[i+2]=255}ob[i+3]=255}
+ ctx.putImageData(out,0,0)};
 const loadImg=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src});
 function setFrom(i){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(i,0,0);buf.set(x.getImageData(0,0,W,H).data)}
 // ---- responsive crisp scaling: whole multiples when >=2x, fractional below ----
