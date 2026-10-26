@@ -27,7 +27,7 @@ function sphere(S,R,cx,cy,rot,fn,atm,shp){const{img}=S,W=img.width,d=img.data;
  S.g.putImageData(img,0,0)}
 const P={};
 /* ---------- SUN (SDO-style, pixelised) with calligraphic script L ---------- */
-const SUNR=['#2a0402','#5e0c03','#9a1c06','#d23a0c','#f2641a','#fc9a2e','#ffd070','#fff4d0','#ffffff'];
+const SUNR=['#1c0201','#460603','#7a0e04','#b01e08','#d8360e','#ee5a18','#fa8a2c','#ffc070','#ffe8c0'];
 const GLOW=['#1a0201','#4a0803','#8a1606','#c42a0a'];
 const bz=(p0,p1,p2,p3,t)=>{const u=1-t;return[u*u*u*p0[0]+3*u*u*t*p1[0]+3*u*t*t*p2[0]+t*t*t*p3[0],u*u*u*p0[1]+3*u*u*t*p1[1]+3*u*t*t*p2[1]+t*t*t*p3[1]]};
 // the first capital L of the old LLC title (llc-title/final.png), traced in 960x540 title coordinates; drawn stroke by stroke
@@ -49,11 +49,12 @@ P.sun=(S,t,o)=>{o=o||{};const W=S.img.width,R=W*.34,cx=W/2,cy=W/2,ign=o.ign??1;c
    const gr=Math.abs(g1-.5)*1.5+g2*.5,act=fbm(lon*2.4+t*.02,lat*2.4+3);
    let v=.12+.66*Math.pow(nz,.5)+(gr-.5)*.42+(act>.6?(act-.6)*1.3:0);
    for(const[fx,fy,fr]of FLARES){const q=Math.hypot(dx-fx,dy-fy)/fr;if(q<1){const fl=.7+.3*Math.sin(t*6+fx*20)*Math.sin(t*3.7+fy*17);v+=(1-q)*(1-q)*1.8*fl}}
-   if(r>.93)v=Math.max(v,.85+(r-.93)*3);col=dq(SUNR,v*ign,x,y);
+   v-=Math.pow(Math.max(0,r-.62)/.38,2.2)*.42;if(r>.965)v=Math.max(v,.5+(r-.965)*9*vn(ang*40,t*.6));col=dq(SUNR,v*ign,x,y);
    const lx=x-lx0,ly=y-ly0;if(Lp>0&&lx>=0&&ly>=0&&lx<Ld&&ly<Ld&&Lmask.m[ly*Ld+lx])col='#000000'}
-  else if(ign>.98&&r<1.47){const cs=Math.max(2,Math.round(W/64)),qx=(Math.floor(x/cs)+.5)*cs,qy=(Math.floor(y/cs)+.5)*cs,qdx=(qx-cx)/R,qdy=(qy-cy)/R,h=Math.hypot(qdx,qdy)-1,qa=Math.atan2(qdy,qdx);let v=0;
+  else if(ign>.98&&r<1.47){const cs=1,qx=x+.5,qy=y+.5,qdx=(qx-cx)/R,qdy=(qy-cy)/R,h=Math.hypot(qdx,qdy)-1,qa=Math.atan2(qdy,qdx);let v=0;
    // chunky flame tongues curling off the limb
-   const ca=qa-h*1.6*Math.sin(t*.7+qa*3),tl=.06+Math.pow(vn(ca*7+3,t*.45),2.2)*.34+Math.pow(vn(ca*17,t*.9+9),3)*.1;if(h<tl){const k=1-h/tl;v=Math.max(v,.18+k*.82)}
+   const ca=qa-h*1.6*Math.sin(t*.7+qa*3),tl=.035+Math.pow(vn(ca*9+3,t*.45),2.2)*.26+Math.pow(vn(ca*27,t*.9+9),3)*.12+Math.pow(vn(ca*61,t*1.4+4),4)*.06,rt=vn(qx*.35,qy*.35+t)*.16-.08;if(h<tl){const k=1-h/tl;v=Math.max(v,.18+k*.82+rt)}
+   else if(h<.42&&bay(x,y)<(1-h/.42)*.42)v=Math.max(v,.19+(1-h/.42)*.1);
    // looping prominences (thick banded arcs)
    for(const[a0,da,hh,sp,ph]of PROMS){let dA=Math.atan2(Math.sin(qa-a0),Math.cos(qa-a0));const sd=dA/da+.5;if(sd<0||sd>1)continue;
     const cyc=(Math.sin(t*sp+ph)*.5+.5),ht=hh*1.25*(.45+.55*cyc),tr=ht*Math.sin(Math.PI*sd),th=.05+.035*Math.sin(Math.PI*sd);
@@ -61,7 +62,7 @@ P.sun=(S,t,o)=>{o=o||{};const W=S.img.width,R=W*.34,cx=W/2,cy=W/2,ign=o.ign??1;c
    // bursting flares
    for(const[a0,per,ph]of BURSTS){const c=((t+ph)%per)/per;if(c>.35)continue;const dA=Math.abs(Math.atan2(Math.sin(qa-a0),Math.cos(qa-a0)));const len=.45*Math.sin(c/.35*Math.PI),wd=.09*(1-h/(len+.001));
     if(h<len&&dA<wd){const k=1-h/len;v=Math.max(v,.4+k*.6)}}
-   if(v>.18)col=v>.82?'#fff4c8':v>.64?'#ffd54a':v>.45?'#ff9a1e':v>.3?'#e8600e':'#b23a0a'}
+   if(v>.18)col=v>.84?'#ffe0a8':v>.68?'#ffa040':v>.5?'#f0601a':v>.33?'#c8300c':v>.24?'#8e1a06':'#5a0e04'}
   const o2=(y*W+x)*4;if(col){const c=hx(col);d[o2]=c[0];d[o2+1]=c[1];d[o2+2]=c[2];d[o2+3]=255}else d[o2+3]=0}
  S.g.putImageData(img,0,0)};
 /* ---------- ASHAAD: basement flesh/brick planet with a trapdoor ---------- */
