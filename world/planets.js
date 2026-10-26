@@ -7,7 +7,7 @@ const bay=(x,y)=>B4[(y&3)*4+(x&3)];
 const LINE=(x,y)=>[.1,.6,.35,.85][y&3];
 const STAR=(x,y)=>{const m=((x+2*y)%5+5)%5,k=((x*7+y*13)&7);return m===0?.15:(m===1||m===4)&&k<3?.55:.9};
 // pick a colour from a ramp with v in [0,1] using a threshold function
-function dq(r,v,x,y,th=bay){v=Math.max(0,Math.min(1,v))*(r.length-1);let i=Math.floor(v);if(v-i>th(x,y))i++;return r[Math.min(r.length-1,i)]}
+let FLAT=0;function dq(r,v,x,y,th=bay){v=Math.max(0,Math.min(1,v))*(r.length-1);let i=Math.floor(v);if(v-i>(FLAT?.5:th(x,y)))i++;return r[Math.min(r.length-1,i)]}
 const H=(a,b)=>{let h=(a*374761393+b*668265263)|0;h=Math.imul(h^h>>>13,1274126177);return((h^h>>>16)>>>0)/4294967296};
 function vn(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),w=yf*yf*(3-2*yf);
  return(H(xi,yi)*(1-u)+H(xi+1,yi)*u)*(1-w)+(H(xi,yi+1)*(1-u)+H(xi+1,yi+1)*u)*w}
@@ -49,12 +49,12 @@ P.sun=(S,t,o)=>{o=o||{};const W=S.img.width,R=W*.34,cx=W/2,cy=W/2,ign=o.ign??1;c
    const gr=Math.abs(g1-.5)*1.5+g2*.5,act=fbm(lon*2.4+t*.02,lat*2.4+3);
    let v=.12+.66*Math.pow(nz,.5)+(gr-.5)*.42+(act>.6?(act-.6)*1.3:0);
    for(const[fx,fy,fr]of FLARES){const q=Math.hypot(dx-fx,dy-fy)/fr;if(q<1){const fl=.7+.3*Math.sin(t*6+fx*20)*Math.sin(t*3.7+fy*17);v+=(1-q)*(1-q)*1.8*fl}}
-   v-=Math.pow(Math.max(0,r-.62)/.38,2.2)*.42;if(r>.965)v=Math.max(v,.5+(r-.965)*9*vn(ang*40,t*.6));col=dq(SUNR,v*ign,x,y);
+   v-=Math.pow(Math.max(0,r-.62)/.38,2.2)*(FLAT?.22:.42);if(FLAT){if(r>.9)v=Math.max(v,.62)}else if(r>.965)v=Math.max(v,.5+(r-.965)*9*vn(ang*40,t*.6));col=dq(SUNR,v*ign,x,y);
    const lx=x-lx0,ly=y-ly0;if(Lp>0&&lx>=0&&ly>=0&&lx<Ld&&ly<Ld&&Lmask.m[ly*Ld+lx])col='#000000'}
   else if(ign>.98&&r<1.47){const cs=1,qx=x+.5,qy=y+.5,qdx=(qx-cx)/R,qdy=(qy-cy)/R,h=Math.hypot(qdx,qdy)-1,qa=Math.atan2(qdy,qdx);let v=0;
    // chunky flame tongues curling off the limb
-   const ca=qa-h*1.6*Math.sin(t*.7+qa*3),tl=.035+Math.pow(vn(ca*9+3,t*.45),2.2)*.26+Math.pow(vn(ca*27,t*.9+9),3)*.12+Math.pow(vn(ca*61,t*1.4+4),4)*.06,rt=vn(qx*.35,qy*.35+t)*.16-.08;if(h<tl){const k=1-h/tl;v=Math.max(v,.18+k*.82+rt)}
-   else if(h<.42&&bay(x,y)<(1-h/.42)*.42)v=Math.max(v,.19+(1-h/.42)*.1);
+   const ca=qa-h*1.6*Math.sin(t*.7+qa*3),tl=FLAT?.05+Math.pow(vn(ca*5+3,t*.45),2)*.3:.035+Math.pow(vn(ca*9+3,t*.45),2.2)*.26+Math.pow(vn(ca*27,t*.9+9),3)*.12+Math.pow(vn(ca*61,t*1.4+4),4)*.06,rt=FLAT?0:vn(qx*.35,qy*.35+t)*.16-.08;if(h<tl){const k=1-h/tl;v=Math.max(v,.18+k*.82+rt)}
+   else if(!FLAT&&h<.42&&bay(x,y)<(1-h/.42)*.42)v=Math.max(v,.19+(1-h/.42)*.1);
    // looping prominences (thick banded arcs)
    for(const[a0,da,hh,sp,ph]of PROMS){let dA=Math.atan2(Math.sin(qa-a0),Math.cos(qa-a0));const sd=dA/da+.5;if(sd<0||sd>1)continue;
     const cyc=(Math.sin(t*sp+ph)*.5+.5),ht=hh*1.25*(.45+.55*cyc),tr=ht*Math.sin(Math.PI*sd),th=.05+.035*Math.sin(Math.PI*sd);
@@ -258,6 +258,65 @@ P.crest=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);const
   else c=dq(CR[k],lit,x,y);
   const q=hx(c),o=(y*W+x)*4;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255}
  S.g.putImageData(S.img,0,0)};
-P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
+
+/* ---------- FINLEY BALL: floating pixel colosseum with the real Langrino weapon balls ----------
+   Roster/colours from /workspace/weapon_ball/weapon_ball.py (Finley Ball / weapon ball game):
+   SWORD (#FF6464, spinning sword), SPEAR (#3A6BFF, long spear), BOW (#FFFF00, shoots arrows),
+   TNT (#E01E37, fuse + periodic blast), MAGNET (#E8423F red/blue poles, pulls others), TOXIC SPIKE (#8BE62B, spikes),
+   DAGGER (#00FF00, fast short blade), SLIME (#1FC9A6, leaves splats). */
+const TAU=Math.PI*2;
+const FB=[['sword','#ff6464'],['spear','#3a6bff'],['bow','#ffff00'],['tnt','#e01e37'],['magnet','#e8423f'],['toxic','#8be62b'],['dagger','#00ff00'],['slime','#1fc9a6']];
+const FSTONE=['#2a1c14','#4a3424','#6e5038','#957052','#bf9a70','#e3c69a'],FSAND=['#6a4a26','#9a7038','#c69a56','#e3bf7c','#f3dba4'];
+function fbInit(){const st={t:-1,b:[],pr:[],sp:[],spl:[]};FB.forEach(([k,c],i)=>{const a=i/FB.length*TAU;st.b.push({k,c:hx(c),x:Math.cos(a)*.5,y:Math.sin(a)*.5,vx:Math.cos(a*3+1)*.55,vy:Math.sin(a*2+2)*.55,r:.105,ang:a,cd:1+i*.4,fl:0})});return st}
+function fbStep(st,dt){const B=st.b;for(const b of B){b.ang+=dt*(b.k==='dagger'?7:b.k==='sword'?4:b.k==='spear'?1.8:1);b.fl=Math.max(0,b.fl-dt*4);b.cd-=dt;
+  if(b.k==='magnet')for(const o of B){if(o===b)continue;const dx=b.x-o.x,dy=b.y-o.y,d=Math.hypot(dx,dy)+.05;o.vx+=dx/d*.25*dt/d;o.vy+=dy/d*.25*dt/d}
+  if(b.k==='bow'&&b.cd<0){b.cd=1.1;const tg=B[(B.indexOf(b)+1+Math.floor(st.t*3)%(B.length-1))%B.length];const dx=tg.x-b.x,dy=tg.y-b.y,d=Math.hypot(dx,dy)||1;st.pr.push({x:b.x,y:b.y,vx:dx/d*1.6,vy:dy/d*1.6,o:b,l:1.2,k:'arrow'})}
+  if(b.k==='tnt'&&b.cd<0){b.cd=3.2;st.sp.push({x:b.x,y:b.y,ring:0});for(const o of B){if(o===b)continue;const dx=o.x-b.x,dy=o.y-b.y,d=Math.hypot(dx,dy);if(d<.5){o.vx+=dx/d*.9;o.vy+=dy/d*.9;o.fl=1}}for(let i=0;i<10;i++){const a=Math.random()*TAU;st.sp.push({x:b.x,y:b.y,vx:Math.cos(a)*.9,vy:Math.sin(a)*.9,l:.4,c:i%2?'#ffd54a':'#ff7a1e'})}}
+  if(b.k==='slime'&&b.cd<0){b.cd=.35;st.spl.push({x:b.x,y:b.y,l:4});if(st.spl.length>24)st.spl.shift()}
+  const sp=Math.hypot(b.vx,b.vy),tgt=.6;b.vx*=1+(tgt-sp)*dt*.8;b.vy*=1+(tgt-sp)*dt*.8;b.x+=b.vx*dt;b.y+=b.vy*dt;
+  const d=Math.hypot(b.x,b.y),lim=1-b.r;if(d>lim){const nx=b.x/d,ny=b.y/d;b.x=nx*lim;b.y=ny*lim;const vn=b.vx*nx+b.vy*ny;if(vn>0){b.vx-=2*vn*nx;b.vy-=2*vn*ny}}}
+ for(let i=0;i<B.length;i++)for(let j=i+1;j<B.length;j++){const a=B[i],c=B[j],dx=c.x-a.x,dy=c.y-a.y,d=Math.hypot(dx,dy),m=a.r+c.r;if(d<m&&d>0){const nx=dx/d,ny=dy/d,o=(m-d)/2;a.x-=nx*o;a.y-=ny*o;c.x+=nx*o;c.y+=ny*o;const rv=(c.vx-a.vx)*nx+(c.vy-a.vy)*ny;if(rv<0){a.vx+=rv*nx;a.vy+=rv*ny;c.vx-=rv*nx;c.vy-=rv*ny;
+   const mx=(a.x+c.x)/2,my=(a.y+c.y)/2;for(let k=0;k<5;k++){const q=Math.random()*TAU;st.sp.push({x:mx,y:my,vx:Math.cos(q)*.7,vy:Math.sin(q)*.7,l:.25,c:'#fff4c8'})}a.fl=c.fl=.6}}}
+  // melee weapon tips
+ for(const a of B){const L=a.k==='sword'?2.3:a.k==='spear'?3.2:a.k==='dagger'?1.7:0;if(!L)continue;const tx=a.x+Math.cos(a.ang)*a.r*L,ty=a.y+Math.sin(a.ang)*a.r*L;for(const o of B){if(o===a)continue;const d=Math.hypot(o.x-tx,o.y-ty);if(d<o.r&&o.fl<.3){o.fl=1;o.vx+=(o.x-a.x)*1.2;o.vy+=(o.y-a.y)*1.2;for(let k=0;k<6;k++){const q=Math.random()*TAU;st.sp.push({x:tx,y:ty,vx:Math.cos(q)*.8,vy:Math.sin(q)*.8,l:.3,c:'#ffffff'})}}}}
+ for(const p of st.pr){p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt;for(const o of B){if(o===p.o)continue;if(Math.hypot(o.x-p.x,o.y-p.y)<o.r){p.l=0;o.fl=1;o.vx+=p.vx*.3;o.vy+=p.vy*.3;for(let k=0;k<4;k++){const q=Math.random()*TAU;st.sp.push({x:p.x,y:p.y,vx:Math.cos(q)*.6,vy:Math.sin(q)*.6,l:.25,c:'#ffff66'})}}}if(Math.hypot(p.x,p.y)>.98)p.l=0}
+ st.pr=st.pr.filter(p=>p.l>0);for(const p of st.sp){if(p.ring!=null){p.ring+=dt*1.6;continue}p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt}st.sp=st.sp.filter(p=>p.ring!=null?p.ring<.5:p.l>0);for(const p of st.spl)p.l-=dt;st.spl=st.spl.filter(p=>p.l>0)}
+P.arena=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);if(!S.fb)S.fb=fbInit();const st=S.fb;let dt=st.t<0?0:t-st.t;st.t=t;dt=Math.max(0,Math.min(.06,dt));for(let k=0;k<3;k++)fbStep(st,dt/3);
+ const put=(x,y,c)=>{x=x|0;y=y|0;if(x<0||y<0||x>=W||y>=Hh)return;const o=(y*W+x)*4,q=typeof c==='string'?hx(c):c;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
+ const bob=Math.sin(t*.9)*Hh*.02,cx=W/2,cy=Hh*.42+bob,A=W*.48,Bt=Hh*.3,ai=A*.74,bi=Bt*.74,dep=Hh*.07,wall=Hh*.24;
+ const lit=(x,y)=>Math.max(0,Math.min(1,.62-(x-cx)/W*.9-(y-cy)/Hh*.5));
+ for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){const u=(x+.5-cx)/A,v=(y+.5-cy)/Bt,r=Math.hypot(u,v);
+  if(r<=1){const ui=(x+.5-cx)/ai,vi=(y+.5-cy)/bi,ri=Math.hypot(ui,vi);
+   if(ri>1){// seating tiers with crowd
+    const tier=Math.floor((r-.74)/.26*4),ca=Math.atan2(v,u),cr=H(Math.floor(ca*40),tier*7+Math.floor(t*2)%2*(H(x,y)>.8?1:0));let c=dq(FSTONE,lit(x,y)*.8+(tier%2)*.12+.12,x,y);
+    if(tier>0&&tier<4&&((x+y*3)&1)===0&&cr>.45)c=['#d64545','#3a6bff','#ffd54a','#e8e8e8','#1fc9a6','#ff8c1a'][Math.floor(cr*60)%6];if(r>.97)c=dq(FSTONE,lit(x,y)+.15,x,y);put(x,y,c)}
+   else{const vf=(y+.5-cy-dep)/bi,rf=Math.hypot(ui,vf);if(rf>1&&vi<0){put(x,y,dq(FSTONE,.18+(1+vi)*.25,x,y))}// inner back wall
+    else{const g=.45+.35*(1-rf)+lit(x,y)*.25+(H(x>>1,y>>1)-.5)*.12;put(x,y,dq(FSAND,rf>.94?.25:g,x,y))}}}
+  else if(Math.abs(u)<1&&y>cy){const yb=cy+Bt*Math.sqrt(1-u*u);if(y<yb+wall*(Math.sqrt(1-u*u)*.8+.2)){// outer facade with arches
+    const fy=(y-yb)/wall,col=Math.floor((u+1)*14),ax=((u+1)*14)%1,arch=(fy>.18&&fy<.48||fy>.6&&fy<.9)&&ax>.25&&ax<.75&&!(fy>.18&&fy<.48&&Math.hypot(ax-.5,(fy-.25)*1.4)>.25&&fy<.25);
+    const sh=.75-Math.abs(u)*.15+u*-.25-fy*.3;put(x,y,arch?dq(['#0e0806','#1e120c','#34241a'],(1-fy)*.6,x,y):dq(FSTONE,sh+((col&1)?.04:0),x,y))}}}
+ // floor mapping
+ const F=(u,v)=>[cx+u*ai,cy+dep+v*bi*.92];const R0=ai;
+ for(const p of st.spl){const[sx,sy]=F(p.x,p.y),rr=Math.max(1,R0*.06*Math.min(1,p.l));for(let yy=-rr;yy<=rr;yy++)for(let xx=-rr*1.4;xx<=rr*1.4;xx++)if((xx/1.4)**2+yy*yy<=rr*rr&&H(xx+sx|0,yy+sy|0)>.25)put(sx+xx,sy+yy*.6,'#139e82')}
+ for(const p of st.sp)if(p.ring!=null){const[sx,sy]=F(p.x,p.y),rr=p.ring*R0;for(let a=0;a<TAU;a+=1/Math.max(4,rr)){put(sx+Math.cos(a)*rr,sy+Math.sin(a)*rr*.6,p.ring<.25?'#ffd54a':'#ff7a1e')}}
+ const BS=[...st.b].sort((a,b)=>a.y-b.y);
+ const line=(x0,y0,x1,y1,c)=>{const n=Math.ceil(Math.hypot(x1-x0,y1-y0))+1;for(let i=0;i<=n;i++)put(x0+(x1-x0)*i/n,y0+(y1-y0)*i/n,c)};
+ for(const b of BS){const[sx,sy0]=F(b.x,b.y),rr=Math.max(1.2,b.r*R0),sy=sy0-rr*.9;
+  // shadow
+  for(let xx=-rr;xx<=rr;xx++)put(sx+xx,sy0+1,'#5a3a1c');
+  const wpt=L=>[sx+Math.cos(b.ang)*rr*L,sy+Math.sin(b.ang)*rr*L*.6];
+  if(b.k==='sword'){const[ex,ey]=wpt(2.3),[hx0,hy0]=wpt(1.05);line(hx0,hy0,ex,ey,'#e8eef8');line(...wpt(1.0),...wpt(1.25),'#9a6e3a')}
+  if(b.k==='dagger'){const[ex,ey]=wpt(1.7);line(...wpt(1),ex,ey,'#cfd8e8')}
+  if(b.k==='spear'){const[ex,ey]=wpt(3.2);line(...wpt(.9),ex,ey,'#8a5a2a');put(ex,ey,'#e8eef8');put(ex+Math.cos(b.ang),ey+Math.sin(b.ang)*.6,'#e8eef8')}
+  if(b.k==='bow'){for(let a=-1.1;a<=1.1;a+=.15)put(sx+Math.cos(b.ang+a)*rr*1.35,sy+Math.sin(b.ang+a)*rr*.81,'#8a5a2a')}
+  for(let yy=-Math.ceil(rr);yy<=rr;yy++)for(let xx=-Math.ceil(rr);xx<=rr;xx++){const q=(xx*xx+yy*yy)/(rr*rr);if(q>1)continue;let c=b.c;
+   if(b.k==='magnet'&&yy>0)c=[0x3a,0x6b,0xff];const sh=.75+.35*(-(xx+yy)/rr*.5)-q*.25+(b.fl>.3?.5:0);const o=[Math.min(255,c[0]*sh|0),Math.min(255,c[1]*sh|0),Math.min(255,c[2]*sh|0)];put(sx+xx,sy+yy,(xx+rr*.4)**2+(yy+rr*.4)**2<rr*rr*.06?[255,255,255]:o)}
+  if(b.k==='toxic')for(let i=0;i<8;i++){const a=b.ang*.3+i*TAU/8;put(sx+Math.cos(a)*(rr+1.2),sy+Math.sin(a)*(rr+1.2),'#d8ff8a')}
+  if(b.k==='tnt'){put(sx,sy-rr-1,'#2a2a2a');put(sx+1,sy-rr-2,Math.sin(t*20)>0?'#ffd54a':'#ff7a1e')}
+  if(b.k==='slime'&&rr>3)put(sx-rr*.3,sy+rr*.3,'#9ff5e0')}
+ for(const p of st.pr){const[sx,sy0]=F(p.x,p.y),sy=sy0-R0*.09,a=Math.atan2(p.vy*.6,p.vx);line(sx,sy,sx-Math.cos(a)*R0*.12,sy-Math.sin(a)*R0*.12,'#f0f0f0');put(sx-Math.cos(a)*R0*.12,sy-Math.sin(a)*R0*.12,'#ff6464')}
+ for(const p of st.sp)if(p.ring==null){const[sx,sy]=F(p.x,p.y);put(sx,sy-R0*.08,p.c)}
+ S.g.putImageData(S.img,0,0)};
+P.setFlat=v=>{FLAT=v?1:0};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
 })();

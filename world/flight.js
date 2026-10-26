@@ -22,21 +22,22 @@ const FSH=Array.from({length:5},(_,i)=>({r:300+i*140,a:i*1.3,y:30+i*25,sp:(i%2?-
 function proj(x,y,z){const dx=x-cam.x,dy=y-cam.y,dz=z-cam.z,cy=Math.cos(-cam.yaw),sy=Math.sin(-cam.yaw);let X=dx*cy+dz*sy,Z=-dx*sy+dz*cy;const cp=Math.cos(-cam.pitch),sp=Math.sin(-cam.pitch);const Y=dy*cp-Z*sp;Z=dy*sp+Z*cp;if(Z<2)return null;return[W/2+X/Z*F,H/2-Y/Z*F,Z]}
 function dirProj(x,y,z){const cy=Math.cos(-cam.yaw),sy=Math.sin(-cam.yaw);let X=x*cy+z*sy,Z=-x*sy+z*cy;const cp=Math.cos(-cam.pitch),sp=Math.sin(-cam.pitch);const Y=y*cp-Z*sp;Z=y*sp+Z*cp;if(Z<.05)return null;return[W/2+X/Z*F,H/2-Y/Z*F]}
 const DT=1/120,cam0={};let acc=0,yv=0,pv=0,thrS=0,mdx=0,mdy=0,locked=false,ex=0,ey=0,ez=0,ftAvg=0,ftN=0,ftMax=0,ftList=[];
-const SENS=.0022,DZ=.6;
+const SENS=.0022,DZ=.6;let lastM=-9,skipM=0;
 function phys(h){const k=c=>keys.has(c);
  let yawI=(k('KeyA')||k('ArrowLeft')?-1:0)+(k('KeyD')||k('ArrowRight')?1:0),pitI=(k('ArrowUp')?1:0)+(k('ArrowDown')?-1:0);
  if(stick){const sx=Math.abs(stick.x)<.12?0:stick.x,sy=Math.abs(stick.y)<.12?0:stick.y;yawI+=sx;pitI-=sy}
  // angular velocity: target from inputs, critically-damped approach
  const ty=yawI*1.35,tp=pitI*1.0,da=1-Math.exp(-h*7);yv+=(ty-yv)*da;pv+=(tp-pv)*da;
  // mouse (pointer lock / drag) impulses -> angular velocity
- if(mdx||mdy){yv+=mdx*SENS/h*.12;pv-=mdy*SENS/h*.12;mdx=mdy=0}
- cam.yaw+=yv*h;cam.pitch=Math.max(-1.2,Math.min(1.2,cam.pitch+pv*h));if(Math.abs(cam.pitch)>=1.2)pv=0;
+ if(mdx||mdy){yv+=mdx*SENS/h*.12;pv-=mdy*SENS/h*.12;mdx=mdy=0;lastM=T}
+ cam.yaw+=yv*h;const PL=1.31;cam.pitch+=pv*h;if(cam.pitch>PL){cam.pitch=PL;pv=Math.min(0,pv)}else if(cam.pitch<-PL){cam.pitch=-PL;pv=Math.max(0,pv)}
+ if(!pitI&&T-lastM>.35)cam.pitch*=Math.exp(-h*.9);
  const tr=-yv*.32;cam.roll+=(tr-cam.roll)*(1-Math.exp(-h*4));
  const boost=k('ShiftLeft')||k('ShiftRight')?2.2:1,tin=(k('KeyW')?1:0)-(k('KeyS')?1:0)+thr;thrS+=(tin-thrS)*(1-Math.exp(-h*5));
  cam.v+=thrS*h*240*boost;cam.v*=Math.exp(-h*.45);cam.v=Math.max(-140,Math.min(620*boost,cam.v));
  const fx=Math.sin(cam.yaw)*Math.cos(cam.pitch),fy=Math.sin(cam.pitch),fz=Math.cos(cam.yaw)*Math.cos(cam.pitch);
  // soft external forces: void pull, sun push -> drift velocity with damping
- const vp=wpos(VD,T),vx=vp[0]-cam.x,vy=vp[1]-cam.y,vz=vp[2]-cam.z,vd=Math.hypot(vx,vy,vz);if(vd<850&&vd>1){const f=55*Math.pow(1-vd/850,2);ex+=vx/vd*f*h;ey+=vy/vd*f*h;ez+=vz/vd*f*h}
+ const vp=wpos(VD,T),vx=vp[0]-cam.x,vy=vp[1]-cam.y,vz=vp[2]-cam.z,vd=Math.hypot(vx,vy,vz);if(vd<420&&vd>1){const f=60*Math.pow(1-vd/420,2);ex+=vx/vd*f*h;ey+=vy/vd*f*h;ez+=vz/vd*f*h}
  const sd=Math.hypot(cam.x,cam.y,cam.z)||1;if(sd<190){const f=260*Math.pow(1-sd/190,1.5);ex+=cam.x/sd*f*h;ey+=cam.y/sd*f*h;ez+=cam.z/sd*f*h}
  const ed=Math.exp(-h*1.4);ex*=ed;ey*=ed;ez*=ed;
  cam.x+=(fx*cam.v+ex)*h;cam.y+=(fy*cam.v+ey)*h;cam.z+=(fz*cam.v+ez)*h;
@@ -72,16 +73,18 @@ function render(now,T){
 let near=null;
 function enter(){if(on)return;on=true;window.__flying=true;size();root.hidden=false;btn.hidden=true;document.body.classList.add('flying');cam.x=0;cam.y=140;cam.z=1500;cam.yaw=Math.PI;cam.pitch=-.06;cam.roll=0;cam.v=0;yv=pv=thrS=ex=ey=ez=acc=0;T=0;last=performance.now();raf=requestAnimationFrame(step);root.querySelector('.fexit').focus({preventScroll:true})}
 function exit(){if(!on)return;on=false;window.__flying=false;cancelAnimationFrame(raf);if(document.pointerLockElement)document.exitPointerLock();root.hidden=true;btn.hidden=false;document.body.classList.remove('flying');keys.clear();stick=null;thr=0}
-btn.onclick=enter;root.querySelector('.fexit').onclick=exit;window.__flight={enter,exit,cam,goto:id=>{const o=BOD.find(q=>q.b.id===id),p=wpos(o,T);cam.x=p[0];cam.y=p[1]+20;cam.z=p[2]+o.w*2.2;cam.yaw=Math.PI;cam.pitch=-.05;cam.v=0},stats(){const a=[...ftList].sort((x,y)=>x-y);return{n:a.length,avg:a.reduce((x,y)=>x+y,0)/a.length,p95:a[Math.floor(a.length*.95)],max:a[a.length-1]}},get near(){return near&&name(near)}};
+btn.onclick=enter;root.querySelector('.fexit').onclick=exit;window.__flight={enter,exit,cam,_reset:()=>reset(),_md:(x,y)=>{mdx+=Math.max(-40,Math.min(40,x));mdy+=Math.max(-40,Math.min(40,y))},goto:id=>{const o=BOD.find(q=>q.b.id===id),p=wpos(o,T);cam.x=p[0];cam.y=p[1]+20;cam.z=p[2]+o.w*2.2;cam.yaw=Math.PI;cam.pitch=-.05;cam.v=0},stats(){const a=[...ftList].sort((x,y)=>x-y);return{n:a.length,avg:a.reduce((x,y)=>x+y,0)/a.length,p95:a[Math.floor(a.length*.95)],max:a[a.length-1]}},get near(){return near&&name(near)}};
 addEventListener('resize',()=>{if(on)size()});
 addEventListener('keydown',e=>{if(!on)return;if(e.code==='Escape'){exit();e.stopImmediatePropagation();return}if(e.code==='KeyE'||e.code==='Enter'){if(!pr.hidden&&prA.getAttribute('href'))prA.click();return}keys.add(e.code);if(e.code.startsWith('Arrow')||e.code==='Space')e.preventDefault();e.stopImmediatePropagation()},true);
-addEventListener('keyup',e=>keys.delete(e.code),true);addEventListener('blur',()=>keys.clear());
+addEventListener('keyup',e=>keys.delete(e.code),true);
+const reset=()=>{keys.clear();drag=null;mdx=mdy=0;yv=pv=0;thr=0;stick=null;skipM=2;if(typeof knob!=='undefined'&&knob)knob.style.transform=''};
+addEventListener('blur',reset);document.addEventListener('visibilitychange',()=>{if(document.hidden)reset()});document.addEventListener('pointerlockchange',()=>{const l=document.pointerLockElement===cv;keys.clear();mdx=mdy=0;skipM=2;if(!l)drag=null});
 cv.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;if(cv.requestPointerLock&&!document.pointerLockElement){try{const r=cv.requestPointerLock();r&&r.catch&&r.catch(()=>{})}catch(_){}}drag=[e.clientX,e.clientY];try{cv.setPointerCapture(e.pointerId)}catch(_){}});
-addEventListener('mousemove',e=>{if(!on)return;locked=document.pointerLockElement===cv;if(!locked&&!drag)return;let dx=locked?e.movementX:e.clientX-drag[0],dy=locked?e.movementY:e.clientY-drag[1];if(!locked)drag=[e.clientX,e.clientY];if(Math.abs(dx)<DZ)dx=0;if(Math.abs(dy)<DZ)dy=0;mdx+=Math.max(-60,Math.min(60,dx));mdy+=Math.max(-60,Math.min(60,dy))});
-cv.addEventListener('pointerup',()=>drag=null);
+addEventListener('mousemove',e=>{if(!on)return;locked=document.pointerLockElement===cv;if(!locked&&!drag)return;if(skipM>0){skipM--;if(drag)drag=[e.clientX,e.clientY];return}let dx=locked?e.movementX:e.clientX-drag[0],dy=locked?e.movementY:e.clientY-drag[1];if(!locked)drag=[e.clientX,e.clientY];if(Math.abs(dx)<DZ)dx=0;if(Math.abs(dy)<DZ)dy=0;mdx+=Math.max(-40,Math.min(40,dx));mdy+=Math.max(-40,Math.min(40,dy))});
+cv.addEventListener('pointerup',()=>drag=null);cv.addEventListener('pointercancel',()=>drag=null);cv.addEventListener('lostpointercapture',()=>{if(document.pointerLockElement!==cv)drag=null});
 const st=root.querySelector('.fstick'),knob=st.querySelector('i');let sid=null,sc=null;
 st.addEventListener('pointerdown',e=>{sid=e.pointerId;st.setPointerCapture(sid);const r=st.getBoundingClientRect();sc=[r.left+r.width/2,r.top+r.height/2,r.width/2];mv(e)});
 const mv=e=>{if(e.pointerId!==sid)return;let x=(e.clientX-sc[0])/sc[2],y=(e.clientY-sc[1])/sc[2];const l=Math.hypot(x,y);if(l>1){x/=l;y/=l}stick={x,y};knob.style.transform=`translate(${x*sc[2]*.6}px,${y*sc[2]*.6}px)`};
-st.addEventListener('pointermove',mv);const sEnd=()=>{sid=null;stick=null;knob.style.transform=''};st.addEventListener('pointerup',sEnd);st.addEventListener('pointercancel',sEnd);
+st.addEventListener('pointermove',mv);const sEnd=()=>{sid=null;stick=null;knob.style.transform=''};st.addEventListener('pointerup',sEnd);st.addEventListener('pointercancel',sEnd);st.addEventListener('lostpointercapture',sEnd);
 const hold=(el,v)=>{el.addEventListener('pointerdown',e=>{e.preventDefault();thr=v});['pointerup','pointercancel','pointerleave'].forEach(n=>el.addEventListener(n,()=>{if(thr===v)thr=0}))};hold(root.querySelector('.fthr'),1);hold(root.querySelector('.fbrk'),-1);
 })();

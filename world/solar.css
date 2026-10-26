@@ -78,3 +78,19 @@ body.flying #sat,body.flying .ui:not(.fexit){display:none!important}
  .fstick i{position:absolute;left:35px;top:35px;width:40px;height:40px;border-radius:50%;background:#5affb0aa}
  .fthr,.fbrk{display:block;position:absolute;right:calc(env(safe-area-inset-right) + 22px);width:64px;height:64px;font-size:22px;color:#010103;background:#5affb0cc;border:0;pointer-events:auto}
  .fthr{bottom:calc(env(safe-area-inset-bottom) + 140px)}.fbrk{bottom:calc(env(safe-area-inset-bottom) + 66px);background:#ff8a6acc}}
+
+#info.lg .txt{width:100%;height:100%;max-width:none;justify-content:center;gap:5%;transform:none;left:0;top:0;opacity:var(--rv,1);transition:none;container-type:size;background:none;border:0;box-shadow:none;padding:0}
+#info.lg .lgimg{display:block;width:100%;max-height:60%;min-height:0;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 2px 0 var(--bg))}
+#info.lg .lglogo{display:flex;flex-direction:column;align-items:center;gap:4cqh;max-height:60%;width:100%}
+#info.lg .lgsvg{width:46cqw;height:auto;display:block;filter:drop-shadow(0 2px 0 #000)}
+#info.lg .lgtx{font:400 9cqw/1.05 'Silkscreen',monospace;color:#fff;text-transform:uppercase;text-shadow:0 2px 0 #000,0 0 6px #000;letter-spacing:.02em}
+#info.lg .lgtx.mo{font-size:13cqw;word-break:break-word}
+#info.lg .lgplay{display:block;width:26cqmin;aspect-ratio:1;pointer-events:auto;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--ac) 55%,transparent));transition:transform .15s}
+#info.lgbtn .lgplay{width:80cqmin}
+#info.lg .lgplay svg{width:100%;height:100%;display:block}
+#info.lg .lgplay:hover,#info.lg .lgplay:focus-visible{transform:scale(1.08)}
+#info.lg .lgch{display:flex;flex-direction:column;align-items:center;gap:1.6cqh;pointer-events:auto}
+#info.lg .lgch[hidden]{display:none}
+#info.lg .lgc{font:400 5.5cqw 'Silkscreen',monospace;color:#fff;background:#ff0033;border:0;box-shadow:0 2px 0 #8a0014;padding:1.5cqh 3cqw;cursor:pointer}
+#info.lg .lgc:hover{background:#ff4060}
+#info.lg .lgtx.fb{font-size:15cqw;line-height:.95;color:#ffcf3a;text-shadow:0 .6cqw 0 #ff6464,0 1.2cqw 0 #3a1a06,0 0 6px #000}
