@@ -40,7 +40,7 @@ function buildL(D,prog,R){const m=new Uint8Array(D*D),c=D/2,sc=LM.r/(R*.9),lim=p
  return m}
 const PROMR=['#8a1e04','#d8460a','#ff8a1e','#ffc23a','#ffe98a','#fffbe8'],PROMS=[[-2.3,.55,.22,.5,0],[.5,.42,.17,.7,2],[2.1,.6,.27,.4,4],[-.7,.34,.14,.9,1],[3.0,.4,.19,.6,3]],BURSTS=[[-1.2,7,0],[1.4,9,3.5],[2.7,8,6]];
 const FLARES=[[-.36,.22,.11],[.4,-.4,.07],[-.74,-.32,.08],[.22,.6,.05],[.62,.22,.05],[-.1,-.7,.05]];
-P.sun=(S,t,o)=>{o=o||{};const W=S.img.width,R=W*.34,cx=W/2,cy=W/2,ign=o.ign??1;const Ld=Math.round(R*2),Lp=o.L??1;
+P.sun=(S,t,o)=>{o=o||{};const W=S.img.width,R=W*.34,cx=W/2,cy=W/2,ign=o.ign??1,fl=o.fl??1,reach=fl*.5,FB=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];const Ld=Math.round(R*2),Lp=o.L??1;
  if(!Lmask||Lmask.p!==Lp||Lmask.D!==Ld)Lmask={p:Lp,D:Ld,m:buildL(Ld,Lp,R)};const lx0=Math.round(cx-Ld/2),ly0=Math.round(cy-Ld/2);
  const{img}=S,d=img.data;
  for(let y=0;y<W;y++)for(let x=0;x<W;x++){const dx=(x+.5-cx)/R,dy=(y+.5-cy)/R,r=Math.hypot(dx,dy),ang=Math.atan2(dy,dx);let col=null;
@@ -51,7 +51,8 @@ P.sun=(S,t,o)=>{o=o||{};const W=S.img.width,R=W*.34,cx=W/2,cy=W/2,ign=o.ign??1;c
    for(const[fx,fy,fr]of FLARES){const q=Math.hypot(dx-fx,dy-fy)/fr;if(q<1){const fl=.7+.3*Math.sin(t*6+fx*20)*Math.sin(t*3.7+fy*17);v+=(1-q)*(1-q)*1.8*fl}}
    v-=Math.pow(Math.max(0,r-.62)/.38,2.2)*(FLAT?.22:.42);if(FLAT){if(r>.9)v=Math.max(v,.62)}else if(r>.965)v=Math.max(v,.5+(r-.965)*9*vn(ang*40,t*.6));col=dq(SUNR,v*ign,x,y);
    const lx=x-lx0,ly=y-ly0;if(Lp>0&&lx>=0&&ly>=0&&lx<Ld&&ly<Ld&&Lmask.m[ly*Ld+lx])col='#000000'}
-  else if(ign>.98&&r<1.47){const cs=1,qx=x+.5,qy=y+.5,qdx=(qx-cx)/R,qdy=(qy-cy)/R,h=Math.hypot(qdx,qdy)-1,qa=Math.atan2(qdy,qdx);let v=0;
+  else if(ign>.98&&fl>0&&r<1.47){const cs=1,qx=x+.5,qy=y+.5,qdx=(qx-cx)/R,qdy=(qy-cy)/R,h=Math.hypot(qdx,qdy)-1,qa=Math.atan2(qdy,qdx);let v=0;
+   if(fl<1){const lim=reach*(.55+.45*vn(qa*11+2,1.3))+Math.pow(vn(qa*23,4.1),3)*reach*.6,f=(lim-h)/.07;if(f<=0||FB[(y&3)*4+(x&3)]/16>=f){const o2=(y*W+x)*4;d[o2+3]=0;continue}}
    // chunky flame tongues curling off the limb
    const ca=qa-h*1.6*Math.sin(t*.7+qa*3),tl=FLAT?.05+Math.pow(vn(ca*5+3,t*.45),2)*.3:.035+Math.pow(vn(ca*9+3,t*.45),2.2)*.26+Math.pow(vn(ca*27,t*.9+9),3)*.12+Math.pow(vn(ca*61,t*1.4+4),4)*.06,rt=FLAT?0:vn(qx*.35,qy*.35+t)*.16-.08;if(h<tl){const k=1-h/tl;v=Math.max(v,.18+k*.82+rt)}
    else if(!FLAT&&h<.42&&bay(x,y)<(1-h/.42)*.42)v=Math.max(v,.19+(1-h/.42)*.1);

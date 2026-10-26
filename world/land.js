@@ -85,7 +85,7 @@ function skyCols(th){const c=th.sky.map(hx),out=new Uint32Array(RH*2);for(let y=
 // ---- enter / leave ----
 let cur=null;function land(key){ui();const m=build(key);cur=m;const touch=matchMedia('(pointer:coarse)').matches;
  S={key,m,x:N/2+.5,y:N/2+40.5,z:0,vx:0,vy:0,vz:0,yaw:-Math.PI/2,tyaw:-Math.PI/2,pitch:-.05,tpitch:-.05,ch:0,bob:0,t0:performance.now(),acc:0,touch,locked:false,grounded:true};
- if(key==='arena'){S.x=.5;S.y=40.5}else{// spawn on a calm, low patch near the start
+ if(key==='arena'){S.x=.5;S.y=14.5}else{// spawn on a calm, low patch near the start
   let best=null,bs=1e9;for(let r=0;r<60;r+=3)for(let a=0;a<TAU;a+=.5){const x=S.x+Math.cos(a)*r,y=S.y+Math.sin(a)*r;let mx=-1e9,mn=1e9;for(let dy=-3;dy<=3;dy+=3)for(let dx=-3;dx<=3;dx+=3){const h=Math.max(hAt(x+dx,y+dy),m.wl);mx=Math.max(mx,h);mn=Math.min(mn,h)}const sc=(mx-mn)*3+mx*.05+r*.2;if(sc<bs){bs=sc;best=[x,y]}}S.x=best[0];S.y=best[1]}
  if(key!=='arena'){let by=S.yaw,bm=1e9;for(let a=0;a<TAU;a+=TAU/12){let mx=0;for(let r=4;r<70;r+=4)mx=Math.max(mx,ground(S.x+Math.cos(a)*r,S.y+Math.sin(a)*r)-r*.12);if(mx<bm){bm=mx;by=a}}S.yaw=S.tyaw=by}
  S.z=ground(S.x,S.y);S.ch=S.z+EYE;size();el.querySelector('.lname').textContent=m.th.name;el.classList.toggle('touch',touch);
@@ -104,7 +104,9 @@ function step(dt){let f=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown
  const tx=(cy*f-sy*s)*MAXS*run,ty=(sy*f+cy*s)*MAXS*run,k=1-Math.exp(-dt*(l>.05?6:9)*(S.grounded?1:.35));
  S.vx+=(tx-S.vx)*k;S.vy+=(ty-S.vy)*k;
  // walls: steep rises slow you down instead of teleporting you up cliffs
- const nx=S.x+S.vx*dt,ny=S.y+S.vy*dt,gh=ground(nx,ny);if(gh-S.z>7&&S.grounded){S.vx*=.2;S.vy*=.2}else{S.x=nx;S.y=ny}
+ const sp0=Math.hypot(S.vx,S.vy)||1,ux=S.vx/sp0,uy=S.vy/sp0,blocked=(x,y)=>{const a=ground(x,y)-S.z,b=ground(x+ux*2.5,y+uy*2.5)-S.z;return a>3||b>EYE-1.5};
+ let nx=S.x+S.vx*dt,ny=S.y+S.vy*dt;if(blocked(nx,ny)){// slide along the wall on whichever axis is free
+  if(!blocked(nx,S.y)){ny=S.y;S.vy*=.5}else if(!blocked(S.x,ny)){nx=S.x;S.vx*=.5}else{nx=S.x;ny=S.y;S.vx*=.2;S.vy*=.2}}S.x=nx;S.y=ny
  if(jumpQ&&S.grounded){S.vz=JV;S.grounded=false;window.__blip&&__blip('hover')}jumpQ=false;
  const g0=ground(S.x,S.y);if(!S.grounded){S.vz-=GR*dt;S.z+=S.vz*dt;if(S.z<=g0){S.z=g0;S.vz=0;S.grounded=true}}else{if(g0<S.z-2){S.grounded=false;S.vz=0}else S.z=g0}
  S.x=((S.x%N)+N)%N;S.y=((S.y%N)+N)%N;
@@ -120,7 +122,7 @@ function render(now){const m=S.m,th=m.th,H=m.H,C=m.C,G=m.G,wl=m.wl,hor=Math.roun
  for(let y=0;y<RH;y++){const c=sky[Math.max(0,Math.min(RH*2-1,y-hor+RH))];buf.fill(c,y*RW,(y+1)*RW)}
  if(th.stars){for(let i=0;i<70*th.stars;i++){const a=h2(i,7,3)*TAU,el2=h2(i,8,3)*.9,x=Math.round(((a-S.yaw)/TAU%1+1)%1*RW*5.5)%RW*0+0;const sx=Math.round((((a-S.yaw+Math.PI)%TAU+TAU)%TAU-Math.PI)/FOV*RW*.5+RW/2),sy=Math.round(hor-el2*RH*.9);if(sx>=0&&sx<RW&&sy>=0&&sy<RH&&(RM||h2(i,Math.floor(now/400),5)>.12))buf[sy*RW+sx]=0xffffffff}}
  const fog=hx(th.fog),cyw=Math.cos(S.yaw),syw=Math.sin(S.yaw),tf=Math.tan(FOV/2),ch=S.ch,water=m.th.water,tt=now/1000;
- for(let col=0;col<RW;col+=blk){const ox=(col/RW*2-1)*tf,dx=cyw-syw*ox,dy=syw+cyw*ox;let yb=RH,z=1,dz=.6;
+ for(let col=0;col<RW;col+=blk){const ox=(col/RW*2-1)*tf,dx=cyw-syw*ox,dy=syw+cyw*ox;let yb=RH,z=2.2,dz=.6;
   while(z<D&&yb>0){const px=S.x+dx*z,py=S.y+dy*z,ix=(px|0)&MASK,iy=(py|0)&MASK,k=iy*N+ix;let h=H[k],c=C[k];
    if(h<wl){const wv=RM?0:Math.sin(px*.35+tt*1.6)+Math.sin(py*.29-tt*1.2);h=wl;const q=water[(wv>1.3?3:wv>.2?2:1)-(z>D*.5&&wv<=1.3?1:0)];c=(255<<24)|(q[2]<<16)|(q[1]<<8)|q[0]}
    const sy=Math.round((ch-h)/z*scale+hor);

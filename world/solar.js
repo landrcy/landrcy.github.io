@@ -38,7 +38,7 @@ for(const b of [...MAIN,...MOONS,...ARCH]){b.S={N:0};b.L=[].map(([dv0])=>{const 
 let sys='main',bodies=MAIN;
 // ---- camera ----
 const cam={x:0,y:0,z:1};let tw=null,focus=null,hover=null,intro=RM?null:{t0:performance.now()};if(intro)document.body.classList.add('intro');
-function fitZ(){const ext=sys==='main'?(W<H?[1480,1350]:[1520,930]):(W<H?[490,300]:[490,300]);return Math.min(W/(2*ext[0]),(H-90)/(2*ext[1]))}
+function fitZ(){const ext=sys==='main'?(W<H?[1300,1350]:[1520,930]):(W<H?[490,300]:[490,300]);return Math.min(W/(2*ext[0]),(H-90)/(2*ext[1]))}
 function fitX(){return 0}
 function fitY(){return 0}
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
@@ -59,10 +59,10 @@ function resize(){DPR=1;W=innerWidth;H=innerHeight;cv.width=W;cv.height=H;g.imag
 addEventListener('resize',resize);
 // ---- intro timeline ----
 const clamp=v=>Math.max(0,Math.min(1,v)),seg=(t,a,b)=>clamp((t-a)/(b-a));
-function introState(now){if(!intro)return{stars:1,ign:1,L:1,orb:1,pop:()=>1};const t=(now-intro.t0)/1000;
- return{t,R:revealR(t),stars:1,ign:seg(t,.5,1.7),L:seg(t,1.7,3.7),orb:1,pop:()=>1,popOld:i=>{const p=seg(t,5.2+i*.32,5.75+i*.32);return p<=0?0:1+Math.sin(p*Math.PI)*.25*(1-p)-(1-p)*(1-p)*.9}}}
+function introState(now){if(!intro)return{stars:1,ign:1,fl:1,L:1,orb:1,pop:()=>1};const t=(now-intro.t0)/1000;
+ return{t,R:revealR(t),stars:1,ign:seg(t,.5,1.7),fl:seg(t,1.6,3.0),L:seg(t,1.7,3.7),orb:1,pop:()=>1,popOld:i=>{const p=seg(t,5.2+i*.32,5.75+i*.32);return p<=0?0:1+Math.sin(p*Math.PI)*.25*(1-p)-(1-p)*(1-p)*.9}}}
 // ---- the rift: the solar system is a jagged pixel tear in the old white dot-grid space; small tears peek into archived versions ----
-const RC=8,RX=1500,RY=1000,RGW=RX*2/RC|0,RGH=RY*2/RC|0;
+const RC=8,RX=3200,RY=3800,RGW=RX*2/RC|0,RGH=RY*2/RC|0;
 const hsh=(a,b)=>{let h=(a*374761393+b*668265263)^0x5bd1e995;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296};
 const an1=(a,f,s)=>{const x=a/TAU*f,i=Math.floor(x),u=x-i,k=u*u*(3-2*u);return hsh(((i%f)+f)%f,s)*(1-k)+hsh((((i+1)%f)+f)%f,s)*k};
 const jag=(a,s)=>{const x=a/TAU*90,i=Math.floor(x),u=x-i,saw=(hsh(((i%90)+90)%90,s+5)-.5)*.07*(1-Math.abs(u*2-1));return .07*(an1(a,7,s)-.5)*2+.04*(an1(a,19,s+1)-.5)*2+.03*(an1(a,47,s+2)-.5)*2+saw+(an1(a,13,s+3)>.78?.11*Math.pow(1-Math.abs(((a/TAU*26)%1+1)%1*2-1),3):0)};
@@ -86,18 +86,18 @@ function riftArt(m,gw,gh,frames){const mk=()=>{const c=document.createElement('c
    if(col){d[k*4]=col[0];d[k*4+1]=col[1];d[k*4+2]=col[2];d[k*4+3]=255}}
   cg.putImageData(im,0,0);E.push(c)}
  return{M,E}}
-const MR=riftGrid(RGW,RGH,RC,RX,RY,1345,875,11),MRA=riftArt(MR,RGW,RGH,RM?1:3);
+const MR=riftGrid(RGW,RGH,RC,RX,RY,2850,3450,11),MRA=riftArt(MR,RGW,RGH,RM?1:3);
 const inMain=(x,y)=>{const i=Math.floor((x+RX)/RC),j=Math.floor((y+RY)/RC);return i>=0&&j>=0&&i<RGW&&j<RGH&&MR[j*RGW+i]===1};
 // small rifts: one per archived version, placed in the white space around the main tear (random per visit)
 const SR=[];let srKey='';
-function placeRifts(){const key=(W<H?'p':'l');if(key===srKey)return;srKey=key;SR.length=0;const z=fitZ(),vx=W/2/z*.94,vy=(H-90)/2/z*.94,src=ARCH.filter(b=>b.href&&b.href.startsWith('archive/')&&!b.href.includes('#'));
- let tries=0;for(const b of src){let ok=false;while(!ok&&tries++<4000){const r=W<H?60+Math.random()*60:70+Math.random()*80,x=(Math.random()*2-1)*(vx-r),y=(Math.random()*2-1)*(vy-r);
+function placeRifts(){const key=(W<H?'p':'l');if(key===srKey)return;srKey=key;SR.length=0;const z=fitZ()*(W<H?.36:.42),vx=W/2/z*.94,vy=(H-90)/2/z*.94,src=ARCH.filter(b=>b.href&&b.href.startsWith('archive/')&&!b.href.includes('#'));
+ let tries=0;for(const b of src){let ok=false;while(!ok&&tries++<4000){const r=(W<H?60+Math.random()*60:70+Math.random()*80)*(W<H?3.4:2.3),x=(Math.random()*2-1)*(vx-r),y=(Math.random()*2-1)*(vy-r);
    if(Math.abs(x)>vx-r||Math.abs(y)>vy-r)continue;
    // keep clear of the satellite (top-left) and the bottom UI bar
    const[sx,sy]=[(x-r)*z+W/2,(y-r)*z+H/2];if(sx<150&&sy<110)continue;if((y+r)*z+H/2>H-70)continue;
-   let clear=true;for(let a=0;a<TAU&&clear;a+=TAU/24)if(inMain(x+Math.cos(a)*(r+40),y+Math.sin(a)*(r+40)*.7))clear=false;if(inMain(x,y))clear=false;
+   let clear=true;for(let a=0;a<TAU&&clear;a+=TAU/24)if(inMain(x+Math.cos(a)*(r+90),y+Math.sin(a)*(r+90)*.7))clear=false;if(inMain(x,y))clear=false;
    for(const o of SR)if(Math.hypot(o.x-x,o.y-y)<o.r+r+50)clear=false;if(!clear)continue;
-   ok=true;const cell=6,gw=Math.ceil(r*2.3/cell),gh=Math.ceil(r*1.6/cell),m=riftGrid(gw,gh,cell,gw*cell/2,gh*cell/2,r,r*.62,b.id.length*7+SR.length*31);
+   ok=true;const cell=12,gw=Math.ceil(r*2.3/cell),gh=Math.ceil(r*1.6/cell),m=riftGrid(gw,gh,cell,gw*cell/2,gh*cell/2,r,r*.62,b.id.length*7+SR.length*31);
    const img=new Image();img.src='world/rifts/'+b.id+'.jpg';const c=document.createElement('canvas');c.width=gw*3;c.height=gh*3;
    SR.push({x,y,r,cell,gw,gh,m,art:riftArt(m,gw,gh,RM?1:3),img,c,ph:Math.random()*TAU,title:b.title,href:b.href,rift:1,w:r*2,hr:.5})}}}
 let OC=null,OG=null,ocK='',dotT=null,dotS=0;
@@ -122,7 +122,7 @@ function drawOutside(now){if(window.__noRift||sys!=='main')return;placeRifts();i
  g.drawImage(OC,0,0)}
 function riftHit(sx,sy){if(sys!=='main')return null;const[wx,wy]=S2W(sx,sy);for(const r of SR){const i=Math.floor((wx-r.x+r.gw*r.cell/2)/r.cell),j=Math.floor((wy-r.y+r.gh*r.cell/2)/r.cell);if(i>=0&&j>=0&&i<r.gw&&j<r.gh&&r.m[j*r.gw+i])return r}return null}
 // pixel reveal front (screen px): grows from the sun outwards; everything beyond it is dithered/chunky-hidden
-function revealR(t){const m=Math.min(W,H);if(t<3.9)return m*(.5+.12*seg(t,0,3.9));const z0=m*.82/(250*.72),w0=m*.62/z0;return(w0+(2100-w0)*Math.pow(seg(t,3.9,8.2),1.25))*cam.z}
+function revealR(t){const m=Math.min(W,H);if(t<3.9)return m*(.5+.12*seg(t,0,3.9));const z0=m*.82/(250*.72),w0=m*.62/z0;return(w0+(3800-w0)*Math.pow(seg(t,3.9,8.2),1.25))*cam.z}
 const RVB=.22;let rvC=null,rvG=null,rvI=null;
 function revealOf(sx,sy,R){const[cx,cy]=W2S(0,0);return clamp((R-Math.hypot(sx-cx,sy-cy))/Math.max(20,Math.min(Math.min(W,H)*RVB,R*.5)))}
 function revealMask(R){const cs=4,mw=Math.ceil(W/cs),mh=Math.ceil(H/cs);if(!rvC||rvC.width!==mw||rvC.height!==mh){rvC=document.createElement('canvas');rvC.width=mw;rvC.height=mh;rvG=rvC.getContext('2d');rvI=rvG.createImageData(mw,mh)}
@@ -194,7 +194,7 @@ function lens(){if(sys!=='main')return;const b=MAIN.find(q=>q.id==='void'),[vx0,
    const j=(Y*w+X)*4,m=1-fall*fall*fall,m2=m*m*(3-2*m);o[i]=a[j];o[i+1]=a[j+1];o[i+2]=a[j+2];o[i+3]=255*m2}
   lc.putImageData(out,0,0);lensR=[x0,y0,D]}
  g.drawImage(lensC,x0,y0,D,D)}
-function frame(now){if(document.body.classList.contains('landed')){last=now;requestAnimationFrame(frame);return}if(sys==='archive'&&!warp&&document.body.classList.contains('arch')){last=now;requestAnimationFrame(frame);return}const dt=Math.min(.05,(now-last)/1000);last=now;const IS=introState(now);FA+=((focus?1:0)-FA)*Math.min(1,dt*4);if(mv.on&&!tw){const k=Math.pow(.9,dt*60);mv.x*=k;mv.y*=k;cam.x+=mv.x*dt*60;cam.y+=mv.y*dt*60;if(Math.hypot(mv.x,mv.y)*cam.z<.1)mv.on=0}if(!tw&&!intro&&!focus&&sys==='main'){const bx=W<H?900:1100,by=W<H?1300:900;cam.x=clamp2(cam.x,fitX()-bx,fitX()+bx);cam.y=clamp2(cam.y,fitY()-by,fitY()+by)}
+function frame(now){if(document.body.classList.contains('landed')){last=now;requestAnimationFrame(frame);return}if(sys==='archive'&&!warp&&document.body.classList.contains('arch')){last=now;requestAnimationFrame(frame);return}const dt=Math.min(.05,(now-last)/1000);last=now;const IS=introState(now);FA+=((focus?1:0)-FA)*Math.min(1,dt*4);if(mv.on&&!tw){const k=Math.pow(.9,dt*60);mv.x*=k;mv.y*=k;cam.x+=mv.x*dt*60;cam.y+=mv.y*dt*60;if(Math.hypot(mv.x,mv.y)*cam.z<.1)mv.on=0}if(!tw&&!intro&&!focus&&sys==='main'){const bx=W<H?2700:3100,by=W<H?3100:2700;cam.x=clamp2(cam.x,fitX()-bx,fitX()+bx);cam.y=clamp2(cam.y,fitY()-by,fitY()+by)}
  if(intro){if(IS.t<3.9){cam.x=0;cam.y=0;cam.z=Math.min(W,H)*.82/(250*.72)}else if(!intro.zoomed){intro.zoomed=1;to(fitX(),fitY(),fitZ(),2200)}if(IS.t>7.4&&!intro.ui){intro.ui=1;uiReveal()}if(IS.t>8.8)intro=null}
  if(tw){const k=ease(clamp((now-tw.t0)/tw.ms));const zl=Math.exp(Math.log(tw.a.z)+(Math.log(tw.b.z)-Math.log(tw.a.z))*k);cam.x=tw.a.x+(tw.b.x-tw.a.x)*k;cam.y=tw.a.y+(tw.b.y-tw.a.y)*k;cam.z=zl;if(k>=1){const d=tw.done;tw=null;d&&d()}}
  // orbit motion: hover/focus slows to a stop
@@ -225,7 +225,7 @@ function frame(now){if(document.body.classList.contains('landed')){last=now;requ
   const capB=b.paint==='void'?Math.round(b.w*1.1):b.paint==='crest'?128:b.paint==='sun'?(focus===b?210:140):b.paint==='arena'?180:160,cap=Math.max(6,Math.round(capB*(b.rv<1?Math.max(.08,b.rv*b.rv):1))),pw=Math.max(2,w),ps=Math.max(1,Math.ceil(pw/cap)),Nt=Math.max(6,Math.round(pw/ps)),asp=(b.h||b.w)/b.w;
   let S=b.S;const ga=g.globalAlpha;
   if(!S.N||Math.abs(Nt-S.N)/Nt>.06&&now>=(b.rz||0)){const S2=P.mk(Nt,Math.max(4,Math.round(Nt*asp)));S2.N=Nt;if(S.N){b.prev=S;b.xf=now}b.S=S=S2;b.nx=0;b.rz=now+40}
-  if(now>=(b.nx||0)||(b.id==='sun'&&intro)){const o=b.id==='sun'?{ign:IS.ign,L:IS.L}:b.arg;P.setFlat(S.N<cap*.55);const tn=RM?7:now/1000+(b.ph||0)*3;P[b.paint](S,tn,o);P.setFlat(0);b.nx=RM?Infinity:now+(b.paint==='sun'?(S.N>200?90:S.N>100?110:70):S.N>140?66:S.N>60?44:60)+Math.random()*8}
+  if(now>=(b.nx||0)||(b.id==='sun'&&intro)){const o=b.id==='sun'?{ign:IS.ign,fl:IS.fl,L:IS.L}:b.arg;P.setFlat(b.id==='sun'&&intro?0:S.N<cap*.55);const tn=RM?7:now/1000+(b.ph||0)*3;P[b.paint](S,tn,o);P.setFlat(0);b.nx=RM?Infinity:now+(b.paint==='sun'?(S.N>200?90:S.N>100?110:70):S.N>140?66:S.N>60?44:60)+Math.random()*8}
   const dw=Math.abs(S.N*ps-pw)<=ps?S.N*ps:pw,dh=Math.round(dw*asp),dx=Math.round(sx-dw/2),dy=Math.round(sy-dh/2);
   const xf=b.prev?Math.min(1,(now-b.xf)/160):1;if(b.prev&&xf<1){g.globalAlpha=ga*dim;g.drawImage(b.prev.c,dx,dy,dw,dh)}else b.prev=null;
   g.globalAlpha=ga*dim*(b.prev?xf:1);g.drawImage(S.c,dx,dy,dw,dh);
@@ -296,7 +296,7 @@ cv.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId)){const b=hit(e.cl
 const up=e=>{if(pts.size===1&&moved>=6&&performance.now()-mv.t<80&&!RM)mv.on=1;pts.delete(e.pointerId);if(pts.size<2)pinch=null;cv.classList.remove('drag')};
 cv.addEventListener('pointerup',e=>{up(e);if(moved>=6)return;if(intro){skipIntro();return}const b=hit(e.clientX,e.clientY);if(b&&b!==focus)focusOn(b);else if(!b&&focus)history.state&&history.state.f?history.back():unfocus()});
 cv.addEventListener('pointercancel',up);cv.addEventListener('pointerleave',()=>{hover=null;hideTip()});
-function zoomAt(sx,sy,f){const nz=Math.max(.15,Math.min(60,cam.z*f)),[wx,wy]=S2W(sx,sy);cam.z=nz;cam.x=wx-(sx-W/2)/nz;cam.y=wy-(sy-H/2)/nz}
+function zoomAt(sx,sy,f){const nz=Math.max(sys==='main'?fitZ()*.3:.15,Math.min(60,cam.z*f)),[wx,wy]=S2W(sx,sy);cam.z=nz;cam.x=wx-(sx-W/2)/nz;cam.y=wy-(sy-H/2)/nz}
 cv.addEventListener('wheel',e=>{e.preventDefault();if(intro)skipIntro();tw=null;zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*.0015))},{passive:false});
 addEventListener('keydown',e=>{if(document.body.classList.contains('landed'))return;if(intro){skipIntro();return}if(e.key==='Escape'){if(focus)history.state&&history.state.f?history.back():unfocus();else if(sys==='archive')history.state&&history.state.a?history.back():warpTo('main')}});
 function showTip(b,x,y){const tx=b.moon?b.moon.name:b.title;if(tip.textContent!==tx||!tip.classList.contains("on"))window.__blip&&__blip("hover");tip.textContent=tx;tip.style.left=x+14+'px';tip.style.top=y+14+'px';tip.classList.add('on')}
