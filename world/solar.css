@@ -53,3 +53,8 @@ body.arch #sat{z-index:40}
 body.arch #back{z-index:40}
 #back,#archbtn{display:none!important}
 .mback{display:block;margin:0 auto calc(30px + env(safe-area-inset-bottom));font:inherit;font-size:13px;color:#e8ecff;background:#1c2132;border:2px solid #6a7290;padding:10px 16px;cursor:pointer;box-shadow:3px 3px 0 #000}.mback:hover,.mback:focus-visible{border-color:#ffd67a;color:#ffd67a}
+#info.sea .txt{width:100%;height:100%;max-width:none;justify-content:center;gap:4%;transform:none;left:0;top:0;opacity:var(--rv,1);transition:none}
+#info.sea .seat{display:block;width:100%;max-height:60%;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 2px 0 #021e5a)}
+#info.sea .seaplay{display:block;width:26%;aspect-ratio:1;pointer-events:auto;filter:drop-shadow(0 0 6px #48CAE488);transition:transform .15s}
+#info.sea .seaplay svg{width:100%;height:100%;display:block}
+#info.sea .seaplay:hover,#info.sea .seaplay:focus-visible{transform:scale(1.08)}

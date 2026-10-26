@@ -169,15 +169,19 @@ const VU=['#0a0414','#1c0630','#34104e','#521a6e'];
 P.void=(S,t)=>{const W=S.img.width,H2=S.img.height,cx=W/2,cy=H2/2,R=W*.084,{img}=S,d=img.data,th=-.28,c=Math.cos(th),s=Math.sin(th);
  for(let y=0;y<H2;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=y+.5-cy,r=Math.hypot(dx,dy)/R,a=Math.atan2(dy,dx);let col=null;
   const u=(dx*c+dy*s)/R,v=(-dx*s+dy*c)/R,er=Math.hypot(u,v/.15),ea=Math.atan2(v/.15,u);
-  const streak=.5+.5*Math.sin(er*7-t*2.2+Math.sin(ea*2)*1.5)*Math.sin(ea*3+t*.8),dop=.5-.35*u/Math.max(1,er);
+  const streak=.5+.35*Math.sin(er*7-t*2.2+Math.sin(ea*2)*1.5)*Math.sin(ea*3+t*.8)+.15*Math.sin(er*19-t*4.5+ea*5+vn(ea*3,er)*4),dop=.5-.35*u/Math.max(1,er);
   const disk=er>1.15&&er<5.4?Math.pow(1-(er-1.15)/4.25,1.3)*(.55+.45*streak)*(.6+.8*dop):0;
   if(disk>.06&&(v>0||r>1)){col=dq(VD,disk*1.15,x,y,er>3.8?STAR:er>2.6?LINE:bay)}
   else if(r<=1)col='#000000';
+  if(r>=1&&r<1.09&&!(disk>.5&&v>0))col=dq(VU,.85+.15*Math.sin(a*8-t*5),x,y);
+  else if(!col&&r>1.09&&r<1.6){const q=(1-(r-1.09)/.51);if(q*q*.8>bay(x,y))col=dq(VD,.35+q*.4,x,y)}
   if(!col||(v<0&&r>1&&r<1.5)){ // lensed rings: bright arch over the top, dim arc underneath
    if(v<0&&r>1&&r<2.3){const sh=.85+.15*Math.sin(a*6-t*3);const ring=r<1.16?1:Math.pow(1-(r-1.16)/1.14,1.6)*.75;const q=ring*sh*(.8+.2*Math.sin(r*14-t*2));if(q>.08){const nc=dq(VD,.25+q*.8,x,y,r>1.7?LINE:bay);if(!col||q>disk)col=nc}}
    else if(!col&&v>0&&r>1&&r<1.35){const q=(1-(r-1)/.35)*(.7+.3*Math.sin(a*5+t*2));if(q>.1)col=dq(VU,q,x,y)}}
   if(!col&&r<3.2&&Math.abs(dy)<H2*.42){const q=(1-(r-1)/2.2)*.4*Math.min(1,(H2*.5-Math.abs(dy))/(H2*.12));if(q>bay(x,y)*.9+.06)col=dq(['#06020c','#140828','#24103c'],q*2,x,y,STAR)}
   const o=(y*W+x)*4;if(col){const k=hx(col);d[o]=k[0];d[o+1]=k[1];d[o+2]=k[2];d[o+3]=255}else d[o+3]=0}
+ for(let k=0;k<44;k++){const ph=(t*.22+k*.1373)%1,er2=5.2-ph*ph*4.1,ea2=k*2.399+t*(.6+1.6/er2)+ph*3,u=Math.cos(ea2)*er2,v=Math.sin(ea2)*er2*.15,X=Math.round(cx+(u*c-v*s)*R),Y=Math.round(cy+(u*s+v*c)*R);
+  if(X<0||Y<0||X>=W||Y>=H2)continue;if(v<0&&Math.hypot(X-cx,Y-cy)<R*1.05)continue;const o=(Y*W+X)*4,k2=hx(ph>.8?'#ffffff':ph>.5?'#f0c8ff':'#c06af0');d[o]=k2[0];d[o+1]=k2[1];d[o+2]=k2[2];d[o+3]=255}
  S.g.putImageData(img,0,0)};
 /* ---------- ARCHIVE: little grey station-moon with a ring dock ---------- */
 const STN=['#141820','#2c3442','#4c586c','#7c8aa0','#b8c4d8','#eef4ff'];
