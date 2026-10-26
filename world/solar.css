@@ -77,3 +77,9 @@ body.arch #back{z-index:40}
 #sndbtn{right:1rem;width:2.4rem;height:2.4rem;padding:.35rem;display:flex;align-items:center;justify-content:center}
 #sndbtn svg{width:100%;height:100%;image-rendering:pixelated}
 #sndbtn[aria-pressed=true]{color:#5affb0}
+/* intro: UI pops in with a stepped pixel build after the rift opens */
+body.intro .ui,body.intro #sat{visibility:hidden}
+body.uirv .ui,body.uirv #sat{animation:pxin .7s steps(5) both}
+body.uirv #sndbtn{animation-delay:.15s}body.uirv #sat{animation:pxin .7s steps(5) both,satbob 3.2s ease-in-out .7s infinite}
+@keyframes pxin{0%{opacity:0;clip-path:inset(45% 45%);filter:contrast(4) saturate(0)}60%{opacity:1;filter:contrast(2)}100%{opacity:1;clip-path:inset(0);filter:none}}
+@media(prefers-reduced-motion:reduce){body.uirv .ui,body.uirv #sat{animation:none}}

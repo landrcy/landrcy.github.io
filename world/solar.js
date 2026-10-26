@@ -37,8 +37,8 @@ function lodLv(){return Math.max(0,Math.min(2,Math.log(cam.z/1.1)/Math.log(2)))}
 for(const b of [...MAIN,...MOONS,...ARCH]){b.S={N:0};b.L=[].map(([dv0])=>{const dv=b.paint==='crest'?Math.min(dv0,2.2):b.paint==='void'?Math.max(dv0,1.45):dv0;return P.mk(Math.max(8,Math.round(b.w/dv)),Math.max(6,Math.round((b.h||b.w)/dv)))});b.S={N:0};b.nx=0;b.ang=b.ph||0}
 let sys='main',bodies=MAIN;
 // ---- camera ----
-const cam={x:0,y:0,z:1};let tw=null,focus=null,hover=null,intro=RM?null:{t0:performance.now()};
-function fitZ(){const ext=sys==='main'?(W<H?[1250,780]:[1250,775]):(W<H?[490,300]:[490,300]);return Math.min(W/(2*ext[0]),(H-90)/(2*ext[1]))}
+const cam={x:0,y:0,z:1};let tw=null,focus=null,hover=null,intro=RM?null:{t0:performance.now()};if(intro)document.body.classList.add('intro');
+function fitZ(){const ext=sys==='main'?(W<H?[1480,1350]:[1520,930]):(W<H?[490,300]:[490,300]);return Math.min(W/(2*ext[0]),(H-90)/(2*ext[1]))}
 function fitX(){return 0}
 function fitY(){return 0}
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
@@ -60,8 +60,80 @@ addEventListener('resize',resize);
 // ---- intro timeline ----
 const clamp=v=>Math.max(0,Math.min(1,v)),seg=(t,a,b)=>clamp((t-a)/(b-a));
 function introState(now){if(!intro)return{stars:1,ign:1,L:1,orb:1,pop:()=>1};const t=(now-intro.t0)/1000;
- return{t,stars:seg(t,0,.9),ign:seg(t,.5,1.7),L:seg(t,1.7,3.7),orb:seg(t,4.4,6),pop:i=>{const p=seg(t,5.2+i*.32,5.75+i*.32);return p<=0?0:1+Math.sin(p*Math.PI)*.25*(1-p)-(1-p)*(1-p)*.9}}}
-function skipIntro(){if(!intro)return;intro=null;to(fitX(),fitY(),fitZ(),700)}
+ return{t,R:revealR(t),stars:1,ign:seg(t,.5,1.7),L:seg(t,1.7,3.7),orb:1,pop:()=>1,popOld:i=>{const p=seg(t,5.2+i*.32,5.75+i*.32);return p<=0?0:1+Math.sin(p*Math.PI)*.25*(1-p)-(1-p)*(1-p)*.9}}}
+// ---- the rift: the solar system is a jagged pixel tear in the old white dot-grid space; small tears peek into archived versions ----
+const RC=8,RX=1500,RY=1000,RGW=RX*2/RC|0,RGH=RY*2/RC|0;
+const hsh=(a,b)=>{let h=(a*374761393+b*668265263)^0x5bd1e995;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296};
+const an1=(a,f,s)=>{const x=a/TAU*f,i=Math.floor(x),u=x-i,k=u*u*(3-2*u);return hsh(((i%f)+f)%f,s)*(1-k)+hsh((((i+1)%f)+f)%f,s)*k};
+const jag=(a,s)=>{const x=a/TAU*90,i=Math.floor(x),u=x-i,saw=(hsh(((i%90)+90)%90,s+5)-.5)*.07*(1-Math.abs(u*2-1));return .07*(an1(a,7,s)-.5)*2+.04*(an1(a,19,s+1)-.5)*2+.03*(an1(a,47,s+2)-.5)*2+saw+(an1(a,13,s+3)>.78?.11*Math.pow(1-Math.abs(((a/TAU*26)%1+1)%1*2-1),3):0)};
+function riftGrid(gw,gh,cell,cx,cy,ax,ay,seed){const m=new Uint8Array(gw*gh);for(let j=0;j<gh;j++)for(let i=0;i<gw;i++){const x=(i+.5)*cell-cx,y=(j+.5)*cell-cy,a=Math.atan2(y/ay,x/ax),r=Math.hypot(x/ax,y/ay);m[j*gw+i]=r<1+jag(a,seed)?1:0}return m}
+const RPAL=['#ffffff','#f0ddff','#d79cff','#b45cf0','#8a34d8','#5a1ea8'].map(c=>P.hx(c));
+// mask (inside opaque) + 3 shimmer frames of the crackling edge, all at 1px per cell
+function riftArt(m,gw,gh,frames){const mk=()=>{const c=document.createElement('canvas');c.width=gw;c.height=gh;return c},M=mk(),mg=M.getContext('2d'),mi=mg.createImageData(gw,gh);
+ for(let k=0;k<m.length;k++)if(m[k])mi.data[k*4+3]=255;mg.putImageData(mi,0,0);
+ // distance (cells) to the tear, outside only, up to 4
+ const D=new Uint8Array(gw*gh).fill(9);for(let j=0;j<gh;j++)for(let i=0;i<gw;i++){if(m[j*gw+i])continue;let best=9;for(let dj=-4;dj<=4;dj++)for(let di=-4;di<=4;di++){const ii=i+di,jj=j+dj;if(ii<0||jj<0||ii>=gw||jj>=gh||!m[jj*gw+ii])continue;const d=Math.max(Math.abs(di),Math.abs(dj))+(Math.abs(di)+Math.abs(dj)>5?1:0);if(d<best)best=d}D[j*gw+i]=best}
+ const E=[];for(let f=0;f<frames;f++){const c=mk(),cg=c.getContext('2d'),im=cg.createImageData(gw,gh),d=im.data;
+  for(let j=0;j<gh;j++)for(let i=0;i<gw;i++){const k=j*gw+i,dd=D[k];let col=null;const h=hsh(i*3+f*101,j*7+f*13),b=P.bay(i,j);
+   if(m[k]){// inner rim: a thin dark-violet lip
+    const rim=(i>0&&!m[k-1])||(i<gw-1&&!m[k+1])||(j>0&&!m[k-gw])||(j<gh-1&&!m[k+gw]);if(rim)col=h>.7?RPAL[2]:RPAL[5]}
+   else if(dd===1)col=h>.55?RPAL[0]:h>.2?RPAL[1]:RPAL[2];
+   else if(dd===2)col=b<.55+(h-.5)*.5?RPAL[2]:RPAL[3];
+   else if(dd===3)col=b<.3+(h-.5)*.4?RPAL[3]:null;
+   else if(dd===4)col=b<.1&&h>.4?RPAL[4]:null;
+   // crackle: occasional bright sparks jumping off the edge
+   if(dd>=2&&dd<=4&&h>.985)col=RPAL[0];
+   if(col){d[k*4]=col[0];d[k*4+1]=col[1];d[k*4+2]=col[2];d[k*4+3]=255}}
+  cg.putImageData(im,0,0);E.push(c)}
+ return{M,E}}
+const MR=riftGrid(RGW,RGH,RC,RX,RY,1345,875,11),MRA=riftArt(MR,RGW,RGH,RM?1:3);
+const inMain=(x,y)=>{const i=Math.floor((x+RX)/RC),j=Math.floor((y+RY)/RC);return i>=0&&j>=0&&i<RGW&&j<RGH&&MR[j*RGW+i]===1};
+// small rifts: one per archived version, placed in the white space around the main tear (random per visit)
+const SR=[];let srKey='';
+function placeRifts(){const key=(W<H?'p':'l');if(key===srKey)return;srKey=key;SR.length=0;const z=fitZ(),vx=W/2/z*.94,vy=(H-90)/2/z*.94,src=ARCH.filter(b=>b.href&&b.href.startsWith('archive/')&&!b.href.includes('#'));
+ let tries=0;for(const b of src){let ok=false;while(!ok&&tries++<4000){const r=W<H?60+Math.random()*60:70+Math.random()*80,x=(Math.random()*2-1)*(vx-r),y=(Math.random()*2-1)*(vy-r);
+   if(Math.abs(x)>vx-r||Math.abs(y)>vy-r)continue;
+   // keep clear of the satellite (top-left) and the bottom UI bar
+   const[sx,sy]=[(x-r)*z+W/2,(y-r)*z+H/2];if(sx<150&&sy<110)continue;if((y+r)*z+H/2>H-70)continue;
+   let clear=true;for(let a=0;a<TAU&&clear;a+=TAU/24)if(inMain(x+Math.cos(a)*(r+40),y+Math.sin(a)*(r+40)*.7))clear=false;if(inMain(x,y))clear=false;
+   for(const o of SR)if(Math.hypot(o.x-x,o.y-y)<o.r+r+50)clear=false;if(!clear)continue;
+   ok=true;const cell=6,gw=Math.ceil(r*2.3/cell),gh=Math.ceil(r*1.6/cell),m=riftGrid(gw,gh,cell,gw*cell/2,gh*cell/2,r,r*.62,b.id.length*7+SR.length*31);
+   const img=new Image();img.src='world/rifts/'+b.id+'.jpg';const c=document.createElement('canvas');c.width=gw*3;c.height=gh*3;
+   SR.push({x,y,r,cell,gw,gh,m,art:riftArt(m,gw,gh,RM?1:3),img,c,ph:Math.random()*TAU,title:b.title,href:b.href,rift:1,w:r*2,hr:.5})}}}
+let OC=null,OG=null,ocK='',dotT=null,dotS=0;
+function dotPat(s){if(s===dotS&&dotT)return dotT;dotS=s;const c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,s,s);x.fillStyle=s>=10?'#b9bfcc':'#ccd0da';const d=s>=18?2:1;x.fillRect(0,0,d,d);dotT=g.createPattern(c,'repeat');return dotT}
+// is the whole screen inside the main tear (and no small rift on screen)? then there is nothing outside to draw
+function allInside(){const[a,b]=S2W(0,0),[c,d]=S2W(W,H);for(let i=0;i<=6;i++)for(let j=0;j<=6;j++)if(!inMain(a+(c-a)*i/6,b+(d-b)*j/6))return false;return!(SR.some(r=>r.x+r.r*1.2>a&&r.x-r.r*1.2<c&&r.y+r.r>b&&r.y-r.r<d))}
+function drawOutside(now){if(window.__noRift||sys!=='main')return;placeRifts();if(allInside())return;
+ const z=cam.z,fr=RM?0:Math.floor(now/140)%3,key=[W,H,cam.x.toFixed(2),cam.y.toFixed(2),z.toFixed(4),fr].join();
+ if(key!==ocK){ocK=key;
+  if(!OC||OC.width!==W||OC.height!==H){OC=document.createElement('canvas');OC.width=W;OC.height=H;OG=OC.getContext('2d')}
+  const o=OG;o.imageSmoothingEnabled=false;o.globalCompositeOperation='source-over';o.clearRect(0,0,W,H);
+  // white dot grid locked to the world (pattern offset from the world origin)
+  const s=Math.max(4,Math.round(26*z)),[ox,oy]=W2S(0,0);o.save();o.translate(((ox%s)+s)%s,((oy%s)+s)%s);o.fillStyle=dotPat(s);o.fillRect(-s,-s,W+2*s,H+2*s);o.restore();
+  const[mx,my]=W2S(-RX,-RY),cw=RC*z;
+  o.globalCompositeOperation='destination-out';o.drawImage(MRA.M,mx,my,RGW*cw,RGH*cw);o.globalCompositeOperation='source-over';
+  for(const r of SR){const[sx,sy]=W2S(r.x-r.gw*r.cell/2,r.y-r.gh*r.cell/2),cc=r.cell*z,w=r.gw*cc,h=r.gh*cc;if(sx>W||sy>H||sx+w<0||sy+h<0)continue;
+   const c=r.c,cg=c.getContext('2d');cg.globalCompositeOperation='source-over';cg.fillStyle='#05030c';cg.fillRect(0,0,c.width,c.height);
+   if(r.img.complete&&r.img.naturalWidth){const t=RM?0:now/1000,px=((sx+w/2)/W-.5)*-8+Math.sin(t*.7+r.ph)*1.5,py=((sy+h/2)/H-.5)*-6+Math.cos(t*.5+r.ph);const sc=Math.max(c.width/320,c.height/200)*1.9;cg.imageSmoothingEnabled=true;cg.drawImage(r.img,c.width/2-160*sc+px,c.height/2-100*sc+py,320*sc,200*sc)}
+   cg.globalCompositeOperation='destination-in';cg.imageSmoothingEnabled=false;cg.drawImage(r.art.M,0,0,c.width,c.height);
+   o.drawImage(c,sx,sy,w,h);o.drawImage(r.art.E[RM?0:(fr+Math.floor(r.ph*3))%r.art.E.length],sx,sy,w,h)}
+  o.drawImage(MRA.E[fr],mx,my,RGW*cw,RGH*cw)}
+ g.drawImage(OC,0,0)}
+function riftHit(sx,sy){if(sys!=='main')return null;const[wx,wy]=S2W(sx,sy);for(const r of SR){const i=Math.floor((wx-r.x+r.gw*r.cell/2)/r.cell),j=Math.floor((wy-r.y+r.gh*r.cell/2)/r.cell);if(i>=0&&j>=0&&i<r.gw&&j<r.gh&&r.m[j*r.gw+i])return r}return null}
+// pixel reveal front (screen px): grows from the sun outwards; everything beyond it is dithered/chunky-hidden
+function revealR(t){const m=Math.min(W,H);if(t<3.9)return m*(.5+.12*seg(t,0,3.9));const z0=m*.82/(250*.72),w0=m*.62/z0;return(w0+(2100-w0)*Math.pow(seg(t,3.9,8.2),1.25))*cam.z}
+const RVB=.22;let rvC=null,rvG=null,rvI=null;
+function revealOf(sx,sy,R){const[cx,cy]=W2S(0,0);return clamp((R-Math.hypot(sx-cx,sy-cy))/Math.max(20,Math.min(Math.min(W,H)*RVB,R*.5)))}
+function revealMask(R){const cs=4,mw=Math.ceil(W/cs),mh=Math.ceil(H/cs);if(!rvC||rvC.width!==mw||rvC.height!==mh){rvC=document.createElement('canvas');rvC.width=mw;rvC.height=mh;rvG=rvC.getContext('2d');rvI=rvG.createImageData(mw,mh)}
+ const d=rvI.data,[cx,cy]=W2S(0,0),band=Math.max(20,Math.min(Math.min(W,H)*RVB,R*.5));
+ for(let y=0;y<mh;y++)for(let x=0;x<mw;x++){const p=clamp((R-Math.hypot(x*cs+2-cx,y*cs+2-cy))/band),s=p<.34?4:p<.67?2:1,o=(y*mw+x)*4;
+  // chunky blocks far from the front, fine dither near it
+  const th=B4[((y/s|0)&3)*4+((x/s|0)&3)];if(p>th){d[o+3]=0;continue}const e=p>0&&p>th-.18,h=(x*7+y*13+((performance.now()/120)|0))%5;const c=e?(h<2?[255,255,255]:h<4?[215,156,255]:[180,92,240]):[255,255,255];d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}
+ rvG.putImageData(rvI,0,0);g.imageSmoothingEnabled=false;g.drawImage(rvC,0,0,mw*cs,mh*cs)}
+const B4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v=>(v+.5)/16);
+function uiReveal(){document.body.classList.remove('intro');document.body.classList.add('uirv');setTimeout(()=>document.body.classList.remove('uirv'),2000)}
+function skipIntro(){if(!intro)return;if(!intro.ui)uiReveal();intro=null;to(fitX(),fitY(),fitZ(),700)}
 // ---- render ----
 let last=performance.now(),FA=0;
 
@@ -122,8 +194,8 @@ function lens(){if(sys!=='main')return;const b=MAIN.find(q=>q.id==='void'),[vx0,
    const j=(Y*w+X)*4,m=1-fall*fall*fall,m2=m*m*(3-2*m);o[i]=a[j];o[i+1]=a[j+1];o[i+2]=a[j+2];o[i+3]=255*m2}
   lc.putImageData(out,0,0);lensR=[x0,y0,D]}
  g.drawImage(lensC,x0,y0,D,D)}
-function frame(now){if(sys==='archive'&&!warp&&document.body.classList.contains('arch')){last=now;requestAnimationFrame(frame);return}const dt=Math.min(.05,(now-last)/1000);last=now;const IS=introState(now);FA+=((focus?1:0)-FA)*Math.min(1,dt*4);if(mv.on&&!tw){const k=Math.pow(.9,dt*60);mv.x*=k;mv.y*=k;cam.x+=mv.x*dt*60;cam.y+=mv.y*dt*60;if(Math.hypot(mv.x,mv.y)*cam.z<.1)mv.on=0}if(!tw&&!intro&&sys==='main'){const bx=1260,by=790;cam.x=clamp2(cam.x,fitX()-bx,fitX()+bx);cam.y=clamp2(cam.y,fitY()-by,fitY()+by)}
- if(intro){if(IS.t<3.9){cam.x=0;cam.y=0;cam.z=Math.min(W,H)*.82/(250*.72)}else if(!intro.zoomed){intro.zoomed=1;to(fitX(),fitY(),fitZ(),1500)}if(IS.t>8.2)intro=null}
+function frame(now){if(sys==='archive'&&!warp&&document.body.classList.contains('arch')){last=now;requestAnimationFrame(frame);return}const dt=Math.min(.05,(now-last)/1000);last=now;const IS=introState(now);FA+=((focus?1:0)-FA)*Math.min(1,dt*4);if(mv.on&&!tw){const k=Math.pow(.9,dt*60);mv.x*=k;mv.y*=k;cam.x+=mv.x*dt*60;cam.y+=mv.y*dt*60;if(Math.hypot(mv.x,mv.y)*cam.z<.1)mv.on=0}if(!tw&&!intro&&sys==='main'){const bx=W<H?900:1100,by=W<H?1300:900;cam.x=clamp2(cam.x,fitX()-bx,fitX()+bx);cam.y=clamp2(cam.y,fitY()-by,fitY()+by)}
+ if(intro){if(IS.t<3.9){cam.x=0;cam.y=0;cam.z=Math.min(W,H)*.82/(250*.72)}else if(!intro.zoomed){intro.zoomed=1;to(fitX(),fitY(),fitZ(),2200)}if(IS.t>7.4&&!intro.ui){intro.ui=1;uiReveal()}if(IS.t>8.8)intro=null}
  if(tw){const k=ease(clamp((now-tw.t0)/tw.ms));const zl=Math.exp(Math.log(tw.a.z)+(Math.log(tw.b.z)-Math.log(tw.a.z))*k);cam.x=tw.a.x+(tw.b.x-tw.a.x)*k;cam.y=tw.a.y+(tw.b.y-tw.a.y)*k;cam.z=zl;if(k>=1){const d=tw.done;tw=null;d&&d()}}
  // orbit motion: hover/focus slows to a stop
  const list=sys==='main'?[...bodies,...MOONS]:bodies;
@@ -146,22 +218,25 @@ function frame(now){if(sys==='archive'&&!warp&&document.body.classList.contains(
  // sprites, back-to-front
  const draw=[];bodies.forEach((b,i)=>draw.push([b,i]));if(sys==='main')MOONS.forEach((m,i)=>draw.push([m,3]));
  draw.sort((a,b)=>pos(a[0])[1]-pos(b[0])[1]);
- for(const[b,i]of draw){const pp=b.id==='sun'||b.id==='oldhub'?1:IS.pop(Math.min(i,7)+(b.moon?.5:0));if(pp<=0)continue;const isF=focus&&(b===focus||(focus.yt&&b.moon)),dim=isF||FA<.005?1:1-.72*FA;
+ const one=(b,i)=>{const pp=b.id==='sun'||b.id==='oldhub'?1:IS.pop(Math.min(i,7)+(b.moon?.5:0));if(pp<=0)return;const isF=focus&&(b===focus||(focus.yt&&b.moon)),dim=isF||FA<.005?1:1-.72*FA;
   const[x,y]=pos(b),[sx,sy]=W2S(x,y),w=b.w*cam.z*pp,h=(b.h||b.w)*cam.z*pp;
-  if(sx+w<0||sx-w>W||sy+h<0||sy-h>H)continue;
+  if(sx+w<0||sx-w>W||sy+h<0||sy-h>H)return;
   // resolution chosen from on-screen size: redraw at that res, integer pixel scale, no colour-quantised downsample
-  const cap=b.paint==='void'?Math.round(b.w*1.1):b.paint==='crest'?128:b.paint==='sun'?(focus===b?210:140):b.paint==='arena'?180:160,pw=Math.max(2,w),ps=Math.max(1,Math.ceil(pw/cap)),Nt=Math.max(6,Math.round(pw/ps)),asp=(b.h||b.w)/b.w;
+  const capB=b.paint==='void'?Math.round(b.w*1.1):b.paint==='crest'?128:b.paint==='sun'?(focus===b?210:140):b.paint==='arena'?180:160,cap=Math.max(6,Math.round(capB*(b.rv<1?Math.max(.08,b.rv*b.rv):1))),pw=Math.max(2,w),ps=Math.max(1,Math.ceil(pw/cap)),Nt=Math.max(6,Math.round(pw/ps)),asp=(b.h||b.w)/b.w;
   let S=b.S;const ga=g.globalAlpha;
   if(!S.N||Math.abs(Nt-S.N)/Nt>.06&&now>=(b.rz||0)){const S2=P.mk(Nt,Math.max(4,Math.round(Nt*asp)));S2.N=Nt;if(S.N){b.prev=S;b.xf=now}b.S=S=S2;b.nx=0;b.rz=now+40}
-  if(now>=(b.nx||0)||(b.id==='sun'&&intro)){const o=b.id==='sun'?{ign:IS.ign,L:IS.L}:b.arg;P.setFlat(S.N<cap*.55);const tn=RM?7:now/1000+(b.ph||0)*3,nc=NIGHT[b.moon?'moon':b.id];P.setNight(nc&&!nc.post?{...nc,t:tn}:null);P[b.paint](S,tn,o);P.setNight(null);if(nc&&nc.post)nightPass(S,nc,tn,S.N<cap*.55);P.setFlat(0);b.nx=RM?Infinity:now+(b.paint==='sun'?(S.N>200?90:S.N>100?110:70):S.N>140?66:S.N>60?44:60)+Math.random()*8}
+  if(now>=(b.nx||0)||(b.id==='sun'&&intro)){const o=b.id==='sun'?{ign:IS.ign,L:IS.L}:b.arg;P.setFlat(S.N<cap*.55);const tn=RM?7:now/1000+(b.ph||0)*3;P[b.paint](S,tn,o);P.setFlat(0);b.nx=RM?Infinity:now+(b.paint==='sun'?(S.N>200?90:S.N>100?110:70):S.N>140?66:S.N>60?44:60)+Math.random()*8}
   const dw=Math.abs(S.N*ps-pw)<=ps?S.N*ps:pw,dh=Math.round(dw*asp),dx=Math.round(sx-dw/2),dy=Math.round(sy-dh/2);
   const xf=b.prev?Math.min(1,(now-b.xf)/160):1;if(b.prev&&xf<1){g.globalAlpha=ga*dim;g.drawImage(b.prev.c,dx,dy,dw,dh)}else b.prev=null;
   g.globalAlpha=ga*dim*(b.prev?xf:1);g.drawImage(S.c,dx,dy,dw,dh);
-  g.globalAlpha=ga}
+  g.globalAlpha=ga};
+ let sunL=null;for(const[b,i]of draw){if(intro&&b.id==='sun'){sunL=[b,i];continue}if(intro){const[x0,y0]=pos(b),[s0,t0]=W2S(x0,y0);b.rv=revealOf(s0,t0,IS.R);if(b.rv<=0)continue}else b.rv=1;one(b,i)}
+ g.globalAlpha=1;drawOutside(now);
+ if(intro){g.globalAlpha=1;revealMask(IS.R);if(sunL)one(...sunL)}
  g.globalAlpha=1;bigFlare(now);if(focus&&!tw&&sys==='main'){const[fx,fy]=pos(focus);cam.x+=(fx-cam.x)*Math.min(1,dt*8);cam.y+=(fy-cam.y)*Math.min(1,dt*8)}if(focus)placeInfo();
  requestAnimationFrame(frame)}
 // ---- hit testing ----
-function hit(sx,sy){const[wx,wy]=S2W(sx,sy);let best=null,bd=1e9;const list=sys==='main'?[...MOONS,...bodies]:bodies;
+function hit(sx,sy){const rh=riftHit(sx,sy);if(rh)return rh;const[wx,wy]=S2W(sx,sy);let best=null,bd=1e9;const list=sys==='main'?[...MOONS,...bodies]:bodies;
  for(const b of list){const[x,y]=pos(b),r=b.w*b.hr*(b.id==='void'?1.4:1),d=Math.hypot(wx-x,(wy-y)*(b.id==='void'?1.6:1));if(d<r&&d/r<bd){bd=d/r;best=b}}return best}
 // ---- focus & info ----
 let revealT=0;
@@ -172,19 +247,10 @@ const TH={sun:['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#9ab4e8'],a
  'v-purple':['#241640','#ffcc4d','#38e1d0','#0a0814','Silkscreen','#7c6cff'],'v-white':['#080a12','#dde0e8','#9ab4e8','#080a12','Silkscreen','#cfe0ff'],'v-strings':['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#c9ced8']};
 function theme(b){const t=TH[b.moon?'yt':b.id]||TH.sun;return `--bg:${t[0]};--fg:${t[1]};--ac:${t[2]};--bf:${t[3]};--ft:'${t[4]}';--bd:${t[5]}`}
 const NOINFO={sun:1};
-// night-side lights (shadow side, lower right since light comes from upper left)
-const NIGHT={sea:{c:['#9ff5ff','#48cae4'],d:.3},yt:{c:['#ff3355','#ff9aa8'],d:.32},moon:{c:['#ffd9a0'],d:.25},
- gow:{post:1,c:['#ffe27a','#fff2b0'],d:.06},arena:{post:1,c:['#ffd54a','#ff6464','#7ad8ff'],d:.05},ashaad:{post:1,c:['#ffb040','#ffd27a'],d:.035,glow:1}};
-function nightPass(S,nc,t,flat){const W=S.c.width,Hh=S.c.height,im=S.g.getImageData(0,0,W,Hh),d=im.data,cs=flat?2:1;let n=0;
- for(let y=Math.floor(Hh*.4);y<Hh;y+=cs)for(let x=Math.floor(W*.5);x<W;x+=cs){const o=(y*W+x)*4;if(d[o+3]<200)continue;const sh=(x/W-.5)*1.4+(y/Hh-.4)*1.1;if(sh<.45)continue;
-  const i=Math.floor(x/(cs*2)),j=Math.floor(y/(cs*2)),h=P.H(i*13+5,j*7+3);if(h>nc.d)continue;if(!flat&&P.H(i+77,j+Math.floor(t*1.4+h*40))<.2)continue;
-  const c=P.hx(nc.c[(i+j)%nc.c.length]);for(let yy=0;yy<cs;yy++)for(let xx=0;xx<cs;xx++){const q=((y+yy)*W+x+xx)*4;if(q<d.length){d[q]=c[0];d[q+1]=c[1];d[q+2]=c[2]}}
-  if(nc.glow&&!flat)for(const[a,b2]of[[1,0],[-1,0],[0,1],[0,-1]]){const q=((y+b2)*W+x+a)*4;if(q>=0&&q<d.length&&d[q+3]>200){d[q]=Math.min(255,d[q]*.5+c[0]*.5);d[q+1]=Math.min(255,d[q+1]*.5+c[1]*.4);d[q+2]=d[q+2]*.6}}}
- S.g.putImageData(im,0,0)}
 const PLAY=(d,l,m)=>`<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="${d}" d="M4 2h2v1h2v1h2v1h2v1h2v4h-2v1h-2v1h-2v1h-2v1h-2z"/><path fill="${l}" d="M5 4h1v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-1z"/><path fill="${m}" d="M5 8h1v3h-1zM6 9h2v1h-2z"/></svg>`;
 const YTLOGO=`<svg class="lgsvg" viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#ff0033" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#b8001f" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#fff" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg><b class="lgtx">LLC Powered<br>Channels</b>`;
 // box = [width frac of w, height frac of h, y offset frac of h]
-const LG={arena:{box:[.6,.42,-.02],pal:['#3a1a06','#ffcf3a','#ff6464'],arena:1},sea:{box:[.56,.56,0],img:'sea',pal:['#021e5a','#90E0EF','#48CAE4']},ashaad:{box:[.66,.5,.06],img:'ashaad',pal:['#2a1608','#ffd23a','#c08a1e']},void:{box:[.3,.74,0],img:'void',pal:['#05020d','#e6c8ff','#c04df0']},
+const LG={arena:{box:[.6,.42,.02],pal:['#3a1a06','#ffcf3a','#ff6464'],arena:1},sea:{box:[.56,.56,0],img:'sea',pal:['#021e5a','#90E0EF','#48CAE4']},ashaad:{box:[.66,.5,.06],img:'ashaad',pal:['#2a1608','#ffd23a','#c08a1e']},void:{box:[.3,.74,0],img:'void',pal:['#05020d','#e6c8ff','#c04df0']},
  yt:{box:[.6,.6,0],pal:['#2a0008','#ffffff','#ffb0b8']},gow:{box:[.2,.2,.3],btn:1,pal:['#000000','#ffffff','#e01a22']},moon:{box:[.62,.62,0],pal:['#2a0008','#ffffff','#ffb0b8']}};
 const lgOf=b=>b.moon?LG.moon:LG[b.id];
 const TITLES={void:1,ashaad:1,sea:1,oldhub:1,'v-lovely':1,'v-arcade':1,'v-larper':1,'v-purple':1,'v-white':1,'v-strings':1};
@@ -198,7 +264,7 @@ const a=s=>/^https?:/.test(s)?' target="_blank" rel="noopener"':'';
  if(b.moon){const c=b.moon;return `<h2>${c.name}</h2><p class="stat"><b>${fmt(c.subs)}</b> subs · <b>${fmt(c.views)}</b> views</p><a class="go" href="${c.url}" target="_blank" rel="noopener">▶ Watch</a>`}
  return `<h2>${b.title}</h2>${b.href?`<a class="go" href="${b.href}"${a(b.href)}>${b.cta}</a>`:''}`}
 function faceR(b){return b.id==='void'?b.w*.12:b.w*b.hr}
-function focusOn(b,push=true){hideTip();window.__blip&&__blip("click");if(b.arch){enterArchive();return}if(b.home){warpTo('main');return}
+function focusOn(b,push=true){hideTip();if(b.rift){window.__blip&&__blip('click');location.href=b.href;return}window.__blip&&__blip("click");if(b.arch){enterArchive();return}if(b.home){warpTo('main');return}
  focus=b;info.className='';const bare=NOINFO[b.id];info.innerHTML=bare?'':'<div class="txt" style="'+theme(b)+'">'+infoHTML(b)+'</div>';
  const[x,y]=pos(b),fr=faceR(b),z=Math.min(W,H)*(W<H?.95:.82)/Math.max(b.w*(b.id==='void'?.62:b.yt?1.75:.92),1);
  info.querySelectorAll('[data-chans]').forEach(el=>el.onclick=e=>{e.preventDefault();e.stopPropagation();el.hidden=true;const c=info.querySelector('.lgch');c.hidden=false;const lg=info.querySelector('.lglogo');if(lg)lg.hidden=true});

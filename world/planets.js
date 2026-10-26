@@ -7,7 +7,7 @@ const bay=(x,y)=>B4[(y&3)*4+(x&3)];
 const LINE=(x,y)=>[.1,.6,.35,.85][y&3];
 const STAR=(x,y)=>{const m=((x+2*y)%5+5)%5,k=((x*7+y*13)&7);return m===0?.15:(m===1||m===4)&&k<3?.55:.9};
 // pick a colour from a ramp with v in [0,1] using a threshold function
-let FLAT=0,NL=null;function dq(r,v,x,y,th=bay){v=Math.max(0,Math.min(1,v))*(r.length-1);let i=Math.floor(v);if(v-i>(FLAT?.5:th(x,y)))i++;return r[Math.min(r.length-1,i)]}
+let FLAT=0;function dq(r,v,x,y,th=bay){v=Math.max(0,Math.min(1,v))*(r.length-1);let i=Math.floor(v);if(v-i>(FLAT?.5:th(x,y)))i++;return r[Math.min(r.length-1,i)]}
 const H=(a,b)=>{let h=(a*374761393+b*668265263)|0;h=Math.imul(h^h>>>13,1274126177);return((h^h>>>16)>>>0)/4294967296};
 function vn(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),w=yf*yf*(3-2*yf);
  return(H(xi,yi)*(1-u)+H(xi+1,yi)*u)*(1-w)+(H(xi,yi+1)*(1-u)+H(xi+1,yi+1)*u)*w}
@@ -21,8 +21,6 @@ function sphere(S,R,cx,cy,rot,fn,atm,shp){const{img}=S,W=img.width,d=img.data;
    if(col){let c=typeof col==='string'?hx(col):col;const sv=raw+(bay(x,y)-.5)*.08;
     if(sv<.36){const k=sv<.16?.62:.4;c=[c[0]+(SHD[0]-c[0])*k,c[1]+(SHD[1]-c[1])*k,c[2]+(SHD[2]-c[2])*k].map(Math.round)}
     else if(r2>Math.pow(1-1.6/(R),2)&&dx*LX+dy*LY>.35)c=c.map(v=>Math.min(255,Math.round(v*1.18+22)));
-    if(NL&&raw<.24&&r2<.9){const k=Math.max(3,Math.min(16,R/(FLAT?5:3.2))),fi=lon/TAU*k*2,fj=(lat/Math.PI+.5)*k,i=Math.floor(fi),j=Math.floor(fj),hh=H(i*7+((i%(2*k))+2*k),j);
-     if(hh<NL.d&&Math.abs(fi-i-.5)<.22+1/R&&Math.abs(fj-j-.5)<.22+1/R){const tw=FLAT?1:H(i+31,j+Math.floor(NL.t*1.5+hh*9))>.18;if(tw)c=hx(NL.c[(i+j)&1]||NL.c[0])}}
     col=c}}
   else if(atm){const e=(Math.sqrt(r2)-1)*R;if(e<atm.w){const side=Math.max(0,-(dx*LX+dy*LY))*.0+(.5+.5*(-(dx*LX+dy*LY))/Math.sqrt(r2));const v=(1-e/atm.w)*side*side*1.3;if(v>bay(x,y)*.9+.08)col=dq(atm.r,v,x,y)}}
   const o=(y*W+x)*4;if(col){const c=typeof col==='string'?hx(col):col;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}else d[o+3]=0}
@@ -287,9 +285,10 @@ function fbStep(st,dt){st.rt+=dt;if(st.rt>20)fbPair(st);const B=st.b;for(const b
  for(const p of st.pr){p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt;for(const o of B){if(o===p.o)continue;if(Math.hypot(o.x-p.x,o.y-p.y)<o.r){p.l=0;o.fl=1;o.vx+=p.vx*.3;o.vy+=p.vy*.3;for(let k=0;k<4;k++){const q=Math.random()*TAU;st.sp.push({x:p.x,y:p.y,vx:Math.cos(q)*.6,vy:Math.sin(q)*.6,l:.25,c:'#ffff66'})}}}if(Math.abs(p.x)>.95||Math.abs(p.y)>.95)p.l=0}
  st.pr=st.pr.filter(p=>p.l>0);for(const p of st.sp){if(p.ring!=null){p.ring+=dt*1.6;continue}p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt}st.sp=st.sp.filter(p=>p.ring!=null?p.ring<.5:p.l>0);for(const p of st.spl)p.l-=dt;st.spl=st.spl.filter(p=>p.l>0)}
 const RMq=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FONT={B:[6,5,6,5,6],A:[2,5,7,5,5],L:[4,4,4,4,7],R:[6,5,6,5,5],E:[7,4,6,4,7],N:[5,7,7,7,5],' ':0};
 P.arena=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);if(!S.fb)S.fb=fbInit();const st=S.fb;let dt=st.t<0?0:t-st.t;st.t=t;dt=Math.max(0,Math.min(.06,dt));for(let k=0;k<3;k++)fbStep(st,dt/3);
  const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const o=(y*W+x)*4,q=typeof c==='string'?hx(c):c;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
- const bob=Math.sin(t*.9)*Hh*.02,cx=W/2,cy=Hh*.44+bob,A=W*.4,Bv=Hh*.27,skirt=Hh*.2,post=Hh*.2;
+ const bob=Math.sin(t*.9)*Hh*.02,cx=W/2,cy=Hh*.5+bob,A=W*.4,Bv=Hh*.25,skirt=Hh*.18,post=Hh*.2;
  // floor (u,v in [-1,1]) -> screen, gentle perspective (far edge narrower)
  const F=(u,v)=>{const k=1+v*.1;return[cx+u*A*k,cy+v*Bv]};
  const MAT=['#5a6a8a','#7a8cb0','#a2b2d2','#c8d4ec','#e8eef8'],SK=['#3a0a10','#6a1420','#9a2232','#c43648','#e85a6a'],PST=['#2a2a34','#55556a','#8a8aa2','#c8c8da'];
@@ -299,7 +298,9 @@ P.arena=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);if(!S
     const l=.62-u*.22-v*.14-(Math.abs(u)>.94||Math.abs(v)>.92?.18:0)+(FLAT?0:(H(x>>1,y)-.5)*.06);
     const logo=!FLAT&&Math.hypot(u*1.6,v*1.6)<.55&&Math.hypot(u*1.6,v*1.6)>.47;put(x,y,dq(MAT,logo?l+.25:l,x,y))}
    else{const k=1.1,u=(x+.5-cx)/(A*k);if(Math.abs(u)>1)continue;const fy=(y-ybot)/skirt;
-    const l=.7-u*.25-fy*.35-(Math.abs(u)>.96?.2:0);put(x,y,dq(SK,FLAT?l:l+((Math.floor((u+1)*10)&1)?.05:0),x,y));if(!FLAT&&fy>.35&&fy<.65&&Math.abs(u)<.5&&H(Math.floor((u+1)*30),Math.floor(fy*6))>.5)put(x,y,'#ffd54a')}}}
+    const l=.7-u*.25-fy*.35-(Math.abs(u)>.96?.2:0);put(x,y,dq(SK,FLAT?l:l+((Math.floor((u+1)*10)&1)?.05:0),x,y));}}}
+ // apron lettering: BALL ARENA in a 3x5 pixel font (only when big enough to read)
+ {const s=Math.floor(A*1.5/39);if(s>=1&&!FLAT){const tw=39*s,x0=Math.round(cx-tw/2),y0=Math.round(ybot+skirt*.5-2.5*s);let ox=x0;for(const ch of 'BALL ARENA'){const g=FONT[ch];if(g)for(let r=0;r<5;r++)for(let c2=0;c2<3;c2++)if(g[r]>>(2-c2)&1)for(let a=0;a<s;a++)for(let b2=0;b2<s;b2++){put(ox+c2*s+a+1,y0+r*s+b2+1,'#4a0a12');put(ox+c2*s+a,y0+r*s+b2,r<2?'#ffe27a':'#ffc030')}ox+=4*s}}}
  // underside shadow / float glow
  for(let x=Math.round(cx-A*1.05);x<=cx+A*1.05;x++)put(x,ybot+skirt+1,'#1a0408');
  const corners=[[-1,-1,'#d83a3a'],[1,-1,'#3a6bff'],[1,1,'#e8e8f0'],[-1,1,'#e8e8f0']],RH=[.35,.62,.88].slice(0,FLAT?2:3);
@@ -335,8 +336,10 @@ P.arena=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);if(!S
  // front ropes + front posts
  rope(2,1);drawPost(corners[3]);drawPost(corners[2]);
  // ring lights above (near view only)
- if(!FLAT){const ly=cy-Bv-post*1.55;line(cx-A*.7,ly,cx+A*.7,ly,'#3a3a4a');for(let i=-2;i<=2;i++){const lx=cx+i*A*.32;put(lx,ly+1,'#ffe8a0');put(lx+1,ly+1,'#ffe8a0');put(lx,ly+2,'#fff8d8')}}
+ {const ly=Math.max(1,Math.round(cy-Bv-post*1.15)),hw=A*.78;line(cx-hw,ly,cx+hw,ly,'#4a4a5e');line(cx-hw,ly+1,cx+hw,ly+1,'#26263a');for(const sx of[-1,1]){const[px]=F(sx*.98,-1);line(cx+sx*hw,ly,px,cy-Bv-post*.95,'#3a3a4c')}
+  const nL=FLAT?3:5;for(let i=0;i<nL;i++){const lx=Math.round(cx+(i-(nL-1)/2)*hw*2/(nL-1)*.9),on=RMq||FLAT||Math.sin(t*1.3+i*1.7)>-.85,w=Math.max(1,Math.round(W/90));for(let a=-w;a<=w;a++){put(lx+a,ly+2,'#20202c');put(lx+a,ly+3,on?'#fff8d8':'#8a7a50');if(w>1)put(lx+a,ly+4,on?'#ffe8a0':'#6a5a30')}
+   if(on&&!FLAT){const L=post*.9;for(let yy=4;yy<L;yy++){const sp=w+yy*.35;for(let a=-sp;a<=sp;a++){const x=Math.round(lx+a),y=ly+yy+1,o=(y*W+x)*4;if(x<0||x>=W||y>=Hh||d[o+3]===0)continue;if(bay(x,y)>(1-yy/L)*.55)continue;d[o]=Math.min(255,d[o]+40);d[o+1]=Math.min(255,d[o+1]+34);d[o+2]=Math.min(255,d[o+2]+14)}}}}}
  S.g.putImageData(S.img,0,0)};
-P.setFlat=v=>{FLAT=v?1:0};P.setNight=v=>{NL=v};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
+P.setFlat=v=>{FLAT=v?1:0};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
 })();
