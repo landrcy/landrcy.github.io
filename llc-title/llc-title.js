@@ -38,7 +38,7 @@ const put=()=>{if(!WHITE){ctx.putImageData(img,0,0);return}
  for(let p=0,i=0;p<A.length;p++,i+=4){const r=buf[i],g=buf[i+1],b=buf[i+2];let on;
   if(MASK&&MASK[p]){ // inside the letter silhouette
    on=assembling?(keyed(r,g,b)||(F0&&(Math.abs(r-F0[i])+Math.abs(g-F0[i+1])+Math.abs(b-F0[i+2])>18))):1}
-  else on=keyed(r,g,b)?2:0; // outside: flying pixels / drips, speck-filtered below
+  else on=(keyed(r,g,b)&&Math.max(r,g,b)>=90)?2:0; // outside: flying pixels / drips, speck-filtered below
   A[p]=on}
  // speck filter for outside pixels only (stars)
  for(let y=0,p=0;y<H;y++)for(let x=0;x<W;x++,p++){if(A[p]!==2)continue;let c=0;
