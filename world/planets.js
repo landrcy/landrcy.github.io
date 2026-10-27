@@ -351,6 +351,41 @@ P.arena=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);if(!S
   const nL=FLAT?3:5;for(let i=0;i<nL;i++){const lx=Math.round(cx+(i-(nL-1)/2)*hw*2/(nL-1)*.9),on=RMq||FLAT||Math.sin(t*1.3+i*1.7)>-.85,w=Math.max(1,Math.round(W/90));for(let a=-w;a<=w;a++){put(lx+a,ly+2,'#20202c');put(lx+a,ly+3,on?'#fff8d8':'#8a7a50');if(w>1)put(lx+a,ly+4,on?'#ffe8a0':'#6a5a30')}
    if(on&&!FLAT){const L=post*.9;for(let yy=4;yy<L;yy++){const sp=w+yy*.35;for(let a=-sp;a<=sp;a++){const x=Math.round(lx+a),y=ly+yy+1,o=(y*W+x)*4;if(x<0||x>=W||y>=Hh||d[o+3]===0)continue;if(bay(x,y)>(1-yy/L)*.55)continue;d[o]=Math.min(255,d[o]+40);d[o+1]=Math.min(255,d[o+1]+34);d[o+2]=Math.min(255,d[o+2]+14)}}}}}
  S.g.putImageData(S.img,0,0)};
+/* ---------- PIXEL MUSEUM: small ancient-temple world with ruined colonnades and a glowing rune ring ---------- */
+const TST=['#2a2230','#463a44','#6a5a5a','#94806e','#c0a888','#e4d0aa'],TCY=['#0a3a4a','#1a7a8a','#3ad8e0','#a8fff8','#ffffff'],TMOS=['#1a3a1a','#2e6a2a','#5aa040'];
+P.temple=(S,t)=>{const W=S.img.width,R=W*.33,cx=W/2,cy=W*.54,rot=t*.24,d=S.img.data;
+ sphere(S,R,cx,cy,rot,(lon,lat,lit,x,y)=>{
+  // carved plaza: square slabs with dark grout, worn by noise
+  const u=lon*6/Math.PI,v=lat*6/Math.PI*1.4,fu=u-Math.floor(u),fv=v-Math.floor(v),wear=fbm(lon*1.6+9,lat*1.6);
+  if(lat<-.98){const st=lat<-1.36?0:lat<-1.06?1:2;return dq(TST,lit*.8+[.22,.14,.02][st],x,y)} // stepped temple platform
+  const moss=fbm(lon*2.4+3,lat*2.4+7);if(moss>.65)return dq(TMOS,lit*.9+.05,x,y);
+  if(wear>.6)return dq(['#3a2e30','#6a5446','#a0805e','#c8a87a'],lit*.9,x,y); // sand drifts
+  if(fu<.07||fv<.09)return dq(TST,lit*.55,x,y);
+  // rune glyph carved into some slabs (lit by the sun like the rest, no night glow)
+  const iu=Math.floor(u),iv=Math.floor(v);if(H(iu+40,iv)>.72){const gx=Math.floor(fu*5),gy=Math.floor(fv*5);if(gx>0&&gx<4&&gy>0&&gy<4&&H(iu*5+gx,iv*5+gy)>.45)return dq(TCY,.2+lit*.75,x,y)}
+  return dq(TST,lit*.88+.08+(H(iu,iv)-.5)*.12,x,y)},{w:Math.max(1,R*.06),r:['#0a3a4a','#1a7a8a','#3ad8e0']});
+ const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=W)return;const o=(y*W+x)*4,q=typeof c==='string'?hx(c):c;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
+ const inDisc=(x,y)=>Math.hypot(x+.5-cx,y+.5-cy)<R;
+ // a ruined round temple (tholos) crowns the north pole: its columns stand along the surface normal and turn with the world
+ const PW=Math.max(1,R*.1),PL=R*.36,NC=8,LA=-1.16,cols=[];
+ for(let i=0;i<NC;i++){const ln=i*TAU/NC-rot,nx=Math.sin(ln)*Math.cos(LA),ny=Math.sin(LA),nz=Math.cos(ln)*Math.cos(LA),br=i===5?.42:i===2?.7:1;
+  cols.push({i,nx,ny,nz,raw:Math.max(0,nx*LX+ny*LY+nz*LZ),len:PL*br,top:br===1})}
+ const pillar=c=>{const bx=cx+c.nx*R,by=cy+c.ny*R,pl=Math.hypot(c.nx,c.ny)||1,ux=c.nx/pl,uy=c.ny/pl,L=c.len*Math.sqrt(Math.max(0,1-c.nz*c.nz)),px=-uy,py=ux,sideLit=(px*LX+py*LY)>0;
+  for(let s=0;s<=L;s+=.5)for(let w=-PW/2;w<=PW/2;w+=.5){const xi=Math.round(bx+ux*s+px*w),yi=Math.round(by+uy*s+py*w);if(c.nz<0&&inDisc(xi,yi))continue;
+   if(!c.top&&s>L-1.5&&H(xi,yi)>.45)continue; // snapped, jagged top
+   const fl=Math.abs(w)<PW*.18&&PW>=3?-.12:0,edge=(w>0)===sideLit?.18:-.22,base=s<Math.max(1,PW*.35)?-.1:0;put(xi,yi,dq(TST,.5+edge+fl+base+(c.raw-.4)*.6,xi,yi))}
+  c.tx=bx+ux*L;c.ty=by+uy*L};
+ const lintel=(a,b)=>{if(!a.top||!b.top)return;const n=Math.ceil(Math.hypot(b.tx-a.tx,b.ty-a.ty)*2)+1,back=Math.min(a.nz,b.nz)<0,th=Math.max(1,PW*.55);
+  for(let s=0;s<=n;s++){const x=a.tx+(b.tx-a.tx)*s/n,y=a.ty+(b.ty-a.ty)*s/n;for(let k=0;k<th;k+=.5){const xi=Math.round(x),yi=Math.round(y-k);if(back&&inDisc(xi,yi))continue;put(xi,yi,dq(TST,(back?.42:.62)+(k<.6?-.15:.12),xi,yi))}}};
+ const ord=[...cols].sort((a,b)=>a.nz-b.nz),seen=new Set();
+ for(const c of ord){pillar(c);for(const d2 of[(c.i+NC-1)%NC,(c.i+1)%NC]){const o=cols[d2],key=Math.min(c.i,d2)+'-'+Math.max(c.i,d2);if(o.tx!==undefined&&!seen.has(key)){seen.add(key);lintel(c,o)}}}
+ // glowing rune ring, tilted; back half hides behind the world, front half crosses it
+ const r0=1.2,r1=1.4,SQ2=.32,TT=t;
+ for(let y=0;y<W;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=(y+.5-cy)/SQ2,r=Math.hypot(dx,dy)/R;if(r<r0||r>r1)continue;const o=(y*W+x)*4;
+  if(y<cy&&d[o+3])continue;const a=Math.atan2(dy,dx),seg=Math.floor((a-TT*.35)/TAU*36+360),f=(r-r0)/(r1-r0);
+  const glyph=f>.25&&f<.75&&H(seg,Math.floor(f*3))>.35,lit=.5+.35*Math.cos(a+2.3);
+  put(x,y,glyph?dq(TCY,.62+lit*.4,x,y):dq(['#05141c','#0a3a4a','#1a7a8a'],(f<.2||f>.8?.9:.35)+lit*.3,x,y))}
+ S.g.putImageData(S.img,0,0)};
 P.setFlat=v=>{FLAT=v?1:0};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
 })();

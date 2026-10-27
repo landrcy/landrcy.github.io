@@ -42,6 +42,20 @@ const T={
   h:(x,y)=>{const n=fbm(x,y,4,51,4),r=fbm(x,y,2,61,16);return n*80+10+(r>.72?(r-.72)*900:0)},
   c:(x,y,h)=>h>110?ramp(['#5a1aa0','#8a3ad8','#c04df0','#e6c8ff'].map(hx),(h-110)/120,x,y):ramp(['#08040e','#140a24','#24123a'].map(hx),h/90,x,y),
   glow:{c:'#e6c8ff',d:.004}},
+ pmuseum:{name:'Pixel Museum',sky:['#05040c','#0a0a1c','#1a1a38','#3a2e58'],fog:'#262448',stars:1,
+  // temple ruins: flagstone plazas, raised platforms ringed by columns (some snapped), broken walls, moss
+  h:(x,y)=>{const bx=((x%64)+64)%64,by=((y%64)+64)%64,ix=Math.floor(x/64),iy=Math.floor(y/64),k=h2(ix,iy,81),base=30+fbm(x,y,3,83,4)*26;
+   if(k>.35){const px=Math.abs(bx-32),py=Math.abs(by-32);
+    if(px<22&&py<16){if(px>=18||py>=12){const cx=(bx-11)%7,cy=(by-17)%5;if((px>=18&&py<=12&&cy<2)||(py>=12&&px<=18&&cx<2))return h2(ix*8+(bx>>2),iy*8+(by>>2),85)<.3?100+h2(bx,by,86)*30:150}return 62}
+    if(px<24&&py<18)return 50}
+   if(k<.2&&by>28&&by<31&&bx>8&&bx<56&&h2(bx>>3,iy,87)>.3)return 92+h2(bx,by,88)*30;
+   return base},
+  c:(x,y,h)=>{const bx=((x%64)+64)%64,by=((y%64)+64)%64,st=['#2a2230','#463a44','#6a5a5a','#94806e','#c0a888','#e4d0aa'].map(hx);
+   if(h>=90)return ramp(st,.55+(((y&7)===0)?-.25:0)+fbm(x,y,2,89,32)*.2,x,y); // columns / wall stones
+   const m=fbm(x,y,3,91,8);if(m>.68)return ramp(['#1a3a1a','#2e6a2a','#5aa040'].map(hx),(m-.66)*4,x,y);
+   if(h>=48){const run=(((bx>>2)+(by>>2))%5===0)&&((bx&3)===1||(by&3)===1)&&h>=60;if(run)return hx('#3ad8e0');return ramp(st,.6+((bx&3)===0||(by&3)===0?-.2:0),x,y)}
+   const grout=(x&7)===0||((y&7)===0);return ramp(st,(grout?.25:.45)+fbm(x,y,2,93,16)*.25,x,y)},
+  glow:{c:'#a8fff8',d:.003}},
  moon:{name:'Moon',sky:['#000000','#04040a','#0c0c18','#1a1a2a'],fog:'#101018',stars:2,
   h:(x,y)=>{let h=fbm(x,y,4,71,4)*70+40;for(let k=0;k<14;k++){const cx=h2(k,1,71)*N,cy=h2(k,2,71)*N,R=8+h2(k,3,71)*26;let dx=Math.abs(x-cx),dy=Math.abs(y-cy);dx=Math.min(dx,N-dx);dy=Math.min(dy,N-dy);const d=Math.hypot(dx,dy)/R;if(d<1)h-=(1-d*d)*R*.9;else if(d<1.3)h+=(1.3-d)*R*.5}return h},
   c:(x,y,h)=>ramp(['#3a3a42','#5a5a64','#7a7a86','#a2a2ae','#c8c8d2'].map(hx),h/120+fbm(x,y,2,77,32)*.2-.1,x,y)}};
