@@ -166,23 +166,32 @@ P.gow=(S,t)=>{const W=S.img.width,R=W*.4;
 /* ---------- THE VOID: Gargantua-style black hole, recoloured purple ---------- */
 const VD=['#0a0414','#200838','#3c0e5e','#62188a','#9030b8','#c060e0','#e8b0ff','#fff4ff'];
 const VU=['#0a0414','#1c0630','#34104e','#521a6e'];
-P.void=(S,t)=>{const W=S.img.width,H2=S.img.height,cx=W/2,cy=H2/2,R=W*.084,{img}=S,d=img.data,th=-.28,c=Math.cos(th),s=Math.sin(th);
- for(let y=0;y<H2;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=y+.5-cy,r=Math.hypot(dx,dy)/R,a=Math.atan2(dy,dx);let col=null;
-  const u=(dx*c+dy*s)/R,v=(-dx*s+dy*c)/R,er=Math.hypot(u,v/.15),ea=Math.atan2(v/.15,u);
-  const streak=.5+.35*Math.sin(er*7-t*2.2+Math.sin(ea*2)*1.5)*Math.sin(ea*3+t*.8)+.15*Math.sin(er*19-t*4.5+ea*5+vn(ea*3,er)*4),dop=.5-.35*u/Math.max(1,er);
-  const disk=er>1.15&&er<5.4?Math.pow(1-(er-1.15)/4.25,1.3)*(.55+.45*streak)*(.6+.8*dop):0;
-  if(disk>.06&&(v>0||r>1)){col=dq(VD,disk*1.15,x,y,er>3.8?STAR:er>2.6?LINE:bay)}
-  else if(r<=1)col='#000000';
-  if(r>=1&&r<1.09&&!(disk>.5&&v>0))col=dq(VU,.85+.15*Math.sin(a*8-t*5),x,y);
-  else if(!col&&r>1.09&&r<1.6){const q=(1-(r-1.09)/.51);if(q*q*.8>bay(x,y))col=dq(VD,.35+q*.4,x,y)}
-  if(!col||(v<0&&r>1&&r<1.5)){ // lensed rings: bright arch over the top, dim arc underneath
-   if(v<0&&r>1&&r<2.3){const sh=.85+.15*Math.sin(a*6-t*3);const ring=r<1.16?1:Math.pow(1-(r-1.16)/1.14,1.6)*.75;const q=ring*sh*(.8+.2*Math.sin(r*14-t*2));if(q>.08){const nc=dq(VD,.25+q*.8,x,y,r>1.7?LINE:bay);if(!col||q>disk)col=nc}}
-   else if(!col&&v>0&&r>1&&r<1.35){const q=(1-(r-1)/.35)*(.7+.3*Math.sin(a*5+t*2));if(q>.1)col=dq(VU,q,x,y)}}
-  if(!col&&r<3.2&&Math.abs(dy)<H2*.42){const q=(1-(r-1)/2.2)*.4*Math.min(1,(H2*.5-Math.abs(dy))/(H2*.12));if(q>bay(x,y)*.9+.06)col=dq(['#06020c','#140828','#24103c'],q*2,x,y,STAR)}
+P.void=(S,t,o)=>{o=o||{};const W=S.img.width,H2=S.img.height,cx=W/2,cy=H2/2,R=W*.084,{img}=S,d=img.data,TAU=Math.PI*2;
+ // full circular accretion disk with a living, sporadic edge: lobes + spiral arms + tendrils that grow/retract + periodic bursts
+ const SP=[];for(let k=0;k<13;k++){const per=2.6+((k*7.31)%1)*4.2,ph=(t/per+k*.377)%1,grow=Math.pow(Math.sin(ph*Math.PI),2);SP.push([k*TAU/13+t*(.25+.12*(k%3))+Math.sin(t*.7+k)*.6,grow*(.5+1.1*((k*3.17)%1)),.11+.06*((k*5.3)%1),k])}
+ const bp=(t%6.5)/6.5,bR=1.3+bp*bp*4.4,bW=.25+bp*.5,bA=bp<.6?1-bp/.6:0;
+ const rimAt=(a)=>3.3+.42*Math.sin(3*a+t*.9)+.3*Math.sin(5*a-t*1.3+1.7)+.2*Math.sin(8*a+t*2.1)+(vn(a*2.4+t*.35,t*.5)-.5)*1.2+(vn(a*9+t*1.1,3.3)-.5)*.55;
+ const RIM=new Float32Array(256);for(let i=0;i<256;i++)RIM[i]=rimAt(i/256*TAU);
+ const y0=Math.max(0,o.y0||0),ye=Math.min(H2,o.y1??H2);
+ for(let y=y0;y<ye;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=y+.5-cy,r=Math.hypot(dx,dy)/R,a=Math.atan2(dy,dx);let col=null;
+  if(r>5.98){const o=(y*W+x)*4;d[o+3]=0;continue}
+  const sw=a+2.1*Math.log(Math.max(r,.5))-t*.55,ai=((Math.floor(((sw%TAU)+TAU)%TAU/TAU*256))&255),rim=Math.min(5.3,RIM[ai]);
+  const arms=.5+.5*Math.sin(3*sw+Math.sin(r*1.7-t*1.2)*1.2),streak=.5+.3*Math.sin(r*6-t*2.4+Math.sin(sw*2)*1.5)+.2*Math.sin(r*17-t*4.7+sw*5+vn(sw*3,r)*4),dop=.62+.38*Math.cos(a-t*.18);
+  let disk=0;if(r>1.15&&r<rim){const f=1-(r-1.15)/(rim-1.15);disk=Math.pow(f,1.05)*(.42+.33*streak+.35*arms)*(.6+.6*dop);if(f<.12)disk=Math.max(disk,.32*(1-f/.12)*(.6+.4*arms))}
+  // tendrils beyond the rim
+  if(r>=rim*.85&&!disk||r>=rim)for(const[sa,len0,wd]of SP){const len=Math.min(len0,5.9-rim);if(len<.05)continue;const L=r-rim;if(L<-.4||L>len)continue;const da=Math.abs(Math.atan2(Math.sin(a-sa-L*.35),Math.cos(a-sa-L*.35))),k=1-Math.max(0,L)/len,w=wd*k*(.7+.3*Math.sin(L*6-t*5));if(da<w){disk=Math.max(disk,.25+.55*k*(1-da/w))}}
+  // burst shockwave
+  if(bA>0&&Math.abs(r-bR-(vn(a*4,t)-.5)*.6)<bW*.5){const q=bA*(.5+.5*Math.sin(a*11+t*3));if(q>.25)disk=Math.max(disk,.3+q*.6)}
+  if(disk>.06)col=dq(VD,disk*1.15,x,y,r>3.4?STAR:r>2.4?LINE:bay);
+  if(r<=1)col='#000000';
+  else if(r<1.08)col=dq(VD,.82+.18*Math.sin(a*8-t*5),x,y);
+  else if(r<1.2&&!(disk>.55))col=dq(VU,.5+.4*Math.sin(a*5+t*2),x,y);
+  if(!col&&r<3.2){const q=(1-(r-1)/2.2)*.4;if(q>bay(x,y)*.9+.06)col=dq(['#06020c','#140828','#24103c'],q*2,x,y,STAR)}
   const o=(y*W+x)*4;if(col){const k=hx(col);d[o]=k[0];d[o+1]=k[1];d[o+2]=k[2];d[o+3]=255}else d[o+3]=0}
- for(let k=0;k<44;k++){const ph=(t*.22+k*.1373)%1,er2=5.2-ph*ph*4.1,ea2=k*2.399+t*(.6+1.6/er2)+ph*3,u=Math.cos(ea2)*er2,v=Math.sin(ea2)*er2*.15,X=Math.round(cx+(u*c-v*s)*R),Y=Math.round(cy+(u*s+v*c)*R);
-  if(X<0||Y<0||X>=W||Y>=H2)continue;if(v<0&&Math.hypot(X-cx,Y-cy)<R*1.05)continue;const o=(Y*W+X)*4,k2=hx(ph>.8?'#ffffff':ph>.5?'#f0c8ff':'#c06af0');d[o]=k2[0];d[o+1]=k2[1];d[o+2]=k2[2];d[o+3]=255}
- S.g.putImageData(img,0,0)};
+ // infalling particles on wobbly, looping spiral paths
+ for(let k=0;k<72;k++){const sp=.16+((k*.618)%1)*.14,ph=(t*sp+k*.1373)%1,er2=5.2-ph*ph*4.1+Math.sin(ph*14+k)*.35,ea2=k*2.399+t*(.5+1.7/er2)+ph*(3+(k%4))+Math.sin(ph*9+k*1.3)*.7,X=Math.round(cx+Math.cos(ea2)*er2*R),Y=Math.round(cy+Math.sin(ea2)*er2*R);
+  if(X<0||Y<y0||X>=W||Y>=ye)continue;const o2=(Y*W+X)*4,k2=hx(ph>.8?'#ffffff':ph>.5?'#f0c8ff':'#c06af0');d[o2]=k2[0];d[o2+1]=k2[1];d[o2+2]=k2[2];d[o2+3]=255}
+ S.g.putImageData(img,0,0,0,y0,W,ye-y0)};
 /* ---------- ARCHIVE: little grey station-moon with a ring dock ---------- */
 const STN=['#141820','#2c3442','#4c586c','#7c8aa0','#b8c4d8','#eef4ff'];
 P.archive=(S,t)=>{const W=S.img.width,R=W*.22,cx=W/2,cy=W/2;

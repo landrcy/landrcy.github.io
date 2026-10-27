@@ -18,7 +18,7 @@ const MAIN=[
  B({id:'sea',paint:'sea',w:122,orb:325,per:72,ph:.4,hr:.4,title:'Sea of Thought',by:'a pixel ocean by landrcy',blurb:'A quiet pixel ocean full of messages in bottles: write one, throw it in, then dive and read what strangers left behind.',href:'https://landrcy.github.io/sea-of-thought/',cta:'▶ Dive in'}),
  B({id:'yt',paint:'yt',w:96,orb:590,per:110,ph:4.1,hr:.42,title:'LLC Powered Channels',by:'YouTube',yt:1}),
  B({id:'gow',paint:'crest',w:92,h:74,orb:1190,per:260,ph:5.3,hr:.42,title:'Game of Websites',by:'coopercitywebsites.github.io',blurb:'A searchable catalogue of every site in the collection: unblocked games, NeoForge mods, old builds and the trash pile, ranked by how much code went into each one.',href:'https://coopercitywebsites.github.io/main/',cta:'Open'}),
- B({id:'void',paint:'void',w:236,h:124,orb:990,per:220,ph:5.9,tc:'#c04df0',hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13}),
+ B({id:'void',paint:'void',w:236,h:236,orb:990,per:220,ph:5.9,tc:'#c04df0',hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13}),
  B({id:'arena',paint:'arena',w:134,h:110,orb:790,per:150,ph:2.9,hr:.42,title:'Ball Arena',by:'ball fights from the Langrino channel',href:'https://www.youtube.com/@Langrino',cta:'▶ Watch'})];
 const MOONS=CH.map((c,i)=>B({id:'m-'+c.id,paint:'moon',arg:c.kind,w:Math.round(12+14*Math.sqrt((c.views||0)/MV)),orb:66+i*9,per:9+i*2.6,ph:i*1.3,dir:1,hr:.42,moon:c,title:c.name}));
 const V=(id,kind,w,orb,per,title,by,href,blurb)=>B({id,paint:'vplanet',arg:kind,w,orb,per,ph:orb*.037,hr:.4,title,by,href,cta:'Visit this version',blurb});
@@ -207,8 +207,8 @@ function lens(){if(sys!=='main')return;const b=MAIN.find(q=>q.id==='void'),[vx0,
  if(!lensC)lensC=document.createElement('canvas');const moved=!lensR||Math.abs(lensR[0]-x0)>1||Math.abs(lensR[1]-y0)>1||lensR[2]!==D;
  if(moved||(++lensN%3)===0){if(lensC.width!==w){lensC.width=w;lensC.height=h}const lc=lensC.getContext('2d',{willReadFrequently:true});lc.imageSmoothingEnabled=false;lc.clearRect(0,0,w,h);lc.drawImage(cv,x0,y0,D,D,0,0,w,h);
   const src=lc.getImageData(0,0,w,h),a=src.data,out=lc.createImageData(w,h),o=out.data,c=w/2,Eq=E/q,E2=Eq*Eq,Rq=Rr/q;
-  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const dx=x+.5-c,dy=(y+.5-c)/.8,d2=dx*dx+dy*dy;if(d2>Rq*Rq)continue;const i=(y*w+x)*4,dd=Math.sqrt(d2),fall=dd/Rq,f=1-E2/Math.max(d2,1),k=f*(1-fall*fall)+fall*fall;
-   let X,Y;if(f<0){X=Math.round(c-dx*.6*(E2/d2));Y=Math.round(c-dy*.8*.6*(E2/d2))}else{X=Math.round(c+dx*k);Y=Math.round(c+dy*.8*k)}X=X<0?0:X>=w?w-1:X;Y=Y<0?0:Y>=h?h-1:Y;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const dx=x+.5-c,dy=y+.5-c,d2=dx*dx+dy*dy;if(d2>Rq*Rq)continue;const i=(y*w+x)*4,dd=Math.sqrt(d2),fall=dd/Rq,f=1-E2/Math.max(d2,1),k=f*(1-fall*fall)+fall*fall;
+   let X,Y;if(f<0){X=Math.round(c-dx*.6*(E2/d2));Y=Math.round(c-dy*.6*(E2/d2))}else{X=Math.round(c+dx*k);Y=Math.round(c+dy*k)}X=X<0?0:X>=w?w-1:X;Y=Y<0?0:Y>=h?h-1:Y;
    const j=(Y*w+X)*4,m=1-fall*fall*fall,m2=m*m*(3-2*m);o[i]=a[j];o[i+1]=a[j+1];o[i+2]=a[j+2];o[i+3]=255*m2}
   lc.putImageData(out,0,0);lensR=[x0,y0,D]}
  g.drawImage(lensC,x0,y0,D,D)}
@@ -243,7 +243,7 @@ function frame(now){if(document.body.classList.contains('landed')){last=now;requ
   const capB=b.paint==='void'?Math.round(b.w*1.1):b.paint==='crest'?128:b.paint==='sun'?(intro?140:380):b.paint==='arena'?180:160,cap=Math.max(6,Math.round(capB*(b.rv<1?Math.max(.08,b.rv*b.rv):1))),pw=Math.max(2,w),ps=Math.max(1,Math.ceil(pw/cap)),Nt=Math.max(6,Math.round(pw/ps)),asp=(b.h||b.w)/b.w;
   let S=b.S;const ga=g.globalAlpha;
   if(!S.N||Math.abs(Nt-S.N)/Nt>.06&&now>=(b.rz||0)){const S2=P.mk(Nt,Math.max(4,Math.round(Nt*asp)));S2.N=Nt;if(S.N){b.prev=S;b.xf=now}b.S=S=S2;b.nx=0;b.rz=now+40}
-  if(now>=(b.nx||0)||(b.id==='sun'&&intro)){let o=b.id==='sun'?{ign:IS.ign,fl:IS.fl,L:IS.L}:b.arg;if(b.id==='sun'&&!intro&&S.N>200&&S.full){const ch=Math.ceil(S.N/10),y0=(S.row||0);o={...o,y0,y1:y0+ch};S.row=y0+ch>=S.N?0:y0+ch}else if(b.id==='sun')S.full=1;P.setFlat(b.id==='sun'&&intro?0:S.N<cap*.55);const tn=RM?7:now/1000+(b.ph||0)*3;P[b.paint](S,tn,o);P.setFlat(0);b.nx=RM?Infinity:now+(b.paint==='sun'?(S.N>200&&!intro?16:S.N>200?90:S.N>100?110:70):S.N>140?66:S.N>60?44:60)+Math.random()*8}
+  if(now>=(b.nx||0)||(b.id==='sun'&&intro)){let o=b.id==='sun'?{ign:IS.ign,fl:IS.fl,L:IS.L}:b.arg;if(b.id==='sun'&&!intro&&S.N>200&&S.full){const ch=Math.ceil(S.N/10),y0=(S.row||0);o={...o,y0,y1:y0+ch};S.row=y0+ch>=S.N?0:y0+ch}else if(b.id==='sun')S.full=1;if(b.id==='void'&&!RM&&S.N>140&&S.full){const HH=S.img.height,ch=Math.ceil(HH/3),y0=(S.row||0);o={y0,y1:y0+ch};S.row=y0+ch>=HH?0:y0+ch}else if(b.id==='void')S.full=1;P.setFlat(b.id==='sun'&&intro?0:S.N<cap*.55);const tn=RM?7:now/1000+(b.ph||0)*3;P[b.paint](S,tn,o);P.setFlat(0);b.nx=RM?Infinity:now+(b.id==='void'&&S.N>140&&S.full&&!RM?22:b.paint==='sun'?(S.N>200&&!intro?16:S.N>200?90:S.N>100?110:70):S.N>140?66:S.N>60?44:60)+Math.random()*8}
   const dw=Math.abs(S.N*ps-pw)<=ps?S.N*ps:pw,dh=Math.round(dw*asp),dx=Math.round(sx-dw/2),dy=Math.round(sy-dh/2);if(b.id==='sun'){b.tx=dw/S.N;b.gx=dx;b.gy=dy}
   const xf=b.prev?Math.min(1,(now-b.xf)/160):1;if(b.prev&&xf<1){g.globalAlpha=ga*dim;g.drawImage(b.prev.c,dx,dy,dw,dh)}else b.prev=null;
   g.globalAlpha=ga*dim*(b.prev?xf:1);g.drawImage(S.c,dx,dy,dw,dh);
@@ -348,7 +348,7 @@ let sunClicks=[];function sunTap(){const n=performance.now();sunClicks=sunClicks
 window.__flare=()=>{BF.next=0};window.__deco=DECO;window.__fx=FX;
 // ---- hit testing ----
 function hit(sx,sy){const[wx,wy]=S2W(sx,sy);let best=null,bd=1e9;const list=sys==='main'?[...MOONS,...bodies]:bodies;
- for(const b of list){const[x,y]=pos(b),r=b.w*b.hr*(b.id==='void'?1.4:1),d=Math.hypot(wx-x,(wy-y)*(b.id==='void'?1.6:1));if(d<r&&d/r<bd){bd=d/r;best=b}}return best||decoHit(sx,sy)}
+ for(const b of list){const[x,y]=pos(b),r=b.w*b.hr*(b.id==='void'?1.4:1),d=Math.hypot(wx-x,wy-y);if(d<r&&d/r<bd){bd=d/r;best=b}}return best||decoHit(sx,sy)}
 // ---- focus & info ----
 let revealT=0;
 const TH={sun:['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#9ab4e8'],ashaad:['#120a0c','#e8dcc0','#ffd23a','#2a1608','Silkscreen','#5a3a20'],sea:['#021e5a','#90E0EF','#48CAE4','#021e5a','VT323','#f3dfae'],arena:['#1a0f08','#fff3d6','#ffcf3a','#1a0f08','Silkscreen','#ff6464'],
@@ -361,7 +361,7 @@ const NOINFO={sun:1};
 const PLAY=(d,l,m)=>`<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="${d}" d="M4 2h2v1h2v1h2v1h2v1h2v4h-2v1h-2v1h-2v1h-2v1h-2z"/><path fill="${l}" d="M5 4h1v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-1z"/><path fill="${m}" d="M5 8h1v3h-1zM6 9h2v1h-2z"/></svg>`;
 const YTLOGO=`<svg class="lgsvg" viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#ff0033" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#b8001f" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#fff" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg><b class="lgtx">LLC Powered<br>Channels</b>`;
 // box = [width frac of w, height frac of h, y offset frac of h]
-const LG={arena:{box:[.6,.42,.02],pal:['#3a1a06','#ffcf3a','#ff6464'],arena:1},sea:{box:[.56,.56,0],img:'sea',pal:['#021e5a','#90E0EF','#48CAE4']},ashaad:{box:[.66,.5,.06],img:'ashaad',pal:['#2a1608','#ffd23a','#c08a1e']},void:{box:[.3,.74,0],img:'void',pal:['#05020d','#e6c8ff','#c04df0']},
+const LG={arena:{box:[.6,.42,.02],pal:['#3a1a06','#ffcf3a','#ff6464'],arena:1},sea:{box:[.56,.56,0],img:'sea',pal:['#021e5a','#90E0EF','#48CAE4']},ashaad:{box:[.66,.5,.06],img:'ashaad',pal:['#2a1608','#ffd23a','#c08a1e']},void:{box:[.3,.39,0],img:'void',pal:['#05020d','#e6c8ff','#c04df0']},
  yt:{box:[.6,.6,0],pal:['#2a0008','#ffffff','#ffb0b8']},gow:{box:[.2,.2,.3],btn:1,pal:['#000000','#ffffff','#e01a22']},moon:{box:[.62,.62,0],pal:['#2a0008','#ffffff','#ffb0b8']}};
 const lgOf=b=>b.moon?LG.moon:LG[b.id];
 const TITLES={void:1,ashaad:1,sea:1,oldhub:1,'v-lovely':1,'v-arcade':1,'v-larper':1,'v-purple':1,'v-white':1,'v-strings':1};
