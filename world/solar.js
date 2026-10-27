@@ -148,8 +148,8 @@ const BELT=[];{const rk=(sz,seed)=>{const n=8,S=[];for(let k=0;k<n;k++){const la
  const LIB=[];for(let i=0;i<14;i++)LIB.push(rk([4,5,6,7,8,10,12][i%7],i*7.3));
  for(let i=0;i<260;i++){const u=Math.random(),r=405+(u+Math.random())*.5*70+((Math.random()-.5)*12);BELT.push({r,a:Math.random()*TAU,sp:.012*Math.pow(360/r,1.5)*(.9+Math.random()*.2),s:LIB[Math.floor(Math.random()*Math.random()*LIB.length)],sc:.6+Math.random()*.9})}}
 function drawBelt(dt,alpha){if(sys!=='main'||alpha<=0)return;const ga=g.globalAlpha;g.globalAlpha=ga*alpha;
- for(const k of BELT){if(!RM)k.a+=dt*k.sp;const wx=Math.cos(k.a)*k.r,wy=Math.sin(k.a)*k.r*SQ,[sx,sy]=W2S(wx,wy);const sz=Math.max(1,Math.round(k.s[0].width*k.sc*cam.z*.9));if(sx<-sz||sy<-sz||sx>W+sz||sy>H+sz)continue;
-  if(sz<=2){g.fillStyle='#7a6658';g.fillRect(Math.round(sx),Math.round(sy),sz,sz);continue}
+ for(const k of BELT){if(!RM)k.a+=dt*k.sp;const wx=Math.cos(k.a)*k.r,wy=Math.sin(k.a)*k.r*SQ,[sx,sy]=W2S(wx,wy);const sw=k.s[0].width,tgt=sw*k.sc*cam.z*.9,rt=REFT(),sz=tgt<sw*.75?Math.max(1,Math.round(tgt/rt))*rt:sw*Math.max(1,Math.min(rt,Math.round(tgt/sw)));if(sx<-sz||sy<-sz||sx>W+sz||sy>H+sz)continue;
+  if(tgt<sw*.75){g.fillStyle='#7a6658';const q=Math.min(sz,rt*3);g.fillRect(Math.round(sx/rt)*rt,Math.round(sy/rt)*rt,q,q);continue}
   const li=((Math.round(Math.atan2(wy,wx)/TAU*8)%8)+8)%8;g.drawImage(k.s[li],Math.round(sx-sz/2),Math.round(sy-sz/2),sz,sz)}
  g.globalAlpha=ga}
 
@@ -165,11 +165,13 @@ function drawShips(now,alpha){if(sys!=='main'||alpha<=0||RM)return;const t=now/1
  for(const s of SHIPS){const T=t+s.ph*10;let x,y,vx,vy;
   if(s.far){x=W*(.5+s.ax*Math.sin(T*s.fx*1.4))-cam.x*.05;y=H*(.5+s.ay*Math.sin(T*s.fy*1.1+1));x=((x%(W+80))+W+80)%(W+80)-40;vx=Math.cos(T*s.fx*1.4);vy=Math.cos(T*s.fy*1.1+1)*.6;g.globalAlpha=ga*alpha*.55}
   else{const wx=s.ax*Math.sin(T*s.fx)+(s.lp?60*Math.cos(T*.9):0),wy=s.ay*Math.sin(T*s.fy+s.ph)*SQ+(s.lp?60*Math.sin(T*.9):0);[x,y]=W2S(wx,wy);vx=s.ax*s.fx*Math.cos(T*s.fx)-(s.lp?54*Math.sin(T*.9):0);vy=s.ay*s.fy*Math.cos(T*s.fy+s.ph)*SQ+(s.lp?54*Math.cos(T*.9):0);g.globalAlpha=ga*alpha}
-  const sc=s.far?s.sc:Math.max(1,Math.round(s.sc*Math.min(cam.z,2.5)*.6)),w=s.c.width*sc,h=s.c.height*sc;if(x<-w||y<-w||x>W+w||y>H+w)continue;
+  const sc=s.far?1:REFT(),w=s.c.width*sc,h=s.c.height*sc;if(x<-w||y<-w||x>W+w||y>H+w)continue;
   g.save();g.translate(Math.round(x),Math.round(y));g.rotate(Math.atan2(vy,vx));
   const fl=.6+.4*Math.sin(t*40+s.ph*7);g.fillStyle=`rgba(255,${150+Math.round(80*fl)},60,${.85*fl})`;const fl2=Math.round(sc*(2+2*fl));g.fillRect(-w/2-fl2,-sc,fl2,sc*2);g.fillStyle='#fff6d8';g.fillRect(-w/2-sc,-Math.ceil(sc/2),sc,sc);
   g.drawImage(s.c,Math.round(-w/2),Math.round(-h/2),w,h);g.restore()}
  g.globalAlpha=ga}
+function REFT(){return Math.max(1,Math.round(cam.z*.68))}
+function snapPlay(){const p=info.querySelector('.lgplay');if(!p)return;const k=(tw?'t':'s')+W+'x'+H+(focus&&focus.id);if(tw||p.dataset.sn===k)return;p.style.width='';const w=p.getBoundingClientRect().width,u=p.querySelector('svg')?.viewBox?.baseVal?.width||16,n=Math.max(1,Math.floor(w/u));p.style.width=n*u+'px';p.dataset.sn=k}
 function clamp2(v,a,b){return v<a?a:v>b?b:v}
 // ---- occasional big solar flare ----
 let BF={next:performance.now()+12000+Math.random()*10000,t0:0,a:0,s:1};
@@ -219,8 +221,8 @@ function frame(now){if(document.body.classList.contains('landed')){last=now;requ
  g.globalAlpha=1;lens();drawDecoBack(now);
  g.globalAlpha=Math.max(0,1-wv*1.6);
  // orbit rings (pixel dashes)
- const ring=(cx,cy,r,prog,col)=>{const ps=Math.max(1,Math.min(3,Math.round(cam.z))),n=Math.max(48,Math.floor(r*cam.z*TAU/(ps*3.5)));g.fillStyle=col;for(let k=0;k<n*prog;k++){if(k%3===2)continue;const a=k/n*TAU-Math.PI/2,[sx,sy]=W2S(cx+Math.cos(a)*r,cy+Math.sin(a)*r*SQ);g.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}};
- {const ps=Math.max(1,Math.min(3,Math.round(cam.z))),ga0=g.globalAlpha;for(const b of bodies){if(b.orb==null||b.moon)continue;const n=Math.max(40,Math.min(130,Math.round(b.orb*cam.z*2.6/(ps*3)))),arc=2.6,dr=b.dir||1;g.fillStyle=b.tc||'#c8ccff';
+ const ring=(cx,cy,r,prog,col)=>{const ps=REFT(),n=Math.max(48,Math.floor(r*cam.z*TAU/(ps*3.5)));g.fillStyle=col;for(let k=0;k<n*prog;k++){if(k%3===2)continue;const a=k/n*TAU-Math.PI/2,[sx,sy]=W2S(cx+Math.cos(a)*r,cy+Math.sin(a)*r*SQ);g.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}};
+ {const ps=REFT(),ga0=g.globalAlpha;for(const b of bodies){if(b.orb==null||b.moon)continue;const n=Math.max(40,Math.min(130,Math.round(b.orb*cam.z*2.6/(ps*3)))),arc=2.6,dr=b.dir||1;g.fillStyle=b.tc||'#c8ccff';
  for(let k=1;k<=n;k++){const f=k/n,an=b.ang-dr*arc*f,[sx,sy]=W2S(Math.cos(an)*b.orb,Math.sin(an)*b.orb*SQ);if(sx<-4||sy<-4||sx>W+4||sy>H+4)continue;const al=Math.pow(1-f,1.3)*.6*IS.orb;if(al<.02||(k%2&&f>.35))continue;g.globalAlpha=ga0*al;g.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}}g.globalAlpha=ga0}
  if(sys==='main'){const[yx,yy]=pos(MAIN[3]);}
  {const A=MAIN[1],tg=(hover===A||focus===A)?1:0;A.op=(A.op||0)+(tg-(A.op||0))*Math.min(1,dt*(tg?2.2:3));A.arg={open:RM?tg:A.op}}
@@ -243,13 +245,13 @@ function frame(now){if(document.body.classList.contains('landed')){last=now;requ
  let sunL=null;for(const[b,i]of draw){if(intro&&b.id==='sun'){sunL=[b,i];continue}if(intro){const[x0,y0]=pos(b),[s0,t0]=W2S(x0,y0);b.rv=revealOf(s0,t0,IS.R);if(b.rv<=0)continue}else b.rv=1;one(b,i)}
  g.globalAlpha=1;drawOutside(now);
  if(intro){g.globalAlpha=1;revealMask(IS.R);if(sunL)one(...sunL)}
- g.globalAlpha=1;bigFlare(now);if(focus&&!tw&&sys==='main'){const[fx,fy]=pos(focus);cam.x+=(fx-cam.x)*Math.min(1,dt*8);cam.y+=(fy-cam.y)*Math.min(1,dt*8)}if(focus)placeInfo();
+ g.globalAlpha=1;bigFlare(now);if(focus&&!tw&&sys==='main'){const[fx,fy]=pos(focus);cam.x+=(fx-cam.x)*Math.min(1,dt*8);cam.y+=(fy-cam.y)*Math.min(1,dt*8)}if(focus){placeInfo();snapPlay()}
  requestAnimationFrame(frame)}
 // ---- deep-space decor: nebulae, galaxies, far planets (parallax), stations/wrecks/rocks (world), comets, shooting stars, secrets ----
 // every decor sprite is painted procedurally at a resolution picked from its on-screen size (like the planets), so far = chunky, near = detailed
 const DK=(()=>{let r=4242;return()=>(r=(Math.imul(r^(r>>>15),2246822519)+0x9e3779b9)|0,((r>>>0)%100000)/100000)})();
 const dhx=c=>P.hx(c),dpk=c=>{const h=dhx(c);return(255<<24)|(h[2]<<16)|(h[1]<<8)|h[0]};
-const DLOD=[6,8,12,16,24,32,48,64,96,128,160,200];
+const DLOD=[6,8,12,16,24,32,48,64,96,128,160,200,256,320];
 function dSprite(o,N){o.cache=o.cache||{};if(o.cache[N])return o.cache[N];const w=N,h=Math.max(2,Math.round(N*o.asp)),c=document.createElement('canvas');c.width=w;c.height=h;const cg=c.getContext('2d'),im=cg.createImageData(w,h),U=new Uint32Array(im.data.buffer);
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const v=o.paint((x+.5)/w,(y+.5)/h,x,y,N);if(v)U[y*w+x]=v}cg.putImageData(im,0,0);const keys=Object.keys(o.cache);if(keys.length>3)delete o.cache[keys[0]];return o.cache[N]=c}
 function dDraw(o,sx,sy,zl,rot){const px=o.sz*zl;if(px<2)return;if(sx+px<0||sy+px<0||sx-px>W||sy-px>H)return;let N=DLOD[0];for(const n of DLOD)if(n<=px&&n<=o.cap)N=n;const c=dSprite(o,N),sc=Math.max(1,Math.floor(px/N)),dw=c.width*sc,dh=c.height*sc;
@@ -299,13 +301,13 @@ const DECO={back:[],world:[]};
  for(let i=0;i<3;i++)add(station(i,110+DK()*70),120);for(let i=0;i<4;i++)add(wreck(i,90+DK()*80),110);for(let i=0;i<24;i++)add(rock(i,18+DK()*42),40);add(ASTRO,60);ASTRO.astro=1})();
 // transient fx
 const FX={comet:null,nextC:performance.now()+9000+Math.random()*15000,shoot:null,nextS:performance.now()+4000+Math.random()*6000,ufo:null,nextU:performance.now()+70000+Math.random()*130000};
-const TX=()=>Math.max(1,Math.ceil(cam.z*1.6));
+const TX=()=>REFT();for(const o of[...DECO.back,...DECO.world,UFO])o.cap=Math.min(o.pf===.55?320:256,Math.max(o.cap,Math.ceil(o.sz*1.5)));
 function drawDecoBack(now){if(sys!=='main')return;const ga=g.globalAlpha,t=RM?0:now/1000;
  for(const o of DECO.back){const zl=cam.z*o.pf,wx=o.x+(o.dx||0)*t,wy=o.y+(o.dy||0)*t;g.globalAlpha=ga*(o.asp===.62?.6:o.pf<.35?.8:.9);dDraw(o,W/2+(wx-cam.x*o.pf)*cam.z,H/2+(wy-cam.y*o.pf)*cam.z,cam.z)}
  g.globalAlpha=ga;if(RM)return;
  // shooting stars: brief pixel streaks in the deep layer
  if(!FX.shoot&&now>FX.nextS&&!intro){FX.shoot={t0:now,x:Math.random()*W,y:Math.random()*H*.6,a:.4+Math.random()*.5+(Math.random()<.5?Math.PI-1.3:0),L:60+Math.random()*90}}
- if(FX.shoot){const s=FX.shoot,k=(now-s.t0)/650;if(k>=1){FX.shoot=null;FX.nextS=now+5000+Math.random()*9000}else{const ps=2,hx=s.x+Math.cos(s.a)*s.L*2*k,hy=s.y+Math.sin(s.a)*s.L*2*k;for(let i=0;i<s.L/ps;i++){const f=i/(s.L/ps);if(P.bay(i,3)>1-f*1.2&&i>2)continue;g.fillStyle=f<.15?'#ffffff':f<.5?'#cfd4ff':'#6a70b8';g.globalAlpha=ga*(1-k*k)*(1-f);g.fillRect(Math.round((hx-Math.cos(s.a)*i*ps)/ps)*ps,Math.round((hy-Math.sin(s.a)*i*ps)/ps)*ps,ps,ps)}g.globalAlpha=ga}}}
+ if(FX.shoot){const s=FX.shoot,k=(now-s.t0)/650;if(k>=1){FX.shoot=null;FX.nextS=now+5000+Math.random()*9000}else{const ps=REFT(),hx=s.x+Math.cos(s.a)*s.L*2*k,hy=s.y+Math.sin(s.a)*s.L*2*k;for(let i=0;i<s.L/ps;i++){const f=i/(s.L/ps);if(P.bay(i,3)>1-f*1.2&&i>2)continue;g.fillStyle=f<.15?'#ffffff':f<.5?'#cfd4ff':'#6a70b8';g.globalAlpha=ga*(1-k*k)*(1-f);g.fillRect(Math.round((hx-Math.cos(s.a)*i*ps)/ps)*ps,Math.round((hy-Math.sin(s.a)*i*ps)/ps)*ps,ps,ps)}g.globalAlpha=ga}}}
 function drawDecoWorld(now){if(sys!=='main')return;const t=RM?0:now/1000,ga=g.globalAlpha;
  for(const o of DECO.world){const bob=RM?0:Math.sin(t*.4+o.ph)*6,[sx,sy]=W2S(o.x+(o.astro?Math.sin(t*.13)*30:0),o.y+bob);let rot=0;if(!RM&&!o.name.includes('station')&&o!==ASTRO)rot=Math.sin(t*.05+o.ph)*.35;if(o===ASTRO&&!RM)rot=t*.25+(o.wave&&now-o.wave<1600?Math.sin((now-o.wave)/90)*.5:0);
   dDraw(o,sx,sy,cam.z,rot);o.scx=sx;o.scy=sy;o.sr=o.sz*cam.z*.5;
@@ -390,8 +392,8 @@ function showTip(b,x,y){const tx=b.moon?b.moon.name:b.title;if(tip.textContent!=
 function hideTip(){tip.classList.remove('on')}
 resize();if(intro){cam.z=Math.min(W,H)*.82/(250*.72)}else{cam.x=fitX();cam.y=fitY();cam.z=fitZ()}
 // fixed top-left satellite: archive in, home out
-const satBtn=document.getElementById('sat'),SAT=P.mk(64,40);satBtn.width=64;satBtn.height=40;const sg=satBtn.getContext('2d');
-setInterval(()=>{P.satellite(SAT,RM?3:performance.now()/1000);sg.clearRect(0,0,64,40);sg.drawImage(SAT.c,0,0)},110);
+const satBtn=document.getElementById('sat'),SW=innerWidth<=520?72:96,SH=innerWidth<=520?45:60,SAT=P.mk(SW,SH);satBtn.width=SW;satBtn.height=SH;const sg=satBtn.getContext('2d');
+setInterval(()=>{P.satellite(SAT,RM?3:performance.now()/1000);sg.clearRect(0,0,SW,SH);sg.drawImage(SAT.c,0,0)},110);
 satBtn.onclick=()=>{if(warp)return;if(focus)unfocus();if(sys==='main')enterArchive();else backBtn.onclick()};
 const setSatLbl=()=>satBtn.setAttribute('aria-label',sys==='main'?'Fly to the archive of old versions':'Fly home');setInterval(setSatLbl,500);setSatLbl();
 requestAnimationFrame(frame);
