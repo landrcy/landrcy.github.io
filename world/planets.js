@@ -352,7 +352,7 @@ P.arena=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);if(!S
    if(on&&!FLAT){const L=post*.9;for(let yy=4;yy<L;yy++){const sp=w+yy*.35;for(let a=-sp;a<=sp;a++){const x=Math.round(lx+a),y=ly+yy+1,o=(y*W+x)*4;if(x<0||x>=W||y>=Hh||d[o+3]===0)continue;if(bay(x,y)>(1-yy/L)*.55)continue;d[o]=Math.min(255,d[o]+40);d[o+1]=Math.min(255,d[o+1]+34);d[o+2]=Math.min(255,d[o+2]+14)}}}}}
  S.g.putImageData(S.img,0,0)};
 /* ---------- PIXEL MUSEUM: an ancient-temple world. A ruined peristyle temple with a glowing door crowns the pole,
-   floating rune stones drift around it, torches flicker on the stair, and an animated rune ring circles the world. ---------- */
+   floating rune stones drift around it and torches flicker on the stair; one relic moon per museum room orbits it (P.rmoon). ---------- */
 const TST=['#2a2230','#463a44','#6a5a5a','#94806e','#c0a888','#e4d0aa'],TCY=['#0a3a4a','#1a7a8a','#3ad8e0','#a8fff8','#ffffff'],TMOS=['#1a3a1a','#2e6a2a','#5aa040'],
  TRCK=['#1a1418','#2a2230','#463a44','#6a5a5a','#94806e'];
 // convex solids as planes [nx,ny,nz,d] (inside where n.p<=d), in temple space (units of R, y up, z towards the front)
@@ -425,14 +425,185 @@ P.temple=(S,t)=>{const W=S.img.width,R=W*.3,cx=W/2,cy=W*.6,rot=t*.24,d=S.img.dat
  for(const s of[-1,1]){const lx=.5,lz=s*.24,X=(lx*C+lz*Sn)*TSC,Zf=-lx*Sn+lz*C;if(Zf<-.05)continue;const fx=cx+X*R,fy=cy-R-.3*TSC*R,fs=Math.max(1,R*.045);
   for(let k=0;k<Math.ceil(fs*3);k++){const yy=fy-k*.7-1,w=Math.max(0,fs*(1-k/(fs*3))*(.8+.4*H(k,Math.floor(TT*10)+s*9)));for(let xx=-w;xx<=w;xx+=1){const x=Math.round(fx+xx+(H(k,Math.floor(TT*12))-.5)*1.2),y=Math.round(yy);
     const hot=1-Math.abs(xx)/(w+.5)-k/(fs*3)*.6;put(x,y,dq(['#7a1a08','#e04a10','#ffa030','#ffe890'],hot+.15,x,y))}}}
- // ---- animated rune ring: back half hides behind the world, front half crosses it ----
- const r0=1.22,r1=1.46,SQ2=.3;
- for(let y=0;y<W;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=(y+.5-cy)/SQ2,r=Math.hypot(dx,dy)/R;if(r<r0||r>r1)continue;const o=(y*W+x)*4;
-  if(y<cy&&d[o+3])continue;const a=Math.atan2(dy,dx),sa=a-TT*.35,seg=Math.floor(sa/TAU*40+400),f=(r-r0)/(r1-r0),fs=(sa/TAU*40+400)%1;
-  const glyph=f>.22&&f<.78&&fs>.12&&fs<.88&&H(seg*3+Math.floor((fs-.12)/.76*3),Math.floor((f-.22)/.56*3))>.38,lit=.5+.35*Math.cos(a+2.3),pulse=Math.max(0,Math.cos(a*2-TT*1.6))**6;
-  put(x,y,glyph?dq(TCY,.55+lit*.3+pulse*.4,x,y):dq(['#05141c','#0a3a4a','#1a7a8a','#3ad8e0'],(f<.14||f>.86?.62:.22)+lit*.25+pulse*.3,x,y))}
  stones.filter(s=>s.Z>=0).forEach(stone);
  S.g.putImageData(S.img,0,0)};
+/* ---------- PIXEL MUSEUM ROOM MOONS: one tiny animated relic per museum room, orbiting the temple world like the LLC channel moons.
+   Every relic is evaluated per pixel in its own unit square (u,v in -1..1, y down), lit from the upper left, so it is the same
+   chunky pixel art at any resolution. ---------- */
+{
+const RL=(nx,ny,nz)=>Math.max(0,nx*LX+ny*LY+nz*LZ);
+const qz=(raw,x,y)=>Math.max(0,Math.min(1,Math.floor(raw*5+(bay(x,y)-.5)*.6)/5+.1));
+const shd=(c,raw,x,y)=>{c=typeof c==='string'?hx(c):c;const sv=raw+(bay(x,y)-.5)*.08;if(sv<.3){const k=sv<.12?.55:.35;return[c[0]+(SHD[0]-c[0])*k,c[1]+(SHD[1]-c[1])*k,c[2]+(SHD[2]-c[2])*k].map(Math.round)}return c};
+const Lc=(r,raw,x,y,b=0)=>raw<0?null:shd(dq(r,qz(raw,x,y)*.92+b,x,y),raw,x,y);
+const eL=(u,v,cx,cy,rx,ry)=>{const a=(u-cx)/rx,b=(v-cy)/ry,q=a*a+b*b;return q>1?-1:RL(a,b,Math.sqrt(1-q))};
+const sD=(u,v,ax,ay,bx,by)=>{const vx=bx-ax,vy=by-ay,l2=vx*vx+vy*vy||1e-9;let k=((u-ax)*vx+(v-ay)*vy)/l2;k=k<0?0:k>1?1:k;return[u-ax-vx*k,v-ay-vy*k,k]};
+const cL=(u,v,ax,ay,bx,by,r)=>{const[dx,dy]=sD(u,v,ax,ay,bx,by),nx=dx/r,ny=dy/r,q=nx*nx+ny*ny;return q>1?-1:RL(nx,ny,Math.sqrt(1-q))};
+// bevelled box in local coords (lx,ly), rotated to screen by (ca,sa)
+const bL=(lx,ly,hw,hh,bv,ca=1,sa=0)=>{const ax=Math.abs(lx),ay=Math.abs(ly);if(ax>hw||ay>hh)return -1;const ex=hw-ax,ey=hh-ay;let nx=0,ny=0;if(ex<bv&&ex<=ey)nx=Math.sign(lx)*.75;else if(ey<bv)ny=Math.sign(ly)*.75;return RL(nx*ca-ny*sa,nx*sa+ny*ca,.66)};
+const sdB=(u,v,cx,cy,hw,hh)=>{const dx=Math.abs(u-cx)-hw,dy=Math.abs(v-cy)-hh;return Math.hypot(Math.max(dx,0),Math.max(dy,0))+Math.min(Math.max(dx,dy),0)};
+const glow=(d,gw,x,y,r,k=1)=>{if(d<=0||d>=gw)return null;const f=(1-d/gw)*k;return bay(x,y)<f*f*.9?dq(r,f*.85,x,y):null};
+const tri=x=>1-Math.abs((x%2+2)%2-1);
+const STL=['#14161e','#2e3240','#565c6e','#8c94a6','#c8d0dc','#f4f8ff'],GLD=['#3a2008','#6a4210','#a87020','#e0a838','#ffe08a'],
+ EMB=['#3a0a04','#8a1a08','#e04a10','#ff9a2a','#ffe08a'],LEA=['#1e0e08','#3e2010','#6a3a1c','#8a5a30'],RED=['#1a0408','#4a0a12','#8a141e','#d8283a','#ff7a7a'],
+ MCH=['#14182a','#2e3650','#4e5c80','#7a8aa8','#b8c8e0','#eef4ff'],YEL=['#3a2a04','#8a6a0a','#e0c030','#fff08a'],
+ PUR=['#14082a','#3a1a6a','#6a2ab0','#9a5ae0','#d0a8ff'],PAG=['#6a5a48','#a89a84','#d8ccb4','#f4ecd8','#fffcf0'],
+ DRG=['#200404','#5a0e08','#a01e10','#d83a1e','#ff7a3a'],BON=['#4a3a2a','#a08a68','#e8d8b0'],
+ CRY=['#140a30','#3a1a6a','#6a3ac0','#a07af0','#e0c8ff','#ffffff'],CYN=['#04202a','#0a5a6a','#2ab8d0','#8ae8ff','#e8ffff'],
+ NEO=['#3a0a24','#8a1448','#ff2a6a','#ff8ab8','#ffe0f0'],TEAL=['#04201c','#0a5a50','#2ab8a0','#7affe0','#e8fffa'],
+ SUNC=['#460603','#7a0e04','#b01e08','#d8360e','#ee5a18','#fa8a2c','#ffc070','#ffe8c0'],VIO=['#12042a','#3a1070','#7a2ac0','#c060f0','#f0c0ff','#ffffff'],
+ GLS=['#2a5a6a','#6ab0c0','#b8f0f8','#ffffff'],SEA=['#021e5a','#0a4a8a','#1a7ac0','#48CAE4','#90E0EF'],ASH=['#1a0c0a','#3a1e16','#6a3a26','#a0603a','#d8945a'],
+ IRN=['#0a0a10','#24242e','#4a4a58','#80808e','#c0c0cc'],WHT=['#4a4650','#8a8690','#c8c4cc','#f4f2f6','#ffffff'];
+const K={
+ // HALL OF BLADES & ARMOR: an ember-glowing longsword spinning end over end
+ sword:{pre:t=>{const a=t*1.1;return{ca:Math.cos(a),sa:Math.sin(a),p:.55+.45*Math.sin(t*3),t}},
+  px(u,v,x,y,P,pw){const{ca,sa}=P,lx=u*ca+v*sa,ly=-u*sa+v*ca,ax=Math.abs(lx);
+   if(ly>-.86&&ly<.2){const hw=Math.max(pw*.75,.13*Math.min(1,(ly+.86)/.3));if(ax<hw){if(ax<Math.max(pw*.5,.025)&&ly>-.62&&ly<.12)return dq(EMB,.5+P.p*.5,x,y);const n=Math.sign(lx)*.6;return Lc(STL,RL(n*ca,n*sa,.8),x,y,ax>hw-pw*1.1?.12:0)}}
+   if(ly>=.2&&ly<.31&&ax<.38)return Lc(GLD,bL(lx,ly-.255,.38,.055,pw*1.2,ca,sa),x,y);
+   if(ly>=.31&&ly<.66&&ax<Math.max(.065,pw*.75))return Lc(LEA,RL(Math.sign(lx)*.5*ca,Math.sign(lx)*.5*sa,.85),x,y,(Math.floor(ly*26)&1)?-.15:0);
+   const pcx=-.74*sa,pcy=.74*ca;if((u-pcx)**2+(v-pcy)**2<.0121){const r=eL(u,v,pcx,pcy,.11,.11);return Math.hypot(u-pcx,v-pcy)<.045?dq(RED,.6+r*.6,x,y):Lc(GLD,r,x,y)}
+   for(let k=0;k<5;k++){const ex=Math.sin(k*2.1+P.t*.9)*.55,ey=.7-((P.t*.35+k*.21)%1)*1.6;if(Math.abs(u-ex)<pw*.9&&Math.abs(v-ey)<pw*.9)return EMB[3+(k&1)]}
+   const[dx,dy]=sD(lx,ly,0,-.86,0,.2);return glow(Math.hypot(dx,dy)-.06,.26,x,y,EMB,.55+P.p*.45)}},
+ // MECHA FORGE: a stubby walker mech, stomping in place, visor eye scanning, chest core and antenna blinking
+ mech:{pre:t=>({b:Math.abs(Math.sin(t*4))*-.05,s:Math.sin(t*4),e:tri(t*1.2),bl:(t*1.7)%1<.5,c:.55+.45*Math.sin(t*5)}),
+  px(u,v,x,y,P,pw){const o=P.b,yy=v-o;
+   if(yy>-.58&&yy<-.27&&Math.abs(u)<.24){if(yy>-.48&&yy<-.38&&Math.abs(u)<.17){const ex=-.13+P.e*.26;return Math.abs(u-ex)<Math.max(pw,.05)?dq(EMB,.9,x,y):'#1a0a06'}return Lc(MCH,bL(u,yy+.425,.24,.155,pw*1.3),x,y,.05)}
+   if(cL(u,yy,.12,-.58,.2,-.8,Math.max(pw*.6,.025))>=0)return Lc(STL,cL(u,yy,.12,-.58,.2,-.8,Math.max(pw*.6,.025)),x,y);
+   {const r=eL(u,yy,.2,-.84,.06,.06);if(r>=0)return P.bl?dq(RED,.75+r*.4,x,y):Lc(RED,r,x,y,-.2)}
+   for(const s of[-1,1]){const r=eL(u,yy,s*.43,-.2,.15,.13);if(r>=0)return Lc(YEL,r,x,y,.05)}
+   for(const s of[-1,1]){const sw=s*P.s*.07,r=cL(u,yy,s*.45,-.12,s*.53,.22+sw,.085);if(r>=0)return Lc(MCH,r,x,y);const f=eL(u,yy,s*.53,.28+sw,.1,.09);if(f>=0)return Lc(STL,f,x,y)}
+   {const r=eL(u,yy,0,.06,.1,.1);if(r>=0)return dq(EMB,.4+P.c*.5+r*.3,x,y)}
+   {const r=bL(u,yy-.02,.38,.29,pw*1.5);if(r>=0)return Lc(MCH,r,x,y,(Math.abs(yy-.24)<.03?-.15:0))}
+   for(const s of[-1,1]){const lift=Math.max(0,s*P.s)*.09;{const r=bL(u-s*.19,v-.5+lift,.1,.2,pw*1.2);if(r>=0)return Lc(STL,r,x,y)}{const r=bL(u-s*.21,v-.75+lift,.16,.06,pw*1.2);if(r>=0)return Lc(MCH,r,x,y,-.1)}}
+   return null}},
+ // ARCANE LIBRARY: an open spellbook flapping its covers like wings, a page turning, runes circling it
+ book:{pre:t=>{const ph=.55+.35*Math.sin(t*4.5);return{c:Math.cos(ph)*.86,s:Math.sin(ph)*.3,fl:(t*1.3)%Math.PI,b:Math.sin(t*2)*.05,t}},
+  px(u,v,x,y,P,pw){const yy=v-P.b;
+   for(let k=0;k<4;k++){const a=P.t*1.8+k*1.571,rx=Math.cos(a)*.86,ry=Math.sin(a)*.26-.62;if(Math.abs(u-rx)+Math.abs(v-ry)<Math.max(pw*1.2,.05))return dq(PUR,.75+.25*Math.sin(P.t*6+k),x,y)}
+   // turning page
+   {const fc=Math.cos(P.fl)*P.c;if(fc*u>=0&&Math.abs(u)<Math.abs(fc)){const k=Math.abs(u)/Math.max(.01,Math.abs(P.c)),lift=Math.sin(P.fl)*.18*k,top=-.36-P.s*k-lift,bot=.36-P.s*k-lift;if(yy>top&&yy<bot)return Lc(PAG,.35+.45*Math.abs(Math.cos(P.fl)),x,y,(Math.floor((yy-top)*14)%2&&k>.2&&k<.85&&H(Math.floor((yy-top)*14),7)>.4)?-.3:0)}}
+   const k=Math.abs(u)/P.c;if(k>1)return null;const top=-.42-P.s*k,bot=.42-P.s*k;if(yy<top||yy>bot)return null;
+   if(Math.abs(u)<pw*.75)return'#2a0a40';
+   if(k<.93&&yy>top+.07&&yy<bot-.07){const row=(yy-top)*12,ink=row%1<.4&&k>.14&&k<.84&&H(Math.floor(row)+(u<0?0:40),Math.floor(k*5))>.3;return ink?(H(Math.floor(row),u<0?3:9)>.85?dq(PUR,.8,x,y):'#5a4a7a'):Lc(PAG,(u<0?.62:.42)-(k<.12?.25:0),x,y)}
+   if(k>.82&&(yy<top+.12||yy>bot-.12))return Lc(GLD,u<0?.7:.45,x,y);return Lc(PUR,(u<0?.6:.35)+((yy<top+pw*1.2)?.2:0),x,y)}},
+ // DRAGON HOARD: a little red dragon on a heap of glinting gold, wings beating, the odd puff of fire
+ dragon:{pre:t=>{const f=Math.sin(t*5),fire=(t%4.2)>3.4;return{wt:[-.52,-.62+f*.32],f,fire,t}},
+  px(u,v,x,y,P,pw){const t=P.t;
+   if(P.fire&&u>.62&&Math.abs(v+.32+(u-.62)*.15)<(u-.6)*.4+.03){const n=vn(u*9-t*14,v*9)-(u-.62)*1.2;if(n>.15)return dq(EMB,n+.3,x,y)}
+   {const r=eL(u,v,.47,-.38,.17,.11);if(r>=0)return Math.hypot(u-.5,v+.42)<Math.max(pw*.8,.03)?'#ffe050':Lc(DRG,r,x,y,.05)}
+   {const r=cL(u,v,.5,-.35,.66,-.32,.065);if(r>=0)return Lc(DRG,r,x,y)}
+   {const r=cL(u,v,.4,-.46,.3,-.62,Math.max(pw*.6,.03));if(r>=0)return Lc(BON,r,x,y)}
+   {const r=cL(u,v,.16,.06,.38,-.32,.1);if(r>=0)return Lc(DRG,r,x,y,u>.27?.1:0)}
+   const wing=(sx,sy,ofs,dk)=>{const tx=P.wt[0]+ofs,ty=P.wt[1],jx=-.32+ofs,jy=.02;const c1=(tx-sx)*(v-sy)-(ty-sy)*(u-sx),c2=(jx-tx)*(v-ty)-(jy-ty)*(u-tx),c3=(sx-jx)*(v-jy)-(sy-jy)*(u-jx);
+    if((c1>=0&&c2>=0&&c3>=0)||(c1<=0&&c2<=0&&c3<=0)){const rib=Math.abs(((Math.atan2(v-sy,u-sx)*7)%1+1)%1-.5)<.08;return Lc(DRG,(rib?.25:.45)-dk+P.f*.1,x,y,-.1)}
+    const r=cL(u,v,sx,sy,tx,ty,Math.max(pw*.7,.035));return r>=0?Lc(DRG,r,x,y,-dk):null};
+   {const c=wing(-.02,-.02,0,0);if(c)return c}
+   {const r=eL(u,v,-.02,.2,.36,.24);if(r>=0)return Lc(DRG,r,x,y,(v>.28&&Math.abs(u)<.25)?.18:0)}
+   {const c=wing(.12,-.06,.22,.25);if(c)return c}
+   {const r=cL(u,v,-.32,.3,-.62,.38,.07);if(r>=0)return Lc(DRG,r,x,y)}
+   {const r=cL(u,v,-.62,.38,-.8,.18,.045);if(r>=0)return Lc(DRG,r,x,y)}
+   if(Math.abs(u+.82)+Math.abs(v-.12)<.08)return Lc(DRG,.5,x,y);
+   {const r=eL(u,v,0,.84,.98,.44);if(r>=0){if(H(x*7+y,Math.floor(t*3)+y*3)>.965)return'#fffbe8';const coin=((Math.floor(u*9)+Math.floor(v*11))&1)?.08:-.04;return Lc(GLD,r,x,y,coin)}}
+   return null}},
+ // CRYSTAL CAVERN: a faceted amethyst shard turning on its axis with two cyan splinters circling it
+ crystal:{pre:t=>({r:t*.9,t,g:.6+.4*Math.sin(t*2.4)}),
+  px(u,v,x,y,P,pw){const sh=k=>{const a=P.t*1.3+k*Math.PI;return[Math.cos(a)*.7,.12+Math.sin(a)*.2,Math.sin(a)]},sm=k=>{const[cx,cy]=sh(k);const q=Math.abs(u-cx)/.12+Math.abs(v-cy)/.24;return q<1?Lc(CYN,(u<cx?.75:.35)+(v<cy?.1:-.1),x,y):null};
+   for(let k=0;k<2;k++)if(sh(k)[2]>0){const c=sm(k);if(c)return c}
+   const w=v<-.88||v>.76?0:v<-.36?.42*(v+.88)/.52:v>.4?.42*(.76-v)/.36:.42;
+   if(Math.abs(u)<Math.max(w,v>-.88&&v<.76?pw*.6:0)){const s=Math.asin(Math.max(-1,Math.min(1,u/Math.max(w,1e-3)))),st=Math.PI/3,fa=Math.round((s+P.r)/st)*st-P.r,ny=v<-.36?-.55:v>.4?.55:0;
+    if(H(Math.floor(u*9+P.r*3),Math.floor(v*9))>.93&&Math.sin(P.t*4+u*9)>.4)return'#ffffff';return Lc(CRY,RL(Math.sin(fa)*.85,ny,Math.cos(fa)*.85),x,y,.08)}
+   for(let k=0;k<2;k++)if(sh(k)[2]<=0){const c=sm(k);if(c)return c}
+   return glow(Math.abs(u)-w,.2,x,y,PUR,P.g)}},
+ // NEON CYBER SHRINE: a flickering neon torii gate with code raining through it
+ torii:{pre:t=>({on:H(Math.floor(t*9),3)>.07?1:.35,t}),
+  px(u,v,x,y,P,pw){const on=P.on,tp=-.62-.14*u*u,col=(r,b)=>dq(NEO,(.45+b)*on+.05,x,y);
+   if(Math.abs(u)<.92&&v>tp&&v<tp+.13)return col(NEO,v<tp+.04?.45:.25);
+   if(Math.abs(u)<.72&&v>-.34&&v<-.25)return col(NEO,.3);
+   if(Math.abs(u)<.05&&v>-.49&&v<-.34)return col(NEO,.25);
+   for(const s of[-1,1])if(Math.abs(u-s*.46)<.075&&v>-.5&&v<.8)return v>.68?'#1a0a14':col(NEO,(u-s*.46<0?.4:.2));
+   if(Math.abs(u)<.37&&v>-.24&&v<.72){const c=Math.floor(u*12+6),hd=(P.t*(.5+H(c,1)*.6)+H(c,2))%1*1.2-.3,dv=hd-v;if(dv>0&&dv<.35&&(Math.floor(v*20)&1)&&H(c,Math.floor(v*20))>.25)return dq(TEAL,dv<.06?.95:.7-dv,x,y);return null}
+   let d=Math.min(sdB(u,v,0,tp+.065,.92,.065),sdB(u,v,0,-.295,.72,.045),sdB(u,v,-.46,.15,.075,.65),sdB(u,v,.46,.15,.075,.65));return glow(d,.16,x,y,NEO,.8*on)}},
+ // STARSHIP RELIC VAULT: a tesseract folding through itself, drawn as glowing edges
+ cube:{paint(S,t){const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);const a=t*.7,b=t*.45,c=t*.3,V=[];
+   for(let i=0;i<16;i++){let p=[i&1?1:-1,i&2?1:-1,i&4?1:-1,i&8?1:-1];let x=p[0]*Math.cos(a)-p[3]*Math.sin(a),w=p[0]*Math.sin(a)+p[3]*Math.cos(a),z=p[2]*Math.cos(b)-w*Math.sin(b);w=p[2]*Math.sin(b)+w*Math.cos(b);const k=1/(2.6-w*.6);let X=x*k,Y=p[1]*k,Z=z*k;
+    const x2=X*Math.cos(c)+Z*Math.sin(c),z2=-X*Math.sin(c)+Z*Math.cos(c);const q=1/(2.4-z2);V.push([W/2+x2*q*W*.95,Hh/2+Y*q*W*.95,z2])}
+   const put=(x,y,cc)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const o=(y*W+x)*4;d[o]=cc[0];d[o+1]=cc[1];d[o+2]=cc[2];d[o+3]=255};
+   const cr=W*.16;for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){const r=Math.hypot(x+.5-W/2,y+.5-Hh/2)/cr;if(r<1&&bay(x,y)<(1-r)*.7*(.7+.3*Math.sin(t*3)))put(x,y,hx(dq(TEAL,.2+(1-r)*.5,x,y)))}
+   const th=W>70?1:0,E=[];for(let i=0;i<16;i++)for(let j=0;j<4;j++){const k=i^(1<<j);if(k>i)E.push([V[i],V[k]])}E.sort((p,q)=>p[0][2]+p[1][2]-q[0][2]-q[1][2]);
+   for(const[p,q]of E){const n=Math.ceil(Math.hypot(q[0]-p[0],q[1]-p[1]))+1;for(let s=0;s<=n;s++){const f=s/n,x=p[0]+(q[0]-p[0])*f,y=p[1]+(q[1]-p[1])*f,z=p[2]+(q[2]-p[2])*f,cc=hx(dq(TEAL,.45+z*.35+(1-(y/Hh))*.15,Math.round(x),Math.round(y)));put(x,y,cc);if(th){put(x+1,y,cc);put(x,y+1,cc)}}}
+   for(const p of V){const cc=hx(p[2]>0?'#ffffff':'#7affe0');put(p[0],p[1],cc);if(W>40){put(p[0]+1,p[1],cc);put(p[0],p[1]+1,cc);put(p[0]+1,p[1]+1,cc)}}
+   S.g.putImageData(S.img,0,0)}},
+ // LANDRCYVERSE OBSERVATORY: a mini sun, boiling, flaring corona, the script L glowing on its face
+ lsun:{pre:t=>({t}),
+  px(u,v,x,y,P,pw){const r=Math.hypot(u,v),R=.56;
+   if(r<R){const Lm=(Math.abs(u+.1)<.065&&v>-.3&&v<.2)||(v>.11&&v<.2&&u>-.16&&u<.2)||(Math.abs(u+.02)<.08&&Math.abs(v+.32)<.035);if(Lm)return dq(['#ffc070','#ffe8c0','#fffbe8'],.5+.5*Math.sin(P.t*2),x,y);
+    const a=u/R,b=v/R,nz=Math.sqrt(Math.max(0,1-a*a-b*b)),n=fbm(Math.atan2(a,nz)*2.2+P.t*.25+5,Math.asin(Math.max(-1,Math.min(1,b)))*2.2);return dq(SUNC,.25+n*.55+nz*.3+RL(a,b,nz)*.25,x,y)}
+   if(r<.95){const a=Math.atan2(v,u),n=vn(a*4+8+P.t*.8,r*5-P.t*1.6)*(1-(r-R)/.39);if(n>bay(x,y)*.45+.18)return dq(['#4a0803','#8a1606','#c42a0a','#ff8a1e','#ffc23a'],n*1.3,x,y)}
+   return null}},
+ // THE VOID ABYSS: a black orb with a swirling violet accretion disk and a bright photon ring
+ voidorb:{pre:t=>({t,ca:Math.cos(-.22),sa:Math.sin(-.22)}),
+  px(u,v,x,y,P,pw){const lx=u*P.ca+v*P.sa,ly=(-u*P.sa+v*P.ca)/.27,dr=Math.hypot(lx,ly),R=.4,r=Math.hypot(u,v);
+   const disk=()=>{if(dr<.55||dr>.95)return null;const a=Math.atan2(ly,lx),n=vn(a*3-P.t*2.4+dr*4,dr*7)*(1-(dr-.55)/.4*.6);return n>.25?dq(VIO,n*1.25+(dr<.65?.25:0),x,y):null};
+   if(ly>0||r>=R+.06){const c=disk();if(c)return c}
+   if(r<R)return r>R-Math.max(pw,.04)?dq(VIO,.35,x,y):'#05020a';
+   if(r<R+.06)return dq(VIO,.75+.25*Math.sin(P.t*3+Math.atan2(v,u)*2),x,y);
+   return glow(r-R-.06,.12,x,y,VIO,.6)}},
+ // SEA OF THOUGHT: a message in a bottle bobbing and tipping, the water inside sloshing, bubbles rising
+ bottle:{pre:t=>{const a=Math.sin(t*1.3)*.38;return{ca:Math.cos(a),sa:Math.sin(a),b:Math.sin(t*2.1)*.05,t}},
+  px(u,v,x,y,P,pw){const yy=v-P.b,lx=u*P.ca+yy*P.sa,ly=-u*P.sa+yy*P.ca,ax=Math.abs(lx);
+   if(ly>-.78&&ly<-.56&&ax<.09)return Lc(LEA,RL(Math.sign(lx)*.5*P.ca,Math.sign(lx)*.5*P.sa,.8),x,y,.15);
+   const hw=ly<-.56?0:ly<-.24?.11:ly<-.06?.11+(ly+.24)/.18*.17:ly<.7?.28:0;if(ax>hw)return null;
+   const rim=ax>hw-Math.max(pw*1.1,.04)||ly>.7-Math.max(pw*1.1,.04)||(ly<-.5);
+   if(rim)return dq(GLS,lx<0?.75:.35,x,y);
+   if(lx>-.2&&lx<-.13&&ly>-.02&&ly<.5)return'#ffffff';
+   {const[dx,dy]=sD(lx,ly,-.04,.08,.06,.42);if(Math.hypot(dx,dy)<.075)return Lc(PAG,RL(dx/.075*P.ca,dx/.075*P.sa,.7),x,y,Math.abs(ly-.25)<.03?-1:0)}
+   const lvl=.18+Math.sin(u*7+P.t*3)*.03;if(yy>lvl){if(H(Math.floor(u*20),Math.floor((yy+P.t*.3)*14))>.94)return'#e8ffff';return dq(SEA,.3+(.62-yy)*.5+(lx<0?.15:0),x,y)}
+   return bay(x,y)<.28?GLS[1]:null}},
+ // THE BINDING OF ASHAAD: a scorched little world bound in two iron chains and a padlock
+ chained:{pre:t=>({t,r:t*.4,s:Math.sin(t*1.5)*.04}),
+  px(u,v,x,y,P,pw){const R=.56;
+   {const r=bL(u,v-.12,.13,.1,pw*1.2);if(r>=0)return Lc(GLD,r,x,y,Math.hypot(u,v-.12)<.035?-.6:0)}
+   {const q=Math.hypot(u,v+.02);if(q<.09&&q>.05&&v<.04)return Lc(IRN,q<.07?.7:.4,x,y)}
+   for(const[a0,sg]of[[.6,1],[-.6,-1]]){const a=a0+P.s*sg,ca=Math.cos(a),sa=Math.sin(a),s=u*ca+v*sa,dd=-u*sa+v*ca;if(Math.abs(s)>.98||Math.abs(dd)>.08)continue;
+    const L=.15,k=Math.floor(s/L+50),f=s/L+50-k;if(k&1){if(Math.abs(dd)<Math.max(pw*.6,.026)&&f>.05&&f<.95)return Lc(IRN,dd<0?.75:.35,x,y)}else{const e=((f-.5)/.62)**2+(dd/.075)**2;if(e<1&&e>.3)return Lc(IRN,RL(-(f-.5)*ca*.8-dd*sa,-(f-.5)*sa*.8+dd*ca,.6),x,y)}}
+   const r=Math.hypot(u,v);if(r<R){const a=u/R,b=v/R,nz=Math.sqrt(1-a*a-b*b),lon=Math.atan2(a,nz)+P.r,lat=Math.asin(b),raw=RL(a,b,nz),n=fbm(lon*2.2+3,lat*2.2+1);
+    const cr=H(Math.floor(lon*3+20),Math.floor(lat*3+9))>.72&&Math.hypot((lon*3%1+1)%1-.5,(lat*3%1+1)%1-.5)<.25;if(n>.62&&raw<.5)return dq(EMB,.4+n*.4,x,y);return Lc(ASH,raw,x,y,(n-.5)*.4-(cr?.2:0))}
+   return glow(r-R,.14,x,y,EMB,.5)}},
+ // LLC BROADCAST SHRINE: a red CRT set with rabbit ears, its screen rolling between static and the play logo
+ tv:{pre:t=>({t,st:(t%5)>4.3,roll:(t*.6)%1,w:Math.sin(t*2.5)*.06}),
+  px(u,v,x,y,P,pw){
+   for(const[ex,ey]of[[-.42+P.w,-.92],[.38-P.w,-.88]]){const r=eL(u,v,ex,ey,.055,.055);if(r>=0)return Lc(STL,r,x,y,.1);const c=cL(u,v,0,-.42,ex,ey,Math.max(pw*.55,.02));if(c>=0)return Lc(STL,c,x,y)}
+   {const r=eL(u,v,0,-.42,.13,.07);if(r>=0)return Lc(IRN,r,x,y)}
+   for(const s of[-1,1]){const r=bL(u-s*.48,v-.66,.07,.07,pw);if(r>=0)return Lc(IRN,r,x,y)}
+   for(const ky of[-.1,.16]){const r=eL(u,v,.58,ky,.07,.07);if(r>=0)return Lc(WHT,r,x,y)}
+   if(Math.abs(u+.1)<.46&&Math.abs(v-.08)<.33){const sx=u+.1,sy=v-.08;if(Math.abs(sx)>.46-Math.max(pw,.03)||Math.abs(sy)>.33-Math.max(pw,.03))return'#0a0408';
+    if(P.st)return dq(WHT,H(x+Math.floor(P.t*20)*13,y),x,y);
+    const rb=Math.abs(((sy+.33)/.66-P.roll+1)%1)<.08?.15:0;
+    if(Math.abs(sx)<.2&&Math.abs(sy)<.14){const inT=sx>-.06&&sx<.09&&Math.abs(sy)<(.09-sx)*.6;return inT?'#ffffff':dq(RED,.75+rb,x,y)}
+    return dq(['#06060a','#14141e','#24243a'],.3+(y&1?0:.25)+rb*2,x,y)}
+   return Lc(RED,bL(u,v-.08,.74,.5,pw*1.8),x,y,.05)}},
+ // BALL ARENA COLOSSEUM: a boxing glove throwing jabs, sparks on every hit
+ glove:{pre:t=>{const p=(t*.85)%1,e=p<.12?p/.12:p<.3?1:1-(p-.3)/.7;return{o:-.14+e*.22,e,p,t}},
+  px(u,v,x,y,P,pw){const o=P.o;
+   if(P.e>.85)for(let k=0;k<6;k++){const a=k*1.047+.3,r0=.12,r1=.12+P.e*.12,px0=.78+o*.3;const[dx,dy]=sD(u,v,px0+Math.cos(a)*r0,-.08+Math.sin(a)*r0,px0+Math.cos(a)*r1,-.08+Math.sin(a)*r1);if(Math.hypot(dx,dy)<Math.max(pw*.6,.025))return k&1?'#ffd040':'#ffffff'}
+   {const r=eL(u,v,o-.22,.06,.2,.26);if(r>=0&&u<o-.12)return Lc(RED,r,x,y,-.05)}
+   {const r=eL(u,v,o+.12,-.06,.52+P.e*.04,.44);if(r>=0)return Lc(RED,r,x,y,.05)}
+   {const r=bL(u-(o-.48),v-.06,.16,.32,pw*1.5);if(r>=0)return Lc(WHT,r,x,y,Math.abs(u-(o-.48))<.035&&(Math.floor(v*16)&1)?-.4:0)}
+   return null}},
+ // COOPER SKY CITY: the red-and-white crest spinning like a coin, a glint sweeping its face
+ crest:{pre:t=>{const th=t*.9;return{c:Math.cos(th),s:Math.sin(th),t}},
+  px(u,v,x,y,P,pw){const sx=Math.max(.06,Math.abs(P.c)),lu=u/sx,front=P.c>0;
+   const ins=(k)=>{const hw=.64*k;if(v<-.7*k+.0)return false;if(v<.12)return Math.abs(lu)<hw;const q=(v-.12)/(.74*k);return q<1&&Math.abs(lu)<hw*Math.sqrt(1-q*q)};
+   if(!ins(1))return null;const raw=RL(Math.sign(P.s)*-.6*(1-sx),0,.55+.4*sx);
+   const edge=Math.abs(u)>(.64*sx-Math.max(pw*1.2,.035))&&v<.12;
+   if(edge)return Lc(GLD,raw+.2,x,y);
+   if(!ins(.84))return Lc(front?WHT:GLD,raw+(v<-.5?.15:0),x,y);
+   if(front){const r=Math.hypot(lu/1.05,v+.16),a=Math.atan2(v+.16,lu);if(r>.17&&r<.31&&Math.abs(a)>.75)return Lc(WHT,raw+.1,x,y);const g=((P.t*.6)%2.4)*2-1.6;if(Math.abs(lu*.6+v-g)<.07)return'#ffe0e0';return Lc(RED,raw,x,y,.05)}
+   return Lc(RED,raw*.7,x,y,-.1)}},
+};
+P.rmoon=(S,t,kind)=>{const k=K[kind];if(!k)return;if(k.paint)return k.paint(S,t);const W=S.img.width,Hh=S.img.height,d=S.img.data,PP=k.pre(t),pw=2/W,oy=(Hh-W)/W;
+ for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){const u=(x+.5)*pw-1,v=(y+.5)*pw-1-oy,c=k.px(u,v,x,y,PP,pw),o=(y*W+x)*4;if(c){const q=typeof c==='string'?hx(c):c;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255}else d[o+3]=0}
+ S.g.putImageData(S.img,0,0)};
+}
 P.setFlat=v=>{FLAT=v?1:0};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
 })();

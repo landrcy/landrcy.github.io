@@ -16,12 +16,18 @@ const MAIN=[
  B({id:'sun',paint:'sun',w:250,x:0,y:0,hr:.36,title:'Landrcyverse',by:'games & websites by Landry',blurb:'Every planet is one of my sites. Click a planet to fly to it.'}),
  B({id:'ashaad',paint:'ashaad',w:66,h:60,orb:220,per:50,ph:2.2,hr:.42,title:'The Binding of Ashaad',by:'a brainrot roguelike by landrcy',blurb:'Descend into the basement, shoot your tears, grab cursed items and survive in this browser roguelike. 3 starters, 4 floors, 1 secret Finley boss.',href:'https://landrcy.github.io/binding-of-ashaad/',cta:'▶ Play'}),
  B({id:'sea',paint:'sea',w:122,orb:325,per:72,ph:.4,hr:.4,title:'Sea of Thought',by:'a pixel ocean by landrcy',blurb:'A quiet pixel ocean full of messages in bottles: write one, throw it in, then dive and read what strangers left behind.',href:'https://landrcy.github.io/sea-of-thought/',cta:'▶ Dive in'}),
- B({id:'yt',paint:'yt',w:96,orb:770,per:130,ph:4.1,hr:.42,title:'LLC Powered Channels',by:'YouTube',yt:1}),
- B({id:'gow',paint:'crest',w:92,h:74,orb:1330,per:280,ph:5.3,hr:.42,title:'Game of Websites',by:'coopercitywebsites.github.io',blurb:'A searchable catalogue of every site in the collection: unblocked games, NeoForge mods, old builds and the trash pile, ranked by how much code went into each one.',href:'https://coopercitywebsites.github.io/main/',cta:'Open'}),
- B({id:'void',paint:'void',w:236,h:236,orb:1150,per:235,ph:5.9,tc:'#c04df0',hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13}),
- B({id:'arena',paint:'arena',w:134,h:110,orb:960,per:175,ph:2.9,hr:.42,title:'Ball Arena',by:'ball fights from the Langrino channel',href:'https://www.youtube.com/@Langrino',cta:'▶ Watch'}),
- B({id:'pmuseum',paint:'temple',w:150,orb:470,per:92,ph:1.4,hr:.4,title:'Pixel Museum',href:'https://landrcy.github.io/pixel-museum/',cta:'▶ Visit'})];
+ B({id:'yt',paint:'yt',w:96,orb:885,per:140,ph:4.1,hr:.42,title:'LLC Powered Channels',by:'YouTube',yt:1}),
+ B({id:'gow',paint:'crest',w:92,h:74,orb:1420,per:290,ph:5.3,hr:.42,title:'Game of Websites',by:'coopercitywebsites.github.io',blurb:'A searchable catalogue of every site in the collection: unblocked games, NeoForge mods, old builds and the trash pile, ranked by how much code went into each one.',href:'https://coopercitywebsites.github.io/main/',cta:'Open'}),
+ B({id:'void',paint:'void',w:236,h:236,orb:1255,per:245,ph:5.9,tc:'#c04df0',hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13}),
+ B({id:'arena',paint:'arena',w:134,h:110,orb:1080,per:185,ph:2.9,hr:.42,title:'Ball Arena',by:'ball fights from the Langrino channel',href:'https://www.youtube.com/@Langrino',cta:'▶ Watch'}),
+ B({id:'pmuseum',paint:'temple',w:150,orb:525,per:98,ph:1.4,hr:.4,title:'Pixel Museum',href:'https://landrcy.github.io/pixel-museum/',cta:'▶ Visit'})];
 const MOONS=CH.map((c,i)=>B({id:'m-'+c.id,paint:'moon',arg:c.kind,w:Math.round(12+14*Math.sqrt((c.views||0)/MV)),orb:66+i*9,per:9+i*2.6,ph:i*1.3,dir:1,hr:.42,moon:c,title:c.name}));
+// Pixel Museum room moons: one animated relic per museum room, two rings (west wing sites inside, east wing vaults outside)
+const PMU=MAIN.find(b=>b.id==='pmuseum'),PMURL='https://landrcy.github.io/pixel-museum/#';
+const ROOMS=[['hub','Landrcyverse Observatory','Landrcyverse','lsun',18],['void','The Void Abyss','The Void','voidorb',18],['sea','Sea of Thought','Sea of Thought','bottle',17],['ashaad','The Binding of Ashaad','Ashaad','chained',18],['llc','LLC Broadcast Shrine','LLC Channels','tv',18],['arena','Ball Arena Colosseum','Ball Arena','glove',16],['city','Cooper Sky City','Cooper City','crest',16],
+ ['mecha','Mecha Forge','Mecha Forge','mech',20],['swords','Hall of Blades & Armor','Swords & Armor','sword',22],['books','Arcane Library','Arcane Library','book',20],['dragon','Dragon Hoard','Dragon Hoard','dragon',22],['crystal','Crystal Cavern','Crystal Cavern','crystal',20],['cyber','Neon Cyber Shrine','Cyber Shrine','torii',20],['relic','Starship Relic Vault','Relic Vault','cube',19]];
+const RMOONS=ROOMS.map(([id,title,short,kind,w],i)=>{const outer=i>=7,k=i%7;return B({id:'r-'+id,paint:'rmoon',arg:kind,w,orb:outer?124:84,per:outer?52:34,ph:k*TAU/7+(outer?.45:0),hr:.45,par:PMU,room:id,short,title,href:PMURL+id})});
+MOONS.push(...RMOONS);
 const V=(id,kind,w,orb,per,title,by,href,blurb)=>B({id,paint:'vplanet',arg:kind,w,orb,per,ph:orb*.037,hr:.4,title,by,href,cta:'Visit this version',blurb});
 const ARCH=[
  B({id:'oldhub',paint:'oldhub',w:110,x:0,y:0,hr:.36,title:'The space hub',by:'Oct 24, 2026 · one long page on a starfield',blurb:'Every site as its own floating pixel panel: dungeon slab, waves, warped void, browser tab, TV and arena.',href:'archive/',cta:'Visit this version'}),
@@ -39,14 +45,14 @@ for(const b of [...MAIN,...MOONS,...ARCH]){b.S={N:0};b.L=[].map(([dv0])=>{const 
 let sys='main',bodies=MAIN;
 // ---- camera ----
 const cam={x:0,y:0,z:1};let tw=null,focus=null,hover=null,intro=RM?null:{t0:performance.now()};if(intro)document.body.classList.add('intro');
-function fitZ(){const ext=sys==='main'?(W<H?[1400,1350]:[1420,880]):(W<H?[490,300]:[490,300]);return Math.min(W/(2*ext[0]),(H-90)/(2*ext[1]))}
+function fitZ(){const ext=sys==='main'?(W<H?[1480,1440]:[1510,940]):(W<H?[490,300]:[490,300]);return Math.min(W/(2*ext[0]),(H-90)/(2*ext[1]))}
 function fitX(){return 0}
 function fitY(){return 0}
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 function to(x,y,z,ms=900,done){mv.on=0;if(RM)ms=1;tw={a:{...cam},b:{x,y,z},t0:performance.now(),ms,done}}
 // ---- body positions ----
-const parent=b=>b.moon?MAIN[3]:null;
-function pos(b){if(b.orb==null)return[b.x,b.y];const c=b.moon?pos(MAIN[3]):[0,0];return[c[0]+Math.cos(b.ang)*b.orb,c[1]+Math.sin(b.ang)*b.orb*SQ]}
+const parent=b=>b.moon?MAIN[3]:b.par||null;
+function pos(b){if(b.orb==null)return[b.x,b.y];const c=b.moon?pos(MAIN[3]):b.par?pos(b.par):[0,0];return[c[0]+Math.cos(b.ang)*b.orb,c[1]+Math.sin(b.ang)*b.orb*SQ]}
 const S2W=(sx,sy)=>[cam.x+(sx-W/2)/cam.z,cam.y+(sy-H/2)/cam.z],W2S=(x,y)=>[(x-cam.x)*cam.z+W/2,(y-cam.y)*cam.z+H/2];
 // ---- starfield + nebula ----
 const STARS=[];for(let l=0;l<3;l++)for(let i=0;i<(l===0?260:l===1?110:40);i++)STARS.push({x:Math.random(),y:Math.random(),l,p:Math.random()*TAU,c:['#8a90c8','#cfd4ff','#fff6d8','#ffd0f0'][Math.floor(Math.random()*4)]});
@@ -153,7 +159,7 @@ const BELT=[];{const rk=(sz,seed)=>{const n=8,S=[];for(let k=0;k<n;k++){const la
    const q=P.hx(P.dq(['#120c1a','#2a2030','#4a3c44','#7a6658','#b09878','#e0c8a0'],Math.min(1,l*.9),x,y)),o=(y*sz+x)*4;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255}
   c.g.putImageData(c.img,0,0);S.push(c.c)}return S};
  const LIB=[];for(let i=0;i<14;i++)LIB.push(rk([4,5,6,7,8,10,12][i%7],i*7.3));
- for(let i=0;i<340;i++){const u=Math.random(),r=565+(u+Math.random())*.5*70+((Math.random()-.5)*12);BELT.push({r,a:Math.random()*TAU,sp:.012*Math.pow(360/r,1.5)*(.9+Math.random()*.2),s:LIB[Math.floor(Math.random()*Math.random()*LIB.length)],sc:.6+Math.random()*.9})}}
+ for(let i=0;i<340;i++){const u=Math.random(),r=680+(u+Math.random())*.5*70+((Math.random()-.5)*12);BELT.push({r,a:Math.random()*TAU,sp:.012*Math.pow(360/r,1.5)*(.9+Math.random()*.2),s:LIB[Math.floor(Math.random()*Math.random()*LIB.length)],sc:.6+Math.random()*.9})}}
 function drawBelt(dt,alpha){if(sys!=='main'||alpha<=0)return;const ga=g.globalAlpha;g.globalAlpha=ga*alpha;
  for(const k of BELT){if(!RM)k.a+=dt*k.sp;const wx=Math.cos(k.a)*k.r,wy=Math.sin(k.a)*k.r*SQ,[sx,sy]=W2S(wx,wy);const sw=k.s[0].width,tgt=sw*k.sc*cam.z*.9,rt=REFT(),sz=tgt<sw*.75?Math.max(1,Math.round(tgt/rt))*rt:sw*Math.max(1,Math.min(rt,Math.round(tgt/sw)));if(sx<-sz||sy<-sz||sx>W+sz||sy>H+sz)continue;
   if(tgt<sw*.75){g.fillStyle='#7a6658';const q=Math.min(sz,rt*3);g.fillRect(Math.round(sx/rt)*rt,Math.round(sy/rt)*rt,q,q);continue}
@@ -218,7 +224,7 @@ function frame(now){if(document.body.classList.contains('landed')){last=now;requ
  if(tw){const k=ease(clamp((now-tw.t0)/tw.ms));const zl=Math.exp(Math.log(tw.a.z)+(Math.log(tw.b.z)-Math.log(tw.a.z))*k);cam.x=tw.a.x+(tw.b.x-tw.a.x)*k;cam.y=tw.a.y+(tw.b.y-tw.a.y)*k;cam.z=zl;if(k>=1){const d=tw.done;tw=null;d&&d()}}
  // orbit motion: hover/focus slows to a stop
  const list=sys==='main'?[...bodies,...MOONS]:bodies;
- for(const b of list){if(b.orb==null)continue;const frozen=focus&&(focus===b||(b.moon?(focus===b||focus.moon):(b.id==='yt'&&(focus.yt||focus.moon))));const tgt=RM||frozen?0:hover===b?0:(hover&&hover.yt&&b.moon)?.35:1;b.sf+=(tgt-b.sf)*Math.min(1,dt*4);b.ang+=dt*TAU/b.per*b.sf*(b.dir||1)}
+ for(const b of list){if(b.orb==null)continue;const frozen=focus&&(focus===b||(b.moon?(focus===b||focus.moon):b.par?!!focus.par:(b.id==='yt'&&(focus.yt||focus.moon))||(b.id==='pmuseum'&&!!focus.par)));const tgt=RM||frozen?0:hover===b?0:(hover&&((hover.yt&&b.moon)||(hover===b.par)))?.35:1;b.sf+=(tgt-b.sf)*Math.min(1,dt*4);b.ang+=dt*TAU/b.per*b.sf*(b.dir||1)}
  let wv=0;if(warp){const k=(now-warp.t0)/1700;wv=Math.sin(Math.min(1,k)*Math.PI);if(k>=.5&&!warp.swapped){warp.swapped=true;sys=warp.to;bodies=sys==='main'?MAIN:ARCH;document.body.classList.toggle('arch',sys==='archive');tw=null;cam.x=fitX();cam.y=fitY();cam.z=fitZ()*6;to(fitX(),fitY(),fitZ(),1100)}if(k>=1)warp=null}
  // stars
  g.globalAlpha=1;g.fillStyle='#010103';g.fillRect(0,0,W,H);
@@ -235,13 +241,13 @@ function frame(now){if(document.body.classList.contains('landed')){last=now;requ
  {const A=MAIN[1],tg=(hover===A||focus===A)?1:0;A.op=(A.op||0)+(tg-(A.op||0))*Math.min(1,dt*(tg?2.2:3));A.arg={open:RM?tg:A.op}}
  drawBelt(dt,IS.orb);drawShips(now,IS.orb);drawDecoWorld(now);
  // sprites, back-to-front
- const draw=[];bodies.forEach((b,i)=>draw.push([b,i]));if(sys==='main')MOONS.forEach((m,i)=>draw.push([m,3]));
+ const draw=[];bodies.forEach((b,i)=>draw.push([b,i]));if(sys==='main')MOONS.forEach((m,i)=>draw.push([m,m.par?MAIN.indexOf(m.par):3]));
  draw.sort((a,b)=>pos(a[0])[1]-pos(b[0])[1]);
- const one=(b,i)=>{const pp=b.id==='sun'||b.id==='oldhub'?1:IS.pop(Math.min(i,7)+(b.moon?.5:0));if(pp<=0)return;const isF=focus&&(b===focus||(focus.yt&&b.moon)),dim=isF||FA<.005?1:1-.72*FA;
+ const one=(b,i)=>{const pp=b.id==='sun'||b.id==='oldhub'?1:IS.pop(Math.min(i,7)+(b.moon?.5:0));if(pp<=0)return;const isF=focus&&(b===focus||(focus.yt&&b.moon)||(b.par&&focus===b.par)),dim=isF||FA<.005?1:1-.72*FA;
   const[x,y]=pos(b),[sx,sy]=W2S(x,y),w=b.w*cam.z*pp,h=(b.h||b.w)*cam.z*pp;
   if(sx+w<0||sx-w>W||sy+h<0||sy-h>H)return;
   // resolution chosen from on-screen size: redraw at that res, integer pixel scale, no colour-quantised downsample
-  const capB=b.paint==='void'?Math.round(b.w*1.1):b.paint==='crest'?128:b.paint==='sun'?(intro?140:380):b.paint==='arena'?180:160,cap=Math.max(6,Math.round(capB*(b.rv<1?Math.max(.08,b.rv*b.rv):1))),pw=Math.max(2,w),ps=Math.max(1,Math.ceil(pw/cap)),Nt=Math.max(6,Math.round(pw/ps)),asp=(b.h||b.w)/b.w;
+  const capB=b.paint==='void'?Math.round(b.w*1.1):b.paint==='crest'?128:b.paint==='sun'?(intro?140:380):b.paint==='arena'?180:b.paint==='rmoon'?96:160,cap=Math.max(6,Math.round(capB*(b.rv<1?Math.max(.08,b.rv*b.rv):1))),pw=Math.max(2,w),ps=Math.max(1,Math.ceil(pw/cap)),Nt=Math.max(6,Math.round(pw/ps)),asp=(b.h||b.w)/b.w;
   let S=b.S;const ga=g.globalAlpha;
   if(!S.N||Math.abs(Nt-S.N)/Nt>.06&&now>=(b.rz||0)){const S2=P.mk(Nt,Math.max(4,Math.round(Nt*asp)));S2.N=Nt;if(S.N){b.prev=S;b.xf=now}b.S=S=S2;b.nx=0;b.rz=now+40}
   if(now>=(b.nx||0)||(b.id==='sun'&&intro)){let o=b.id==='sun'?{ign:IS.ign,fl:IS.fl,L:IS.L}:b.arg;if(b.id==='sun'&&!intro&&S.N>200&&S.full){const ch=Math.ceil(S.N/10),y0=(S.row||0);o={...o,y0,y1:y0+ch};S.row=y0+ch>=S.N?0:y0+ch}else if(b.id==='sun')S.full=1;if(b.id==='void'&&!RM&&S.N>140&&S.full){const HH=S.img.height,ch=Math.ceil(HH/3),y0=(S.row||0);o={y0,y1:y0+ch};S.row=y0+ch>=HH?0:y0+ch}else if(b.id==='void')S.full=1;P.setFlat(b.id==='sun'&&intro?0:S.N<cap*.55);const tn=RM?7:now/1000+(b.ph||0)*3;P[b.paint](S,tn,o);P.setFlat(0);b.nx=RM?Infinity:now+(b.id==='void'&&S.N>140&&S.full&&!RM?22:b.paint==='sun'?(S.N>200&&!intro?16:S.N>200?90:S.N>100?110:70):S.N>140?66:S.N>60?44:60)+Math.random()*8}
@@ -314,8 +320,8 @@ const UFO={sz:22,asp:.5,cap:32,name:'UFO?!',paint:(u,v,x,y,N)=>{const dx=(u-.5)*
   if(Math.abs(dy-.2)<.32&&Math.abs(dx)<1-Math.abs(dy-.2)*.9){if(Math.abs(dy-.25)<.07&&(Math.floor(u*N/3))%2)return dpk('#ffe66d');return ramp(MTL,lite(dx,dy)+.2,x,y)}return 0}};
 // layout (seeded, stable): only in the empty space between the outer orbit and the tear, never on the planets
 const DECO={back:[],world:[]};
-(function(){const inZone=(x,y,m)=>Math.hypot(x,y/SQ)>1440+m&&inMain(x,y)&&inMain(x+m,y)&&inMain(x-m,y)&&inMain(x,y+m)&&inMain(x,y-m);
- const put=(o,pf,m,tries=300)=>{for(let t=0;t<tries;t++){const x=(DK()*2-1)*2700,y=(DK()*2-1)*3300;if(pf===1?!inZone(x,y,m):!(inMain(x,y)&&Math.hypot(x,y/SQ)>1400+o.sz*.35))continue;if(pf<1&&DECO.back.some(q=>Math.hypot(q.x-x,q.y-y)<(q.sz+o.sz)*.45))continue;if(pf===1&&DECO.world.some(q=>Math.hypot(q.x-x,q.y-y)<q.sz+o.sz+90))continue;o.x=x;o.y=y;return o}return null};
+(function(){const inZone=(x,y,m)=>Math.hypot(x,y/SQ)>1530+m&&inMain(x,y)&&inMain(x+m,y)&&inMain(x-m,y)&&inMain(x,y+m)&&inMain(x,y-m);
+ const put=(o,pf,m,tries=300)=>{for(let t=0;t<tries;t++){const x=(DK()*2-1)*2700,y=(DK()*2-1)*3300;if(pf===1?!inZone(x,y,m):!(inMain(x,y)&&Math.hypot(x,y/SQ)>1490+o.sz*.35))continue;if(pf<1&&DECO.back.some(q=>Math.hypot(q.x-x,q.y-y)<(q.sz+o.sz)*.45))continue;if(pf===1&&DECO.world.some(q=>Math.hypot(q.x-x,q.y-y)<q.sz+o.sz+90))continue;o.x=x;o.y=y;return o}return null};
  for(let i=0;i<11;i++){const o=put(nebula(i,NPAL[i%3],700+DK()*900),.55,0);if(o){o.pf=.55;o.dx=(DK()-.5)*3;o.dy=(DK()-.5)*2;DECO.back.push(o)}}
  for(let i=0;i<6;i++){const o=put(galaxy(i,i%3===2,110+DK()*150),.3,0);if(o){o.pf=.3;DECO.back.push(o)}}
  for(let i=0;i<5;i++){const o=put(farPlanet(i,45+DK()*80),.4,0);if(o){o.pf=.4;DECO.back.push(o)}}
@@ -357,19 +363,19 @@ const TH={sun:['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#9ab4e8'],a
  yt:['#0f0f0f','#fff','#fff','#0f0f0f','Roboto','#ff0033'],oldhub:['#120c1e','#f3ecdf','#ff0033','#fff','Silkscreen','#ffcc4d'],ballfight:['#120c1e','#f3ecdf','#ffcc4d','#120c1e','Silkscreen','#ff0033'],
  'v-lovely':['#fff8f1','#3a2430','#ff5d8f','#fff','Fredoka','#ffb347'],'v-arcade':['#1a1440','#ffd257','#ff5d8f','#fff','Silkscreen','#7c6cff'],'v-larper':['#1a1440','#ffcc4d','#7c6cff','#fff','Silkscreen','#ff5d8f'],
  'v-purple':['#241640','#ffcc4d','#38e1d0','#0a0814','Silkscreen','#7c6cff'],'v-white':['#080a12','#dde0e8','#9ab4e8','#080a12','Silkscreen','#cfe0ff'],pmuseum:['#05040c','#a8fff8','#3ad8e0','#05040c','Silkscreen','#1a7a8a'],'v-strings':['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#c9ced8']};
-function theme(b){const t=TH[b.moon?'yt':b.id]||TH.sun;return `--bg:${t[0]};--fg:${t[1]};--ac:${t[2]};--bf:${t[3]};--ft:'${t[4]}';--bd:${t[5]}`}
+function theme(b){const t=TH[b.moon?'yt':b.par?'pmuseum':b.id]||TH.sun;return `--bg:${t[0]};--fg:${t[1]};--ac:${t[2]};--bf:${t[3]};--ft:'${t[4]}';--bd:${t[5]}`}
 const NOINFO={sun:1};
 const PLAY=(d,l,m)=>`<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="${d}" d="M4 2h2v1h2v1h2v1h2v1h2v4h-2v1h-2v1h-2v1h-2v1h-2z"/><path fill="${l}" d="M5 4h1v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-1z"/><path fill="${m}" d="M5 8h1v3h-1zM6 9h2v1h-2z"/></svg>`;
 const YTLOGO=`<svg class="lgsvg" viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#ff0033" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#b8001f" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#fff" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg><b class="lgtx">LLC Powered<br>Channels</b>`;
 // box = [width frac of w, height frac of h, y offset frac of h]
 const LG={arena:{box:[.6,.42,.02],pal:['#3a1a06','#ffcf3a','#ff6464'],arena:1},sea:{box:[.56,.56,0],img:'sea',pal:['#021e5a','#90E0EF','#48CAE4']},ashaad:{box:[.66,.5,.06],img:'ashaad',pal:['#2a1608','#ffd23a','#c08a1e']},void:{box:[.3,.39,0],img:'void',pal:['#05020d','#e6c8ff','#c04df0']},
- yt:{box:[.6,.6,0],pal:['#2a0008','#ffffff','#ffb0b8']},gow:{box:[.2,.2,.3],btn:1,pal:['#000000','#ffffff','#e01a22']},moon:{box:[.62,.62,0],pal:['#2a0008','#ffffff','#ffb0b8']},pmuseum:{box:[.4,.34,0],img:'pmuseum',pal:['#0a3a4a','#a8fff8','#3ad8e0']}};
-const lgOf=b=>b.moon?LG.moon:LG[b.id];
+ yt:{box:[.6,.6,0],pal:['#2a0008','#ffffff','#ffb0b8']},gow:{box:[.2,.2,.3],btn:1,pal:['#000000','#ffffff','#e01a22']},moon:{box:[.62,.62,0],pal:['#2a0008','#ffffff','#ffb0b8']},rmoon:{box:[.7,.62,0],pal:['#0a3a4a','#a8fff8','#3ad8e0']},pmuseum:{box:[.4,.34,0],img:'pmuseum',pal:['#0a3a4a','#a8fff8','#3ad8e0']}};
+const lgOf=b=>b.moon?LG.moon:b.par?LG.rmoon:LG[b.id];
 const TITLES={void:1,ashaad:1,sea:1,oldhub:1,'v-lovely':1,'v-arcade':1,'v-larper':1,'v-purple':1,'v-white':1,'v-strings':1};
-function infoHTML(b){const L=lgOf(b);if(L){const href=b.moon?b.moon.url:b.href,nm=b.moon?b.moon.name:b.title,pl=`<a class="lgplay"${href?` href="${href}" target="_blank" rel="noopener"`:` href="#" data-chans="1"`} aria-label="${b.yt?'Show channels':'Play '+nm}">${PLAY(...L.pal)}</a>`;
-  const logo=L.btn?'':L.img?`<img class="lgimg" src="world/titles/${L.img}.png" alt="${nm}">`:b.yt?`<div class="lglogo">${YTLOGO}</div>`:L.arena?`<div class="lglogo"><b class="lgtx fb">BALL<br>ARENA</b></div>`:`<div class="lglogo"><b class="lgtx mo">${nm}</b></div>`;
+function infoHTML(b){const L=lgOf(b);if(L){const href=b.moon?b.moon.url:b.href,nm=b.moon?b.moon.name:b.title,pl=`<a class="lgplay"${href?` href="${href}" target="_blank" rel="noopener"`:` href="#" data-chans="1"`} aria-label="${b.yt?'Show channels':(b.par?'Open ':'Play ')+nm}">${PLAY(...L.pal)}</a>`;
+  const logo=L.btn?'':L.img?`<img class="lgimg" src="world/titles/${L.img}.png" alt="${nm}">`:b.yt?`<div class="lglogo">${YTLOGO}</div>`:L.arena?`<div class="lglogo"><b class="lgtx fb">BALL<br>ARENA</b></div>`:`<div class="lglogo"><b class="lgtx mo">${b.short||nm}</b></div>`;
   const ch=b.yt?`<div class="lgch" hidden>${CH.map(c=>`<button class="lgc" data-moon="m-${c.id}">${c.name}</button>`).join('')}</div>`:'';
-  const lk=b.moon?'moon':b.id;return `<h2 class="sr">${nm}</h2>${logo}<div class="lgrow">${pl}<button type="button" class="lgland" data-land="${lk}" aria-label="Land on ${nm}">LAND</button></div>${ch}`}
+  const lk=b.moon?'moon':b.par?b.par.id:b.id;return `<h2 class="sr">${nm}</h2>${logo}<div class="lgrow">${pl}<button type="button" class="lgland" data-land="${lk}" aria-label="Land on ${nm}">LAND</button></div>${ch}`}
  if(TITLES[b.id]){const ex=/^https?:/.test(b.href)?' target="_blank" rel="noopener"':'';return `<h2 class="sr">${b.title}</h2><a class="tlink" href="${b.href}"${ex} aria-label="${b.title}"><img class="timg" src="world/titles/${b.id}.png" alt="${b.title}"></a><a class="go" href="${b.href}"${ex}>${b.cta}</a>`}
 const a=s=>/^https?:/.test(s)?' target="_blank" rel="noopener"':'';
  if(b.yt)return `<h2>${b.title}</h2><p class="stat"><b>${fmt(TV)}</b> views · <b>${fmt(TS)}</b> subs</p><div class="mlist">${CH.map(c=>`<button class="go sm" data-moon="m-${c.id}">${c.name}</button>`).join('')}</div>`;
@@ -402,7 +408,7 @@ addEventListener('popstate',()=>{if(focus)unfocus();else if(sys==='archive')warp
 // ---- input: drag pan, wheel / pinch zoom, tap/click focus ----
 const pts=new Map(),mv={x:0,y:0,t:0,on:0};let moved=0,pinch=null;
 cv.addEventListener('pointerdown',e=>{mv.on=0;cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);moved=0;if(pts.size===2){const[a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),z:cam.z}}});
-cv.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId)){const b=hit(e.clientX,e.clientY);hover=b;cv.style.cursor=b?'pointer':'grab';b&&!focus?showTip(b,e.clientX,e.clientY):(b&&b.moon&&focus&&focus.yt?showTip(b,e.clientX,e.clientY):hideTip());return}
+cv.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId)){const b=hit(e.clientX,e.clientY);hover=b;cv.style.cursor=b?'pointer':'grab';b&&!focus?showTip(b,e.clientX,e.clientY):(b&&((b.moon&&focus&&focus.yt)||(b.par&&focus&&(focus===b.par||(focus.par&&focus!==b))))?showTip(b,e.clientX,e.clientY):hideTip());return}
  const p=pts.get(e.pointerId),dx=e.clientX-p[0],dy=e.clientY-p[1];pts.set(e.pointerId,[e.clientX,e.clientY]);moved+=Math.abs(dx)+Math.abs(dy);if(moved<6)return;
  if(intro)skipIntro();tw=null;if(pts.size===2&&pinch){const[a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);zoomAt((a[0]+b[0])/2,(a[1]+b[1])/2,pinch.z*d/pinch.d/cam.z)}else{cam.x-=dx/cam.z;cam.y-=dy/cam.z;mv.x=-dx/cam.z;mv.y=-dy/cam.z;mv.t=performance.now()}cv.classList.add('drag')});
 const up=e=>{if(pts.size===1&&moved>=6&&performance.now()-mv.t<80&&!RM)mv.on=1;pts.delete(e.pointerId);if(pts.size<2)pinch=null;cv.classList.remove('drag')};
