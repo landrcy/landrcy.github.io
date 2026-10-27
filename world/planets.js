@@ -427,6 +427,38 @@ P.temple=(S,t)=>{const W=S.img.width,R=W*.3,cx=W/2,cy=W*.6,rot=t*.24,d=S.img.dat
     const hot=1-Math.abs(xx)/(w+.5)-k/(fs*3)*.6;put(x,y,dq(['#7a1a08','#e04a10','#ffa030','#ffe890'],hot+.15,x,y))}}}
  stones.filter(s=>s.Z>=0).forEach(stone);
  S.g.putImageData(S.img,0,0)};
+/* ---------- W.A.M.: a black obsidian world for the minimal pixel fantasy timing-combat game. Square stone arenas with ornate
+   frames sit on its surface (a tiny white warrior waits in the biggest one) and reality-cracks left by the bosses leak white-violet light. ---------- */
+const WOB=['#050507','#0b0b0f','#131319','#1d1d25','#2a2a35','#3c3c4a'],WFR=['#1a1a22','#3a3a44','#66666f','#9a9aa6','#d0d0da','#f4f4f8'],
+ WCK=['#2a1650','#5a2a9a','#8a5ad8','#b480ff','#e6d6ff','#ffffff'],WHL=['#120a22','#24143e','#3a1f66'];
+// arenas: [lon, lat, half-size]; tangent frame precomputed so each one is a true square on the sphere
+const WAR=[[.35,-.32,.44],[2.45,.3,.3],[4.3,-.5,.25]].map(([lo,la,s])=>({s,c:[Math.cos(la)*Math.sin(lo),Math.sin(la),Math.cos(la)*Math.cos(lo)],e1:[Math.cos(lo),0,-Math.sin(lo)],e2:[-Math.sin(la)*Math.sin(lo),Math.cos(la),-Math.sin(la)*Math.cos(lo)],big:s>.4}));
+P.wam=(S,t)=>{const W=S.img.width,R=W*.4,pw=1/R,rot=t*.24;
+ sphere(S,R,W/2,W/2,rot,(lon,lat,lit,x,y)=>{
+  const cl=Math.cos(lat),px=cl*Math.sin(lon),py=Math.sin(lat),pz=cl*Math.cos(lon);
+  // reality cracks: ridges of two noise fields, white core, violet edge, a dithered violet halo bleeding into the stone
+  const n1=Math.abs(fbm(lon*1.6+5,lat*2+1)-.5),n2=Math.abs(vn(lon*3.6+11,lat*4.2+3)-.5)+(fbm(lon*1.1+2,lat*1.1+8)>.6?0:1);
+  const sm=R<28,cw=Math.min(.03,Math.max(.005,pw*.4)),mw=sm?cw*1.6:Math.max(.012,pw*1.1),fl=.75+.25*Math.sin(t*2.2+lon*5+lat*3);
+  const crack=()=>{const c=sm?n1:Math.min(n1,n2*1.25);if(c<cw)return dq(WCK,.82+fl*.18,x,y);if(c<mw)return dq(WCK,.38+fl*.32,x,y);if(!sm&&c<mw+pw*1.6+.006){const k=1-(c-mw)/(pw*1.6+.006);return bay(x,y)<k*.7?dq(WHL,k+.2,x,y):null}return null};
+  for(const A of WAR){const d=px*A.c[0]+py*A.c[1]+pz*A.c[2];if(d<.6)continue;const u=(px*A.e1[0]+py*A.e1[1]+pz*A.e1[2])/d,v=(px*A.e2[0]+py*A.e2[1]+pz*A.e2[2])/d,s=A.s,au=Math.abs(u),av=Math.abs(v),m=Math.max(au,av)/s;if(m>=1)continue;
+   if(m>.84){// ornate stone frame: bevel lit from the upper left, crenellated rim, corner towers with a white stud
+    const side=au>av?(u<0?1:-1):(v<0?1:-1),e=(au>av?v:u)/s,corner=au>s*.8&&av>s*.8;
+    if(corner){const q=Math.max(Math.abs(au-s*.9),Math.abs(av-s*.9))/s;if(q<Math.max(.035,pw*.6/s))return'#ffffff';return dq(WFR,lit*.75+.25+(q>.075?(u<0||v<0?.08:-.12):0),x,y)}
+    const notch=m>.95&&(Math.floor((e+1)*8)&1);if(notch)return dq(WFR,lit*.4+.04,x,y);
+    return dq(WFR,lit*.7+.16+side*(m>.92?.14:-.06)+(Math.floor((e+1)*16)&1?0:-.06),x,y)}
+   if(m>.78)return dq(WOB,(u<0&&au>=av)||(v<0&&av>au)?.02:lit*.3,x,y); // recessed inner lip, shadowed on the lit side
+   const c=crack();if(c&&!A.big)return c;
+   if(A.big){const q=u/s,r=v/s,ps=pw/s;// a tiny white warrior with black eyes, sword at his side
+    if(Math.abs(q)<.13&&r>-.16&&r<.12){if(r<0&&r>-.1&&Math.abs(Math.abs(q)-.055)<Math.max(.022,ps*.5))return'#0b0b0e';return dq(WFR,lit*.4+.6,x,y)}
+    if(Math.abs(q-.21)<Math.max(.022,ps*.5)&&r>-.3&&r<.06)return dq(WFR,lit*.35+.62,x,y);
+    if(Math.abs(q-.21)<.06&&Math.abs(r-.06)<Math.max(.02,ps*.5))return dq(WFR,.45,x,y);
+    if(Math.abs(q)<.2&&r>=.12&&r<.18)return WOB[0];if(c)return c}
+   const g=Math.abs(((u/s*2.5+5)%1)-.5)>.44||Math.abs(((v/s*2.5+5)%1)-.5)>.44;return dq(WOB,lit*.42+(g?.12:.02),x,y)}
+  const c=crack();if(c)return c;
+  // obsidian blocks in staggered rows, rough chips and scree
+  const uu=lon*7/Math.PI,vv=lat*7/Math.PI*1.2,iv=Math.floor(vv),u2=uu+(iv&1)*.5,iu=Math.floor(u2),fu=u2-iu,fv=vv-iv;
+  if(fu<.06||fv<.08)return dq(WOB,lit*.4,x,y);
+  const chip=fbm(lon*5+3,lat*5+9)>.66?.1:0;return dq(WOB,lit*.72+.06+(H(iu,iv)-.5)*.14+chip,x,y)},{w:Math.max(1,R*.06),r:WHL.concat(['#5a2a9a'])})};
 /* ---------- PIXEL MUSEUM ROOM MOONS: one tiny animated relic per museum room, orbiting the temple world like the LLC channel moons.
    Every relic is evaluated per pixel in its own unit square (u,v in -1..1, y down), lit from the upper left, so it is the same
    chunky pixel art at any resolution. ---------- */
@@ -589,6 +621,36 @@ const K={
    {const r=eL(u,v,o+.12,-.06,.52+P.e*.04,.44);if(r>=0)return Lc(RED,r,x,y,.05)}
    {const r=bL(u-(o-.48),v-.06,.16,.32,pw*1.5);if(r>=0)return Lc(WHT,r,x,y,Math.abs(u-(o-.48))<.035&&(Math.floor(v*16)&1)?-.4:0)}
    return null}},
+ // W.A.M. WARRIOR: a white pixel sword spinning end over end, a glint running up the blade like on the title screen
+ wsword:{pre:t=>{const a=t*1.1;return{ca:Math.cos(a),sa:Math.sin(a),g:(t*.7)%1.6}},
+  px(u,v,x,y,P,pw){const{ca,sa}=P,lx=u*ca+v*sa,ly=-u*sa+v*ca,ax=Math.abs(lx);
+   if(ly>-.88&&ly<.2){const hw=Math.max(pw*.75,.12*Math.min(1,(ly+.88)/.26));if(ax<hw){if(P.g<1&&Math.abs(ly-(.15-P.g*1.03))<Math.max(pw*.8,.05))return'#ffffff';const n=Math.sign(lx)*.6;return Lc(WHT,RL(n*ca,n*sa,.8),x,y,ax<Math.max(pw*.5,.025)?.12:-.05)}}
+   if(ly>=.2&&ly<.3&&ax<.36)return Lc(IRN,bL(lx,ly-.25,.36,.05,pw*1.2,ca,sa),x,y,.15);
+   if(ly>=.3&&ly<.64&&ax<Math.max(.065,pw*.75))return Lc(IRN,RL(Math.sign(lx)*.5*ca,Math.sign(lx)*.5*sa,.85),x,y,(Math.floor(ly*26)&1)?-.15:.05);
+   const pcx=-.73*sa,pcy=.73*ca;if((u-pcx)**2+(v-pcy)**2<.01)return Lc(WHT,eL(u,v,pcx,pcy,.1,.1),x,y);return null}},
+ // W.A.M. ARCHER: a wooden bow rocking gently, string drawing back on a white-tipped arrow with green fletching
+ wbow:{pre:t=>{const a=-.5+Math.sin(t*1.2)*.2;return{ca:Math.cos(a),sa:Math.sin(a),p:.5+.5*Math.sin(t*2.4)}},
+  px(u,v,x,y,P,pw){const{ca,sa}=P,lx=u*ca+v*sa,ly=-u*sa+v*ca,dr=Math.hypot(lx-.55,ly),an=Math.atan2(ly,lx-.55),da=Math.PI-Math.abs(an);
+   const nk=.08+P.p*.22,sw=Math.max(pw*.5,.016);
+   // limb: an arc bulging left, thick at the grip, tapering to the tips
+   if(da<.95){const th=Math.max(pw*.8,.075*(1-da*.45));if(Math.abs(dr-.95)<th){const n=(dr-.95)/th,nx=-Math.cos(da)*n,ny=Math.sign(ly)*Math.sin(da)*n;
+     if(da<.16)return Lc(['#1e3a1e','#3a6a3a','#5fae5f','#a8e0a8'],RL(nx*ca-ny*sa,nx*sa+ny*ca,.75),x,y);return Lc(LEA,RL(nx*ca-ny*sa,nx*sa+ny*ca,.75),x,y,.12)}}
+   // string from each tip to the nock point
+   for(const s2 of[-1,1]){const[dx,dy]=sD(lx,ly,0,s2*.77,nk,0);if(Math.hypot(dx,dy)<sw)return'#e8e8f0'}
+   // arrow
+   if(Math.abs(ly)<Math.max(pw*.6,.022)&&lx>-.7&&lx<nk)return Lc(LEA,.6,x,y,.2);
+   if(lx<=-.7&&lx>-.86&&Math.abs(ly)<(lx+.86)*.55)return Lc(WHT,.6-(ly>0?.2:0),x,y);
+   if(lx>nk-.2&&lx<nk+.02&&Math.abs(ly)<.1&&Math.abs(ly)>Math.max(pw*.6,.022)*.5&&((lx-nk+.2)*.5>Math.abs(ly)-.1+.1-(lx-nk+.2)*.2))return Lc(['#1e3a1e','#3a6a3a','#7ee07e','#c8ffc8'],ly<0?.7:.4,x,y);
+   return null}},
+ // W.A.M. MAGE: a crooked staff with an iron claw holding a pulsing violet orb, sparks circling it
+ wstaff:{pre:t=>{const a=.32+Math.sin(t*1.1)*.08;return{ca:Math.cos(a),sa:Math.sin(a),p:.55+.45*Math.sin(t*3),t}},
+  px(u,v,x,y,P,pw){const{ca,sa}=P,lx=u*ca+v*sa,ly=-u*sa+v*ca,oy=-.6;
+   const orr=Math.hypot(lx,ly-oy);
+   if(orr<.17){const r=eL(lx,ly,-.0,oy,.17,.17);if(orr<.05&&lx<0&&ly<oy)return'#ffffff';return Lc(PUR,r,x,y,.25+P.p*.2)}
+   for(const s2 of[-1,1]){const r=cL(lx,ly,s2*.12,oy+.2,s2*.2,oy-.12,Math.max(pw*.7,.04));if(r>=0)return Lc(IRN,r,x,y,.1);const r2=cL(lx,ly,s2*.2,oy-.12,s2*.08,oy-.26,Math.max(pw*.6,.032));if(r2>=0)return Lc(IRN,r2,x,y,.15)}
+   const wob=Math.sin(ly*7)*.025;if(ly>oy+.15&&ly<.92){const r=cL(lx-wob,ly,0,oy+.15,0,.92,Math.max(pw*.75,.055));if(r>=0)return Lc(LEA,r,x,y,ly>.3&&ly<.42?-.2:.1)}
+   for(let k=0;k<4;k++){const a=P.t*2.2+k*Math.PI/2,ex=Math.cos(a)*.34,ey=oy+Math.sin(a)*.34*.6;if(Math.abs(lx-ex)<Math.max(pw*.8,.035)&&Math.abs(ly-ey)<Math.max(pw*.8,.035))return k&1?'#d0a8ff':'#ffffff'}
+   return glow(orr-.17,.28,x,y,PUR,.45+P.p*.4)}},
  // COOPER SKY CITY: the red-and-white crest spinning like a coin, a glint sweeping its face
  crest:{pre:t=>{const th=t*.9;return{c:Math.cos(th),s:Math.sin(th),t}},
   px(u,v,x,y,P,pw){const sx=Math.max(.06,Math.abs(P.c)),lu=u/sx,front=P.c>0;

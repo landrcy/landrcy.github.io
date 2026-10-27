@@ -58,6 +58,19 @@ const T={
    if(h>=48){const run=(((bx>>2)+(by>>2))%5===0)&&((bx&3)===1||(by&3)===1)&&h>=60;if(run)return hx('#3ad8e0');return ramp(st,.6+((bx&3)===0||(by&3)===0?-.2:0),x,y)}
    const grout=(x&7)===0||((y&7)===0);return ramp(st,(grout?.25:.45)+fbm(x,y,2,93,16)*.25,x,y)},
   glow:{c:'#a8fff8',d:.003}},
+ wam:{name:'W.A.M.',sky:['#000000','#040308','#0c0818','#1e1436'],fog:'#0c0a16',stars:1,
+  // black arena field: square stone arenas with ornate raised frames and corner towers, obsidian scree between, reality-cracks everywhere
+  h:(x,y)=>{const bx=((x%64)+64)%64,by=((y%64)+64)%64,ix=Math.floor(x/64),iy=Math.floor(y/64),k=h2(ix,iy,121),px=Math.abs(bx-32),py=Math.abs(by-32),m=Math.max(px,py),
+    cr=Math.abs(fbm(x,y,3,123,4)-.5),cut=cr<.01?-3:0;
+   if(k>.28&&m<27){if(m>=23){if(px>=23&&py>=23)return 78;return(m>=26&&((((px>=23?by:bx)>>2)&1)))?52:58}if(m>=22)return 36;return 42+cut}
+   return 20+fbm(x,y,4,125,4)*42+(h2(x>>2,y>>2,127)>.93?8:0)+cut},
+  c:(x,y,h)=>{const bx=((x%64)+64)%64,by=((y%64)+64)%64,ix=Math.floor(x/64),iy=Math.floor(y/64),k=h2(ix,iy,121),px=Math.abs(bx-32),py=Math.abs(by-32),m=Math.max(px,py),cr=Math.abs(fbm(x,y,3,123,4)-.5);
+   const FR=['#1c1c24','#34343e','#55555f','#8a8a96','#c8c8d2'].map(hx),OB=['#060608','#0e0e14','#181820','#24242e','#34343f'].map(hx);
+   const wall=k>.28&&m>=22&&m<27;if(!wall){if(cr<.004)return hx('#e6d6ff');if(cr<.01)return hx(cr<.007?'#b480ff':'#5a2a9a')}
+   if(k>.28&&m<27){if(m>=23){if(px>=23&&py>=23)return(Math.abs(px-25)<1&&Math.abs(py-25)<1&&h>=70)?hx('#ffffff'):ramp(FR,.6-((x+y)&1)*.06,x,y);return ramp(FR,.38+((((px>=23?by:bx))&3)===0?-.2:0)+(m>=26?.1:0),x,y)}
+    if(m>=22)return hx('#050507');const g=(bx&7)===0||(by&7)===0;return ramp(OB,g?.62:.3+h2(bx>>3,by>>3,129)*.12,x,y)}
+   if(cr<.02&&bay(x,y)<(.02-cr)*40)return hx('#2a1650');return ramp(OB,(h-20)/46+fbm(x,y,2,131,32)*.2-.1,x,y)},
+  glow:{c:'#d8c0ff',d:.003}},
  moon:{name:'Moon',sky:['#000000','#04040a','#0c0c18','#1a1a2a'],fog:'#101018',stars:2,
   h:(x,y)=>{let h=fbm(x,y,4,71,4)*70+40;for(let k=0;k<14;k++){const cx=h2(k,1,71)*N,cy=h2(k,2,71)*N,R=8+h2(k,3,71)*26;let dx=Math.abs(x-cx),dy=Math.abs(y-cy);dx=Math.min(dx,N-dx);dy=Math.min(dy,N-dy);const d=Math.hypot(dx,dy)/R;if(d<1)h-=(1-d*d)*R*.9;else if(d<1.3)h+=(1.3-d)*R*.5}return h},
   c:(x,y,h)=>ramp(['#3a3a42','#5a5a64','#7a7a86','#a2a2ae','#c8c8d2'].map(hx),h/120+fbm(x,y,2,77,32)*.2-.1,x,y)}};

@@ -17,10 +17,11 @@ const MAIN=[
  B({id:'ashaad',paint:'ashaad',w:66,h:60,orb:220,per:50,ph:2.2,hr:.42,title:'The Binding of Ashaad',by:'a brainrot roguelike by landrcy',blurb:'Descend into the basement, shoot your tears, grab cursed items and survive in this browser roguelike. 3 starters, 4 floors, 1 secret Finley boss.',href:'https://landrcy.github.io/binding-of-ashaad/',cta:'▶ Play'}),
  B({id:'sea',paint:'sea',w:122,orb:325,per:72,ph:.4,hr:.4,title:'Sea of Thought',by:'a pixel ocean by landrcy',blurb:'A quiet pixel ocean full of messages in bottles: write one, throw it in, then dive and read what strangers left behind.',href:'https://landrcy.github.io/sea-of-thought/',cta:'▶ Dive in'}),
  B({id:'yt',paint:'yt',w:96,orb:885,per:140,ph:4.1,hr:.42,title:'LLC Powered Channels',by:'YouTube',yt:1}),
- B({id:'gow',paint:'crest',w:92,h:74,orb:1420,per:290,ph:5.3,hr:.42,title:'Game of Websites',by:'coopercitywebsites.github.io',blurb:'A searchable catalogue of every site in the collection: unblocked games, NeoForge mods, old builds and the trash pile, ranked by how much code went into each one.',href:'https://coopercitywebsites.github.io/main/',cta:'Open'}),
+ B({id:'gow',paint:'crest',w:92,h:74,orb:1590,per:315,ph:5.3,hr:.42,title:'Game of Websites',by:'coopercitywebsites.github.io',blurb:'A searchable catalogue of every site in the collection: unblocked games, NeoForge mods, old builds and the trash pile, ranked by how much code went into each one.',href:'https://coopercitywebsites.github.io/main/',cta:'Open'}),
  B({id:'void',paint:'void',w:236,h:236,orb:1255,per:245,ph:5.9,tc:'#c04df0',hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13}),
  B({id:'arena',paint:'arena',w:134,h:110,orb:1080,per:185,ph:2.9,hr:.42,title:'Ball Arena',by:'ball fights from the Langrino channel',href:'https://www.youtube.com/@Langrino',cta:'▶ Watch'}),
- B({id:'pmuseum',paint:'temple',w:150,orb:525,per:98,ph:1.4,hr:.4,title:'Pixel Museum',href:'https://landrcy.github.io/pixel-museum/',cta:'▶ Visit'})];
+ B({id:'pmuseum',paint:'temple',w:150,orb:525,per:98,ph:1.4,hr:.4,title:'Pixel Museum',href:'https://landrcy.github.io/pixel-museum/',cta:'▶ Visit'}),
+ B({id:'wam',paint:'wam',w:104,orb:1425,per:272,ph:3.6,hr:.4,title:'W.A.M.',href:'https://landrcy.github.io/wam/',cta:'▶ Play'})];
 const MOONS=CH.map((c,i)=>B({id:'m-'+c.id,paint:'moon',arg:c.kind,w:Math.round(12+14*Math.sqrt((c.views||0)/MV)),orb:66+i*9,per:9+i*2.6,ph:i*1.3,dir:1,hr:.42,moon:c,title:c.name}));
 // Pixel Museum room moons: one animated relic per museum room, two rings (west wing sites inside, east wing vaults outside)
 const PMU=MAIN.find(b=>b.id==='pmuseum'),PMURL='https://landrcy.github.io/pixel-museum/#';
@@ -28,6 +29,9 @@ const ROOMS=[['hub','Landrcyverse Observatory','Landrcyverse','lsun',18],['void'
  ['mecha','Mecha Forge','Mecha Forge','mech',20],['swords','Hall of Blades & Armor','Swords & Armor','sword',22],['books','Arcane Library','Arcane Library','book',20],['dragon','Dragon Hoard','Dragon Hoard','dragon',22],['crystal','Crystal Cavern','Crystal Cavern','crystal',20],['cyber','Neon Cyber Shrine','Cyber Shrine','torii',20],['relic','Starship Relic Vault','Relic Vault','cube',19]];
 const RMOONS=ROOMS.map(([id,title,short,kind,w],i)=>{const outer=i>=7,k=i%7;return B({id:'r-'+id,paint:'rmoon',arg:kind,w,orb:outer?124:84,per:outer?52:34,ph:k*TAU/7+(outer?.45:0),hr:.45,par:PMU,room:id,short,title,href:PMURL+id})});
 MOONS.push(...RMOONS);
+// W.A.M. party moons: the warrior's sword, the archer's bow and the mage's staff
+const WAMB=MAIN.find(b=>b.id==='wam');
+MOONS.push(...[['sword',"Warrior's Sword",'SWORD','wsword',19],['bow',"Archer's Bow",'BOW','wbow',18],['staff',"Mage's Staff",'STAFF','wstaff',20]].map(([id,title,short,kind,w],i)=>B({id:'w-'+id,paint:'rmoon',arg:kind,w,orb:70,per:30,ph:i*TAU/3+.3,hr:.45,par:WAMB,short,title,href:WAMB.href})));
 const V=(id,kind,w,orb,per,title,by,href,blurb)=>B({id,paint:'vplanet',arg:kind,w,orb,per,ph:orb*.037,hr:.4,title,by,href,cta:'Visit this version',blurb});
 const ARCH=[
  B({id:'oldhub',paint:'oldhub',w:110,x:0,y:0,hr:.36,title:'The space hub',by:'Oct 24, 2026 · one long page on a starfield',blurb:'Every site as its own floating pixel panel: dungeon slab, waves, warped void, browser tab, TV and arena.',href:'archive/',cta:'Visit this version'}),
@@ -45,7 +49,7 @@ for(const b of [...MAIN,...MOONS,...ARCH]){b.S={N:0};b.L=[].map(([dv0])=>{const 
 let sys='main',bodies=MAIN;
 // ---- camera ----
 const cam={x:0,y:0,z:1};let tw=null,focus=null,hover=null,intro=RM?null:{t0:performance.now()};if(intro)document.body.classList.add('intro');
-function fitZ(){const ext=sys==='main'?(W<H?[1480,1440]:[1510,940]):(W<H?[490,300]:[490,300]);return Math.min(W/(2*ext[0]),(H-90)/(2*ext[1]))}
+function fitZ(){const ext=sys==='main'?(W<H?[1650,1560]:[1680,1040]):(W<H?[490,300]:[490,300]);return Math.min(W/(2*ext[0]),(H-90)/(2*ext[1]))}
 function fitX(){return 0}
 function fitY(){return 0}
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
@@ -224,7 +228,7 @@ function frame(now){if(document.body.classList.contains('landed')){last=now;requ
  if(tw){const k=ease(clamp((now-tw.t0)/tw.ms));const zl=Math.exp(Math.log(tw.a.z)+(Math.log(tw.b.z)-Math.log(tw.a.z))*k);cam.x=tw.a.x+(tw.b.x-tw.a.x)*k;cam.y=tw.a.y+(tw.b.y-tw.a.y)*k;cam.z=zl;if(k>=1){const d=tw.done;tw=null;d&&d()}}
  // orbit motion: hover/focus slows to a stop
  const list=sys==='main'?[...bodies,...MOONS]:bodies;
- for(const b of list){if(b.orb==null)continue;const frozen=focus&&(focus===b||(b.moon?(focus===b||focus.moon):b.par?!!focus.par:(b.id==='yt'&&(focus.yt||focus.moon))||(b.id==='pmuseum'&&!!focus.par)));const tgt=RM||frozen?0:hover===b?0:(hover&&((hover.yt&&b.moon)||(hover===b.par)))?.35:1;b.sf+=(tgt-b.sf)*Math.min(1,dt*4);b.ang+=dt*TAU/b.per*b.sf*(b.dir||1)}
+ for(const b of list){if(b.orb==null)continue;const frozen=focus&&(focus===b||(b.moon?(focus===b||focus.moon):b.par?focus.par===b.par:(b.id==='yt'&&(focus.yt||focus.moon))||(focus.par===b)));const tgt=RM||frozen?0:hover===b?0:(hover&&((hover.yt&&b.moon)||(hover===b.par)))?.35:1;b.sf+=(tgt-b.sf)*Math.min(1,dt*4);b.ang+=dt*TAU/b.per*b.sf*(b.dir||1)}
  let wv=0;if(warp){const k=(now-warp.t0)/1700;wv=Math.sin(Math.min(1,k)*Math.PI);if(k>=.5&&!warp.swapped){warp.swapped=true;sys=warp.to;bodies=sys==='main'?MAIN:ARCH;document.body.classList.toggle('arch',sys==='archive');tw=null;cam.x=fitX();cam.y=fitY();cam.z=fitZ()*6;to(fitX(),fitY(),fitZ(),1100)}if(k>=1)warp=null}
  // stars
  g.globalAlpha=1;g.fillStyle='#010103';g.fillRect(0,0,W,H);
@@ -320,8 +324,8 @@ const UFO={sz:22,asp:.5,cap:32,name:'UFO?!',paint:(u,v,x,y,N)=>{const dx=(u-.5)*
   if(Math.abs(dy-.2)<.32&&Math.abs(dx)<1-Math.abs(dy-.2)*.9){if(Math.abs(dy-.25)<.07&&(Math.floor(u*N/3))%2)return dpk('#ffe66d');return ramp(MTL,lite(dx,dy)+.2,x,y)}return 0}};
 // layout (seeded, stable): only in the empty space between the outer orbit and the tear, never on the planets
 const DECO={back:[],world:[]};
-(function(){const inZone=(x,y,m)=>Math.hypot(x,y/SQ)>1530+m&&inMain(x,y)&&inMain(x+m,y)&&inMain(x-m,y)&&inMain(x,y+m)&&inMain(x,y-m);
- const put=(o,pf,m,tries=300)=>{for(let t=0;t<tries;t++){const x=(DK()*2-1)*2700,y=(DK()*2-1)*3300;if(pf===1?!inZone(x,y,m):!(inMain(x,y)&&Math.hypot(x,y/SQ)>1490+o.sz*.35))continue;if(pf<1&&DECO.back.some(q=>Math.hypot(q.x-x,q.y-y)<(q.sz+o.sz)*.45))continue;if(pf===1&&DECO.world.some(q=>Math.hypot(q.x-x,q.y-y)<q.sz+o.sz+90))continue;o.x=x;o.y=y;return o}return null};
+(function(){const inZone=(x,y,m)=>Math.hypot(x,y/SQ)>1700+m&&inMain(x,y)&&inMain(x+m,y)&&inMain(x-m,y)&&inMain(x,y+m)&&inMain(x,y-m);
+ const put=(o,pf,m,tries=300)=>{for(let t=0;t<tries;t++){const x=(DK()*2-1)*2700,y=(DK()*2-1)*3300;if(pf===1?!inZone(x,y,m):!(inMain(x,y)&&Math.hypot(x,y/SQ)>1660+o.sz*.35))continue;if(pf<1&&DECO.back.some(q=>Math.hypot(q.x-x,q.y-y)<(q.sz+o.sz)*.45))continue;if(pf===1&&DECO.world.some(q=>Math.hypot(q.x-x,q.y-y)<q.sz+o.sz+90))continue;o.x=x;o.y=y;return o}return null};
  for(let i=0;i<11;i++){const o=put(nebula(i,NPAL[i%3],700+DK()*900),.55,0);if(o){o.pf=.55;o.dx=(DK()-.5)*3;o.dy=(DK()-.5)*2;DECO.back.push(o)}}
  for(let i=0;i<6;i++){const o=put(galaxy(i,i%3===2,110+DK()*150),.3,0);if(o){o.pf=.3;DECO.back.push(o)}}
  for(let i=0;i<5;i++){const o=put(farPlanet(i,45+DK()*80),.4,0);if(o){o.pf=.4;DECO.back.push(o)}}
@@ -362,18 +366,23 @@ const TH={sun:['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#9ab4e8'],a
  gow:['#000','#fff','#e01a22','#fff','Anton','#e01a22'],ccold:['#000','#fff','#e01a22','#fff','Anton','#e01a22'],void:['#05020d','#efe6ff','#c04df0','#fff','VT323','#c04df0'],
  yt:['#0f0f0f','#fff','#fff','#0f0f0f','Roboto','#ff0033'],oldhub:['#120c1e','#f3ecdf','#ff0033','#fff','Silkscreen','#ffcc4d'],ballfight:['#120c1e','#f3ecdf','#ffcc4d','#120c1e','Silkscreen','#ff0033'],
  'v-lovely':['#fff8f1','#3a2430','#ff5d8f','#fff','Fredoka','#ffb347'],'v-arcade':['#1a1440','#ffd257','#ff5d8f','#fff','Silkscreen','#7c6cff'],'v-larper':['#1a1440','#ffcc4d','#7c6cff','#fff','Silkscreen','#ff5d8f'],
- 'v-purple':['#241640','#ffcc4d','#38e1d0','#0a0814','Silkscreen','#7c6cff'],'v-white':['#080a12','#dde0e8','#9ab4e8','#080a12','Silkscreen','#cfe0ff'],pmuseum:['#05040c','#a8fff8','#3ad8e0','#05040c','Silkscreen','#1a7a8a'],'v-strings':['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#c9ced8']};
-function theme(b){const t=TH[b.moon?'yt':b.par?'pmuseum':b.id]||TH.sun;return `--bg:${t[0]};--fg:${t[1]};--ac:${t[2]};--bf:${t[3]};--ft:'${t[4]}';--bd:${t[5]}`}
+ 'v-purple':['#241640','#ffcc4d','#38e1d0','#0a0814','Silkscreen','#7c6cff'],'v-white':['#080a12','#dde0e8','#9ab4e8','#080a12','Silkscreen','#cfe0ff'],pmuseum:['#05040c','#a8fff8','#3ad8e0','#05040c','Silkscreen','#1a7a8a'],wam:['#000000','#f2f2f2','#ffffff','#000000','Silkscreen','#8a8a96'],'v-strings':['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#c9ced8']};
+function theme(b){const t=TH[b.moon?'yt':b.par?b.par.id:b.id]||TH.sun;return `--bg:${t[0]};--fg:${t[1]};--ac:${t[2]};--bf:${t[3]};--ft:'${t[4]}';--bd:${t[5]}`}
 const NOINFO={sun:1};
 const PLAY=(d,l,m)=>`<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="${d}" d="M4 2h2v1h2v1h2v1h2v1h2v4h-2v1h-2v1h-2v1h-2v1h-2z"/><path fill="${l}" d="M5 4h1v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-1z"/><path fill="${m}" d="M5 8h1v3h-1zM6 9h2v1h-2z"/></svg>`;
 const YTLOGO=`<svg class="lgsvg" viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#ff0033" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#b8001f" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#fff" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg><b class="lgtx">LLC Powered<br>Channels</b>`;
 // box = [width frac of w, height frac of h, y offset frac of h]
 const LG={arena:{box:[.6,.42,.02],pal:['#3a1a06','#ffcf3a','#ff6464'],arena:1},sea:{box:[.56,.56,0],img:'sea',pal:['#021e5a','#90E0EF','#48CAE4']},ashaad:{box:[.66,.5,.06],img:'ashaad',pal:['#2a1608','#ffd23a','#c08a1e']},void:{box:[.3,.39,0],img:'void',pal:['#05020d','#e6c8ff','#c04df0']},
- yt:{box:[.6,.6,0],pal:['#2a0008','#ffffff','#ffb0b8']},gow:{box:[.2,.2,.3],btn:1,pal:['#000000','#ffffff','#e01a22']},moon:{box:[.62,.62,0],pal:['#2a0008','#ffffff','#ffb0b8']},rmoon:{box:[.7,.62,0],pal:['#0a3a4a','#a8fff8','#3ad8e0']},pmuseum:{box:[.4,.34,0],img:'pmuseum',pal:['#0a3a4a','#a8fff8','#3ad8e0']}};
-const lgOf=b=>b.moon?LG.moon:b.par?LG.rmoon:LG[b.id];
+ yt:{box:[.6,.6,0],pal:['#2a0008','#ffffff','#ffb0b8']},gow:{box:[.2,.2,.3],btn:1,pal:['#000000','#ffffff','#e01a22']},moon:{box:[.62,.62,0],pal:['#2a0008','#ffffff','#ffb0b8']},rmoon:{box:[.7,.62,0],pal:['#0a3a4a','#a8fff8','#3ad8e0']},pmuseum:{box:[.4,.34,0],img:'pmuseum',pal:['#0a3a4a','#a8fff8','#3ad8e0']},wam:{box:[.56,.44,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']},wmoon:{box:[.8,.66,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']}};
+const lgOf=b=>b.moon?LG.moon:b.par?(b.par.id==='wam'?LG.wmoon:LG.rmoon):LG[b.id];
+// W.A.M. pixel font (glyphs from the game's js/font.js: [width, 11 rows of LSB-left bitmasks]), drawn white with the game's #24242c drop shadow
+const WG={W:[12,3951,1902,1902,1902,1902,1902,1902,1830,2046,1023,0],'.':[3,0,0,0,0,0,0,0,0,7,7,0],A:[10,510,252,462,462,462,510,510,462,462,975,0],M:[12,1023,2046,1830,1902,1902,1902,1902,1902,1902,3951,0],
+ S:[10,766,1023,911,7,254,508,896,967,1023,509,0],O:[10,252,510,462,903,903,903,903,462,510,252,0],R:[10,255,510,454,462,462,510,254,462,462,975,0],D:[10,511,1022,966,910,910,910,910,926,1022,495,0],B:[10,511,1022,974,910,510,1022,910,926,1022,495,0],T:[9,511,511,313,56,56,56,56,56,56,124,0],F:[10,1023,1022,518,78,126,126,78,14,14,31,0]};
+function wamSVG(str,cls){let x=0,d='';for(const ch of str){const gl=WG[ch];if(!gl){x+=4;continue}for(let r=0;r<11;r++){const m=gl[r+1];let c=0;while(c<gl[0]){if(m>>c&1){let e=c;while(e<gl[0]&&(m>>e&1))e++;d+=`M${x+c} ${r}h${e-c}v1h${c-e}z`;c=e}else c++}}x+=gl[0]+1}
+ return `<svg class="${cls}" viewBox="0 0 ${x} 11" shape-rendering="crispEdges" aria-hidden="true"><path fill="#24242c" transform="translate(1 1)" d="${d}"/><path fill="#ffffff" d="${d}"/></svg>`}
 const TITLES={void:1,ashaad:1,sea:1,oldhub:1,'v-lovely':1,'v-arcade':1,'v-larper':1,'v-purple':1,'v-white':1,'v-strings':1};
 function infoHTML(b){const L=lgOf(b);if(L){const href=b.moon?b.moon.url:b.href,nm=b.moon?b.moon.name:b.title,pl=`<a class="lgplay"${href?` href="${href}" target="_blank" rel="noopener"`:` href="#" data-chans="1"`} aria-label="${b.yt?'Show channels':(b.par?'Open ':'Play ')+nm}">${PLAY(...L.pal)}</a>`;
-  const logo=L.btn?'':L.img?`<img class="lgimg" src="world/titles/${L.img}.png" alt="${nm}">`:b.yt?`<div class="lglogo">${YTLOGO}</div>`:L.arena?`<div class="lglogo"><b class="lgtx fb">BALL<br>ARENA</b></div>`:`<div class="lglogo"><b class="lgtx mo">${b.short||nm}</b></div>`;
+  const logo=L.btn?'':L.wam?`<div class="lglogo">${wamSVG(b.short||nm,'lgsvg lgwam')}</div>`:L.img?`<img class="lgimg" src="world/titles/${L.img}.png" alt="${nm}">`:b.yt?`<div class="lglogo">${YTLOGO}</div>`:L.arena?`<div class="lglogo"><b class="lgtx fb">BALL<br>ARENA</b></div>`:`<div class="lglogo"><b class="lgtx mo">${b.short||nm}</b></div>`;
   const ch=b.yt?`<div class="lgch" hidden>${CH.map(c=>`<button class="lgc" data-moon="m-${c.id}">${c.name}</button>`).join('')}</div>`:'';
   const lk=b.moon?'moon':b.par?b.par.id:b.id;return `<h2 class="sr">${nm}</h2>${logo}<div class="lgrow">${pl}<button type="button" class="lgland" data-land="${lk}" aria-label="Land on ${nm}">LAND</button></div>${ch}`}
  if(TITLES[b.id]){const ex=/^https?:/.test(b.href)?' target="_blank" rel="noopener"':'';return `<h2 class="sr">${b.title}</h2><a class="tlink" href="${b.href}"${ex} aria-label="${b.title}"><img class="timg" src="world/titles/${b.id}.png" alt="${b.title}"></a><a class="go" href="${b.href}"${ex}>${b.cta}</a>`}
