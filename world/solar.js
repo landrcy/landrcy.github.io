@@ -1,6 +1,21 @@
 /* LLC pixel solar system landing. Every body is a procedurally painted, dithered pixel sprite (world/planets.js). */
 (()=>{
 const P=window.PLANETS,RM=matchMedia('(prefers-reduced-motion: reduce)').matches,TAU=Math.PI*2,SQ=.6;
+// lan4drcy: a glowing pixel tesseract rotating through the XW and ZW planes, inner (far-w) cube magenta, outer cube cyan, dithered halo
+P.lan4=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,{dq,bay,hx}=P;d.fill(0);const a=t*.55,b=t*.37,c=.5+t*.18,tl=.38,V=[];
+ const CY=['#0a2a3a','#1a6a8a','#3ad0f0','#a8f6ff','#ffffff'],MG=['#2a0a3a','#7a1a8a','#d03af0','#ffa8f6','#ffffff'];
+ for(let i=0;i<16;i++){const p=[i&1?1:-1,i&2?1:-1,i&4?1:-1,i&8?1:-1];let x=p[0]*Math.cos(a)-p[3]*Math.sin(a),w=p[0]*Math.sin(a)+p[3]*Math.cos(a),z=p[2]*Math.cos(b)-w*Math.sin(b);w=p[2]*Math.sin(b)+w*Math.cos(b);
+  const k=1/(2.7-w*.75);let X=x*k,Y=p[1]*k,Z=z*k;const x2=X*Math.cos(c)+Z*Math.sin(c),z2=-X*Math.sin(c)+Z*Math.cos(c),y2=Y*Math.cos(tl)-z2*Math.sin(tl),z3=Y*Math.sin(tl)+z2*Math.cos(tl),q=1/(2.6-z3);
+  V.push([W/2+x2*q*W*1.05,Hh/2+y2*q*W*1.05,(w+1)/2])}
+ const put=(x,y,cc,ad)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const o=(y*W+x)*4;if(ad&&d[o+3])return;d[o]=cc[0];d[o+1]=cc[1];d[o+2]=cc[2];d[o+3]=255};
+ const pl=.6+.4*Math.sin(t*2.2),cr=W*.2;
+ for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){const r=Math.hypot(x+.5-W/2,y+.5-Hh/2)/cr;if(r<1&&bay(x,y)<(1-r)*(1-r)*.75*pl)put(x,y,hx(dq(r<.45?MG:CY,.25+(1-r)*.45,x,y)))}
+ const th=W>56?1:0,E=[];for(let i=0;i<16;i++)for(let j=0;j<4;j++){const k=i^(1<<j);if(k>i)E.push([V[i],V[k]])}E.sort((p,q)=>p[0][2]+p[1][2]-q[0][2]-q[1][2]);
+ if(W>40)for(const[p,q]of E){const n=Math.ceil(Math.hypot(q[0]-p[0],q[1]-p[1]))+1;for(let s=0;s<=n;s++){const f=s/n,x=p[0]+(q[0]-p[0])*f,y=p[1]+(q[1]-p[1])*f;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1],[2,0],[0,2]])if(bay(Math.round(x+ox),Math.round(y+oy))<.45)put(x+ox,y+oy,hx(CY[1]),1)}}
+ for(const[p,q]of E){const n=Math.ceil(Math.hypot(q[0]-p[0],q[1]-p[1]))+1;for(let s=0;s<=n;s++){const f=s/n,x=p[0]+(q[0]-p[0])*f,y=p[1]+(q[1]-p[1])*f,w=p[2]+(q[2]-p[2])*f,R=w<.5?MG:CY,cc=hx(dq(R,.35+Math.abs(w-.5)*.9+(1-f*0)*.1,Math.round(x),Math.round(y)));put(x,y,cc);if(th){put(x+1,y,cc);put(x,y+1,cc)}}}
+ for(const p of V){const cc=hx(p[2]>.5?'#ffffff':'#ffc8fa');put(p[0],p[1],cc);if(W>40){put(p[0]+1,p[1],cc);put(p[0],p[1]+1,cc);put(p[0]+1,p[1]+1,cc)}}
+ S.g.putImageData(S.img,0,0)};
+
 const cv=document.getElementById('sky'),g=cv.getContext('2d'),info=document.getElementById('info'),tip=document.getElementById('tip'),backBtn=document.getElementById('back'),homeBtn=document.getElementById('home'),archBtn=document.getElementById('archbtn');
 let W=0,H=0,DPR=1;
 // ---- data (stats: public YouTube counts as of Oct 26, 2026; null = not public) ----
@@ -21,6 +36,7 @@ const MAIN=[
  B({id:'void',paint:'void',w:236,h:236,orb:1255,per:245,ph:5.9,tc:'#c04df0',hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13}),
  B({id:'arena',paint:'arena',w:134,h:110,orb:1080,per:185,ph:2.9,hr:.42,title:'Ball Arena',by:'ball fights from the Langrino channel',href:'https://www.youtube.com/@Langrino',cta:'▶ Watch'}),
  B({id:'pmuseum',paint:'temple',w:150,orb:525,per:98,ph:1.4,hr:.4,title:'Pixel Museum',href:'https://landrcy.github.io/pixel-museum/',cta:'▶ Visit'}),
+ B({id:'lan4drcy',paint:'lan4',w:112,orb:790,per:125,ph:.9,hr:.42,title:'lan4drcy',href:'/lan4drcy/',cta:'▶ Play'}),
  B({id:'wam',paint:'wam',w:104,orb:1425,per:272,ph:3.6,hr:.4,title:'W.A.M.',href:'https://landrcy.github.io/wam/',cta:'▶ Play'})];
 const MOONS=CH.map((c,i)=>B({id:'m-'+c.id,paint:'moon',arg:c.kind,w:Math.round(12+14*Math.sqrt((c.views||0)/MV)),orb:66+i*9,per:9+i*2.6,ph:i*1.3,dir:1,hr:.42,moon:c,title:c.name}));
 // Pixel Museum room moons: one animated relic per museum room, two rings (west wing sites inside, east wing vaults outside)
@@ -496,7 +512,7 @@ const PLAY=(d,l,m)=>`<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path
 const YTLOGO=`<svg class="lgsvg" viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#ff0033" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#b8001f" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#fff" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg><b class="lgtx">LLC Powered<br>Channels</b>`;
 // box = [width frac of w, height frac of h, y offset frac of h]
 const LG={arena:{box:[.6,.42,.02],pal:['#3a1a06','#ffcf3a','#ff6464'],arena:1},sea:{box:[.56,.56,0],img:'sea',pal:['#021e5a','#90E0EF','#48CAE4']},ashaad:{box:[.66,.5,.06],img:'ashaad',pal:['#2a1608','#ffd23a','#c08a1e']},void:{box:[.3,.39,0],img:'void',pal:['#05020d','#e6c8ff','#c04df0']},
- yt:{box:[.6,.6,0],pal:['#2a0008','#ffffff','#ffb0b8']},moon:{box:[.62,.62,0],pal:['#2a0008','#ffffff','#ffb0b8']},rmoon:{box:[.7,.62,0],pal:['#0a3a4a','#a8fff8','#3ad8e0']},pmuseum:{box:[.4,.34,0],img:'pmuseum',pal:['#0a3a4a','#a8fff8','#3ad8e0']},wam:{box:[.56,.44,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']},wmoon:{box:[.8,.66,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']}};
+ yt:{box:[.6,.6,0],pal:['#2a0008','#ffffff','#ffb0b8']},moon:{box:[.62,.62,0],pal:['#2a0008','#ffffff','#ffb0b8']},rmoon:{box:[.7,.62,0],pal:['#0a3a4a','#a8fff8','#3ad8e0']},pmuseum:{box:[.4,.34,0],img:'pmuseum',pal:['#0a3a4a','#a8fff8','#3ad8e0']},wam:{box:[.56,.44,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']},wmoon:{box:[.8,.66,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']},lan4drcy:{box:[.66,.36,0],pal:['#06121c','#e8fdff','#66f0ff']}};
 const lgOf=b=>b.moon?LG.moon:b.par?(b.par.id==='wam'?LG.wmoon:LG.rmoon):LG[b.id];
 // W.A.M. pixel font (glyphs from the game's js/font.js: [width, 11 rows of LSB-left bitmasks]), drawn white with the game's #24242c drop shadow
 const WG={W:[12,3951,1902,1902,1902,1902,1902,1902,1830,2046,1023,0],'.':[3,0,0,0,0,0,0,0,0,7,7,0],A:[10,510,252,462,462,462,510,510,462,462,975,0],M:[12,1023,2046,1830,1902,1902,1902,1902,1902,1902,3951,0],
