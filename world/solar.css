@@ -88,3 +88,4 @@ body.uirv #sndbtn{animation-delay:.15s}body.uirv #sat{animation:pxin .7s steps(5
 #info.lgbtn .lgplay{width:72cqmin}
 #info[data-p="pmuseum"] .lgplay{flex-shrink:0}
 #info.lg .lgwam{width:88cqw;filter:drop-shadow(0 0 4px #000)}#info[data-p^="w"] .lgplay{flex-shrink:0}
+#info[data-p="ashaad"] .lgrow{transform:translateY(30cqmin)}
