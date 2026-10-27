@@ -16,7 +16,7 @@ const MAIN=[
  B({id:'sun',paint:'sun',w:250,x:0,y:0,hr:.36,title:'Landrcyverse',by:'games & websites by Landry',blurb:'Every planet is one of my sites. Click a planet to fly to it.'}),
  B({id:'ashaad',paint:'ashaad',w:66,h:60,orb:220,per:50,ph:2.2,hr:.42,title:'The Binding of Ashaad',by:'a brainrot roguelike by landrcy',blurb:'Descend into the basement, shoot your tears, grab cursed items and survive in this browser roguelike. 3 starters, 4 floors, 1 secret Finley boss.',href:'https://landrcy.github.io/binding-of-ashaad/',cta:'▶ Play'}),
  B({id:'sea',paint:'sea',w:122,orb:325,per:72,ph:.4,hr:.4,title:'Sea of Thought',by:'a pixel ocean by landrcy',blurb:'A quiet pixel ocean full of messages in bottles: write one, throw it in, then dive and read what strangers left behind.',href:'https://landrcy.github.io/sea-of-thought/',cta:'▶ Dive in'}),
- B({id:'yt',paint:'yt',w:96,orb:885,per:140,ph:4.1,hr:.42,title:'LLC Powered Channels',by:'YouTube',yt:1}),
+ B({id:'yt',paint:'yt',w:96,orb:885,per:140,ph:4.1,hr:.42,title:'LLC Powered Channels',by:'YouTube',yt:1,href:'youtube/'}),
  B({id:'gow',paint:'crest',w:92,h:74,orb:1590,per:315,ph:5.3,hr:.42,title:'Cooper City'}),
  B({id:'void',paint:'void',w:236,h:236,orb:1255,per:245,ph:5.9,tc:'#c04df0',hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13}),
  B({id:'arena',paint:'arena',w:134,h:110,orb:1080,per:185,ph:2.9,hr:.42,title:'Ball Arena',by:'ball fights from the Langrino channel',href:'https://www.youtube.com/@Langrino',cta:'▶ Watch'}),
@@ -504,7 +504,7 @@ const WG={W:[12,3951,1902,1902,1902,1902,1902,1902,1830,2046,1023,0],'.':[3,0,0,
 function wamSVG(str,cls){let x=0,d='';for(const ch of str){const gl=WG[ch];if(!gl){x+=4;continue}for(let r=0;r<11;r++){const m=gl[r+1];let c=0;while(c<gl[0]){if(m>>c&1){let e=c;while(e<gl[0]&&(m>>e&1))e++;d+=`M${x+c} ${r}h${e-c}v1h${c-e}z`;c=e}else c++}}x+=gl[0]+1}
  return `<svg class="${cls}" viewBox="0 0 ${x} 11" shape-rendering="crispEdges" aria-hidden="true"><path fill="#24242c" transform="translate(1 1)" d="${d}"/><path fill="#ffffff" d="${d}"/></svg>`}
 const TITLES={void:1,ashaad:1,sea:1,oldhub:1,'v-lovely':1,'v-arcade':1,'v-larper':1,'v-purple':1,'v-white':1,'v-strings':1};
-function infoHTML(b){const L=lgOf(b);if(L){const href=b.moon?b.moon.url:b.href,nm=b.moon?b.moon.name:b.title,pl=`<a class="lgplay"${href?` href="${href}" target="_blank" rel="noopener"`:` href="#" data-chans="1"`} aria-label="${b.yt?'Show channels':(b.par?'Open ':'Play ')+nm}">${PLAY(...L.pal)}</a>`;
+function infoHTML(b){const L=lgOf(b);if(L){const href=b.moon?b.moon.url:b.href,nm=b.moon?b.moon.name:b.title,pl=`<a class="lgplay"${href?` href="${href}"${/^https?:/.test(href)?' target="_blank" rel="noopener"':''}`:` href="#" data-chans="1"`} aria-label="${b.yt?'Open live channel stats':(b.par?'Open ':'Play ')+nm}">${PLAY(...L.pal)}</a>`;
   const logo=L.btn?'':L.wam?`<div class="lglogo">${wamSVG(b.short||nm,'lgsvg lgwam')}</div>`:L.img?`<img class="lgimg" src="world/titles/${L.img}.png" alt="${nm}">`:b.yt?`<div class="lglogo">${YTLOGO}</div>`:L.arena?`<div class="lglogo"><b class="lgtx fb">BALL<br>ARENA</b></div>`:`<div class="lglogo"><b class="lgtx mo">${b.short||nm}</b></div>`;
   const ch=b.yt?`<div class="lgch" hidden>${CH.map(c=>`<button class="lgc" data-moon="m-${c.id}">${c.name}</button>`).join('')}</div>`:'';
   return `<h2 class="sr">${nm}</h2>${logo}<div class="lgrow">${pl}</div>${ch}`}

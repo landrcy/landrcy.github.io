@@ -1,0 +1,101 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LLC Powered Channels · Live</title>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#07050f;color:#f3ecdf;font-family:'VT323',monospace;font-size:20px;min-height:100%}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:-1;image-rendering:pixelated}
+main{max-width:760px;margin:0 auto;padding:28px 16px 48px}
+a.back{font-family:Silkscreen;font-size:12px;color:#b9b0d0;text-decoration:none;letter-spacing:1px}a.back:hover{color:#fff}
+h1{font-family:Silkscreen;font-weight:700;font-size:clamp(22px,5vw,36px);margin:18px 0 4px;display:flex;align-items:center;gap:12px}
+h1 svg{width:44px;height:31px;flex:none}
+.sub{color:#b9b0d0;margin:0 0 22px}
+.live{display:inline-flex;align-items:center;gap:6px;font-family:Silkscreen;font-size:11px;color:#ff4d6a}
+.live i{width:8px;height:8px;background:#ff0033;display:inline-block;animation:bl 1.2s steps(2) infinite}@keyframes bl{50%{opacity:.25}}
+.tot{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px}
+.card{background:#120c1e;border:3px solid #2c2244;box-shadow:4px 4px 0 #000;padding:14px 16px}
+.card h2{font-family:Silkscreen;font-size:12px;letter-spacing:1px;margin:0 0 8px;color:#b9b0d0;font-weight:400}
+.odo{font-family:Silkscreen;font-weight:700;font-size:clamp(26px,7vw,48px);display:flex;line-height:1;height:1em;overflow:hidden}
+.odo .d{display:inline-block;height:1em;overflow:hidden;width:.82em;text-align:center}
+.odo .d span{display:flex;flex-direction:column;transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.odo .d span b{height:1em;font-weight:700}
+.odo .c{width:.4em;text-align:center}
+.card.s .odo{color:#ff4d6a}.card.v .odo{color:#ffcc4d}
+.note{font-size:16px;color:#8d84a6;margin-top:6px}
+h3{font-family:Silkscreen;font-size:14px;letter-spacing:1px;margin:0 0 10px}
+#board{position:relative}
+.row{position:absolute;left:0;right:0;height:62px;display:flex;align-items:center;gap:12px;padding:0 14px;background:#120c1e;border:3px solid #2c2244;box-shadow:4px 4px 0 #000;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.row.first{border-color:#ffcc4d}
+.rk{font-family:Silkscreen;font-weight:700;width:34px;font-size:18px;color:#b9b0d0;position:relative}
+.crown{width:30px;height:18px;flex:none;margin-right:8px;vertical-align:-2px}.nm{display:flex;align-items:center}
+.nm{flex:1;min-width:0}.nm a{color:#f3ecdf;text-decoration:none;font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}.nm a:hover{color:#fff;text-decoration:underline}
+.st{text-align:right;font-family:Silkscreen;font-size:13px;line-height:1.5;white-space:nowrap}.st b{color:#ff4d6a}.st em{font-style:normal;color:#ffcc4d}.st .na{color:#6e6588}
+footer{margin-top:24px;font-size:16px;color:#8d84a6}
+@media(max-width:520px){.tot{grid-template-columns:1fr}.row{height:58px;gap:8px;padding:0 10px}.nm a{font-size:19px}.st{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.odo .d span,.row{transition:none}.live i{animation:none}}
+</style></head><body><canvas id="sky"></canvas>
+<main>
+<a class="back" href="/">◀ BACK TO THE HUB</a>
+<h1><svg viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#ff0033" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#b8001f" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#fff" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg>LLC Powered Channels</h1>
+<p class="sub"><span class="live"><i></i>LIVE</span> &nbsp;combined counts across every channel</p>
+<section class="tot">
+ <div class="card s"><h2>TOTAL SUBSCRIBERS</h2><div class="odo" id="ts">–</div><div class="note" id="tsn"></div></div>
+ <div class="card v"><h2>TOTAL VIEWS</h2><div class="odo" id="tv">–</div><div class="note" id="tvn"></div></div>
+</section>
+<h3>LEADERBOARD · BY SUBSCRIBERS</h3>
+<div id="board"></div>
+<footer id="foot">Loading live counts…</footer>
+</main>
+<script>
+const CH=[
+ {id:'UCT3ciRCc8ouYTix5_Heyrhg',name:'Langrino',url:'https://www.youtube.com/@Langrino'},
+ {id:'UCCo7JOIyE3W--C9ANfWdObA',name:'clutchclips',url:'https://www.youtube.com/@clutchclipscrate'},
+ {id:'UCNBQ7mBPy16upVp0EhbdTgA',name:'bowlfuloftrivia',url:'https://www.youtube.com/@bowlfuloftrivia'},
+ {id:'UCRegZeMyJ1B5B9n64rfgKAw',name:'RedditStoryADay',url:'https://www.youtube.com/channel/UCRegZeMyJ1B5B9n64rfgKAw'},
+ {id:'UCfDhWTThokF3gKW03iEGijg',name:'SAT in a Minute',url:'https://www.youtube.com/channel/UCfDhWTThokF3gKW03iEGijg'}];
+CH.forEach(c=>{c.subs=null;c.views=null;c.ok=false;c.tried=false});
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+// ---- odometer ----
+function odo(el,n){if(n==null){el.textContent='unavailable';el.dataset.v='';return}
+ const s=n.toLocaleString('en-US');if(el.dataset.v===s)return;
+ if(el.dataset.len!=String(s.length)){el.innerHTML=[...s].map(ch=>/\d/.test(ch)?`<span class="d"><span>${'0123456789'.split('').map(x=>`<b>${x}</b>`).join('')}</span></span>`:`<span class="c">${ch}</span>`).join('');el.dataset.len=s.length;
+  if(!RM){el.querySelectorAll('.d>span').forEach(sp=>{sp.style.transition='none';sp.style.transform='translateY(0)';sp.offsetHeight;sp.style.transition=''})}}
+ const ds=[...s].filter(ch=>/\d/.test(ch));el.querySelectorAll('.d>span').forEach((sp,i)=>sp.style.transform=`translateY(-${ds[i]}em)`);el.dataset.v=s}
+// ---- board ----
+const board=document.getElementById('board'),rows={};const CROWN='<svg class="crown" viewBox="0 0 15 9" shape-rendering="crispEdges"><path fill="#ffcc4d" d="M0 1h1v1h1v1h1v-1h1v-1h1v1h1v1h1v-3h1v3h1v-1h1v-1h1v1h1v1h1v-1h1v-1h1v8h-15z"/><path fill="#c98a12" d="M0 7h15v2h-15z"/><path fill="#ff0033" d="M7 5h1v1h-1z"/></svg>';
+const fmt=n=>n==null?'<span class="na">unavailable</span>':n.toLocaleString('en-US');
+CH.forEach(c=>{const r=document.createElement('div');r.className='row';r.innerHTML=`<div class="rk"></div><div class="nm"><a href="${c.url}" target="_blank" rel="noopener">${c.name}</a></div><div class="st"></div>`;board.appendChild(r);rows[c.id]=r});
+function render(){
+ const H=innerWidth<=520?66:72;
+ const order=[...CH].sort((a,b)=>(b.subs??-1)-(a.subs??-1)||(b.views??-1)-(a.views??-1));
+ order.forEach((c,i)=>{const r=rows[c.id];r.style.transform=`translateY(${i*H}px)`;r.classList.toggle('first',i===0&&c.subs!=null);
+  r.querySelector('.rk').textContent='#'+(i+1);const nm=r.querySelector('.nm'),cr=nm.querySelector('.crown');if(i===0&&c.subs!=null){if(!cr)nm.insertAdjacentHTML('afterbegin',CROWN)}else if(cr)cr.remove();
+  r.querySelector('.st').innerHTML=c.tried?`<b>${fmt(c.subs)}</b> subs<br><em>${fmt(c.views)}</em> views`:'<span class="na">loading…</span>'});
+ board.style.height=CH.length*H+'px';
+ const okS=CH.filter(c=>c.subs!=null),okV=CH.filter(c=>c.views!=null),done=CH.every(c=>c.tried);
+ if(okS.length)odo(document.getElementById('ts'),okS.reduce((a,c)=>a+c.subs,0));
+ if(okV.length)odo(document.getElementById('tv'),okV.reduce((a,c)=>a+c.views,0));
+ const miss=(k)=>{const m=CH.filter(c=>c.tried&&c[k]==null).map(c=>c.name);return m.length?'not counted (unavailable): '+m.join(', '):''};
+ document.getElementById('tsn').textContent=done?miss('subs'):'';document.getElementById('tvn').textContent=done?miss('views'):'';
+}
+// ---- live data: socialcounts.org public API (CORS-enabled, ~100 req/hour) ----
+let last=0,delay=8000,i=0;
+async function fetchOne(c){try{const r=await fetch('https://api.socialcounts.org/youtube-live-subscriber-count/'+c.id,{cache:'no-store'});
+  const rl=r.headers.get('RateLimit');const rem=rl&&+(/remaining=(\d+)/.exec(rl)||[])[1];
+  if(r.status===429){delay=Math.min(120000,delay*2);return}
+  if(!r.ok)throw 0;const j=await r.json(),a=j.counters&&(j.counters.api||j.counters.estimation);
+  if(!a)throw 0;
+  // a channel with no videos and no views returns all zeros: its stats aren't really available
+  const empty=!a.videoCount&&!a.viewCount;
+  c.subs=empty?null:a.subscriberCount;c.views=empty?null:a.viewCount;c.ok=!empty;last=Date.now();
+  delay=rem!=null&&rem<20?60000:8000;
+ }catch(e){c.subs=c.subs??null;c.views=c.views??null}finally{c.tried=true}}
+async function boot(){await Promise.all(CH.map(fetchOne));render();loop()}
+async function loop(){await new Promise(r=>setTimeout(r,delay));if(!document.hidden){await fetchOne(CH[i++%CH.length]);render()}loop()}
+setInterval(()=>{document.getElementById('foot').textContent=last?`Live counts from socialcounts.org · refreshing a channel every ${Math.round(delay/1000)}s · last update ${Math.round((Date.now()-last)/1000)}s ago`:'Loading live counts…'},1000);
+addEventListener('resize',render);render();boot();
+// ---- starfield ----
+const sky=document.getElementById('sky'),g=sky.getContext('2d');let st=[];
+function sz(){sky.width=Math.ceil(innerWidth/3);sky.height=Math.ceil(innerHeight/3);st=Array.from({length:sky.width*sky.height/350|0},()=>({x:Math.random()*sky.width,y:Math.random()*sky.height,p:Math.random()*6,c:['#fff','#b9b0d0','#ffcc4d','#ff9ab0'][Math.random()*4|0]}))}
+function draw(t){g.fillStyle='#07050f';g.fillRect(0,0,sky.width,sky.height);for(const s of st){g.globalAlpha=RM?.8:.45+.45*Math.sin(t/700+s.p);g.fillStyle=s.c;g.fillRect(s.x|0,s.y|0,1,1)}g.globalAlpha=1;if(!RM)requestAnimationFrame(draw)}
+addEventListener('resize',()=>{sz();if(RM)draw(0)});sz();requestAnimationFrame(draw);
+</script></body></html>
