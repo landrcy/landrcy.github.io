@@ -62,17 +62,35 @@ const clamp=v=>Math.max(0,Math.min(1,v)),seg=(t,a,b)=>clamp((t-a)/(b-a));
 function introState(now){if(!intro)return{stars:1,ign:1,fl:1,L:1,orb:1,pop:()=>1};const t=(now-intro.t0)/1000;
  return{t,R:revealR(t),stars:1,ign:seg(t,.5,1.7),fl:seg(t,1.6,3.0),L:seg(t,1.7,3.7),orb:1,pop:()=>1,popOld:i=>{const p=seg(t,5.2+i*.32,5.75+i*.32);return p<=0?0:1+Math.sin(p*Math.PI)*.25*(1-p)-(1-p)*(1-p)*.9}}}
 // ---- the rift: the solar system is a jagged pixel tear in the old white dot-grid space; small tears peek into archived versions ----
-const RC=8,RX=3200,RY=3800,RGW=RX*2/RC|0,RGH=RY*2/RC|0;
+const RC=5,RX=3900,RY=4700,RGW=RX*2/RC|0,RGH=RY*2/RC|0;
 const hsh=(a,b)=>{let h=(a*374761393+b*668265263)^0x5bd1e995;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296};
 const an1=(a,f,s)=>{const x=a/TAU*f,i=Math.floor(x),u=x-i,k=u*u*(3-2*u);return hsh(((i%f)+f)%f,s)*(1-k)+hsh((((i+1)%f)+f)%f,s)*k};
-const jag=(a,s)=>{const x=a/TAU*90,i=Math.floor(x),u=x-i,saw=(hsh(((i%90)+90)%90,s+5)-.5)*.07*(1-Math.abs(u*2-1));return .07*(an1(a,7,s)-.5)*2+.04*(an1(a,19,s+1)-.5)*2+.03*(an1(a,47,s+2)-.5)*2+saw+(an1(a,13,s+3)>.78?.11*Math.pow(1-Math.abs(((a/TAU*26)%1+1)%1*2-1),3):0)};
+// piecewise-linear angular noise: hard corners instead of smooth waves
+const lin=(a,f,s)=>{const x=((a/TAU)%1+1)%1*f,i=Math.floor(x),u=x-i;return hsh(i%f,s)*(1-u)+hsh((i+1)%f,s)*u};
+// edge profile: sharp shards + uneven notches at varied scales, precomputed into a lookup table (seeded, stable)
+const JT={};function jagTab(s){if(JT[s])return JT[s];const n=8192,T=new Float32Array(n),SH=[];let r=s*977+1;const rnd=()=>(r=hsh(r,s+71)*1e6|0,hsh(r,s+3));
+ for(let i=0;i<95;i++){const big=rnd()<.18,notch=rnd()<.3;SH.push([rnd()*TAU,(big?.02+rnd()*.05:.002+rnd()*.016)*(notch?1.4:1),notch?-(.015+rnd()*(big?.07:.03)):(big?.06+rnd()*.13:.012+rnd()*.05),rnd()*.8-.4])}
+ for(let k=0;k<n;k++){const a=k/n*TAU;let v=.08*(lin(a,9,s)-.5)*2+.045*(lin(a,23,s+1)-.5)*2+.025*(lin(a,61,s+2)-.5)*2+.012*(lin(a,173,s+4)-.5)*2;
+  for(const[c,w,h,sk]of SH){let d=Math.atan2(Math.sin(a-c),Math.cos(a-c))/w;d+=d*sk*Math.sign(d);if(d>-1&&d<1)v+=h*(1-Math.abs(d))}T[k]=v}return JT[s]=T}
+const jag=(a,s)=>{const T=jagTab(s);return T[((Math.round(a/TAU*8192)%8192)+8192)%8192]};
 function riftGrid(gw,gh,cell,cx,cy,ax,ay,seed){const m=new Uint8Array(gw*gh);for(let j=0;j<gh;j++)for(let i=0;i<gw;i++){const x=(i+.5)*cell-cx,y=(j+.5)*cell-cy,a=Math.atan2(y/ay,x/ax),r=Math.hypot(x/ax,y/ay);m[j*gw+i]=r<1+jag(a,seed)?1:0}return m}
+// branching cracks splintering out of the tear into the white (seeded): thick ones open the tear, hairlines are glow only
+const HL=new Uint8Array(RGW*RGH);
+function riftCracks(m,gw,gh,cell,cx,cy,ax,ay,seed){let r=seed*131+7;const rnd=()=>(r=(hsh(r,seed)*1e7)|0,hsh(r,seed+9));
+ const plot=(x,y,th)=>{const i=Math.floor((x+cx)/cell),j=Math.floor((y+cy)/cell);const t=Math.floor(th);for(let dj=-t;dj<=t;dj++)for(let di=-t;di<=t;di++){if(di*di+dj*dj>th*th+.5)continue;const ii=i+di,jj=j+dj;if(ii<1||jj<1||ii>=gw-1||jj>=gh-1)continue;if(th<.75)HL[jj*gw+ii]=1;else m[jj*gw+ii]=1}};
+ const grow=(x,y,ang,len,th,depth)=>{let L=0;while(L<len){const seg=cell*(2+rnd()*5);ang+=(rnd()-.5)*.9;const nx=x+Math.cos(ang)*seg,ny=y+Math.sin(ang)*seg,st=Math.ceil(seg/(cell*.5));
+   for(let q=1;q<=st;q++)plot(x+(nx-x)*q/st,y+(ny-y)*q/st,th*(1-L/len*.6));x=nx;y=ny;L+=seg;
+   if(depth<3&&rnd()<(depth?.12:.2)){const bl=(len-L)*(.3+rnd()*.7);if(bl>cell*4)grow(x,y,ang+(rnd()<.5?-1:1)*(.35+rnd()*.9),bl,Math.max(.4,th*(.35+rnd()*.4)),depth+1)}}};
+ const n=16+Math.floor(rnd()*6);for(let k=0;k<n;k++){const a=rnd()*TAU,e=1+jag(Math.atan2(Math.sin(a),Math.cos(a)),seed)-.01,x=Math.cos(a)*ax*e,y=Math.sin(a)*ay*e,big=rnd();
+  grow(x,y,Math.atan2(Math.sin(a)*ax/ay,Math.cos(a))+(rnd()-.5)*.8,(big<.25?400:120)+rnd()*(big<.25?650:300),big<.2?2.2:big<.6?1.2:.5,0)}}
 const RPAL=['#ffffff','#f0ddff','#d79cff','#b45cf0','#8a34d8','#5a1ea8'].map(c=>P.hx(c));
 // mask (inside opaque) + 3 shimmer frames of the crackling edge, all at 1px per cell
 function riftArt(m,gw,gh,frames){const mk=()=>{const c=document.createElement('canvas');c.width=gw;c.height=gh;return c},M=mk(),mg=M.getContext('2d'),mi=mg.createImageData(gw,gh);
  for(let k=0;k<m.length;k++)if(m[k])mi.data[k*4+3]=255;mg.putImageData(mi,0,0);
  // distance (cells) to the tear, outside only, up to 4
- const D=new Uint8Array(gw*gh).fill(9);for(let j=0;j<gh;j++)for(let i=0;i<gw;i++){if(m[j*gw+i])continue;let best=9;for(let dj=-4;dj<=4;dj++)for(let di=-4;di<=4;di++){const ii=i+di,jj=j+dj;if(ii<0||jj<0||ii>=gw||jj>=gh||!m[jj*gw+ii])continue;const d=Math.max(Math.abs(di),Math.abs(dj))+(Math.abs(di)+Math.abs(dj)>5?1:0);if(d<best)best=d}D[j*gw+i]=best}
+ const D=new Uint8Array(gw*gh).fill(9);for(let k=0;k<m.length;k++)if(m[k])D[k]=0;
+ for(let j=0;j<gh;j++)for(let i=0;i<gw;i++){const k=j*gw+i;let v=D[k];if(!v)continue;if(i>0)v=Math.min(v,D[k-1]+1);if(j>0){v=Math.min(v,D[k-gw]+1);if(i>0)v=Math.min(v,D[k-gw-1]+1);if(i<gw-1)v=Math.min(v,D[k-gw+1]+1)}D[k]=v}
+ for(let j=gh-1;j>=0;j--)for(let i=gw-1;i>=0;i--){const k=j*gw+i;let v=D[k];if(!v)continue;if(i<gw-1)v=Math.min(v,D[k+1]+1);if(j<gh-1){v=Math.min(v,D[k+gw]+1);if(i<gw-1)v=Math.min(v,D[k+gw+1]+1);if(i>0)v=Math.min(v,D[k+gw-1]+1)}D[k]=v}
  const E=[];for(let f=0;f<frames;f++){const c=mk(),cg=c.getContext('2d'),im=cg.createImageData(gw,gh),d=im.data;
   for(let j=0;j<gh;j++)for(let i=0;i<gw;i++){const k=j*gw+i,dd=D[k];let col=null;const h=hsh(i*3+f*101,j*7+f*13),b=P.bay(i,j);
    if(m[k]){// inner rim: a thin dark-violet lip
@@ -83,29 +101,19 @@ function riftArt(m,gw,gh,frames){const mk=()=>{const c=document.createElement('c
    else if(dd===4)col=b<.1&&h>.4?RPAL[4]:null;
    // crackle: occasional bright sparks jumping off the edge
    if(dd>=2&&dd<=4&&h>.985)col=RPAL[0];
+   if(!m[k]&&HL[k]&&!col)col=h>.5?RPAL[2]:RPAL[3];else if(!m[k]&&HL[k]&&dd>1)col=RPAL[1];
    if(col){d[k*4]=col[0];d[k*4+1]=col[1];d[k*4+2]=col[2];d[k*4+3]=255}}
   cg.putImageData(im,0,0);E.push(c)}
  return{M,E}}
-const MR=riftGrid(RGW,RGH,RC,RX,RY,2850,3450,11),MRA=riftArt(MR,RGW,RGH,RM?1:3);
+const MR=riftGrid(RGW,RGH,RC,RX,RY,3000,3650,11);riftCracks(MR,RGW,RGH,RC,RX,RY,3000,3650,11);const MRA=riftArt(MR,RGW,RGH,RM?1:2);
 const inMain=(x,y)=>{const i=Math.floor((x+RX)/RC),j=Math.floor((y+RY)/RC);return i>=0&&j>=0&&i<RGW&&j<RGH&&MR[j*RGW+i]===1};
 // small rifts: one per archived version, placed in the white space around the main tear (random per visit)
-const SR=[];let srKey='';
-function placeRifts(){const key=(W<H?'p':'l');if(key===srKey)return;srKey=key;SR.length=0;const z=fitZ()*(W<H?.36:.42),vx=W/2/z*.94,vy=(H-90)/2/z*.94,src=ARCH.filter(b=>b.href&&b.href.startsWith('archive/')&&!b.href.includes('#'));
- let tries=0;for(const b of src){let ok=false;while(!ok&&tries++<4000){const r=(W<H?60+Math.random()*60:70+Math.random()*80)*(W<H?3.4:2.3),x=(Math.random()*2-1)*(vx-r),y=(Math.random()*2-1)*(vy-r);
-   if(Math.abs(x)>vx-r||Math.abs(y)>vy-r)continue;
-   // keep clear of the satellite (top-left) and the bottom UI bar
-   const[sx,sy]=[(x-r)*z+W/2,(y-r)*z+H/2];if(sx<150&&sy<110)continue;if((y+r)*z+H/2>H-70)continue;
-   let clear=true;for(let a=0;a<TAU&&clear;a+=TAU/24)if(inMain(x+Math.cos(a)*(r+90),y+Math.sin(a)*(r+90)*.7))clear=false;if(inMain(x,y))clear=false;
-   for(const o of SR)if(Math.hypot(o.x-x,o.y-y)<o.r+r+50)clear=false;if(!clear)continue;
-   ok=true;const cell=12,gw=Math.ceil(r*2.3/cell),gh=Math.ceil(r*1.6/cell),m=riftGrid(gw,gh,cell,gw*cell/2,gh*cell/2,r,r*.62,b.id.length*7+SR.length*31);
-   const img=new Image();img.src='world/rifts/'+b.id+'.jpg';const c=document.createElement('canvas');c.width=gw*3;c.height=gh*3;
-   SR.push({x,y,r,cell,gw,gh,m,art:riftArt(m,gw,gh,RM?1:3),img,c,ph:Math.random()*TAU,title:b.title,href:b.href,rift:1,w:r*2,hr:.5})}}}
 let OC=null,OG=null,ocK='',dotT=null,dotS=0;
 function dotPat(s){if(s===dotS&&dotT)return dotT;dotS=s;const c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,s,s);x.fillStyle=s>=10?'#b9bfcc':'#ccd0da';const d=s>=18?2:1;x.fillRect(0,0,d,d);dotT=g.createPattern(c,'repeat');return dotT}
 // is the whole screen inside the main tear (and no small rift on screen)? then there is nothing outside to draw
-function allInside(){const[a,b]=S2W(0,0),[c,d]=S2W(W,H);for(let i=0;i<=6;i++)for(let j=0;j<=6;j++)if(!inMain(a+(c-a)*i/6,b+(d-b)*j/6))return false;return!(SR.some(r=>r.x+r.r*1.2>a&&r.x-r.r*1.2<c&&r.y+r.r>b&&r.y-r.r<d))}
-function drawOutside(now){if(window.__noRift||sys!=='main')return;placeRifts();if(allInside())return;
- const z=cam.z,fr=RM?0:Math.floor(now/140)%3,key=[W,H,cam.x.toFixed(2),cam.y.toFixed(2),z.toFixed(4),fr].join();
+function allInside(){const[a,b]=S2W(0,0),[c,d]=S2W(W,H);for(let i=0;i<=6;i++)for(let j=0;j<=6;j++)if(!inMain(a+(c-a)*i/6,b+(d-b)*j/6))return false;return true}
+function drawOutside(now){if(window.__noRift||sys!=='main')return;if(allInside())return;
+ const z=cam.z,fr=RM?0:Math.floor(now/140)%MRA.E.length,key=[W,H,cam.x.toFixed(2),cam.y.toFixed(2),z.toFixed(4),fr].join();
  if(key!==ocK){ocK=key;
   if(!OC||OC.width!==W||OC.height!==H){OC=document.createElement('canvas');OC.width=W;OC.height=H;OG=OC.getContext('2d')}
   const o=OG;o.imageSmoothingEnabled=false;o.globalCompositeOperation='source-over';o.clearRect(0,0,W,H);
@@ -113,14 +121,8 @@ function drawOutside(now){if(window.__noRift||sys!=='main')return;placeRifts();i
   const s=Math.max(4,Math.round(26*z)),[ox,oy]=W2S(0,0);o.save();o.translate(((ox%s)+s)%s,((oy%s)+s)%s);o.fillStyle=dotPat(s);o.fillRect(-s,-s,W+2*s,H+2*s);o.restore();
   const[mx,my]=W2S(-RX,-RY),cw=RC*z;
   o.globalCompositeOperation='destination-out';o.drawImage(MRA.M,mx,my,RGW*cw,RGH*cw);o.globalCompositeOperation='source-over';
-  for(const r of SR){const[sx,sy]=W2S(r.x-r.gw*r.cell/2,r.y-r.gh*r.cell/2),cc=r.cell*z,w=r.gw*cc,h=r.gh*cc;if(sx>W||sy>H||sx+w<0||sy+h<0)continue;
-   const c=r.c,cg=c.getContext('2d');cg.globalCompositeOperation='source-over';cg.fillStyle='#05030c';cg.fillRect(0,0,c.width,c.height);
-   if(r.img.complete&&r.img.naturalWidth){const t=RM?0:now/1000,px=((sx+w/2)/W-.5)*-8+Math.sin(t*.7+r.ph)*1.5,py=((sy+h/2)/H-.5)*-6+Math.cos(t*.5+r.ph);const sc=Math.max(c.width/320,c.height/200)*1.9;cg.imageSmoothingEnabled=true;cg.drawImage(r.img,c.width/2-160*sc+px,c.height/2-100*sc+py,320*sc,200*sc)}
-   cg.globalCompositeOperation='destination-in';cg.imageSmoothingEnabled=false;cg.drawImage(r.art.M,0,0,c.width,c.height);
-   o.drawImage(c,sx,sy,w,h);o.drawImage(r.art.E[RM?0:(fr+Math.floor(r.ph*3))%r.art.E.length],sx,sy,w,h)}
   o.drawImage(MRA.E[fr],mx,my,RGW*cw,RGH*cw)}
  g.drawImage(OC,0,0)}
-function riftHit(sx,sy){if(sys!=='main')return null;const[wx,wy]=S2W(sx,sy);for(const r of SR){const i=Math.floor((wx-r.x+r.gw*r.cell/2)/r.cell),j=Math.floor((wy-r.y+r.gh*r.cell/2)/r.cell);if(i>=0&&j>=0&&i<r.gw&&j<r.gh&&r.m[j*r.gw+i])return r}return null}
 // pixel reveal front (screen px): grows from the sun outwards; everything beyond it is dithered/chunky-hidden
 function revealR(t){const m=Math.min(W,H);if(t<3.9)return m*(.5+.12*seg(t,0,3.9));const z0=m*.82/(250*.72),w0=m*.62/z0;return(w0+(3800-w0)*Math.pow(seg(t,3.9,8.2),1.25))*cam.z}
 const RVB=.22;let rvC=null,rvG=null,rvI=null;
@@ -171,18 +173,26 @@ function drawShips(now,alpha){if(sys!=='main'||alpha<=0||RM)return;const t=now/1
 function clamp2(v,a,b){return v<a?a:v>b?b:v}
 // ---- occasional big solar flare ----
 let BF={next:performance.now()+12000+Math.random()*10000,t0:0,a:0,s:1};
-function bigFlare(now){if(RM||sys!=='main'||intro)return;if(!BF.t0&&now>=BF.next){BF.t0=now;BF.a=Math.random()*TAU;BF.s=Math.random()<.5?1:-1}if(!BF.t0)return;
+// rendered on the sun's own texel grid (same pixel size + origin as the sun sprite at every LOD)
+let FC=null,FV=null;
+function bigFlare(now){if(RM||sys!=='main'||intro)return;if(!BF.t0&&now>=BF.next){BF.t0=now;BF.a=Math.random()*TAU;BF.s=Math.random()<.5?1:-1;BF.sd=Math.random()*99}if(!BF.t0)return;
  const k=(now-BF.t0)/4200;if(k>=1){BF.t0=0;BF.next=now+15000+Math.random()*25000;return}
- const sun=MAIN[0],[cx,cy]=W2S(0,0),R=sun.w*.34*cam.z,ps=Math.max(1,Math.min(4,Math.round(cam.z*1.2))),grow=Math.min(1,k/.3),fade=k<.6?1:1-(k-.6)/.4,ga=g.globalAlpha,PAL=['#fffbe8','#ffe98a','#ffc23a','#ff8a1e','#d8460a'];
- if(cx<-R*4||cy<-R*4||cx>W+R*4||cy>H+R*4)return;
- const cs=Math.max(3,Math.round(R/12)),span=.8,Hm=R*2.1*grow,BAND=[['#8e1a06',1],['#c8300c',.74],['#f0601a',.5],['#ffa040',.3],['#ffe0a8',.14]];
- const n=Math.ceil((span*R+Hm*2.2)/cs*1.6),seen=new Set();
- for(const[col,wf]of BAND){g.fillStyle=col;g.globalAlpha=ga*Math.min(1,fade*1.4-(1-wf)*(k>.6?.6:0));if(g.globalAlpha<=.02)continue;seen.clear();
-  for(let i=0;i<=n;i++){const u=i/n,env=Math.sin(Math.PI*u),a=BF.a+BF.s*(u-.5)*span+Math.sin(u*5+now/700)*.05*grow,h=env*Hm+Math.sin(u*11+now/260)*R*.06*grow,th=R*(.12+.14*env)*wf*(1+.25*Math.sin(u*17+now/150));
-   const bx=cx+Math.cos(a)*(R*.97+h),by=cy+Math.sin(a)*(R*.97+h),m=Math.ceil(th/cs);
-   for(let j=-m;j<=m;j++){const px=Math.floor((bx+Math.cos(a)*j*cs)/cs),py=Math.floor((by+Math.sin(a)*j*cs)/cs),key=px*7919+py;if(seen.has(key))continue;seen.add(key);g.fillRect(px*cs,py*cs,cs,cs)}}}
- if(k>.35){g.fillStyle='#ffa040';for(let i=0;i<22;i++){const q=(i*.618)%1,a=BF.a+BF.s*(q-.5)*span*1.5,d=R*(1+2.1*grow)+(k-.35)*R*3*(.5+q);g.globalAlpha=ga*fade*(1-q*.5);g.fillRect(Math.floor((cx+Math.cos(a)*d)/cs)*cs,Math.floor((cy+Math.sin(a)*d)/cs)*cs,cs,cs)}}
- g.globalAlpha=ga}
+ const sun=MAIN[0];if(!sun.tx)return;const[cx,cy]=W2S(0,0),R=sun.w*.34*cam.z,tx=sun.tx,grow=Math.min(1,k/.3),fade=k<.6?1:1-(k-.6)/.4;
+ const E=R*3.4;if(cx<-E||cy<-E||cx>W+E||cy>H+E)return;
+ const x0=sun.gx+Math.floor((cx-E-sun.gx)/tx)*tx,y0=sun.gy+Math.floor((cy-E-sun.gy)/tx)*tx,n=Math.min(420,Math.ceil(2*E/tx)+1);
+ if(!FC||FC.width!==n){FC=document.createElement('canvas');FC.width=FC.height=n;FV=new Float32Array(n*n)}FV.fill(0);
+ const Rc=R/tx,ccx=(cx-x0)/tx,ccy=(cy-y0)/tx,t=now/1000;
+ const stamp=(px,py,rad,amp)=>{const r=Math.max(.6,rad),i0=Math.max(0,Math.floor(px-r)),i1=Math.min(n-1,Math.ceil(px+r)),j0=Math.max(0,Math.floor(py-r)),j1=Math.min(n-1,Math.ceil(py+r));
+  for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const d=Math.hypot(i+.5-px,j+.5-py)/r;if(d<1){const v=(1-d)*amp,q=j*n+i;if(v>FV[q])FV[q]=v}}};
+ const arc=(a0,span,Hm,thk,wob,amp)=>{const L=(span*Rc+Hm*2.4),m=Math.ceil(L*2);for(let i=0;i<=m;i++){const u=i/m,env=Math.sin(Math.PI*u),a=a0+BF.s*(u-.5)*span+Math.sin(u*5+t*1.4)*.05*grow*wob,h=env*Hm+Math.sin(u*11+t*3.8)*Rc*.06*grow*wob,
+   th=Rc*thk*(.45+.55*env)*(1+.25*Math.sin(u*17+t*6.6));stamp(ccx+Math.cos(a)*(Rc*.97+h),ccy+Math.sin(a)*(Rc*.97+h),th,amp)}};
+ arc(BF.a,.8,Rc*2.1*grow,.26,1,1);
+ arc(BF.a+BF.s*.62,.22,Rc*.42*grow,.09,.5,.85);arc(BF.a-BF.s*.55,.16,Rc*.3*grow,.07,.5,.8);arc(BF.a+BF.s*.08,.12,Rc*.75*grow,.05,.3,.75);
+ if(k>.35)for(let i=0;i<34;i++){const q=(i*.618)%1,a=BF.a+BF.s*(q-.5)*.8*1.5,d=Rc*(1+2.1*grow)+(k-.35)*Rc*3*(.5+q);stamp(ccx+Math.cos(a)*d,ccy+Math.sin(a)*d,i%5?.6:1.3,.55+.4*(1-q))}
+ const fg=FC.getContext('2d'),im=fg.createImageData(n,n),U=new Uint32Array(im.data.buffer),BANDS=[[.86,'#fff6d8'],[.74,'#ffe0a8'],[.62,'#ffc23a'],[.5,'#ffa040'],[.38,'#f0601a'],[.26,'#c8300c'],[.14,'#8e1a06']].map(([v,c])=>{const h=P.hx(c);return[v,(255<<24)|(h[2]<<16)|(h[1]<<8)|h[0]]});
+ const thr=1-fade;for(let j=0;j<n;j++)for(let i=0;i<n;i++){const q=j*n+i;let v=FV[q];if(v<=0)continue;v=v*(.75+.25*fade)+(P.vn(i*.42+BF.sd,j*.42-t*1.5)-.5)*.32+(P.bay(i,j)-.5)*.08-thr*.5;
+  for(const[b0,c]of BANDS)if(v>b0){U[q]=c;break}}
+ fg.putImageData(im,0,0);const ga=g.globalAlpha;g.imageSmoothingEnabled=false;g.drawImage(FC,x0,y0,n*tx,n*tx);g.globalAlpha=ga}
 let lensC=null,lensN=0,lensR=null;
 function lens(){if(sys!=='main')return;const b=MAIN.find(q=>q.id==='void'),[vx0,vy0]=pos(b),[sx,sy]=W2S(vx0,vy0),E=b.w*.084*cam.z*2.3,Rr=Math.ceil(E*3.2);
  if(E<3||sx+Rr<0||sy+Rr<0||sx-Rr>W||sy-Rr>H)return;const x0=Math.floor(sx-Rr),y0=Math.floor(sy-Rr),D=Rr*2,q=Math.max(1,Math.ceil(D/260)),w=Math.ceil(D/q),h=w;
@@ -194,7 +204,7 @@ function lens(){if(sys!=='main')return;const b=MAIN.find(q=>q.id==='void'),[vx0,
    const j=(Y*w+X)*4,m=1-fall*fall*fall,m2=m*m*(3-2*m);o[i]=a[j];o[i+1]=a[j+1];o[i+2]=a[j+2];o[i+3]=255*m2}
   lc.putImageData(out,0,0);lensR=[x0,y0,D]}
  g.drawImage(lensC,x0,y0,D,D)}
-function frame(now){if(document.body.classList.contains('landed')){last=now;requestAnimationFrame(frame);return}if(sys==='archive'&&!warp&&document.body.classList.contains('arch')){last=now;requestAnimationFrame(frame);return}const dt=Math.min(.05,(now-last)/1000);last=now;const IS=introState(now);FA+=((focus?1:0)-FA)*Math.min(1,dt*4);if(mv.on&&!tw){const k=Math.pow(.9,dt*60);mv.x*=k;mv.y*=k;cam.x+=mv.x*dt*60;cam.y+=mv.y*dt*60;if(Math.hypot(mv.x,mv.y)*cam.z<.1)mv.on=0}if(!tw&&!intro&&!focus&&sys==='main'){const bx=W<H?2700:3100,by=W<H?3100:2700;cam.x=clamp2(cam.x,fitX()-bx,fitX()+bx);cam.y=clamp2(cam.y,fitY()-by,fitY()+by)}
+function frame(now){if(document.body.classList.contains('landed')){last=now;requestAnimationFrame(frame);return}if(sys==='archive'&&!warp&&document.body.classList.contains('arch')){last=now;requestAnimationFrame(frame);return}const dt=Math.min(.05,(now-last)/1000);last=now;const IS=introState(now);FA+=((focus?1:0)-FA)*Math.min(1,dt*4);if(mv.on&&!tw){const k=Math.pow(.9,dt*60);mv.x*=k;mv.y*=k;cam.x+=mv.x*dt*60;cam.y+=mv.y*dt*60;if(Math.hypot(mv.x,mv.y)*cam.z<.1)mv.on=0}if(!tw&&!intro&&!focus&&sys==='main'){const bx=W<H?2200:2600,by=W<H?2700:2300;cam.x=clamp2(cam.x,fitX()-bx,fitX()+bx);cam.y=clamp2(cam.y,fitY()-by,fitY()+by)}
  if(intro){if(IS.t<3.9){cam.x=0;cam.y=0;cam.z=Math.min(W,H)*.82/(250*.72)}else if(!intro.zoomed){intro.zoomed=1;to(fitX(),fitY(),fitZ(),2200)}if(IS.t>7.4&&!intro.ui){intro.ui=1;uiReveal()}if(IS.t>8.8)intro=null}
  if(tw){const k=ease(clamp((now-tw.t0)/tw.ms));const zl=Math.exp(Math.log(tw.a.z)+(Math.log(tw.b.z)-Math.log(tw.a.z))*k);cam.x=tw.a.x+(tw.b.x-tw.a.x)*k;cam.y=tw.a.y+(tw.b.y-tw.a.y)*k;cam.z=zl;if(k>=1){const d=tw.done;tw=null;d&&d()}}
  // orbit motion: hover/focus slows to a stop
@@ -206,7 +216,7 @@ function frame(now){if(document.body.classList.contains('landed')){last=now;requ
  g.globalAlpha=IS.stars;const T=1024,ox=Math.round(((cam.x*.056)%T+T)%T),oy=Math.round(((cam.y*.056)%T+T)%T);for(let ty=-oy;ty<H;ty+=T)for(let tx=-ox;tx<W;tx+=T)g.drawImage(neb.c,tx,ty,T,T);
  const ts=now/1000;for(const s of STARS){const f=[.04,.09,.16][s.l],ps=[2,2,3][s.l];let x=((s.x*W-cam.x*f*.7)%W+W)%W,y=((s.y*H-cam.y*f*.7)%H+H)%H;x=Math.round(x/ps)*ps;y=Math.round(y/ps)*ps;
   const tw2=RM?1:.5+.5*Math.sin(ts*(1+s.l)+s.p);if(tw2<.25&&s.l===0)continue;g.fillStyle=s.c;if(wv>.02){const L=wv*(.15+s.l*.12),ex=x+(x-W/2)*L,ey=y+(y-H/2)*L,n=Math.ceil(Math.hypot(ex-x,ey-y)/ps);for(let i=0;i<=n;i++)g.fillRect(Math.round((x+(ex-x)*i/n)/ps)*ps,Math.round((y+(ey-y)*i/n)/ps)*ps,ps,ps);continue}g.fillRect(x,y,ps,ps);if(s.l===2&&tw2>.7){g.fillRect(x-ps,y,ps,ps);g.fillRect(x+ps,y,ps,ps);g.fillRect(x,y-ps,ps,ps);g.fillRect(x,y+ps,ps,ps)}}
- g.globalAlpha=1;lens();
+ g.globalAlpha=1;lens();drawDecoBack(now);
  g.globalAlpha=Math.max(0,1-wv*1.6);
  // orbit rings (pixel dashes)
  const ring=(cx,cy,r,prog,col)=>{const ps=Math.max(1,Math.min(3,Math.round(cam.z))),n=Math.max(48,Math.floor(r*cam.z*TAU/(ps*3.5)));g.fillStyle=col;for(let k=0;k<n*prog;k++){if(k%3===2)continue;const a=k/n*TAU-Math.PI/2,[sx,sy]=W2S(cx+Math.cos(a)*r,cy+Math.sin(a)*r*SQ);g.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}};
@@ -214,7 +224,7 @@ function frame(now){if(document.body.classList.contains('landed')){last=now;requ
  for(let k=1;k<=n;k++){const f=k/n,an=b.ang-dr*arc*f,[sx,sy]=W2S(Math.cos(an)*b.orb,Math.sin(an)*b.orb*SQ);if(sx<-4||sy<-4||sx>W+4||sy>H+4)continue;const al=Math.pow(1-f,1.3)*.6*IS.orb;if(al<.02||(k%2&&f>.35))continue;g.globalAlpha=ga0*al;g.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}}g.globalAlpha=ga0}
  if(sys==='main'){const[yx,yy]=pos(MAIN[3]);}
  {const A=MAIN[1],tg=(hover===A||focus===A)?1:0;A.op=(A.op||0)+(tg-(A.op||0))*Math.min(1,dt*(tg?2.2:3));A.arg={open:RM?tg:A.op}}
- drawBelt(dt,IS.orb);drawShips(now,IS.orb);
+ drawBelt(dt,IS.orb);drawShips(now,IS.orb);drawDecoWorld(now);
  // sprites, back-to-front
  const draw=[];bodies.forEach((b,i)=>draw.push([b,i]));if(sys==='main')MOONS.forEach((m,i)=>draw.push([m,3]));
  draw.sort((a,b)=>pos(a[0])[1]-pos(b[0])[1]);
@@ -226,7 +236,7 @@ function frame(now){if(document.body.classList.contains('landed')){last=now;requ
   let S=b.S;const ga=g.globalAlpha;
   if(!S.N||Math.abs(Nt-S.N)/Nt>.06&&now>=(b.rz||0)){const S2=P.mk(Nt,Math.max(4,Math.round(Nt*asp)));S2.N=Nt;if(S.N){b.prev=S;b.xf=now}b.S=S=S2;b.nx=0;b.rz=now+40}
   if(now>=(b.nx||0)||(b.id==='sun'&&intro)){const o=b.id==='sun'?{ign:IS.ign,fl:IS.fl,L:IS.L}:b.arg;P.setFlat(b.id==='sun'&&intro?0:S.N<cap*.55);const tn=RM?7:now/1000+(b.ph||0)*3;P[b.paint](S,tn,o);P.setFlat(0);b.nx=RM?Infinity:now+(b.paint==='sun'?(S.N>200?90:S.N>100?110:70):S.N>140?66:S.N>60?44:60)+Math.random()*8}
-  const dw=Math.abs(S.N*ps-pw)<=ps?S.N*ps:pw,dh=Math.round(dw*asp),dx=Math.round(sx-dw/2),dy=Math.round(sy-dh/2);
+  const dw=Math.abs(S.N*ps-pw)<=ps?S.N*ps:pw,dh=Math.round(dw*asp),dx=Math.round(sx-dw/2),dy=Math.round(sy-dh/2);if(b.id==='sun'){b.tx=dw/S.N;b.gx=dx;b.gy=dy}
   const xf=b.prev?Math.min(1,(now-b.xf)/160):1;if(b.prev&&xf<1){g.globalAlpha=ga*dim;g.drawImage(b.prev.c,dx,dy,dw,dh)}else b.prev=null;
   g.globalAlpha=ga*dim*(b.prev?xf:1);g.drawImage(S.c,dx,dy,dw,dh);
   g.globalAlpha=ga};
@@ -235,9 +245,86 @@ function frame(now){if(document.body.classList.contains('landed')){last=now;requ
  if(intro){g.globalAlpha=1;revealMask(IS.R);if(sunL)one(...sunL)}
  g.globalAlpha=1;bigFlare(now);if(focus&&!tw&&sys==='main'){const[fx,fy]=pos(focus);cam.x+=(fx-cam.x)*Math.min(1,dt*8);cam.y+=(fy-cam.y)*Math.min(1,dt*8)}if(focus)placeInfo();
  requestAnimationFrame(frame)}
+// ---- deep-space decor: nebulae, galaxies, far planets (parallax), stations/wrecks/rocks (world), comets, shooting stars, secrets ----
+// every decor sprite is painted procedurally at a resolution picked from its on-screen size (like the planets), so far = chunky, near = detailed
+const DK=(()=>{let r=4242;return()=>(r=(Math.imul(r^(r>>>15),2246822519)+0x9e3779b9)|0,((r>>>0)%100000)/100000)})();
+const dhx=c=>P.hx(c),dpk=c=>{const h=dhx(c);return(255<<24)|(h[2]<<16)|(h[1]<<8)|h[0]};
+const DLOD=[6,8,12,16,24,32,48,64,96,128,160,200];
+function dSprite(o,N){o.cache=o.cache||{};if(o.cache[N])return o.cache[N];const w=N,h=Math.max(2,Math.round(N*o.asp)),c=document.createElement('canvas');c.width=w;c.height=h;const cg=c.getContext('2d'),im=cg.createImageData(w,h),U=new Uint32Array(im.data.buffer);
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){const v=o.paint((x+.5)/w,(y+.5)/h,x,y,N);if(v)U[y*w+x]=v}cg.putImageData(im,0,0);const keys=Object.keys(o.cache);if(keys.length>3)delete o.cache[keys[0]];return o.cache[N]=c}
+function dDraw(o,sx,sy,zl,rot){const px=o.sz*zl;if(px<2)return;if(sx+px<0||sy+px<0||sx-px>W||sy-px>H)return;let N=DLOD[0];for(const n of DLOD)if(n<=px&&n<=o.cap)N=n;const c=dSprite(o,N),sc=Math.max(1,Math.floor(px/N)),dw=c.width*sc,dh=c.height*sc;
+ if(rot){g.save();g.translate(Math.round(sx),Math.round(sy));g.rotate(rot);g.drawImage(c,-Math.round(dw/2),-Math.round(dh/2),dw,dh);g.restore()}else g.drawImage(c,Math.round(sx-dw/2),Math.round(sy-dh/2),dw,dh);o.sw=dw;o.sh=dh}
+const ramp=(pal,v,x,y)=>{const n=pal.length,f=Math.max(0,Math.min(.999,v))*(n-1),i=Math.floor(f);return pal[Math.min(n-1,i+(f-i>P.bay(x,y)?1:0))]};
+// palettes
+const NPAL=[['#12082a','#24104a','#3c1a6e','#5e2a98','#8a4ac0'],['#041a22','#08303a','#0e4c56','#1a7478','#36a8a0'],['#1e0620','#3a0c3c','#5e165e','#8a2a82','#c04aa8']].map(p=>p.map(dpk));
+function nebula(seed,pal,sz){const sd=seed*13.7;return{sz,asp:.62,cap:160,pf:.55,paint:(u,v,x,y)=>{const dx=(u-.5)*2,dy=(v-.5)*2,fall=Math.max(0,1-Math.pow(dx*dx+dy*dy,.8));const n=P.fbm(u*3.2+sd,v*2+sd*.7)*1.15+P.fbm(u*9+sd*2,v*6)*.35-.42;const d=n*fall*2.2;
+  if(d<=.08||P.bay(x,y)>d*2.4)return 0;return ramp(pal,d*1.15,x,y)}}}
+function galaxy(seed,kind,sz){const sd=seed*7.1,tilt=.35+DK()*.5,rot=DK()*6.28,arms=2+(DK()<.4?1:0);return{sz,asp:1,cap:96,pf:.3,paint:(u,v,x,y)=>{let dx=(u-.5)*2,dy=(v-.5)*2;const ca=Math.cos(rot),sa=Math.sin(rot),rx=dx*ca-dy*sa,ry=(dx*sa+dy*ca)/tilt,r=Math.hypot(rx,ry);if(r>1)return 0;
+  let d;if(kind){d=Math.exp(-r*r*5)*1.1}else{const a=Math.atan2(ry,rx),sp=Math.cos(arms*(a-Math.log(r+.05)*2.6)+sd);d=Math.exp(-r*r*7)*1.1+Math.max(0,sp)*(1-r)*.55*(.7+.3*P.vn(rx*9+sd,ry*9))}
+  if(d<.1||P.bay(x,y)>d*2)return 0;return ramp(kind?GPE:GPS,d,x,y)}}}
+const GPS=['#1a1440','#3a3478','#6a6ab8','#a8b4f0','#fff6e0'].map(dpk),GPE=['#2a1418','#5a3028','#a07048','#e8c890','#fff6e0'].map(dpk);
+function farPlanet(seed,sz){const pals=[['#0c0a1a','#2a2448','#4e4680','#8a82c0'],['#140808','#3a1a14','#7a3a22','#c47a48'],['#06140e','#12342a','#2a6050','#5aa08a'],['#101014','#2a2a34','#55556a','#9a9ab0']],pal=pals[seed%4].map(dpk),ring=seed%3===1,sd=seed*3.3;
+ return{sz,asp:ring?.7:1,cap:64,pf:.4,paint:(u,v,x,y,N)=>{const asp=ring?.7:1;let dx=(u-.5)*2*(ring?1.45:1),dy=(v-.5)*2*(ring?1.45/asp*asp:1);if(ring)dy=(v-.5)*2*1.45*asp;
+  const r=Math.hypot(dx,dy);if(ring){const ry=dy/.28,rr=Math.hypot(dx,ry);if(rr>1.2&&rr<1.42&&!(r<1&&dy<0))return P.bay(x,y)<.6?pal[2]:pal[1]}
+  if(r>1)return 0;const nz=Math.sqrt(1-r*r),l=Math.max(0,(-dx*.6-dy*.6+nz*.55));const b=P.vn(dy*4+sd,dx*.6)*.3;return ramp(pal,l*.9+b-.1,x,y)}}}
+// world objects (lit from the upper left)
+const MTL=['#14141c','#2a2c3a','#4a4e64','#7a809c','#b4bad4','#eef0ff'].map(dpk),RUST=['#1a0e0a','#3a1e14','#6a3a24','#9a5a34','#c88a50'].map(dpk),ROCK=['#120e0e','#2a2222','#4a3c36','#6e5c50','#9a8470'].map(dpk);
+const lite=(dx,dy)=>.62-dx*.32-dy*.32;
+function station(seed,sz){const kind=seed%2,sd=seed*1.7;return{sz,asp:kind?1:.7,cap:96,name:kind?'Ring station':'Relay outpost',paint:(u,v,x,y,N)=>{const dx=(u-.5)*2,dy=(v-.5)*2;
+  if(kind){const ry=dy/.5,r=Math.hypot(dx,ry);if(r>.82&&r<1){const sh=lite(dx,dy)+(r-.91)*-2;return ramp(MTL,sh+((Math.floor(Math.atan2(ry,dx)*6))%2?.08:0),x,y)}
+   if(r<.22)return ramp(MTL,lite(dx,dy)+.2-r,x,y);const a=Math.atan2(ry,dx);for(let k=0;k<4;k++){const da=Math.atan2(Math.sin(a-k*Math.PI/2-.3),Math.cos(a-k*Math.PI/2-.3));if(Math.abs(da)*r<.035&&r<.85)return ramp(MTL,.45,x,y)}
+   if(r>.82&&r<1.0&&P.bay(x,y)>.95)return dpk('#ffe66d');return 0}
+  const ay=dy/.7;if(Math.abs(ay)<.16&&Math.abs(dx)<.24)return ramp(MTL,lite(dx,ay)+.15,x,y);if(Math.abs(ay)<.035&&Math.abs(dx)<.9)return ramp(MTL,.4,x,y);
+  if(Math.abs(dx)>.3&&Math.abs(dx)<.9&&Math.abs(ay)>.07&&Math.abs(ay)<.5){const cx=Math.floor((Math.abs(dx)-.3)*N*.25),cy=Math.floor(ay*N*.25);return (cx+cy)%2?dpk('#1e3a8a'):dpk('#3a6ad8')}
+  if(Math.abs(dx)<.05&&ay<-.16&&ay>-.7)return ramp(MTL,.55,x,y);if(Math.hypot(dx,ay+.74)<.08)return dpk('#ff5a5a');return 0}}}
+function wreck(seed,sz){const sd=seed*5.3;return{sz,asp:.5,cap:96,name:['Derelict freighter','Wrecked scout','Broken hauler'][seed%3],paint:(u,v,x,y,N)=>{const dx=(u-.5)*2,dy=(v-.5)*2/.5*.5*2;
+  const hull=Math.abs(dy)<.42*(1-Math.pow(Math.max(0,dx),3))&&dx>-.95,brk=Math.abs(dx-(.15+.2*P.vn(dy*4+sd,1)))<.06+.05*P.vn(dy*9,sd);if(!hull||brk)return 0;
+  const hole=P.fbm(u*4+sd,v*4)>.62;if(hole)return P.bay(x,y)>.5?RUST[0]:0;const pan=(Math.floor(u*N/6)+Math.floor(v*N/6))%2?.05:0;
+  return ramp(P.vn(u*6+sd,v*6)>.55?RUST:MTL,lite(dx,dy)+pan-Math.abs(dy)*.3,x,y)}}}
+function rock(seed,sz){const sd=seed*2.9;return{sz,asp:.85,cap:48,name:seed%5?'Drifting rock':'Ice chunk',paint:(u,v,x,y)=>{const dx=(u-.5)*2,dy=(v-.5)*2/.85*.85,a=Math.atan2(dy,dx),rr=.78+.22*P.vn(Math.cos(a)*2+sd,Math.sin(a)*2);const r=Math.hypot(dx,dy);if(r>rr)return 0;
+  const nz=Math.sqrt(Math.max(0,1-(r/rr)**2)),c=P.vn(u*7+sd,v*7)>.68?-.2:0;return ramp(seed%5?ROCK:MTL,lite(dx,dy)*.7+nz*.35+c-.1,x,y)}}}
+const ASTRO={sz:15,asp:1.3,cap:24,name:'A lost astronaut',paint:(u,v,x,y)=>{const dx=(u-.5)*2,dy=(v-.5)*2;if(Math.hypot(dx,dy+.45)<.42)return Math.hypot(dx+.08,dy+.5)<.26?(dx<-.05&&dy<-.6?dpk('#ffffff'):dpk('#2a6ad8')):ramp(MTL,lite(dx,dy)+.35,x,y);
+  if(Math.abs(dx)<.4&&dy>-.05&&dy<.5)return ramp(MTL,lite(dx,dy)+.3,x,y);if(dy>=.5&&dy<.95&&Math.abs(Math.abs(dx)-.2)<.14)return ramp(MTL,.65,x,y);if(Math.abs(dy-.05)<.12&&Math.abs(dx)<.85&&Math.abs(dx)>.38)return ramp(MTL,.7,x,y);if(dx>.4&&dx<.62&&dy>-.2&&dy<.35)return dpk('#c84a3a');return 0}};
+const UFO={sz:22,asp:.5,cap:32,name:'UFO?!',paint:(u,v,x,y,N)=>{const dx=(u-.5)*2,dy=(v-.5)*2;if(dy<0&&Math.hypot(dx/.42,dy/.95+.05)<1)return Math.hypot(dx+.15,dy+.55)<.15?dpk('#ffffff'):dpk('#7af0c8');
+  if(Math.abs(dy-.2)<.32&&Math.abs(dx)<1-Math.abs(dy-.2)*.9){if(Math.abs(dy-.25)<.07&&(Math.floor(u*N/3))%2)return dpk('#ffe66d');return ramp(MTL,lite(dx,dy)+.2,x,y)}return 0}};
+// layout (seeded, stable): only in the empty space between the outer orbit and the tear, never on the planets
+const DECO={back:[],world:[]};
+(function(){const inZone=(x,y,m)=>Math.hypot(x,y/SQ)>1290+m&&inMain(x,y)&&inMain(x+m,y)&&inMain(x-m,y)&&inMain(x,y+m)&&inMain(x,y-m);
+ const put=(o,pf,m,tries=300)=>{for(let t=0;t<tries;t++){const x=(DK()*2-1)*2700,y=(DK()*2-1)*3300;if(pf===1?!inZone(x,y,m):!(inMain(x,y)&&Math.hypot(x,y/SQ)>1250+o.sz*.35))continue;if(pf<1&&DECO.back.some(q=>Math.hypot(q.x-x,q.y-y)<(q.sz+o.sz)*.45))continue;if(pf===1&&DECO.world.some(q=>Math.hypot(q.x-x,q.y-y)<q.sz+o.sz+90))continue;o.x=x;o.y=y;return o}return null};
+ for(let i=0;i<11;i++){const o=put(nebula(i,NPAL[i%3],700+DK()*900),.55,0);if(o){o.pf=.55;o.dx=(DK()-.5)*3;o.dy=(DK()-.5)*2;DECO.back.push(o)}}
+ for(let i=0;i<6;i++){const o=put(galaxy(i,i%3===2,110+DK()*150),.3,0);if(o){o.pf=.3;DECO.back.push(o)}}
+ for(let i=0;i<5;i++){const o=put(farPlanet(i,45+DK()*80),.4,0);if(o){o.pf=.4;DECO.back.push(o)}}
+ DECO.back.sort((a,b)=>a.pf-b.pf);
+ const add=(o,m)=>{const q=put(o,1,m);if(q){q.ph=DK()*6.28;DECO.world.push(q)}};
+ for(let i=0;i<3;i++)add(station(i,110+DK()*70),120);for(let i=0;i<4;i++)add(wreck(i,90+DK()*80),110);for(let i=0;i<24;i++)add(rock(i,18+DK()*42),40);add(ASTRO,60);ASTRO.astro=1})();
+// transient fx
+const FX={comet:null,nextC:performance.now()+9000+Math.random()*15000,shoot:null,nextS:performance.now()+4000+Math.random()*6000,ufo:null,nextU:performance.now()+70000+Math.random()*130000};
+const TX=()=>Math.max(1,Math.ceil(cam.z*1.6));
+function drawDecoBack(now){if(sys!=='main')return;const ga=g.globalAlpha,t=RM?0:now/1000;
+ for(const o of DECO.back){const zl=cam.z*o.pf,wx=o.x+(o.dx||0)*t,wy=o.y+(o.dy||0)*t;g.globalAlpha=ga*(o.asp===.62?.6:o.pf<.35?.8:.9);dDraw(o,W/2+(wx-cam.x*o.pf)*cam.z,H/2+(wy-cam.y*o.pf)*cam.z,cam.z)}
+ g.globalAlpha=ga;if(RM)return;
+ // shooting stars: brief pixel streaks in the deep layer
+ if(!FX.shoot&&now>FX.nextS&&!intro){FX.shoot={t0:now,x:Math.random()*W,y:Math.random()*H*.6,a:.4+Math.random()*.5+(Math.random()<.5?Math.PI-1.3:0),L:60+Math.random()*90}}
+ if(FX.shoot){const s=FX.shoot,k=(now-s.t0)/650;if(k>=1){FX.shoot=null;FX.nextS=now+5000+Math.random()*9000}else{const ps=2,hx=s.x+Math.cos(s.a)*s.L*2*k,hy=s.y+Math.sin(s.a)*s.L*2*k;for(let i=0;i<s.L/ps;i++){const f=i/(s.L/ps);if(P.bay(i,3)>1-f*1.2&&i>2)continue;g.fillStyle=f<.15?'#ffffff':f<.5?'#cfd4ff':'#6a70b8';g.globalAlpha=ga*(1-k*k)*(1-f);g.fillRect(Math.round((hx-Math.cos(s.a)*i*ps)/ps)*ps,Math.round((hy-Math.sin(s.a)*i*ps)/ps)*ps,ps,ps)}g.globalAlpha=ga}}}
+function drawDecoWorld(now){if(sys!=='main')return;const t=RM?0:now/1000,ga=g.globalAlpha;
+ for(const o of DECO.world){const bob=RM?0:Math.sin(t*.4+o.ph)*6,[sx,sy]=W2S(o.x+(o.astro?Math.sin(t*.13)*30:0),o.y+bob);let rot=0;if(!RM&&!o.name.includes('station')&&o!==ASTRO)rot=Math.sin(t*.05+o.ph)*.35;if(o===ASTRO&&!RM)rot=t*.25+(o.wave&&now-o.wave<1600?Math.sin((now-o.wave)/90)*.5:0);
+  dDraw(o,sx,sy,cam.z,rot);o.scx=sx;o.scy=sy;o.sr=o.sz*cam.z*.5;
+  if(o.name==='Ring station'||o.name==='Relay outpost'){if(!RM&&(Math.floor(t*1.5+o.ph)%2)){const ps=TX();g.fillStyle='#ff5a5a';g.fillRect(Math.round(sx+o.sz*cam.z*.42),Math.round(sy-o.sz*cam.z*.05),ps,ps)}}}
+ g.globalAlpha=ga;if(RM)return;
+ // comets: occasionally cross with a dithered pixel tail
+ if(!FX.comet&&now>FX.nextC&&!intro){const a=Math.random()*TAU,[cx,cy]=S2W(W/2,H/2),Rv=Math.hypot(W,H)/cam.z*.6,off=(Math.random()-.5)*Rv*.8;FX.comet={t0:now,x:cx-Math.cos(a)*Rv-Math.sin(a)*off,y:cy-Math.sin(a)*Rv+Math.cos(a)*off,vx:Math.cos(a)*Rv*2/9,vy:Math.sin(a)*Rv*2/9,H:[]}}
+ if(FX.comet){const c=FX.comet,k=(now-c.t0)/9000;if(k>=1){FX.comet=null;FX.nextC=now+25000+Math.random()*30000}else{const wx=c.x+c.vx*k*9,wy=c.y+c.vy*k*9,[hx,hy]=W2S(wx,wy),ps=TX(),sp=Math.hypot(c.vx,c.vy),ux=-c.vx/sp,uy=-c.vy/sp,L=Math.max(40,90*cam.z*2)/ps;
+   for(let i=L;i>=0;i--){const f=i/L,wd=Math.max(0,Math.round((1-f)*3*Math.min(1,cam.z*1.5)));for(let j=-wd;j<=wd;j++){if(i>2&&P.bay(i,j+4)>(1-f)*1.4-Math.abs(j)*.2)continue;g.fillStyle=f<.06?'#ffffff':f<.25?'#c8f4ff':f<.55?'#5ad8ff':'#2a6ad8';g.fillRect(Math.round(hx/ps+ux*i-uy*j)*ps,Math.round(hy/ps+uy*i+ux*j)*ps,ps,ps)}}}}
+ // the UFO (rare)
+ if(!FX.ufo&&now>FX.nextU&&!intro&&!focus){const l=Math.random()<.5;FX.ufo={t0:now,l,y:H*(.15+Math.random()*.5)}}
+ if(FX.ufo){const u=FX.ufo,k=(now-u.t0)/2600;if(k>=1){FX.ufo=null;FX.nextU=now+150000+Math.random()*150000}else{const e=k<.4?k/.4*.5:k<.6?.5:.5+(k-.6)/.4*.5,ee=k<.4?1-Math.pow(1-k/.4,2):k<.6?1:1+Math.pow((k-.6)/.4,2)*2,x=u.l?-60+(W*.5+60)*Math.min(ee,1)+(ee>1?(ee-1)*W:0):W+60-(W*.5+60)*Math.min(ee,1)-(ee>1?(ee-1)*W:0),y=u.y+Math.sin(k*20)*6;
+   const z=Math.max(1.6,cam.z*1.6);dDraw(UFO,x,y,z);UFO.scx=x;UFO.scy=y;UFO.sr=UFO.sz*z*.6;UFO.live=1;if(k>.4&&k<.6){g.fillStyle='rgba(122,240,200,.25)';const ps=TX()+1;for(let i=0;i<10;i++)if(P.bay(i,Math.floor(now/90))>.4)g.fillRect(Math.round(x-6+i*1.2),Math.round(y+8+i*3),ps,ps)}}}else UFO.live=0}
+function decoHit(sx,sy){if(sys!=='main')return null;if(UFO.live&&Math.hypot(sx-UFO.scx,sy-UFO.scy)<UFO.sr)return{title:UFO.name,deco:UFO};for(const o of DECO.world)if(o.sr>4&&Math.hypot(sx-o.scx,sy-o.scy)<o.sr)return{title:o.name,deco:o};return null}
+let sunClicks=[];function sunTap(){const n=performance.now();sunClicks=sunClicks.filter(q=>n-q<3000);sunClicks.push(n);if(sunClicks.length>=5){sunClicks=[];BF.next=0;BF.t0=0;tip.textContent='☀ you woke the sun';tip.style.left=W/2-70+'px';tip.style.top=H*.2+'px';tip.classList.add('on');setTimeout(hideTip,2400)}}
+window.__flare=()=>{BF.next=0};window.__deco=DECO;window.__fx=FX;
 // ---- hit testing ----
-function hit(sx,sy){const rh=riftHit(sx,sy);if(rh)return rh;const[wx,wy]=S2W(sx,sy);let best=null,bd=1e9;const list=sys==='main'?[...MOONS,...bodies]:bodies;
- for(const b of list){const[x,y]=pos(b),r=b.w*b.hr*(b.id==='void'?1.4:1),d=Math.hypot(wx-x,(wy-y)*(b.id==='void'?1.6:1));if(d<r&&d/r<bd){bd=d/r;best=b}}return best}
+function hit(sx,sy){const[wx,wy]=S2W(sx,sy);let best=null,bd=1e9;const list=sys==='main'?[...MOONS,...bodies]:bodies;
+ for(const b of list){const[x,y]=pos(b),r=b.w*b.hr*(b.id==='void'?1.4:1),d=Math.hypot(wx-x,(wy-y)*(b.id==='void'?1.6:1));if(d<r&&d/r<bd){bd=d/r;best=b}}return best||decoHit(sx,sy)}
 // ---- focus & info ----
 let revealT=0;
 const TH={sun:['#080a12','#dde0e8','#ffe66d','#080a12','Silkscreen','#9ab4e8'],ashaad:['#120a0c','#e8dcc0','#ffd23a','#2a1608','Silkscreen','#5a3a20'],sea:['#021e5a','#90E0EF','#48CAE4','#021e5a','VT323','#f3dfae'],arena:['#1a0f08','#fff3d6','#ffcf3a','#1a0f08','Silkscreen','#ff6464'],
@@ -264,7 +351,7 @@ const a=s=>/^https?:/.test(s)?' target="_blank" rel="noopener"':'';
  if(b.moon){const c=b.moon;return `<h2>${c.name}</h2><p class="stat"><b>${fmt(c.subs)}</b> subs · <b>${fmt(c.views)}</b> views</p><a class="go" href="${c.url}" target="_blank" rel="noopener">▶ Watch</a>`}
  return `<h2>${b.title}</h2>${b.href?`<a class="go" href="${b.href}"${a(b.href)}>${b.cta}</a>`:''}`}
 function faceR(b){return b.id==='void'?b.w*.12:b.w*b.hr}
-function focusOn(b,push=true){hideTip();if(b.rift){window.__blip&&__blip('click');location.href=b.href;return}window.__blip&&__blip("click");if(b.arch){enterArchive();return}if(b.home){warpTo('main');return}
+function focusOn(b,push=true){hideTip();if(b.deco){const o=b.deco;window.__blip&&__blip('hover');if(o===ASTRO){o.wave=performance.now();tip.textContent='👋 hi! (lost astronaut)';tip.classList.add('on')}return}window.__blip&&__blip("click");if(b.arch){enterArchive();return}if(b.home){warpTo('main');return}
  focus=b;info.className='';const bare=NOINFO[b.id];info.innerHTML=bare?'':'<div class="txt" style="'+theme(b)+'">'+infoHTML(b)+'</div>';
  const[x,y]=pos(b),fr=faceR(b),z=Math.min(W,H)*(W<H?.95:.82)/Math.max(b.w*(b.id==='void'?.62:b.yt?1.75:.92),1);
  info.querySelectorAll('[data-chans]').forEach(el=>el.onclick=e=>{e.preventDefault();e.stopPropagation();el.hidden=true;const c=info.querySelector('.lgch');c.hidden=false;const lg=info.querySelector('.lglogo');if(lg)lg.hidden=true});
@@ -294,9 +381,9 @@ cv.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId)){const b=hit(e.cl
  const p=pts.get(e.pointerId),dx=e.clientX-p[0],dy=e.clientY-p[1];pts.set(e.pointerId,[e.clientX,e.clientY]);moved+=Math.abs(dx)+Math.abs(dy);if(moved<6)return;
  if(intro)skipIntro();tw=null;if(pts.size===2&&pinch){const[a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);zoomAt((a[0]+b[0])/2,(a[1]+b[1])/2,pinch.z*d/pinch.d/cam.z)}else{cam.x-=dx/cam.z;cam.y-=dy/cam.z;mv.x=-dx/cam.z;mv.y=-dy/cam.z;mv.t=performance.now()}cv.classList.add('drag')});
 const up=e=>{if(pts.size===1&&moved>=6&&performance.now()-mv.t<80&&!RM)mv.on=1;pts.delete(e.pointerId);if(pts.size<2)pinch=null;cv.classList.remove('drag')};
-cv.addEventListener('pointerup',e=>{up(e);if(moved>=6)return;if(intro){skipIntro();return}const b=hit(e.clientX,e.clientY);if(b&&b!==focus)focusOn(b);else if(!b&&focus)history.state&&history.state.f?history.back():unfocus()});
+cv.addEventListener('pointerup',e=>{up(e);if(moved>=6)return;if(intro){skipIntro();return}const b=hit(e.clientX,e.clientY);if(b&&b.id==='sun')sunTap();if(b&&b!==focus)focusOn(b);else if(!b&&focus)history.state&&history.state.f?history.back():unfocus()});
 cv.addEventListener('pointercancel',up);cv.addEventListener('pointerleave',()=>{hover=null;hideTip()});
-function zoomAt(sx,sy,f){const nz=Math.max(sys==='main'?fitZ()*.3:.15,Math.min(60,cam.z*f)),[wx,wy]=S2W(sx,sy);cam.z=nz;cam.x=wx-(sx-W/2)/nz;cam.y=wy-(sy-H/2)/nz}
+function zoomAt(sx,sy,f){const nz=Math.max(sys==='main'?fitZ()*.45:.15,Math.min(60,cam.z*f)),[wx,wy]=S2W(sx,sy);cam.z=nz;cam.x=wx-(sx-W/2)/nz;cam.y=wy-(sy-H/2)/nz}
 cv.addEventListener('wheel',e=>{e.preventDefault();if(intro)skipIntro();tw=null;zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*.0015))},{passive:false});
 addEventListener('keydown',e=>{if(document.body.classList.contains('landed'))return;if(intro){skipIntro();return}if(e.key==='Escape'){if(focus)history.state&&history.state.f?history.back():unfocus();else if(sys==='archive')history.state&&history.state.a?history.back():warpTo('main')}});
 function showTip(b,x,y){const tx=b.moon?b.moon.name:b.title;if(tip.textContent!==tx||!tip.classList.contains("on"))window.__blip&&__blip("hover");tip.textContent=tx;tip.style.left=x+14+'px';tip.style.top=y+14+'px';tip.classList.add('on')}
