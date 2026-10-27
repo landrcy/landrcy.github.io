@@ -51,7 +51,9 @@ const T={
    if(k<.2&&by>28&&by<31&&bx>8&&bx<56&&h2(bx>>3,iy,87)>.3)return 92+h2(bx,by,88)*30;
    return base},
   c:(x,y,h)=>{const bx=((x%64)+64)%64,by=((y%64)+64)%64,st=['#2a2230','#463a44','#6a5a5a','#94806e','#c0a888','#e4d0aa'].map(hx);
-   if(h>=90)return ramp(st,.55+(((y&7)===0)?-.25:0)+fbm(x,y,2,89,32)*.2,x,y); // columns / wall stones
+   if(h>=90){ // columns / wall stones: each 2x2 column gets its own stone (sandstone, grey marble, white marble, dark basalt, weathered ochre)
+    const k=h2(x>>1,y>>1,95),P=k<.3?st:k<.5?['#3a3a44','#5a5a66','#8a8a96','#b4b4c0','#d8d8e2'].map(hx):k<.65?['#7a7470','#b0aaa4','#d8d2ca','#f0ece4','#ffffff'].map(hx):k<.8?['#16141c','#24202c','#3a3442','#56505e'].map(hx):['#4a2e1a','#7a5230','#a87a4a','#d0a870'].map(hx);
+    return ramp(P,.35+h2(x>>1,y>>1,96)*.45+(((y&7)===0)?-.15:0),x,y)}
    const m=fbm(x,y,3,91,8);if(m>.68)return ramp(['#1a3a1a','#2e6a2a','#5aa040'].map(hx),(m-.66)*4,x,y);
    if(h>=48){const run=(((bx>>2)+(by>>2))%5===0)&&((bx&3)===1||(by&3)===1)&&h>=60;if(run)return hx('#3ad8e0');return ramp(st,.6+((bx&3)===0||(by&3)===0?-.2:0),x,y)}
    const grout=(x&7)===0||((y&7)===0);return ramp(st,(grout?.25:.45)+fbm(x,y,2,93,16)*.25,x,y)},

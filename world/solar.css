@@ -104,3 +104,4 @@ body.landed #info,body.landed #tip,body.landed .ui:not(.lback):not(#sndbtn),body
 #land.touch .ljump{display:block}
 @media(prefers-reduced-motion:reduce){#land .lhint{transition:none}}
 @container (max-aspect-ratio:3/4){#info.lg .lgrow{flex-direction:column;gap:2cqmin}#info.lg .lgland{font-size:max(9px,9cqmin)}}
+#info[data-p="pmuseum"] .lgplay{flex-shrink:0}

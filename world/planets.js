@@ -351,40 +351,87 @@ P.arena=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);if(!S
   const nL=FLAT?3:5;for(let i=0;i<nL;i++){const lx=Math.round(cx+(i-(nL-1)/2)*hw*2/(nL-1)*.9),on=RMq||FLAT||Math.sin(t*1.3+i*1.7)>-.85,w=Math.max(1,Math.round(W/90));for(let a=-w;a<=w;a++){put(lx+a,ly+2,'#20202c');put(lx+a,ly+3,on?'#fff8d8':'#8a7a50');if(w>1)put(lx+a,ly+4,on?'#ffe8a0':'#6a5a30')}
    if(on&&!FLAT){const L=post*.9;for(let yy=4;yy<L;yy++){const sp=w+yy*.35;for(let a=-sp;a<=sp;a++){const x=Math.round(lx+a),y=ly+yy+1,o=(y*W+x)*4;if(x<0||x>=W||y>=Hh||d[o+3]===0)continue;if(bay(x,y)>(1-yy/L)*.55)continue;d[o]=Math.min(255,d[o]+40);d[o+1]=Math.min(255,d[o+1]+34);d[o+2]=Math.min(255,d[o+2]+14)}}}}}
  S.g.putImageData(S.img,0,0)};
-/* ---------- PIXEL MUSEUM: small ancient-temple world with ruined colonnades and a glowing rune ring ---------- */
-const TST=['#2a2230','#463a44','#6a5a5a','#94806e','#c0a888','#e4d0aa'],TCY=['#0a3a4a','#1a7a8a','#3ad8e0','#a8fff8','#ffffff'],TMOS=['#1a3a1a','#2e6a2a','#5aa040'];
-P.temple=(S,t)=>{const W=S.img.width,R=W*.33,cx=W/2,cy=W*.54,rot=t*.24,d=S.img.data;
+/* ---------- PIXEL MUSEUM: an ancient-temple world. A ruined peristyle temple with a glowing door crowns the pole,
+   floating rune stones drift around it, torches flicker on the stair, and an animated rune ring circles the world. ---------- */
+const TST=['#2a2230','#463a44','#6a5a5a','#94806e','#c0a888','#e4d0aa'],TCY=['#0a3a4a','#1a7a8a','#3ad8e0','#a8fff8','#ffffff'],TMOS=['#1a3a1a','#2e6a2a','#5aa040'],
+ TRCK=['#1a1418','#2a2230','#463a44','#6a5a5a','#94806e'];
+// convex solids as planes [nx,ny,nz,d] (inside where n.p<=d), in temple space (units of R, y up, z towards the front)
+const tbox=(x0,x1,y0,y1,z0,z1,m,k)=>({m,k,c:[(x0+x1)/2,(y0+y1)/2,(z0+z1)/2],hy:(y1-y0)/2+.03,hr:Math.hypot(x1-x0,z1-z0)/2+.03,p:[[1,0,0,x1],[-1,0,0,-x0],[0,1,0,y1],[0,-1,0,-y0],[0,0,1,z1],[0,0,-1,-z0]]});
+const TEMPLE=(()=>{const L=[],cw=.05;
+ L.push(tbox(-.7,.7,-.3,-.02,-.44,.44,'rock'));                                                // rock plinth
+ [[.66,.42,-.02,.04],[.6,.37,.04,.1],[.54,.32,.1,.16]].forEach(([a,c,y0,y1])=>L.push(tbox(-a,a,y0,y1,-c,c,'step')));
+ for(let i=0;i<5;i++)L.push(tbox(.6,.92-i*.06,-.28+i*.06,-.22+i*.06,-.2,.2,'step'));           // grand stair up to the entrance end
+ L.push(tbox(-.34,.34,.16,.62,-.16,.16,'wall'));                                                // cella, doors on both ends
+ const xs=[-.45,-.27,-.09,.09,.27,.45];
+ for(const z of[-.25,.25])xs.forEach(x=>{const top=x<-.4?(z>0?.36:.46):.62;L.push(tbox(x-cw,x+cw,.16,top,z-cw,z+cw,'col',top<.6?1:0))});
+ for(const z of[-.09,.09])L.push(tbox(.45-cw,.45+cw,.16,.62,z-cw,z+cw,'col'));                   // porch columns framing the door
+ L.push(tbox(-.31,.52,.62,.72,-.31,.31,'frieze'));                                              // entablature with relief band
+ L.push(tbox(-.4,-.31,.62,.665,.2,.31,'frieze'));                                               // snapped stub of the lost corner
+ const h=.2,c=.31,yb=.72;L.push({m:'ped',c:[.105,.82,0],hy:.12,hr:.53,p:[[1,0,0,.52],[-1,0,0,.31],[0,-1,0,-yb],[0,1,h/c,yb+h],[0,1,-h/c,yb+h]]}); // pediment
+ for(const s of[-1,1]){const x=.66,z=s*.33;L.push(tbox(x-.06,x+.06,.04,.12,z-.06,z+.06,'step'),tbox(x-.04,x+.04,.12,.3,z-.03,z+.03,'statue'),tbox(x-.032,x+.032,.3,.37,z-.03,z+.03,'statue'))}
+ for(const s of[-1,1]){const x=.5,z=s*.24;L.push(tbox(x-.015,x+.015,.16,.26,z-.015,z+.015,'iron'),tbox(x-.045,x+.045,.26,.3,z-.045,z+.045,'iron'))}
+ return L})();
+const TSTONES=[[.4,.55,1.22,.12],[1.7,.95,1.3,.09],[2.6,.3,1.2,.1],[3.5,.75,1.28,.13],[4.6,.5,1.24,.09],[5.5,.9,1.2,.11]];
+P.temple=(S,t)=>{const W=S.img.width,R=W*.3,cx=W/2,cy=W*.6,rot=t*.24,d=S.img.data,TT=t;
  sphere(S,R,cx,cy,rot,(lon,lat,lit,x,y)=>{
-  // carved plaza: square slabs with dark grout, worn by noise
-  const u=lon*6/Math.PI,v=lat*6/Math.PI*1.4,fu=u-Math.floor(u),fv=v-Math.floor(v),wear=fbm(lon*1.6+9,lat*1.6);
-  if(lat<-.98){const st=lat<-1.36?0:lat<-1.06?1:2;return dq(TST,lit*.8+[.22,.14,.02][st],x,y)} // stepped temple platform
-  const moss=fbm(lon*2.4+3,lat*2.4+7);if(moss>.65)return dq(TMOS,lit*.9+.05,x,y);
-  if(wear>.6)return dq(['#3a2e30','#6a5446','#a0805e','#c8a87a'],lit*.9,x,y); // sand drifts
+  const u=lon*6/Math.PI,v=lat*6/Math.PI*1.4,fu=u-Math.floor(u),fv=v-Math.floor(v),iu=Math.floor(u),iv=Math.floor(v);
+  // carved relief bands: a frieze of figures and runes running round the world
+  for(const b of[-.42,.36]){const q=(lat-b)/.11;if(Math.abs(q)<1){if(Math.abs(q)>.78)return dq(TST,lit*.5+.02,x,y);const m=lon*20/Math.PI,fm=m-Math.floor(m),k=Math.floor(m);
+    const fig=H(k,b>0?3:7)>.5?(Math.abs(fm-.5)<.18&&q>-.55)||(Math.abs(fm-.5)<.3&&Math.abs(q+.1)<.18):(Math.abs(fm-.5)<.28&&Math.abs(q)<.3&&((Math.floor(fm*4)+Math.floor(q*3+3))&1));
+    if(fig)return H(k,11)>.82?dq(TCY,.25+lit*.7,x,y):dq(TST,lit*.85+.2,x,y);return dq(TST,lit*.6+.05,x,y)}}
+  if(lat<-1.12)return dq(TST,lit*.8+.15,x,y); // paved crown under the temple
+  const moss=fbm(lon*2.4+3,lat*2.4+7);if(moss>.67)return dq(TMOS,lit*.9+.05,x,y);
+  if(fbm(lon*1.6+9,lat*1.6)>.62)return dq(['#3a2e30','#6a5446','#a0805e','#c8a87a'],lit*.9,x,y); // sand drifts
   if(fu<.07||fv<.09)return dq(TST,lit*.55,x,y);
-  // rune glyph carved into some slabs (lit by the sun like the rest, no night glow)
-  const iu=Math.floor(u),iv=Math.floor(v);if(H(iu+40,iv)>.72){const gx=Math.floor(fu*5),gy=Math.floor(fv*5);if(gx>0&&gx<4&&gy>0&&gy<4&&H(iu*5+gx,iv*5+gy)>.45)return dq(TCY,.2+lit*.75,x,y)}
+  if(H(iu+40,iv)>.74){const gx=Math.floor(fu*5),gy=Math.floor(fv*5);if(gx>0&&gx<4&&gy>0&&gy<4&&H(iu*5+gx,iv*5+gy)>.45)return dq(TCY,.2+lit*.75,x,y)}
   return dq(TST,lit*.88+.08+(H(iu,iv)-.5)*.12,x,y)},{w:Math.max(1,R*.06),r:['#0a3a4a','#1a7a8a','#3ad8e0']});
  const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=W)return;const o=(y*W+x)*4,q=typeof c==='string'?hx(c):c;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
+ const shade=(c,raw,x,y)=>{c=typeof c==='string'?hx(c):c;const sv=raw+(bay(x,y)-.5)*.08;if(sv<.36){const k=sv<.16?.62:.4;return[c[0]+(SHD[0]-c[0])*k,c[1]+(SHD[1]-c[1])*k,c[2]+(SHD[2]-c[2])*k].map(Math.round)}return c};
  const inDisc=(x,y)=>Math.hypot(x+.5-cx,y+.5-cy)<R;
- // a ruined round temple (tholos) crowns the north pole: its columns stand along the surface normal and turn with the world
- const PW=Math.max(1,R*.1),PL=R*.36,NC=8,LA=-1.16,cols=[];
- for(let i=0;i<NC;i++){const ln=i*TAU/NC-rot,nx=Math.sin(ln)*Math.cos(LA),ny=Math.sin(LA),nz=Math.cos(ln)*Math.cos(LA),br=i===5?.42:i===2?.7:1;
-  cols.push({i,nx,ny,nz,raw:Math.max(0,nx*LX+ny*LY+nz*LZ),len:PL*br,top:br===1})}
- const pillar=c=>{const bx=cx+c.nx*R,by=cy+c.ny*R,pl=Math.hypot(c.nx,c.ny)||1,ux=c.nx/pl,uy=c.ny/pl,L=c.len*Math.sqrt(Math.max(0,1-c.nz*c.nz)),px=-uy,py=ux,sideLit=(px*LX+py*LY)>0;
-  for(let s=0;s<=L;s+=.5)for(let w=-PW/2;w<=PW/2;w+=.5){const xi=Math.round(bx+ux*s+px*w),yi=Math.round(by+uy*s+py*w);if(c.nz<0&&inDisc(xi,yi))continue;
-   if(!c.top&&s>L-1.5&&H(xi,yi)>.45)continue; // snapped, jagged top
-   const fl=Math.abs(w)<PW*.18&&PW>=3?-.12:0,edge=(w>0)===sideLit?.18:-.22,base=s<Math.max(1,PW*.35)?-.1:0;put(xi,yi,dq(TST,.5+edge+fl+base+(c.raw-.4)*.6,xi,yi))}
-  c.tx=bx+ux*L;c.ty=by+uy*L};
- const lintel=(a,b)=>{if(!a.top||!b.top)return;const n=Math.ceil(Math.hypot(b.tx-a.tx,b.ty-a.ty)*2)+1,back=Math.min(a.nz,b.nz)<0,th=Math.max(1,PW*.55);
-  for(let s=0;s<=n;s++){const x=a.tx+(b.tx-a.tx)*s/n,y=a.ty+(b.ty-a.ty)*s/n;for(let k=0;k<th;k+=.5){const xi=Math.round(x),yi=Math.round(y-k);if(back&&inDisc(xi,yi))continue;put(xi,yi,dq(TST,(back?.42:.62)+(k<.6?-.15:.12),xi,yi))}}};
- const ord=[...cols].sort((a,b)=>a.nz-b.nz),seen=new Set();
- for(const c of ord){pillar(c);for(const d2 of[(c.i+NC-1)%NC,(c.i+1)%NC]){const o=cols[d2],key=Math.min(c.i,d2)+'-'+Math.max(c.i,d2);if(o.tx!==undefined&&!seen.has(key)){seen.add(key);lintel(c,o)}}}
- // glowing rune ring, tilted; back half hides behind the world, front half crosses it
- const r0=1.2,r1=1.4,SQ2=.32,TT=t;
+ // ---- floating stones behind the world first ----
+ const stones=TSTONES.map(([a0,e,r,s],i)=>{const a=a0-rot*1.4,bob=Math.sin(TT*1.3+i*1.7)*.04;return{X:cx+Math.sin(a)*r*R,Y:cy-(e+bob)*R,Z:Math.cos(a),s:Math.max(1.2,s*R),i}});
+ const stone=st=>{const s=st.s;for(let yy=-s;yy<=s;yy++)for(let xx=-s;xx<=s;xx++){const q=Math.abs(xx)/s+Math.abs(yy)/(s*.8)+(H(st.i*31+Math.round(xx),Math.round(yy))-.5)*.25;if(q>1.05)continue;const x=Math.round(st.X+xx),y=Math.round(st.Y+yy);
+   if(st.Z<0&&(inDisc(x,y)||(x>=0&&y>=0&&x<W&&y<W&&d[(y*W+x)*4+3])))continue;const raw=Math.max(0,.62-(xx/s)*.4-(yy/s)*.45);
+   put(x,y,shade(s>=2.5&&((Math.abs(xx)<.6&&Math.abs(yy)<s*.3)||(Math.abs(yy)<.6&&Math.abs(xx)<s*.25))?dq(TCY,.7+.3*Math.sin(TT*3+st.i),x,y):dq(TRCK,raw*1.1+.1,x,y),raw,x,y))}
+  if(s>=2.5&&st.Z>-.2)for(let k=1;k<4;k++){const x=Math.round(st.X+(H(st.i,k)-.5)*s),y=Math.round(st.Y+s*.8+k*1.5+((TT*4+k)%2));if(bay(x,y)<.5)put(x,y,TCY[k<2?2:1])}};
+ stones.filter(s=>s.Z<0).forEach(stone);
+ // ---- temple: ray-cast the convex solids, rotated with the world ----
+ const TSC=.8,th=-rot,C=Math.cos(th),Sn=Math.sin(th),px0=Math.max(0,Math.floor(cx-.85*R)),px1=Math.min(W-1,Math.ceil(cx+.85*R)),py0=Math.max(0,Math.floor(cy-R-1.0*R)),py1=Math.min(W-1,Math.ceil(cy-R+.45*R));
+ const dxl=Sn,dzl=-C,minw=.55/R/TSC;for(const s of TEMPLE)s.X=s.c[0]*C+s.c[2]*Sn;
+ for(let py=py0;py<=py1;py++)for(let px=px0;px<=px1;px++){const X=(px+.5-cx)/R/TSC,Y=(cy-R-(py+.5))/R/TSC,Z=3,ox=X*C-Z*Sn,oz=X*Sn+Z*C;let bt=1e9,bn=null,bs=null;
+  for(const s of TEMPLE){if(Math.abs(X-s.X)>s.hr+minw||Math.abs(Y-s.c[1])>s.hy)continue;let t0=-1e9,t1=1e9,n=null,ok=1;const grow=s.m==='col'||s.m==='statue'||s.m==='iron'?minw:0;
+   for(const p of s.p){const den=p[0]*dxl+p[2]*dzl,num=p[3]+(grow&&p[1]===0?Math.max(0,grow-.04):0)-(p[0]*ox+p[1]*Y+p[2]*oz);
+    if(Math.abs(den)<1e-9){if(num<0){ok=0;break}continue}const tt=num/den;if(den<0){if(tt>t0){t0=tt;n=p}}else if(tt<t1)t1=tt;if(t0>t1){ok=0;break}}
+   if(ok&&n&&t0<bt){bt=t0;bn=n;bs=s}}
+  if(!bs)continue;
+  // hidden behind the planet's limb? (solids sit on top, so only test pixels inside the disc against depth)
+  const hx_=ox+dxl*bt,hz=oz+dzl*bt,hy=Y,nl=Math.hypot(bn[0],bn[1],bn[2]),nx=bn[0]/nl,ny=bn[1]/nl,nz=bn[2]/nl;
+  const sX=nx*C+nz*Sn,sZ=-nx*Sn+nz*C,raw=Math.max(0,sX*LX-ny*LY+sZ*LZ),lit=Math.max(0,Math.min(1,Math.floor(raw*5+(bay(px,py)-.5)*.6)/5+.1));
+  const Zs=-hx_*Sn+hz*C;if(inDisc(px,py)&&hy<-.02&&Zs<-.1)continue;
+  let col;const m=bs.m;
+  if(m==='wall'&&Math.abs(nx)>.9&&Math.abs(hz)<.1&&hy<.44){ // glowing doorway: a swirling portal, self-lit
+   const sw=Math.sin(Math.atan2(hy-.27,hz)*3+TT*3+Math.hypot(hz,hy-.27)*40);col=dq(TCY,.55+sw*.25+(Math.abs(hz)>.075||hy>.42?-.3:0),px,py);put(px,py,col);continue}
+  if(m==='rock')col=dq(TRCK,lit*.85+(fbm(hx_*9+hz*5,hy*9)-.5)*.35+.08,px,py);
+  else if(m==='step')col=dq(TST,lit*.82+.12+(ny>.9?.08:-.04),px,py);
+  else if(m==='col'){const fl=Math.abs(nx)>.9?Math.abs(((hz*40)%1+1)%1-.5)<.18:Math.abs(nz)>.9?Math.abs(((hx_*40)%1+1)%1-.5)<.18:0;col=dq(TST,lit*.85+.14-(fl?.12:0)-(bs.k&&hy>.3&&H(px,py)>.6?.15:0),px,py)}
+  else if(m==='wall')col=dq(TST,lit*.75+.04-((Math.floor(hy*28)&1)===0&&Math.abs(ny)<.5&&H(Math.floor((hx_+hz)*12),Math.floor(hy*28))>.7?.12:0)-(((hy*14)%1)<.12?.12:0),px,py);
+  else if(m==='frieze'){const k=Math.floor((Math.abs(nz)>.5?hx_:hz)*22),band=hy>.655&&hy<.705&&Math.abs(ny)<.5;
+   if(band&&(k&1)){const pulse=(Math.sin(TT*2-k*.6)+1)/2;col=pulse>.75?dq(TCY,.6+lit*.4,px,py):dq(TST,lit*.5,px,py)}else col=dq(TST,lit*.85+.16,px,py)}
+  else if(m==='ped'){const r=Math.hypot(hz,hy-.79);col=Math.abs(nx)>.9&&r<.045?dq(TCY,.45+.4*(Math.sin(TT*2.2)+1)/2,px,py):dq(TST,lit*.85+.1,px,py)}
+  else if(m==='statue')col=dq(H(px>>1,py>>1)>.8?TMOS:['#5a5658','#8a8488','#c8c2c0','#eeeae4'],lit*.9+.1,px,py);
+  else col=dq(['#140c10','#2a2026','#4a3a3a'],lit,px,py);
+  put(px,py,shade(col,raw,px,py))}
+ // torch flames (only when the brazier faces us)
+ for(const s of[-1,1]){const lx=.5,lz=s*.24,X=(lx*C+lz*Sn)*TSC,Zf=-lx*Sn+lz*C;if(Zf<-.05)continue;const fx=cx+X*R,fy=cy-R-.3*TSC*R,fs=Math.max(1,R*.045);
+  for(let k=0;k<Math.ceil(fs*3);k++){const yy=fy-k*.7-1,w=Math.max(0,fs*(1-k/(fs*3))*(.8+.4*H(k,Math.floor(TT*10)+s*9)));for(let xx=-w;xx<=w;xx+=1){const x=Math.round(fx+xx+(H(k,Math.floor(TT*12))-.5)*1.2),y=Math.round(yy);
+    const hot=1-Math.abs(xx)/(w+.5)-k/(fs*3)*.6;put(x,y,dq(['#7a1a08','#e04a10','#ffa030','#ffe890'],hot+.15,x,y))}}}
+ // ---- animated rune ring: back half hides behind the world, front half crosses it ----
+ const r0=1.22,r1=1.46,SQ2=.3;
  for(let y=0;y<W;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=(y+.5-cy)/SQ2,r=Math.hypot(dx,dy)/R;if(r<r0||r>r1)continue;const o=(y*W+x)*4;
-  if(y<cy&&d[o+3])continue;const a=Math.atan2(dy,dx),seg=Math.floor((a-TT*.35)/TAU*36+360),f=(r-r0)/(r1-r0);
-  const glyph=f>.25&&f<.75&&H(seg,Math.floor(f*3))>.35,lit=.5+.35*Math.cos(a+2.3);
-  put(x,y,glyph?dq(TCY,.62+lit*.4,x,y):dq(['#05141c','#0a3a4a','#1a7a8a'],(f<.2||f>.8?.9:.35)+lit*.3,x,y))}
+  if(y<cy&&d[o+3])continue;const a=Math.atan2(dy,dx),sa=a-TT*.35,seg=Math.floor(sa/TAU*40+400),f=(r-r0)/(r1-r0),fs=(sa/TAU*40+400)%1;
+  const glyph=f>.22&&f<.78&&fs>.12&&fs<.88&&H(seg*3+Math.floor((fs-.12)/.76*3),Math.floor((f-.22)/.56*3))>.38,lit=.5+.35*Math.cos(a+2.3),pulse=Math.max(0,Math.cos(a*2-TT*1.6))**6;
+  put(x,y,glyph?dq(TCY,.55+lit*.3+pulse*.4,x,y):dq(['#05141c','#0a3a4a','#1a7a8a','#3ad8e0'],(f<.14||f>.86?.62:.22)+lit*.25+pulse*.3,x,y))}
+ stones.filter(s=>s.Z>=0).forEach(stone);
  S.g.putImageData(S.img,0,0)};
 P.setFlat=v=>{FLAT=v?1:0};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
