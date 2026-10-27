@@ -2,19 +2,22 @@
 (()=>{
 const P=window.PLANETS,RM=matchMedia('(prefers-reduced-motion: reduce)').matches,TAU=Math.PI*2,SQ=.6;
 // lan4drcy: a glowing pixel tesseract rotating through the XW and ZW planes, inner (far-w) cube magenta, outer cube cyan, dithered halo
-P.lan4=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,{dq,bay,hx}=P;d.fill(0);const a=t*.55,b=t*.37,c=.5+t*.18,tl=.38,V=[];
+const L4C=new Map(),L4F=240;
+P.lan4=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,{dq,bay,hx}=P;const th0=(t*.3)%TAU,fi=Math.floor(th0/TAU*L4F)%L4F,ck=W<=72?W+'x'+Hh+':'+fi:null;
+ if(ck&&L4C.has(ck)){S.g.putImageData(L4C.get(ck),0,0);return}
+ const ph=fi/L4F*TAU;d.fill(0);const a=ph*2,b=ph,c=.5+ph,tl=.38,V=[];
  const CY=['#0a2a3a','#1a6a8a','#3ad0f0','#a8f6ff','#ffffff'],MG=['#2a0a3a','#7a1a8a','#d03af0','#ffa8f6','#ffffff'];
  for(let i=0;i<16;i++){const p=[i&1?1:-1,i&2?1:-1,i&4?1:-1,i&8?1:-1];let x=p[0]*Math.cos(a)-p[3]*Math.sin(a),w=p[0]*Math.sin(a)+p[3]*Math.cos(a),z=p[2]*Math.cos(b)-w*Math.sin(b);w=p[2]*Math.sin(b)+w*Math.cos(b);
   const k=1/(2.7-w*.75);let X=x*k,Y=p[1]*k,Z=z*k;const x2=X*Math.cos(c)+Z*Math.sin(c),z2=-X*Math.sin(c)+Z*Math.cos(c),y2=Y*Math.cos(tl)-z2*Math.sin(tl),z3=Y*Math.sin(tl)+z2*Math.cos(tl),q=1/(2.6-z3);
   V.push([W/2+x2*q*W*1.05,Hh/2+y2*q*W*1.05,(w+1)/2])}
  const put=(x,y,cc,ad)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const o=(y*W+x)*4;if(ad&&d[o+3])return;d[o]=cc[0];d[o+1]=cc[1];d[o+2]=cc[2];d[o+3]=255};
- const pl=.6+.4*Math.sin(t*2.2),cr=W*.2;
+ const pl=.6+.4*Math.sin(ph*7),cr=W*.2;
  for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){const r=Math.hypot(x+.5-W/2,y+.5-Hh/2)/cr;if(r<1&&bay(x,y)<(1-r)*(1-r)*.75*pl)put(x,y,hx(dq(r<.45?MG:CY,.25+(1-r)*.45,x,y)))}
  const th=W>56?1:0,E=[];for(let i=0;i<16;i++)for(let j=0;j<4;j++){const k=i^(1<<j);if(k>i)E.push([V[i],V[k]])}E.sort((p,q)=>p[0][2]+p[1][2]-q[0][2]-q[1][2]);
  if(W>40)for(const[p,q]of E){const n=Math.ceil(Math.hypot(q[0]-p[0],q[1]-p[1]))+1;for(let s=0;s<=n;s++){const f=s/n,x=p[0]+(q[0]-p[0])*f,y=p[1]+(q[1]-p[1])*f;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1],[2,0],[0,2]])if(bay(Math.round(x+ox),Math.round(y+oy))<.45)put(x+ox,y+oy,hx(CY[1]),1)}}
  for(const[p,q]of E){const n=Math.ceil(Math.hypot(q[0]-p[0],q[1]-p[1]))+1;for(let s=0;s<=n;s++){const f=s/n,x=p[0]+(q[0]-p[0])*f,y=p[1]+(q[1]-p[1])*f,w=p[2]+(q[2]-p[2])*f,R=w<.5?MG:CY,cc=hx(dq(R,.35+Math.abs(w-.5)*.9+(1-f*0)*.1,Math.round(x),Math.round(y)));put(x,y,cc);if(th){put(x+1,y,cc);put(x,y+1,cc)}}}
  for(const p of V){const cc=hx(p[2]>.5?'#ffffff':'#ffc8fa');put(p[0],p[1],cc);if(W>40){put(p[0]+1,p[1],cc);put(p[0],p[1]+1,cc);put(p[0]+1,p[1]+1,cc)}}
- S.g.putImageData(S.img,0,0)};
+ S.g.putImageData(S.img,0,0);if(ck){if(L4C.size>1500)L4C.clear();L4C.set(ck,new ImageData(new Uint8ClampedArray(d),W,Hh))}};
 
 const cv=document.getElementById('sky'),g=cv.getContext('2d'),info=document.getElementById('info'),tip=document.getElementById('tip'),backBtn=document.getElementById('back'),homeBtn=document.getElementById('home'),archBtn=document.getElementById('archbtn');
 let W=0,H=0,DPR=1;
