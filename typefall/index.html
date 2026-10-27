@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>typefall — a text physics playground</title>
+<style>
+html,body{margin:0;height:100%;background:#f7f2e7;color:#111;font-family:"Times New Roman",Times,serif;overflow:hidden;touch-action:none}
+header{position:fixed;top:0;left:0;right:0;padding:14px 18px 6px;z-index:2;background:linear-gradient(#f7f2e7 75%,rgba(247,242,231,0))}
+h1{font-weight:normal;font-style:italic;font-size:22px;margin:0 0 6px;letter-spacing:.02em}
+form{display:flex;gap:8px;margin-bottom:6px}
+input{flex:1;font:inherit;font-size:18px;background:transparent;border:0;border-bottom:1px solid #111;padding:4px 2px;outline:none;color:#111}
+button{font:inherit;font-size:15px;background:transparent;border:1px solid transparent;color:#111;padding:2px 7px;cursor:pointer;border-radius:2px}
+button:hover{border-color:#bbb}button.on{border-color:#111}
+#tools{display:flex;flex-wrap:wrap;gap:2px 4px}
+#hint{font-style:italic;font-size:14px;color:#555;margin-top:4px;min-height:18px}
+canvas{position:fixed;inset:0;display:block}
+</style></head><body>
+<canvas id="c"></canvas>
+<header>
+<h1>typefall</h1>
+<form id="f"><input id="t" placeholder="type something and press enter…" autocomplete="off" enterkeyhint="go"><button>drop</button><button type="button" id="words">letters</button></form>
+<div id="tools"></div><div id="hint"></div>
+</header>
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+<script src="app.js"></script>
+</body></html>
