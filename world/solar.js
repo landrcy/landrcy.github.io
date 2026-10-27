@@ -19,6 +19,24 @@ P.lan4=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,{dq,bay,hx}=P;co
  for(const p of V){const cc=hx(p[2]>.5?'#ffffff':'#ffc8fa');put(p[0],p[1],cc);if(W>40){put(p[0]+1,p[1],cc);put(p[0],p[1]+1,cc);put(p[0]+1,p[1]+1,cc)}}
  S.g.putImageData(S.img,0,0);if(ck){if(L4C.size>1500)L4C.clear();L4C.set(ck,new ImageData(new Uint8ClampedArray(d),W,Hh))}};
 
+// typefall: a cream paper planet written in tiny serif letters; a ring of drifting letters, some spiralling into an ink dot, and a small letter moon
+const TFC=new Map(),TFF=180,TFO=document.createElement('canvas'),TFG=TFO.getContext('2d',{willReadFrequently:true});
+P.typef=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;const fi=Math.floor(((t*.25)%1+1)%1*TFF),ck=W+'x'+Hh+':'+fi;
+ if(TFC.has(ck)){S.g.putImageData(TFC.get(ck),0,0);return}
+ const ph=fi/TFF*TAU,cx=W/2,cy=Hh/2,R=W*.3;TFO.width=W;TFO.height=Hh;const g=TFG;g.clearRect(0,0,W,Hh);
+ g.fillStyle='#f7f2e7';g.beginPath();g.arc(cx,cy,R,0,TAU);g.fill();
+ g.save();g.beginPath();g.arc(cx,cy,R,0,TAU);g.clip();g.fillStyle='#d9cfb8';g.beginPath();g.arc(cx+R*.35,cy+R*.3,R*.95,0,TAU);g.fill();
+ const fs=Math.max(4,Math.round(W/16)),TX='the quick brown fox jumps over the lazy dog type fall letters ';g.fillStyle='#111';g.font=fs+'px "Times New Roman",serif';
+ if(W>40)for(let row=-4;row<=4;row++){const y=cy+row*fs*1.15,sh=(ph/TAU*TX.length*fs*.5*(1-Math.abs(row)*.08))%(TX.length*fs*.5);g.fillText(TX.repeat(3),cx-R-sh+row*7,y+fs*.35)}
+ g.restore();
+ g.fillStyle='#111';g.beginPath();g.arc(cx,cy,Math.max(1,R*.12),0,TAU);g.fill();
+ const AL='abcdefghijklmnopqrstuvwxyz';g.font=Math.max(4,Math.round(W/13))+'px "Times New Roman",serif';g.textAlign='center';
+ for(let i=0;i<14;i++){const a=ph+i*TAU/14,rr=R*1.32+Math.sin(i*2.3)*R*.06;g.fillStyle='#f7f2e7';g.fillText(AL[i*5%26],cx+Math.cos(a)*rr,cy+Math.sin(a)*rr*.45+fs*.3)}
+ for(let i=0;i<4;i++){const u=((ph/TAU*2+i/4)%1),a=-u*TAU*1.5+i,rr=R*(1.5-u*1.4);g.fillStyle=u<.7?'#f7f2e7':'#111';g.font=Math.max(3,Math.round(W/13*(1-u*.6)))+'px "Times New Roman",serif';g.fillText(AL[(i*7+3)%26],cx+Math.cos(a)*rr,cy+Math.sin(a)*rr+fs*.3)}
+ const ma=-ph*2,mx=cx+Math.cos(ma)*R*1.55,my=cy+Math.sin(ma)*R*.75,mr=Math.max(2,W*.06);g.fillStyle='#f7f2e7';g.beginPath();g.arc(mx,my,mr,0,TAU);g.fill();g.fillStyle='#111';g.font='italic '+Math.round(mr*1.6)+'px "Times New Roman",serif';g.fillText('a',mx,my+mr*.45);
+ const src=g.getImageData(0,0,W,Hh).data;for(let o=0;o<d.length;o+=4){const al=src[o+3];if(al>110){d[o]=src[o];d[o+1]=src[o+1];d[o+2]=src[o+2];d[o+3]=255}else d[o+3]=0}
+ S.g.putImageData(S.img,0,0);if(TFC.size>1200)TFC.clear();TFC.set(ck,new ImageData(new Uint8ClampedArray(d),W,Hh))};
+
 const cv=document.getElementById('sky'),g=cv.getContext('2d'),info=document.getElementById('info'),tip=document.getElementById('tip'),backBtn=document.getElementById('back'),homeBtn=document.getElementById('home'),archBtn=document.getElementById('archbtn');
 let W=0,H=0,DPR=1;
 // ---- data (stats: public YouTube counts as of Oct 26, 2026; null = not public) ----
@@ -39,6 +57,7 @@ const MAIN=[
  B({id:'void',paint:'void',w:236,h:236,orb:1255,per:245,ph:5.9,tc:'#c04df0',hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13}),
  B({id:'arena',paint:'arena',w:134,h:110,orb:1080,per:185,ph:2.9,hr:.42,title:'Ball Arena',by:'ball fights from the Langrino channel',href:'https://www.youtube.com/@Langrino',cta:'▶ Watch'}),
  B({id:'pmuseum',paint:'temple',w:150,orb:525,per:98,ph:1.4,hr:.4,title:'Pixel Museum',href:'https://landrcy.github.io/pixel-museum/',cta:'▶ Visit'}),
+ B({id:'typefall',paint:'typef',w:104,orb:660,per:110,ph:3.3,hr:.32,title:'typefall',href:'/typefall/',cta:'▶ Play'}),
  B({id:'lan4drcy',paint:'lan4',w:112,orb:790,per:125,ph:.9,hr:.42,title:'lan4drcy',href:'/lan4drcy/',cta:'▶ Play'}),
  B({id:'wam',paint:'wam',w:104,orb:1425,per:272,ph:3.6,hr:.4,title:'W.A.M.',href:'https://landrcy.github.io/wam/',cta:'▶ Play'})];
 const MOONS=CH.map((c,i)=>B({id:'m-'+c.id,paint:'moon',arg:c.kind,w:Math.round(12+14*Math.sqrt((c.views||0)/MV)),orb:66+i*9,per:9+i*2.6,ph:i*1.3,dir:1,hr:.42,moon:c,title:c.name}));
@@ -515,7 +534,7 @@ const PLAY=(d,l,m)=>`<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path
 const YTLOGO=`<svg class="lgsvg" viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#ff0033" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#b8001f" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#fff" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg><b class="lgtx">LLC Powered<br>Channels</b>`;
 // box = [width frac of w, height frac of h, y offset frac of h]
 const LG={arena:{box:[.6,.42,.02],pal:['#3a1a06','#ffcf3a','#ff6464'],arena:1},sea:{box:[.56,.56,0],img:'sea',pal:['#021e5a','#90E0EF','#48CAE4']},ashaad:{box:[.66,.5,.06],img:'ashaad',pal:['#2a1608','#ffd23a','#c08a1e']},void:{box:[.3,.39,0],img:'void',pal:['#05020d','#e6c8ff','#c04df0']},
- yt:{box:[.6,.6,0],pal:['#2a0008','#ffffff','#ffb0b8']},moon:{box:[.62,.62,0],pal:['#2a0008','#ffffff','#ffb0b8']},rmoon:{box:[.7,.62,0],pal:['#0a3a4a','#a8fff8','#3ad8e0']},pmuseum:{box:[.4,.34,0],img:'pmuseum',pal:['#0a3a4a','#a8fff8','#3ad8e0']},wam:{box:[.56,.44,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']},wmoon:{box:[.8,.66,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']},lan4drcy:{box:[.66,.36,0],pal:['#06121c','#e8fdff','#66f0ff']}};
+ yt:{box:[.6,.6,0],pal:['#2a0008','#ffffff','#ffb0b8']},moon:{box:[.62,.62,0],pal:['#2a0008','#ffffff','#ffb0b8']},rmoon:{box:[.7,.62,0],pal:['#0a3a4a','#a8fff8','#3ad8e0']},pmuseum:{box:[.4,.34,0],img:'pmuseum',pal:['#0a3a4a','#a8fff8','#3ad8e0']},wam:{box:[.56,.44,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']},wmoon:{box:[.8,.66,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']},lan4drcy:{box:[.66,.36,0],pal:['#06121c','#e8fdff','#66f0ff']},typefall:{box:[.66,.4,0],tf:1,pal:['#111111','#f7f2e7','#d9cfb8']}};
 const lgOf=b=>b.moon?LG.moon:b.par?(b.par.id==='wam'?LG.wmoon:LG.rmoon):LG[b.id];
 // W.A.M. pixel font (glyphs from the game's js/font.js: [width, 11 rows of LSB-left bitmasks]), drawn white with the game's #24242c drop shadow
 const WG={W:[12,3951,1902,1902,1902,1902,1902,1902,1830,2046,1023,0],'.':[3,0,0,0,0,0,0,0,0,7,7,0],A:[10,510,252,462,462,462,510,510,462,462,975,0],M:[12,1023,2046,1830,1902,1902,1902,1902,1902,1902,3951,0],
@@ -524,7 +543,7 @@ function wamSVG(str,cls){let x=0,d='';for(const ch of str){const gl=WG[ch];if(!g
  return `<svg class="${cls}" viewBox="0 0 ${x} 11" shape-rendering="crispEdges" aria-hidden="true"><path fill="#24242c" transform="translate(1 1)" d="${d}"/><path fill="#ffffff" d="${d}"/></svg>`}
 const TITLES={void:1,ashaad:1,sea:1,oldhub:1,'v-lovely':1,'v-arcade':1,'v-larper':1,'v-purple':1,'v-white':1,'v-strings':1};
 function infoHTML(b){const L=lgOf(b);if(L){const href=b.moon?b.moon.url:b.href,nm=b.moon?b.moon.name:b.title,pl=`<a class="lgplay"${href?` href="${href}"${/^https?:/.test(href)?' target="_blank" rel="noopener"':''}`:` href="#" data-chans="1"`} aria-label="${b.yt?'Open live channel stats':(b.par?'Open ':'Play ')+nm}">${PLAY(...L.pal)}</a>`;
-  const logo=L.btn?'':L.wam?`<div class="lglogo">${wamSVG(b.short||nm,'lgsvg lgwam')}</div>`:L.img?`<img class="lgimg" src="world/titles/${L.img}.png" alt="${nm}">`:b.yt?`<div class="lglogo">${YTLOGO}</div>`:L.arena?`<div class="lglogo"><b class="lgtx fb">BALL<br>ARENA</b></div>`:`<div class="lglogo"><b class="lgtx mo">${b.short||nm}</b></div>`;
+  const logo=L.btn?'':L.wam?`<div class="lglogo">${wamSVG(b.short||nm,'lgsvg lgwam')}</div>`:L.img?`<img class="lgimg" src="world/titles/${L.img}.png" alt="${nm}">`:b.yt?`<div class="lglogo">${YTLOGO}</div>`:L.arena?`<div class="lglogo"><b class="lgtx fb">BALL<br>ARENA</b></div>`:L.tf?`<div class="lglogo"><b class="lgtx tf">typefall</b></div>`:`<div class="lglogo"><b class="lgtx mo">${b.short||nm}</b></div>`;
   const ch=b.yt?`<div class="lgch" hidden>${CH.map(c=>`<button class="lgc" data-moon="m-${c.id}">${c.name}</button>`).join('')}</div>`:'';
   return `<h2 class="sr">${nm}</h2>${logo}<div class="lgrow">${pl}</div>${ch}`}
  if(TITLES[b.id]){const ex=/^https?:/.test(b.href)?' target="_blank" rel="noopener"':'';return `<h2 class="sr">${b.title}</h2><a class="tlink" href="${b.href}"${ex} aria-label="${b.title}"><img class="timg" src="world/titles/${b.id}.png" alt="${b.title}"></a><a class="go" href="${b.href}"${ex}>${b.cta}</a>`}
