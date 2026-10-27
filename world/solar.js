@@ -75,53 +75,59 @@ const JT={};function jagTab(s){if(JT[s])return JT[s];const n=8192,T=new Float32A
 const jag=(a,s)=>{const T=jagTab(s);return T[((Math.round(a/TAU*8192)%8192)+8192)%8192]};
 function riftGrid(gw,gh,cell,cx,cy,ax,ay,seed){const m=new Uint8Array(gw*gh);for(let j=0;j<gh;j++)for(let i=0;i<gw;i++){const x=(i+.5)*cell-cx,y=(j+.5)*cell-cy,a=Math.atan2(y/ay,x/ax),r=Math.hypot(x/ax,y/ay);m[j*gw+i]=r<1+jag(a,seed)?1:0}return m}
 // branching cracks splintering out of the tear into the white (seeded): thick ones open the tear, hairlines are glow only
-const HL=new Uint8Array(RGW*RGH);
+const HL=new Uint8Array(RGW*RGH),SEGS=[];
 function riftCracks(m,gw,gh,cell,cx,cy,ax,ay,seed){let r=seed*131+7;const rnd=()=>(r=(hsh(r,seed)*1e7)|0,hsh(r,seed+9));
  const plot=(x,y,th)=>{const i=Math.floor((x+cx)/cell),j=Math.floor((y+cy)/cell);const t=Math.floor(th);for(let dj=-t;dj<=t;dj++)for(let di=-t;di<=t;di++){if(di*di+dj*dj>th*th+.5)continue;const ii=i+di,jj=j+dj;if(ii<1||jj<1||ii>=gw-1||jj>=gh-1)continue;if(th<.75)HL[jj*gw+ii]=1;else m[jj*gw+ii]=1}};
  const grow=(x,y,ang,len,th,depth)=>{let L=0;while(L<len){const seg=cell*(2+rnd()*5);ang+=(rnd()-.5)*.9;const nx=x+Math.cos(ang)*seg,ny=y+Math.sin(ang)*seg,st=Math.ceil(seg/(cell*.5));
-   for(let q=1;q<=st;q++)plot(x+(nx-x)*q/st,y+(ny-y)*q/st,th*(1-L/len*.6));x=nx;y=ny;L+=seg;
+   for(let q=1;q<=st;q++)plot(x+(nx-x)*q/st,y+(ny-y)*q/st,th*(1-L/len*.6));SEGS.push([x,y,nx,ny,th*(1-L/len*.6)*cell]);x=nx;y=ny;L+=seg;
    if(depth<3&&rnd()<(depth?.12:.2)){const bl=(len-L)*(.3+rnd()*.7);if(bl>cell*4)grow(x,y,ang+(rnd()<.5?-1:1)*(.35+rnd()*.9),bl,Math.max(.4,th*(.35+rnd()*.4)),depth+1)}}};
  const n=16+Math.floor(rnd()*6);for(let k=0;k<n;k++){const a=rnd()*TAU,e=1+jag(Math.atan2(Math.sin(a),Math.cos(a)),seed)-.01,x=Math.cos(a)*ax*e,y=Math.sin(a)*ay*e,big=rnd();
   grow(x,y,Math.atan2(Math.sin(a)*ax/ay,Math.cos(a))+(rnd()-.5)*.8,(big<.25?400:120)+rnd()*(big<.25?650:300),big<.2?2.2:big<.6?1.2:.5,0)}}
 const RPAL=['#ffffff','#f0ddff','#d79cff','#b45cf0','#8a34d8','#5a1ea8'].map(c=>P.hx(c));
 // mask (inside opaque) + 3 shimmer frames of the crackling edge, all at 1px per cell
-function riftArt(m,gw,gh,frames){const mk=()=>{const c=document.createElement('canvas');c.width=gw;c.height=gh;return c},M=mk(),mg=M.getContext('2d'),mi=mg.createImageData(gw,gh);
- for(let k=0;k<m.length;k++)if(m[k])mi.data[k*4+3]=255;mg.putImageData(mi,0,0);
- // distance (cells) to the tear, outside only, up to 4
- const D=new Uint8Array(gw*gh).fill(9);for(let k=0;k<m.length;k++)if(m[k])D[k]=0;
+
+const MR=riftGrid(RGW,RGH,RC,RX,RY,3000,3650,11);riftCracks(MR,RGW,RGH,RC,RX,RY,3000,3650,11);
+// coarse distance fields (cells) used to skip the bulk; the edge itself is evaluated per screen texel
+const cham=(inside)=>{const gw=RGW,gh=RGH,D=new Uint8Array(gw*gh).fill(9);for(let k=0;k<D.length;k++)if((MR[k]===1)!==inside)D[k]=0;
  for(let j=0;j<gh;j++)for(let i=0;i<gw;i++){const k=j*gw+i;let v=D[k];if(!v)continue;if(i>0)v=Math.min(v,D[k-1]+1);if(j>0){v=Math.min(v,D[k-gw]+1);if(i>0)v=Math.min(v,D[k-gw-1]+1);if(i<gw-1)v=Math.min(v,D[k-gw+1]+1)}D[k]=v}
- for(let j=gh-1;j>=0;j--)for(let i=gw-1;i>=0;i--){const k=j*gw+i;let v=D[k];if(!v)continue;if(i<gw-1)v=Math.min(v,D[k+1]+1);if(j<gh-1){v=Math.min(v,D[k+gw]+1);if(i<gw-1)v=Math.min(v,D[k+gw+1]+1);if(i>0)v=Math.min(v,D[k+gw-1]+1)}D[k]=v}
- const E=[];for(let f=0;f<frames;f++){const c=mk(),cg=c.getContext('2d'),im=cg.createImageData(gw,gh),d=im.data;
-  for(let j=0;j<gh;j++)for(let i=0;i<gw;i++){const k=j*gw+i,dd=D[k];let col=null;const h=hsh(i*3+f*101,j*7+f*13),b=P.bay(i,j);
-   if(m[k]){// inner rim: a thin dark-violet lip
-    const rim=(i>0&&!m[k-1])||(i<gw-1&&!m[k+1])||(j>0&&!m[k-gw])||(j<gh-1&&!m[k+gw]);if(rim)col=h>.7?RPAL[2]:RPAL[5]}
-   else if(dd===1)col=h>.55?RPAL[0]:h>.2?RPAL[1]:RPAL[2];
-   else if(dd===2)col=b<.55+(h-.5)*.5?RPAL[2]:RPAL[3];
-   else if(dd===3)col=b<.3+(h-.5)*.4?RPAL[3]:null;
-   else if(dd===4)col=b<.1&&h>.4?RPAL[4]:null;
-   // crackle: occasional bright sparks jumping off the edge
-   if(dd>=2&&dd<=4&&h>.985)col=RPAL[0];
-   if(!m[k]&&HL[k]&&!col)col=h>.5?RPAL[2]:RPAL[3];else if(!m[k]&&HL[k]&&dd>1)col=RPAL[1];
-   if(col){d[k*4]=col[0];d[k*4+1]=col[1];d[k*4+2]=col[2];d[k*4+3]=255}}
-  cg.putImageData(im,0,0);E.push(c)}
- return{M,E}}
-const MR=riftGrid(RGW,RGH,RC,RX,RY,3000,3650,11);riftCracks(MR,RGW,RGH,RC,RX,RY,3000,3650,11);const MRA=riftArt(MR,RGW,RGH,RM?1:2);
+ for(let j=gh-1;j>=0;j--)for(let i=gw-1;i>=0;i--){const k=j*gw+i;let v=D[k];if(!v)continue;if(i<gw-1)v=Math.min(v,D[k+1]+1);if(j<gh-1){v=Math.min(v,D[k+gw]+1);if(i<gw-1)v=Math.min(v,D[k+gw+1]+1);if(i>0)v=Math.min(v,D[k+gw-1]+1)}D[k]=v}return D};
+const DOUT=cham(false),DIN=cham(true),SGH=new Map();
+SEGS.forEach((g,n)=>{const p=g[4]+14,i0=Math.floor((Math.min(g[0],g[2])-p+RX)/RC),i1=Math.floor((Math.max(g[0],g[2])+p+RX)/RC),j0=Math.floor((Math.min(g[1],g[3])-p+RY)/RC),j1=Math.floor((Math.max(g[1],g[3])+p+RY)/RC);
+ for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const k=j*RGW+i;let L=SGH.get(k);if(!L)SGH.set(k,L=[]);L.push(n)}});
+const RAX=3000,RAY=3650;let rHair=1e9;
+function riftSD(x,y,k){const a=Math.atan2(y/RAY,x/RAX),rr=Math.hypot(x/RAX,y/RAY),e=1+jag(a,11);let d=(rr-e)/Math.max(rr,1e-3)*Math.hypot(x,y);rHair=1e9;
+ const L=SGH.get(k);if(L)for(const n of L){const g=SEGS[n],vx=g[2]-g[0],vy=g[3]-g[1],l2=vx*vx+vy*vy||1;let t=((x-g[0])*vx+(y-g[1])*vy)/l2;t=t<0?0:t>1?1:t;const q=Math.hypot(x-g[0]-vx*t,y-g[1]-vy*t);if(g[4]<RC*.75){if(q<rHair)rHair=q}else{const dd=q-g[4];if(dd<d)d=dd}}return d}
+
 const inMain=(x,y)=>{const i=Math.floor((x+RX)/RC),j=Math.floor((y+RY)/RC);return i>=0&&j>=0&&i<RGW&&j<RGH&&MR[j*RGW+i]===1};
 // small rifts: one per archived version, placed in the white space around the main tear (random per visit)
 let OC=null,OG=null,ocK='',dotT=null,dotS=0;
 function dotPat(s){if(s===dotS&&dotT)return dotT;dotS=s;const c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,s,s);x.fillStyle=s>=10?'#b9bfcc':'#ccd0da';const d=s>=18?2:1;x.fillRect(0,0,d,d);dotT=g.createPattern(c,'repeat');return dotT}
 // is the whole screen inside the main tear (and no small rift on screen)? then there is nothing outside to draw
 function allInside(){const[a,b]=S2W(0,0),[c,d]=S2W(W,H);for(let i=0;i<=6;i++)for(let j=0;j<=6;j++)if(!inMain(a+(c-a)*i/6,b+(d-b)*j/6))return false;return true}
+let RCUT=null,RGLO=null;
 function drawOutside(now){if(window.__noRift||sys!=='main')return;if(allInside())return;
- const z=cam.z,fr=RM?0:Math.floor(now/140)%MRA.E.length,key=[W,H,cam.x.toFixed(2),cam.y.toFixed(2),z.toFixed(4),fr].join();
+ const z=cam.z,fr=RM?0:Math.floor(now/140)%3,key=[W,H,cam.x.toFixed(2),cam.y.toFixed(2),z.toFixed(4),fr].join();
  if(key!==ocK){ocK=key;
   if(!OC||OC.width!==W||OC.height!==H){OC=document.createElement('canvas');OC.width=W;OC.height=H;OG=OC.getContext('2d')}
   const o=OG;o.imageSmoothingEnabled=false;o.globalCompositeOperation='source-over';o.clearRect(0,0,W,H);
-  // white dot grid locked to the world (pattern offset from the world origin)
   const s=Math.max(4,Math.round(26*z)),[ox,oy]=W2S(0,0);o.save();o.translate(((ox%s)+s)%s,((oy%s)+s)%s);o.fillStyle=dotPat(s);o.fillRect(-s,-s,W+2*s,H+2*s);o.restore();
-  const[mx,my]=W2S(-RX,-RY),cw=RC*z;
-  o.globalCompositeOperation='destination-out';o.drawImage(MRA.M,mx,my,RGW*cw,RGH*cw);o.globalCompositeOperation='source-over';
-  o.drawImage(MRA.E[fr],mx,my,RGW*cw,RGH*cw)}
+  // edge rendered per screen texel (same pixel size as the planets at this zoom)
+  const T=REFT(),wt=Math.ceil(W/T),ht=Math.ceil(H/T),wpt=T/z,lim=Math.min(8,Math.ceil(5*wpt/RC)+1);
+  if(!RCUT||RCUT.c.width!==wt||RCUT.c.height!==ht){const mk=()=>{const c=document.createElement('canvas');c.width=wt;c.height=ht;const x=c.getContext('2d');const im=x.createImageData(wt,ht);return{c,x,im,U:new Uint32Array(im.data.buffer)}};RCUT=mk();RGLO=mk()}
+  const CU=RCUT.U,GU=RGLO.U;CU.fill(0);GU.fill(0);const PK=RPAL.map(c=>(255<<24)|(c[2]<<16)|(c[1]<<8)|c[0]),CUTV=0xff000000;
+  for(let ty=0;ty<ht;ty++){const wy=cam.y+((ty+.5)*T-H/2)/z,j=Math.floor((wy+RY)/RC);if(j<0||j>=RGH)continue;
+   for(let tx=0;tx<wt;tx++){const wx=cam.x+((tx+.5)*T-W/2)/z,i=Math.floor((wx+RX)/RC);if(i<0||i>=RGW)continue;const k=j*RGW+i,q=ty*wt+tx;
+    if(MR[k]===1&&DIN[k]>2){CU[q]=CUTV;continue}if(MR[k]!==1&&DOUT[k]>lim&&!HL[k])continue;
+    const dt=riftSD(wx,wy,k)/wpt,b=P.bay(Math.round(wx/wpt)&1023,Math.round(wy/wpt)&1023);let col=-1;
+    // texel-hash must be world-anchored so the edge doesn't swim when panning
+    const hw=hsh(Math.round(wx/wpt)*3+fr*101,Math.round(wy/wpt)*7+fr*13);
+    if(dt<0){CU[q]=CUTV;if(dt>-1)col=hw>.7?2:5}
+    else if(dt<1)col=hw>.55?0:hw>.2?1:2;else if(dt<2)col=b<.55+(hw-.5)*.5?2:3;else if(dt<3)col=b<.3+(hw-.5)*.4?3:-1;else if(dt<4)col=b<.1&&hw>.4?4:-1;
+    if(dt>=1&&dt<4&&hw>.985)col=0;
+    if(dt>0&&rHair/wpt<.6)col=hw>.5?1:2;
+    if(col>=0)GU[q]=PK[col]}}
+  RCUT.x.putImageData(RCUT.im,0,0);RGLO.x.putImageData(RGLO.im,0,0);
+  o.globalCompositeOperation='destination-out';o.drawImage(RCUT.c,0,0,wt*T,ht*T);o.globalCompositeOperation='source-over';o.drawImage(RGLO.c,0,0,wt*T,ht*T)}
  g.drawImage(OC,0,0)}
 // pixel reveal front (screen px): grows from the sun outwards; everything beyond it is dithered/chunky-hidden
 function revealR(t){const m=Math.min(W,H);if(t<3.9)return m*(.5+.12*seg(t,0,3.9));const z0=m*.82/(250*.72),w0=m*.62/z0;return(w0+(3800-w0)*Math.pow(seg(t,3.9,8.2),1.25))*cam.z}
@@ -181,20 +187,20 @@ function bigFlare(now){if(RM||sys!=='main'||intro)return;if(!BF.t0&&now>=BF.next
  const k=(now-BF.t0)/4200;if(k>=1){BF.t0=0;BF.next=now+15000+Math.random()*25000;return}
  const sun=MAIN[0];if(!sun.tx)return;const[cx,cy]=W2S(0,0),R=sun.w*.34*cam.z,tx=sun.tx,grow=Math.min(1,k/.3),fade=k<.6?1:1-(k-.6)/.4;
  const E=R*3.4;if(cx<-E||cy<-E||cx>W+E||cy>H+E)return;
- const x0=sun.gx+Math.floor((cx-E-sun.gx)/tx)*tx,y0=sun.gy+Math.floor((cy-E-sun.gy)/tx)*tx,n=Math.min(420,Math.ceil(2*E/tx)+1);
+ const x0=sun.gx+Math.floor((cx-E-sun.gx)/tx)*tx,y0=sun.gy+Math.floor((cy-E-sun.gy)/tx)*tx,n=Math.min(900,Math.ceil(2*E/tx)+1);let bx0=n,bx1=-1,by0=n,by1=-1;
  if(!FC||FC.width!==n){FC=document.createElement('canvas');FC.width=FC.height=n;FV=new Float32Array(n*n)}FV.fill(0);
  const Rc=R/tx,ccx=(cx-x0)/tx,ccy=(cy-y0)/tx,t=now/1000;
- const stamp=(px,py,rad,amp)=>{const r=Math.max(.6,rad),i0=Math.max(0,Math.floor(px-r)),i1=Math.min(n-1,Math.ceil(px+r)),j0=Math.max(0,Math.floor(py-r)),j1=Math.min(n-1,Math.ceil(py+r));
+ const stamp=(px,py,rad,amp)=>{const r=Math.max(.6,rad),i0=Math.max(0,Math.floor(px-r)),i1=Math.min(n-1,Math.ceil(px+r)),j0=Math.max(0,Math.floor(py-r)),j1=Math.min(n-1,Math.ceil(py+r));if(i0<bx0)bx0=i0;if(i1>bx1)bx1=i1;if(j0<by0)by0=j0;if(j1>by1)by1=j1;
   for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const d=Math.hypot(i+.5-px,j+.5-py)/r;if(d<1){const v=(1-d)*amp,q=j*n+i;if(v>FV[q])FV[q]=v}}};
- const arc=(a0,span,Hm,thk,wob,amp)=>{const L=(span*Rc+Hm*2.4),m=Math.ceil(L*2);for(let i=0;i<=m;i++){const u=i/m,env=Math.sin(Math.PI*u),a=a0+BF.s*(u-.5)*span+Math.sin(u*5+t*1.4)*.05*grow*wob,h=env*Hm+Math.sin(u*11+t*3.8)*Rc*.06*grow*wob,
+ const arc=(a0,span,Hm,thk,wob,amp)=>{const L=(span*Rc+Hm*2.4),m=Math.ceil(L/Math.max(.5,Rc*thk*.3));for(let i=0;i<=m;i++){const u=i/m,env=Math.sin(Math.PI*u),a=a0+BF.s*(u-.5)*span+Math.sin(u*5+t*1.4)*.05*grow*wob,h=env*Hm+Math.sin(u*11+t*3.8)*Rc*.06*grow*wob,
    th=Rc*thk*(.45+.55*env)*(1+.25*Math.sin(u*17+t*6.6));stamp(ccx+Math.cos(a)*(Rc*.97+h),ccy+Math.sin(a)*(Rc*.97+h),th,amp)}};
  arc(BF.a,.8,Rc*2.1*grow,.26,1,1);
  arc(BF.a+BF.s*.62,.22,Rc*.42*grow,.09,.5,.85);arc(BF.a-BF.s*.55,.16,Rc*.3*grow,.07,.5,.8);arc(BF.a+BF.s*.08,.12,Rc*.75*grow,.05,.3,.75);
  if(k>.35)for(let i=0;i<34;i++){const q=(i*.618)%1,a=BF.a+BF.s*(q-.5)*.8*1.5,d=Rc*(1+2.1*grow)+(k-.35)*Rc*3*(.5+q);stamp(ccx+Math.cos(a)*d,ccy+Math.sin(a)*d,i%5?.6:1.3,.55+.4*(1-q))}
- const fg=FC.getContext('2d'),im=fg.createImageData(n,n),U=new Uint32Array(im.data.buffer),BANDS=[[.86,'#fff6d8'],[.74,'#ffe0a8'],[.62,'#ffc23a'],[.5,'#ffa040'],[.38,'#f0601a'],[.26,'#c8300c'],[.14,'#8e1a06']].map(([v,c])=>{const h=P.hx(c);return[v,(255<<24)|(h[2]<<16)|(h[1]<<8)|h[0]]});
- const thr=1-fade;for(let j=0;j<n;j++)for(let i=0;i<n;i++){const q=j*n+i;let v=FV[q];if(v<=0)continue;v=v*(.75+.25*fade)+(P.vn(i*.42+BF.sd,j*.42-t*1.5)-.5)*.32+(P.bay(i,j)-.5)*.08-thr*.5;
+ if(bx1<bx0)return;const bw=bx1-bx0+1,bh=by1-by0+1,fg=FC.getContext('2d'),im=fg.createImageData(bw,bh),U=new Uint32Array(im.data.buffer),BANDS=[[.86,'#fff6d8'],[.74,'#ffe0a8'],[.62,'#ffc23a'],[.5,'#ffa040'],[.38,'#f0601a'],[.26,'#c8300c'],[.14,'#8e1a06']].map(([v,c])=>{const h=P.hx(c);return[v,(255<<24)|(h[2]<<16)|(h[1]<<8)|h[0]]});
+ const thr=1-fade;for(let j=by0;j<=by1;j++)for(let i=bx0;i<=bx1;i++){let v=FV[j*n+i];const q=(j-by0)*bw+i-bx0;if(v<=0)continue;v=v*(.75+.25*fade)+(P.vn(i*.42+BF.sd,j*.42-t*1.5)-.5)*.32+(P.bay(i,j)-.5)*.08-thr*.5;
   for(const[b0,c]of BANDS)if(v>b0){U[q]=c;break}}
- fg.putImageData(im,0,0);const ga=g.globalAlpha;g.imageSmoothingEnabled=false;g.drawImage(FC,x0,y0,n*tx,n*tx);g.globalAlpha=ga}
+ fg.clearRect(0,0,n,n);fg.putImageData(im,bx0,by0);const ga=g.globalAlpha;g.imageSmoothingEnabled=false;g.drawImage(FC,x0,y0,n*tx,n*tx);g.globalAlpha=ga}
 let lensC=null,lensN=0,lensR=null;
 function lens(){if(sys!=='main')return;const b=MAIN.find(q=>q.id==='void'),[vx0,vy0]=pos(b),[sx,sy]=W2S(vx0,vy0),E=b.w*.084*cam.z*2.3,Rr=Math.ceil(E*3.2);
  if(E<3||sx+Rr<0||sy+Rr<0||sx-Rr>W||sy-Rr>H)return;const x0=Math.floor(sx-Rr),y0=Math.floor(sy-Rr),D=Rr*2,q=Math.max(1,Math.ceil(D/260)),w=Math.ceil(D/q),h=w;
@@ -234,10 +240,10 @@ function frame(now){if(document.body.classList.contains('landed')){last=now;requ
   const[x,y]=pos(b),[sx,sy]=W2S(x,y),w=b.w*cam.z*pp,h=(b.h||b.w)*cam.z*pp;
   if(sx+w<0||sx-w>W||sy+h<0||sy-h>H)return;
   // resolution chosen from on-screen size: redraw at that res, integer pixel scale, no colour-quantised downsample
-  const capB=b.paint==='void'?Math.round(b.w*1.1):b.paint==='crest'?128:b.paint==='sun'?(focus===b?210:140):b.paint==='arena'?180:160,cap=Math.max(6,Math.round(capB*(b.rv<1?Math.max(.08,b.rv*b.rv):1))),pw=Math.max(2,w),ps=Math.max(1,Math.ceil(pw/cap)),Nt=Math.max(6,Math.round(pw/ps)),asp=(b.h||b.w)/b.w;
+  const capB=b.paint==='void'?Math.round(b.w*1.1):b.paint==='crest'?128:b.paint==='sun'?(intro?140:380):b.paint==='arena'?180:160,cap=Math.max(6,Math.round(capB*(b.rv<1?Math.max(.08,b.rv*b.rv):1))),pw=Math.max(2,w),ps=Math.max(1,Math.ceil(pw/cap)),Nt=Math.max(6,Math.round(pw/ps)),asp=(b.h||b.w)/b.w;
   let S=b.S;const ga=g.globalAlpha;
   if(!S.N||Math.abs(Nt-S.N)/Nt>.06&&now>=(b.rz||0)){const S2=P.mk(Nt,Math.max(4,Math.round(Nt*asp)));S2.N=Nt;if(S.N){b.prev=S;b.xf=now}b.S=S=S2;b.nx=0;b.rz=now+40}
-  if(now>=(b.nx||0)||(b.id==='sun'&&intro)){const o=b.id==='sun'?{ign:IS.ign,fl:IS.fl,L:IS.L}:b.arg;P.setFlat(b.id==='sun'&&intro?0:S.N<cap*.55);const tn=RM?7:now/1000+(b.ph||0)*3;P[b.paint](S,tn,o);P.setFlat(0);b.nx=RM?Infinity:now+(b.paint==='sun'?(S.N>200?90:S.N>100?110:70):S.N>140?66:S.N>60?44:60)+Math.random()*8}
+  if(now>=(b.nx||0)||(b.id==='sun'&&intro)){let o=b.id==='sun'?{ign:IS.ign,fl:IS.fl,L:IS.L}:b.arg;if(b.id==='sun'&&!intro&&S.N>200&&S.full){const ch=Math.ceil(S.N/10),y0=(S.row||0);o={...o,y0,y1:y0+ch};S.row=y0+ch>=S.N?0:y0+ch}else if(b.id==='sun')S.full=1;P.setFlat(b.id==='sun'&&intro?0:S.N<cap*.55);const tn=RM?7:now/1000+(b.ph||0)*3;P[b.paint](S,tn,o);P.setFlat(0);b.nx=RM?Infinity:now+(b.paint==='sun'?(S.N>200&&!intro?16:S.N>200?90:S.N>100?110:70):S.N>140?66:S.N>60?44:60)+Math.random()*8}
   const dw=Math.abs(S.N*ps-pw)<=ps?S.N*ps:pw,dh=Math.round(dw*asp),dx=Math.round(sx-dw/2),dy=Math.round(sy-dh/2);if(b.id==='sun'){b.tx=dw/S.N;b.gx=dx;b.gy=dy}
   const xf=b.prev?Math.min(1,(now-b.xf)/160):1;if(b.prev&&xf<1){g.globalAlpha=ga*dim;g.drawImage(b.prev.c,dx,dy,dw,dh)}else b.prev=null;
   g.globalAlpha=ga*dim*(b.prev?xf:1);g.drawImage(S.c,dx,dy,dw,dh);
@@ -259,8 +265,24 @@ function dDraw(o,sx,sy,zl,rot){const px=o.sz*zl;if(px<2)return;if(sx+px<0||sy+px
 const ramp=(pal,v,x,y)=>{const n=pal.length,f=Math.max(0,Math.min(.999,v))*(n-1),i=Math.floor(f);return pal[Math.min(n-1,i+(f-i>P.bay(x,y)?1:0))]};
 // palettes
 const NPAL=[['#12082a','#24104a','#3c1a6e','#5e2a98','#8a4ac0'],['#041a22','#08303a','#0e4c56','#1a7478','#36a8a0'],['#1e0620','#3a0c3c','#5e165e','#8a2a82','#c04aa8']].map(p=>p.map(dpk));
-function nebula(seed,pal,sz){const sd=seed*13.7;return{sz,asp:.62,cap:160,pf:.55,paint:(u,v,x,y)=>{const dx=(u-.5)*2,dy=(v-.5)*2,fall=Math.max(0,1-Math.pow(dx*dx+dy*dy,.8));const n=P.fbm(u*3.2+sd,v*2+sd*.7)*1.15+P.fbm(u*9+sd*2,v*6)*.35-.42;const d=n*fall*2.2;
-  if(d<=.08||P.bay(x,y)>d*2.4)return 0;return ramp(pal,d*1.15,x,y)}}}
+function nebula(seed,pal,sz){const sd=seed*13.7,FW=128,FH=80,F=new Float32Array(FW*FH);for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){const u=(x+.5)/FW,v=(y+.5)/FH,dx=(u-.5)*2,dy=(v-.5)*2,fall=Math.max(0,1-Math.pow(dx*dx+dy*dy,.8));
+  F[y*FW+x]=fall>0?(P.fbm(u*3.2+sd,v*2+sd*.7)*1.15+P.fbm(u*9+sd*2,v*6)*.35-.42)*fall*2.2:0}
+ return{neb:1,F,FW,FH,pal,sz,asp:.62,cap:160,pf:.55,paint:()=>0}}
+// nebula layer: dithered per screen texel (planet pixel size), cached and re-rendered when the camera settles / every 2s for drift
+let NL=null;
+function nebRender(now,T){const t=RM?0:now/1000,wt=Math.ceil(W/T),ht=Math.ceil(H/T);if(!NL||NL.c.width!==wt||NL.c.height!==ht){const c=document.createElement('canvas');c.width=wt;c.height=ht;const x=c.getContext('2d'),im=x.createImageData(wt,ht);NL={c,x,im,U:new Uint32Array(im.data.buffer)}}
+ const U=NL.U;U.fill(0);const z=cam.z;
+ for(const o of DECO.back){if(!o.neb)continue;const px=o.sz*z*o.pf,py=px*o.asp,cx=W/2+(o.x+(o.dx||0)*t-cam.x*o.pf)*z,cy=H/2+(o.y+(o.dy||0)*t-cam.y*o.pf)*z,x0=cx-px/2,y0=cy-py/2;
+  const tx0=Math.max(0,Math.floor(x0/T)),tx1=Math.min(wt-1,Math.ceil((x0+px)/T)),ty0=Math.max(0,Math.floor(y0/T)),ty1=Math.min(ht-1,Math.ceil((y0+py)/T));if(tx0>tx1||ty0>ty1)continue;
+  const F=o.F,FW=o.FW,FH=o.FH,pal=o.pal;
+  for(let ty=ty0;ty<=ty1;ty++){const fv=((ty+.5)*T-y0)/py*FH-.5;if(fv<0||fv>=FH-1)continue;const j=fv|0,b=fv-j,X0=Math.round((ty*T-y0)/T);
+   for(let tx=tx0;tx<=tx1;tx++){const fu=((tx+.5)*T-x0)/px*FW-.5;if(fu<0||fu>=FW-1)continue;const i=fu|0,a=fu-i,k=j*FW+i;
+    const d=(F[k]*(1-a)+F[k+1]*a)*(1-b)+(F[k+FW]*(1-a)+F[k+FW+1]*a)*b;if(d<=.08)continue;const X=Math.round((tx*T-x0)/T),Y=X0;if(P.bay(X,Y)>d*2.4)continue;U[ty*wt+tx]=ramp(pal,d*1.15,X,Y)}}}
+ NL.x.putImageData(NL.im,0,0);NL.cx=cam.x;NL.cy=cam.y;NL.z=z;NL.T=T;NL.t=now}
+function drawNeb(now){const T=REFT(),moved=NL&&NL.z!==cam.z,off=NL&&Math.abs(NL.cx-cam.x)*cam.z*.55>W*.5;
+ if(!NL||NL.T!==T||(moved&&now-NL.t>220)||off||(!RM&&now-NL.t>2000)||NL.c.width!==Math.ceil(W/T))nebRender(now,T);
+ const k=cam.z/NL.z,pf=.55,ox=W/2+(-W/2/NL.z+(NL.cx-cam.x)*pf)*cam.z,oy=H/2+(-H/2/NL.z+(NL.cy-cam.y)*pf)*cam.z,ga=g.globalAlpha;g.globalAlpha=ga*.6;g.imageSmoothingEnabled=false;g.drawImage(NL.c,Math.round(ox),Math.round(oy),NL.c.width*NL.T*k,NL.c.height*NL.T*k);g.globalAlpha=ga}
+
 function galaxy(seed,kind,sz){const sd=seed*7.1,tilt=.35+DK()*.5,rot=DK()*6.28,arms=2+(DK()<.4?1:0);return{sz,asp:1,cap:96,pf:.3,paint:(u,v,x,y)=>{let dx=(u-.5)*2,dy=(v-.5)*2;const ca=Math.cos(rot),sa=Math.sin(rot),rx=dx*ca-dy*sa,ry=(dx*sa+dy*ca)/tilt,r=Math.hypot(rx,ry);if(r>1)return 0;
   let d;if(kind){d=Math.exp(-r*r*5)*1.1}else{const a=Math.atan2(ry,rx),sp=Math.cos(arms*(a-Math.log(r+.05)*2.6)+sd);d=Math.exp(-r*r*7)*1.1+Math.max(0,sp)*(1-r)*.55*(.7+.3*P.vn(rx*9+sd,ry*9))}
   if(d<.1||P.bay(x,y)>d*2)return 0;return ramp(kind?GPE:GPS,d,x,y)}}}
@@ -303,7 +325,7 @@ const DECO={back:[],world:[]};
 const FX={comet:null,nextC:performance.now()+9000+Math.random()*15000,shoot:null,nextS:performance.now()+4000+Math.random()*6000,ufo:null,nextU:performance.now()+70000+Math.random()*130000};
 const TX=()=>REFT();for(const o of[...DECO.back,...DECO.world,UFO])o.cap=Math.min(o.pf===.55?320:256,Math.max(o.cap,Math.ceil(o.sz*1.5)));
 function drawDecoBack(now){if(sys!=='main')return;const ga=g.globalAlpha,t=RM?0:now/1000;
- for(const o of DECO.back){const zl=cam.z*o.pf,wx=o.x+(o.dx||0)*t,wy=o.y+(o.dy||0)*t;g.globalAlpha=ga*(o.asp===.62?.6:o.pf<.35?.8:.9);dDraw(o,W/2+(wx-cam.x*o.pf)*cam.z,H/2+(wy-cam.y*o.pf)*cam.z,cam.z)}
+ drawNeb(now);for(const o of DECO.back){if(o.neb)continue;const zl=cam.z*o.pf,wx=o.x+(o.dx||0)*t,wy=o.y+(o.dy||0)*t;g.globalAlpha=ga*(o.asp===.62?.6:o.pf<.35?.8:.9);dDraw(o,W/2+(wx-cam.x*o.pf)*cam.z,H/2+(wy-cam.y*o.pf)*cam.z,cam.z)}
  g.globalAlpha=ga;if(RM)return;
  // shooting stars: brief pixel streaks in the deep layer
  if(!FX.shoot&&now>FX.nextS&&!intro){FX.shoot={t0:now,x:Math.random()*W,y:Math.random()*H*.6,a:.4+Math.random()*.5+(Math.random()<.5?Math.PI-1.3:0),L:60+Math.random()*90}}
