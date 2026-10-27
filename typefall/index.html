@@ -14,9 +14,10 @@ button:hover{border-color:#bbb}button.on{border-color:#111}
 canvas{position:fixed;inset:0;display:block}
 </style></head><body>
 <canvas id="c"></canvas>
+<input id="t" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" style="position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;border:0;padding:0;font-size:16px;z-index:0">
 <header>
 <h1>typefall</h1>
-<form id="f"><input id="t" placeholder="type something and press enter…" autocomplete="off" enterkeyhint="go"><button>drop</button><button type="button" id="words">letters</button></form>
+<div id="sub" style="font-style:italic;font-size:14px;color:#555;margin-bottom:6px">click anywhere and type · enter drops it · <button type="button" id="words">letters</button></div>
 <div id="tools"></div><div id="hint"></div>
 </header>
 <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
