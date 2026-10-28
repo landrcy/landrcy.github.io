@@ -65,6 +65,7 @@ body.arch #back{z-index:40}
 #info.lg .lgsvg{width:46cqw;height:auto;display:block;filter:drop-shadow(0 2px 0 #000)}
 #info.lg .lgtx{font:400 9cqw/1.05 'Silkscreen',monospace;color:#fff;text-transform:uppercase;text-shadow:0 2px 0 #000,0 0 6px #000;letter-spacing:.02em}
 #info.lg .lgtx.tf{font:italic 400 15cqw/1 'Times New Roman',Times,serif;text-transform:none;color:#f7f2e7;text-shadow:0 2px 0 #111,0 0 6px #000}
+#info.lg .lgtx.tg{font:700 11cqw/1.05 'Pixelify Sans',monospace;color:#ffe2b0;text-shadow:0 3px 0 #3a1f0a,0 0 6px #000}
 #info.lg .lgtx.mo{font-size:13cqw;word-break:break-word}
 #info.lg .lgplay{display:block;width:32cqmin;aspect-ratio:1;pointer-events:auto;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--ac) 55%,transparent));transition:transform .15s}
 #info.lgbtn .lgplay{width:80cqmin}

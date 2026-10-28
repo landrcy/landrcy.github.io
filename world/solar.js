@@ -37,6 +37,24 @@ P.typef=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;const fi=Math.f
  const src=g.getImageData(0,0,W,Hh).data;for(let o=0;o<d.length;o+=4){const al=src[o+3];if(al>110){d[o]=src[o];d[o+1]=src[o+1];d[o+2]=src[o+2];d[o+3]=255}else d[o+3]=0}
  S.g.putImageData(S.img,0,0);if(TFC.size>1200)TFC.clear();TFC.set(ck,new ImageData(new Uint8ClampedArray(d),W,Hh))};
 
+// Talk to Tung: a pixel wooden log planet (tree-ring face, carved eyes and mouth) with a little bat moon
+const TTC=new Map(),TTF=120,TTO=document.createElement('canvas'),TTG=TTO.getContext('2d',{willReadFrequently:true});
+P.tung=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;const fi=Math.floor(((t*.2)%1+1)%1*TTF),ck=W+'x'+Hh+':'+fi;
+ if(TTC.has(ck)){S.g.putImageData(TTC.get(ck),0,0);return}
+ const ph=fi/TTF*TAU,cx=W/2,cy=Hh/2,R=W*.32;TTO.width=W;TTO.height=Hh;const g=TTG;g.clearRect(0,0,W,Hh);
+ g.fillStyle='#8a5a2b';g.beginPath();g.arc(cx,cy,R,0,TAU);g.fill();
+ g.save();g.beginPath();g.arc(cx,cy,R,0,TAU);g.clip();
+ for(let k=6;k>0;k--){g.fillStyle=k%2?'#c8955a':'#a8743e';g.beginPath();g.arc(cx-R*.1,cy-R*.08,R*k/6*.95,0,TAU);g.fill()}
+ g.fillStyle='#5a3416';g.beginPath();g.arc(cx+R*.4,cy+R*.35,R*.9,-.2,1.9);g.lineTo(cx+R*2,cy+R*2);g.fill();
+ g.fillStyle='#1a0e06';const e=Math.max(1,R*.13),bl=Math.sin(ph*3)>.95?.25:1;g.fillRect(cx-R*.42,cy-R*.3,e*1.4,e*1.4*bl);g.fillRect(cx+R*.18,cy-R*.3,e*1.4,e*1.4*bl);
+ g.fillStyle='#fff';if(bl>.5){g.fillRect(cx-R*.42,cy-R*.3,Math.max(1,e*.6),Math.max(1,e*.6));g.fillRect(cx+R*.18,cy-R*.3,Math.max(1,e*.6),Math.max(1,e*.6))}
+ g.fillStyle='#1a0e06';const mo=(Math.sin(ph*4)+1)/2;g.fillRect(cx-R*.25,cy+R*.2,R*.5,Math.max(1,R*(.08+.18*mo)));
+ g.restore();
+ const ma=ph,mx=cx+Math.cos(ma)*R*1.45,my=cy+Math.sin(ma)*R*.6,bw=Math.max(3,W*.16),bh=Math.max(1,W*.035);
+ g.save();g.translate(mx,my);g.rotate(ma*2);g.fillStyle='#d9a866';g.fillRect(-bw/2,-bh/2,bw,bh);g.fillStyle='#8a5a2b';g.fillRect(bw*.15,-bh,bw*.35,bh*2);g.restore();
+ const src=g.getImageData(0,0,W,Hh).data;for(let o=0;o<d.length;o+=4){const al=src[o+3];if(al>110){d[o]=src[o];d[o+1]=src[o+1];d[o+2]=src[o+2];d[o+3]=255}else d[o+3]=0}
+ S.g.putImageData(S.img,0,0);if(TTC.size>1200)TTC.clear();TTC.set(ck,new ImageData(new Uint8ClampedArray(d),W,Hh))};
+
 const cv=document.getElementById('sky'),g=cv.getContext('2d'),info=document.getElementById('info'),tip=document.getElementById('tip'),backBtn=document.getElementById('back'),homeBtn=document.getElementById('home'),archBtn=document.getElementById('archbtn');
 let W=0,H=0,DPR=1;
 // ---- data (stats: public YouTube counts as of Oct 26, 2026; null = not public) ----
@@ -58,6 +76,7 @@ const MAIN=[
  B({id:'arena',paint:'arena',w:134,h:110,orb:1080,per:185,ph:2.9,hr:.42,title:'Ball Arena',by:'ball fights from the Langrino channel',href:'https://www.youtube.com/@Langrino',cta:'▶ Watch'}),
  B({id:'pmuseum',paint:'temple',w:150,orb:525,per:98,ph:1.4,hr:.4,title:'Pixel Museum',href:'https://landrcy.github.io/pixel-museum/',cta:'▶ Visit'}),
  B({id:'typefall',paint:'typef',w:104,orb:660,per:110,ph:3.3,hr:.32,title:'typefall',href:'/typefall/',cta:'▶ Play'}),
+ B({id:'ttt',paint:'tung',w:100,orb:975,per:160,ph:1.9,hr:.32,title:'Talk to Tung',href:'/ttt/',cta:'▶ Play'}),
  B({id:'lan4drcy',paint:'lan4',w:112,orb:790,per:125,ph:.9,hr:.42,title:'lan4drcy',href:'/lan4drcy/',cta:'▶ Play'}),
  B({id:'wam',paint:'wam',w:104,orb:1425,per:272,ph:3.6,hr:.4,title:'W.A.M.',href:'https://landrcy.github.io/wam/',cta:'▶ Play'})];
 const MOONS=CH.map((c,i)=>B({id:'m-'+c.id,paint:'moon',arg:c.kind,w:Math.round(12+14*Math.sqrt((c.views||0)/MV)),orb:66+i*9,per:9+i*2.6,ph:i*1.3,dir:1,hr:.42,moon:c,title:c.name}));
@@ -534,7 +553,7 @@ const PLAY=(d,l,m)=>`<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path
 const YTLOGO=`<svg class="lgsvg" viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#ff0033" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#b8001f" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#fff" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg><b class="lgtx">LLC Powered<br>Channels</b>`;
 // box = [width frac of w, height frac of h, y offset frac of h]
 const LG={arena:{box:[.6,.42,.02],pal:['#3a1a06','#ffcf3a','#ff6464'],arena:1},sea:{box:[.56,.56,0],img:'sea',pal:['#021e5a','#90E0EF','#48CAE4']},ashaad:{box:[.66,.5,.06],img:'ashaad',pal:['#2a1608','#ffd23a','#c08a1e']},void:{box:[.3,.39,0],img:'void',pal:['#05020d','#e6c8ff','#c04df0']},
- yt:{box:[.6,.6,0],pal:['#2a0008','#ffffff','#ffb0b8']},moon:{box:[.62,.62,0],pal:['#2a0008','#ffffff','#ffb0b8']},rmoon:{box:[.7,.62,0],pal:['#0a3a4a','#a8fff8','#3ad8e0']},pmuseum:{box:[.4,.34,0],img:'pmuseum',pal:['#0a3a4a','#a8fff8','#3ad8e0']},wam:{box:[.56,.44,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']},wmoon:{box:[.8,.66,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']},lan4drcy:{box:[.66,.36,0],pal:['#06121c','#e8fdff','#66f0ff']},typefall:{box:[.66,.4,0],tf:1,pal:['#111111','#f7f2e7','#d9cfb8']}};
+ yt:{box:[.6,.6,0],pal:['#2a0008','#ffffff','#ffb0b8']},moon:{box:[.62,.62,0],pal:['#2a0008','#ffffff','#ffb0b8']},rmoon:{box:[.7,.62,0],pal:['#0a3a4a','#a8fff8','#3ad8e0']},pmuseum:{box:[.4,.34,0],img:'pmuseum',pal:['#0a3a4a','#a8fff8','#3ad8e0']},wam:{box:[.56,.44,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']},wmoon:{box:[.8,.66,0],wam:1,pal:['#24242c','#ffffff','#8a8a96']},lan4drcy:{box:[.66,.36,0],pal:['#06121c','#e8fdff','#66f0ff']},typefall:{box:[.66,.4,0],tf:1,pal:['#111111','#f7f2e7','#d9cfb8']},ttt:{box:[.66,.42,0],tg:1,pal:['#3a1f0a','#ffe2b0','#c8955a']}};
 const lgOf=b=>b.moon?LG.moon:b.par?(b.par.id==='wam'?LG.wmoon:LG.rmoon):LG[b.id];
 // W.A.M. pixel font (glyphs from the game's js/font.js: [width, 11 rows of LSB-left bitmasks]), drawn white with the game's #24242c drop shadow
 const WG={W:[12,3951,1902,1902,1902,1902,1902,1902,1830,2046,1023,0],'.':[3,0,0,0,0,0,0,0,0,7,7,0],A:[10,510,252,462,462,462,510,510,462,462,975,0],M:[12,1023,2046,1830,1902,1902,1902,1902,1902,1902,3951,0],
@@ -543,7 +562,7 @@ function wamSVG(str,cls){let x=0,d='';for(const ch of str){const gl=WG[ch];if(!g
  return `<svg class="${cls}" viewBox="0 0 ${x} 11" shape-rendering="crispEdges" aria-hidden="true"><path fill="#24242c" transform="translate(1 1)" d="${d}"/><path fill="#ffffff" d="${d}"/></svg>`}
 const TITLES={void:1,ashaad:1,sea:1,oldhub:1,'v-lovely':1,'v-arcade':1,'v-larper':1,'v-purple':1,'v-white':1,'v-strings':1};
 function infoHTML(b){const L=lgOf(b);if(L){const href=b.moon?b.moon.url:b.href,nm=b.moon?b.moon.name:b.title,pl=`<a class="lgplay"${href?` href="${href}"${/^https?:/.test(href)?' target="_blank" rel="noopener"':''}`:` href="#" data-chans="1"`} aria-label="${b.yt?'Open live channel stats':(b.par?'Open ':'Play ')+nm}">${PLAY(...L.pal)}</a>`;
-  const logo=L.btn?'':L.wam?`<div class="lglogo">${wamSVG(b.short||nm,'lgsvg lgwam')}</div>`:L.img?`<img class="lgimg" src="world/titles/${L.img}.png" alt="${nm}">`:b.yt?`<div class="lglogo">${YTLOGO}</div>`:L.arena?`<div class="lglogo"><b class="lgtx fb">BALL<br>ARENA</b></div>`:L.tf?`<div class="lglogo"><b class="lgtx tf">typefall</b></div>`:`<div class="lglogo"><b class="lgtx mo">${b.short||nm}</b></div>`;
+  const logo=L.btn?'':L.wam?`<div class="lglogo">${wamSVG(b.short||nm,'lgsvg lgwam')}</div>`:L.img?`<img class="lgimg" src="world/titles/${L.img}.png" alt="${nm}">`:b.yt?`<div class="lglogo">${YTLOGO}</div>`:L.arena?`<div class="lglogo"><b class="lgtx fb">BALL<br>ARENA</b></div>`:L.tf?`<div class="lglogo"><b class="lgtx tf">typefall</b></div>`:L.tg?`<div class="lglogo"><b class="lgtx tg">TALK TO<br>TUNG</b></div>`:`<div class="lglogo"><b class="lgtx mo">${b.short||nm}</b></div>`;
   const ch=b.yt?`<div class="lgch" hidden>${CH.map(c=>`<button class="lgc" data-moon="m-${c.id}">${c.name}</button>`).join('')}</div>`:'';
   return `<h2 class="sr">${nm}</h2>${logo}<div class="lgrow">${pl}</div>${ch}`}
  if(TITLES[b.id]){const ex=/^https?:/.test(b.href)?' target="_blank" rel="noopener"':'';return `<h2 class="sr">${b.title}</h2><a class="tlink" href="${b.href}"${ex} aria-label="${b.title}"><img class="timg" src="world/titles/${b.id}.png" alt="${b.title}"></a><a class="go" href="${b.href}"${ex}>${b.cta}</a>`}
