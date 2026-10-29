@@ -39,18 +39,18 @@ const onDisc=(x,y)=>Math.hypot(x-N/2,y-N/2)<N*.44;
 let down=null;
 c.addEventListener('pointermove',e=>{const[x,y]=loc(e);if(onDisc(x,y)){mx=x;my=y;stir(x,y)}e.stopPropagation()});
 c.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];e.stopPropagation()});
-c.addEventListener('pointerup',e=>{e.stopPropagation();if(down&&Math.hypot(e.clientX-down[0],e.clientY-down[1])<8){const[x,y]=loc(e);if(onDisc(x,y))location.href=URL}down=null});
+c.addEventListener('pointerup',e=>{e.stopPropagation();if(down&&Math.hypot(e.clientX-down[0],e.clientY-down[1])<8){const[x,y]=loc(e);if(onDisc(x,y)){if(FFC&&window.__galDS)window.__galDS();else location.href=URL}}down=null});
 c.addEventListener('click',e=>e.stopPropagation());
 c.addEventListener('wheel',e=>{const g=document.getElementById(FFC?'gsky':'sky');if(g){e.preventDefault();g.dispatchEvent(new WheelEvent('wheel',e))}},{passive:false});
-c.addEventListener('keydown',e=>{if(e.key==='Enter')location.href=URL});c.tabIndex=0;
+c.addEventListener('keydown',e=>{if(e.key==='Enter'){if(FFC&&window.__galDS)window.__galDS();else location.href=URL}});c.tabIndex=0;
 let last=0;
-function place(z,cx,cy,W,H2){const s=Math.max(40,Math.round(WS*z)),x=(WX-cx)*z+W/2,y=(WY-cy)*z+H2/2;
+function place(z,cx,cy,W,H2,o){const wx=o?o[0]:WX,wy=o?o[1]:WY,s=Math.max(40,Math.round(WS*z)),x=(wx-cx)*z+W/2,y=(wy-cy)*z+H2/2;
  c.style.width=c.style.height=s+'px';c.style.transform='translate('+Math.round(x-s/2)+'px,'+Math.round(y-s/2)+'px)';
  c.style.display=(x<-s||y<-s||x>W+s||y>H2+s)?'none':'';}
 function frame(ms){
  if(FFC){const g=window.__galView&&window.__galView(),gal=document.getElementById('galaxy');
   if(!g||!gal||!g.inGal){c.style.display='none';return requestAnimationFrame(frame)}
-  if(c.parentNode!==gal)gal.appendChild(c);place(g.cam.z,g.cam.x,g.cam.y,g.GW,g.GH)}
+  if(c.parentNode!==gal)gal.appendChild(c);c.style.zIndex=g.dsZ;place(g.cam.z,g.cam.x,g.cam.y,g.GW,g.GH,g.ds)}
  else{const v=window.__hubView&&window.__hubView(),b=document.body.classList;
   if(!v||v.sys!=='main'||b.contains('arch')||b.contains('galaxy')||b.contains('intro')){c.style.display='none';return requestAnimationFrame(frame)}
   place(v.cam.z,v.cam.x,v.cam.y,v.W,v.H)}
