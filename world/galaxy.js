@@ -50,7 +50,32 @@ const shipImg=document.createElement('img');shipImg.alt='';shipImg.draggable=fal
  const c=document.createElement('canvas');c.width=9;c.height=10;const x=c.getContext('2d');
  M.forEach((r,y)=>[...r].forEach((k,i)=>{if(C[k]){x.fillStyle=C[k];x.fillRect(i,y,1,1)}}));shipImg.src=c.toDataURL()})();
 back.appendChild(shipImg);
-gal.append(gsky,omni,back);
+// Omniverse CTA: tap the omniverse -> "roll for yourself..." + glitchy pixel PLAY link
+const cta=document.createElement('div');cta.id='omcta';cta.hidden=true;
+const ctaT=document.createElement('p');ctaT.textContent='roll for yourself\u2026';
+const play=document.createElement('a');play.id='omplay';play.href='https://rainbowroar14.github.io/RNG/';play.target='_blank';play.rel='noopener';play.setAttribute('aria-label','Play: roll for yourself');
+const pc=document.createElement('canvas');play.appendChild(pc);cta.append(ctaT,play);
+const PF={P:['111','101','111','100','100'],L:['100','100','100','100','111'],A:['010','101','111','101','101'],Y:['101','101','010','010','010'],'\u25B6':['100','110','111','110','100']};
+(()=>{const w='\u25B6 PLAY',S=6,pad=3;let cols=0;[...w].forEach(c=>cols+=c===' '?2:4);
+ pc.width=(cols+pad*2-1)*S;pc.height=(5+pad*2)*S})();
+const px=pc.getContext('2d');
+function drawPlay(){const S=6,pad=3;px.fillStyle='#000';px.fillRect(0,0,pc.width,pc.height);
+ px.fillStyle='#fff';px.fillRect(0,0,pc.width,S);px.fillRect(0,pc.height-S,pc.width,S);px.fillRect(0,0,S,pc.height);px.fillRect(pc.width-S,0,S,pc.height);
+ let x=pad;for(const c of '\u25B6 PLAY'){if(c===' '){x+=2;continue}PF[c].forEach((r,y)=>[...r].forEach((b,i)=>{if(b==='1')px.fillRect((x+i)*S,(pad+y)*S,S,S)}));x+=4}}
+drawPlay();
+let glT=0;
+function glitch(){if(cta.hidden||RM)return;const S=6,n=2+(Math.random()*5|0);
+ for(let k=0;k<n;k++){const w=S*(2+(Math.random()*6|0)),h=S*(1+(Math.random()*2|0));
+  const sx=(Math.random()*(pc.width-w)/S|0)*S,sy=(Math.random()*(pc.height-h)/S|0)*S;
+  const dx=Math.max(0,Math.min(pc.width-w,sx+S*((Math.random()*7|0)-3)));
+  const d=px.getImageData(sx,sy,w,h);px.putImageData(d,dx,sy);
+  if(Math.random()<.4){px.fillStyle=Math.random()<.5?'#ff2a4a':'#5affd8';px.globalAlpha=.85;px.fillRect(dx,sy,S*(1+(Math.random()*3|0)),S);px.globalAlpha=1}}
+ setTimeout(()=>{drawPlay();if(Math.random()<.5)setTimeout(glitch,70)},90+Math.random()*120)}
+function glitchLoop(){clearTimeout(glT);if(cta.hidden)return;glT=setTimeout(()=>{glitch();glitchLoop()},500+Math.random()*1800)}
+function showCta(on){cta.hidden=!on;if(on){drawPlay();glitchLoop()}else clearTimeout(glT)}
+cta.addEventListener('pointerdown',e=>e.stopPropagation());
+cta.addEventListener('click',e=>e.stopPropagation());
+gal.append(gsky,omni,cta,back);
 document.body.appendChild(gal);
 
 const tip=document.getElementById('tip');
@@ -193,7 +218,7 @@ function showGalaxy(){
  worm.setAttribute('aria-label','Return through the wormhole');
  if(!gLoop)gLoop=requestAnimationFrame(galFrame)}
 function hideGalaxy(){
- inGal=false;document.body.classList.remove('galaxy');gal.hidden=true;
+ inGal=false;showCta(false);document.body.classList.remove('galaxy');gal.hidden=true;
  window.__galaxyHold=false;worm.setAttribute('aria-label','Wormhole');hideTip()}
 
 function portalOrigin(){const el=inGal?back:worm,r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,s:inGal?r.width*1.6:r.width}}
@@ -231,7 +256,7 @@ back.addEventListener('click',e=>{e.stopPropagation();if(!busy)travel(false)});
 
 addEventListener('keydown',e=>{
  if(e.key!=='Escape'||!inGal||busy)return;
- e.preventDefault();e.stopImmediatePropagation();travel(false)},true);
+ e.preventDefault();e.stopImmediatePropagation();if(!cta.hidden){showCta(false);return}travel(false)},true);
 
 // fly the galaxy: drag pans, wheel / pinch zooms, a quiet click on empty space returns
 const pts=new Map();let moved=0,pinch=null;
@@ -242,15 +267,18 @@ gsky.addEventListener('pointerdown',e=>{
 gsky.addEventListener('pointermove',e=>{
  if(!pts.has(e.pointerId)){
   gsky.style.cursor=overOmni(e.clientX,e.clientY)?'pointer':'grab';
-  if(overOmni(e.clientX,e.clientY))showTip('Maximum Omniverse',e.clientX,e.clientY);
-  else if(holdTip&&tip&&tip.textContent==='Maximum Omniverse')hideTip();
+  if(overOmni(e.clientX,e.clientY))showTip('Maximum Omniverse \u2014 tap to roll',e.clientX,e.clientY);
+  else if(holdTip&&tip&&tip.textContent.startsWith('Maximum Omniverse'))hideTip();
   return}
  const p=pts.get(e.pointerId),dx=e.clientX-p[0],dy=e.clientY-p[1];pts.set(e.pointerId,[e.clientX,e.clientY]);
  moved+=Math.abs(dx)+Math.abs(dy);if(moved<6)return;gsky.classList.add('drag');
  if(pts.size===2&&pinch){const[a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);zoomAt((a[0]+b[0])/2,(a[1]+b[1])/2,pinch.z*(d/(pinch.d||1))/cam.z)}
  else{cam.x-=dx/cam.z;cam.y-=dy/cam.z;clampCam()}});
 function endPtr(e){const was=moved;pts.delete(e.pointerId);if(pts.size<2)pinch=null;gsky.classList.remove('drag');
- if(e.type==='pointerup'&&was<6&&!overOmni(e.clientX,e.clientY)&&!busy)travel(false)}
+ if(e.type!=='pointerup'||was>=6||busy)return;
+ if(overOmni(e.clientX,e.clientY)){showCta(cta.hidden);return}
+ if(!cta.hidden){showCta(false);return}
+ travel(false)}
 gsky.addEventListener('pointerup',endPtr);
 gsky.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);pinch=null;gsky.classList.remove('drag')});
 function zoomAt(sx,sy,f){
@@ -272,6 +300,7 @@ if(!RM)addEventListener('load',()=>{setTimeout(()=>{const i=new Image();i.src=OM
 
 window.__worm={
  travel,galaxy:()=>{if(!inGal&&!busy){armOmni();showGalaxy()}},
+ cta:showCta,
  home:()=>{if(inGal&&!busy)hideGalaxy()},
  /** Draw one travel frame for previews. u in 0..1, toGalaxy snapshots the hub. */
  frame(u){const snap=snapshot();rush.hidden=false;document.body.classList.add('traveling');drawTravel(u,snap,portalOrigin())},
