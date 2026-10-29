@@ -18,8 +18,8 @@ wimg.alt='';wimg.draggable=false;
 wimg.src=RM?WH_STILL:WH_GIF;
 worm.appendChild(wimg);
 document.body.appendChild(worm);
-// world-space anchor: deep in the empty white void, bottom-right, past the outermost orbit (1590) and outside the dark rift tear (~3000x3650)
-const WX=3230,WY=2700,WS=520;
+// world-space anchor: bottom-right, past the outermost orbit (1590), pulled in so it sits at the bottom-right edge of the default overview (z~.39 @1440x900) instead of off-screen
+const WX=1640,WY=810,WS=400;
 function placeWorm(){
  const v=window.__hubView&&window.__hubView();
  if(v&&v.sys==='main'){const z=v.cam.z,s=Math.max(44,Math.round(WS*z)),x=(WX-v.cam.x)*z+v.W/2,y=(WY-v.cam.y)*z+v.H/2;
