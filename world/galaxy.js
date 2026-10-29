@@ -103,7 +103,17 @@ function glitchEl(el,on,done){let n=0;const iv=setInterval(()=>{n++;el.style.opa
 function finOn(){if(fin)return;fin=true;gfoc=null;showCta(false);finClear();finW.textContent='';
  if(!document.fonts||RM){} 'inley'.split('').forEach((ch,i)=>{const sp=document.createElement('span');sp.textContent=ch;sp.style.opacity='0';sp.style.display='inline-block';finW.appendChild(sp);finT.push(setTimeout(()=>glitchEl(sp,true),RM?0:500+i*260))})}
 function finOff(){if(!fin)return;fin=false;finClear();const sp=[...finW.children].reverse();sp.forEach((el,i)=>finT.push(setTimeout(()=>glitchEl(el,false,()=>el.remove()),RM?0:i*120)))}
-function overBH(x,y){const r=bh.getBoundingClientRect();return Math.hypot(x-r.left-r.width/2,y-r.top-r.height/2)<r.width*.33}gal.append(gsky,bh,clov,omni,cta,finW,back);
+// F pixel-scramble + Finley letter glitches (occasional)
+const bhG=document.createElement('canvas');bhG.setAttribute('aria-hidden','true');bhG.style.cssText='position:absolute;left:0;top:0;pointer-events:none;image-rendering:pixelated;z-index:4';const bgx=bhG.getContext('2d');
+function fScramble(){if(RM||gal.hidden||!bh.complete||!bh.naturalWidth)return;const W=bh.naturalWidth,H=bh.naturalHeight;bhG.width=W;bhG.height=H;bhG.style.width=bh.style.width;bhG.style.height=bh.style.height;bhG.style.transform=bh.style.transform;
+ let f=0;const step=()=>{bgx.clearRect(0,0,W,H);if(f++>=3)return;const n=3+(Math.random()*5|0);
+  for(let k=0;k<n;k++){const h=1+(Math.random()*Math.max(2,H*.05)|0),w=W*(.12+Math.random()*.22)|0,sx=W*(.3+Math.random()*.4-.06)|0,sy=H*(.3+Math.random()*.4)|0,dx=sx+((Math.random()*W*.1-W*.05)|0);
+   bgx.fillStyle='#07020d';bgx.fillRect(sx,sy,w,h);bgx.drawImage(bh,sx,sy,w,h,dx,sy,w,h);
+   if(Math.random()<.35){bgx.globalCompositeOperation='source-atop';bgx.fillStyle=Math.random()<.5?'rgba(255,42,74,.5)':'rgba(90,255,216,.5)';bgx.fillRect(dx,sy,w,h);bgx.globalCompositeOperation='source-over'}}
+  setTimeout(step,50+Math.random()*60)};step()}
+function finGlitch(){const sp=[...finW.children];if(!fin||sp.length!==5||sp.some(e=>e.style.opacity!=='1'))return;const k=1+(Math.random()*2|0);for(let i=0;i<k;i++)glitchEl(sp[Math.random()*5|0],true)}
+(function gLoop(){setTimeout(()=>{if(!gal.hidden&&!document.hidden){if(fin&&Math.random()<.6)finGlitch();else fScramble()}gLoop()},1500+Math.random()*3500)})();
+function overBH(x,y){const r=bh.getBoundingClientRect();return Math.hypot(x-r.left-r.width/2,y-r.top-r.height/2)<r.width*.33}gal.append(gsky,bh,bhG,clov,omni,cta,finW,back);
 document.body.appendChild(gal);
 
 const tip=document.getElementById('tip');
