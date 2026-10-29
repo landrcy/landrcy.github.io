@@ -1,5 +1,5 @@
 // V50 FFC only: Volt Sphere, a wireframe globe of electric lines and lightning bolts, two grids spinning on crossed axes.
-// V58: iron plates removed; branching electric beams reach from the sphere toward the mouse cursor.
+// V59: always 4 randomly forking beams; they curve/home toward the mouse when it nears the sphere or a beam tip.
 // Procedural pixel art (low-res buffer, nearest upscale), F blackhole light baked per pixel. Click zooms to it (title showcase).
 (()=>{if(!window.__FFC)return;
 const VS_W=900,K=1.9,N=512,B=128,R=30,SC=128/80,PS=64,RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -12,7 +12,15 @@ const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
 const PAL=[[40,30,110],[90,60,200],[60,140,255],[90,230,255],[230,250,255]];
 const BAY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
 let MX=null,MY=null;addEventListener('pointermove',e=>{MX=e.clientX;MY=e.clientY},{passive:true});
-function mouseT(){if(MX==null||c.style.display==='none')return null;const r=c.getBoundingClientRect();if(!r.width)return null;let x=((MX-r.left)/r.width*B-B/2)/R,y=((MY-r.top)/r.height*B-B/2)/R;const l=Math.hypot(x,y)||1e-3,m=Math.min(l,2.05);if(l<1.05)return null;return[x/l*m,y/l*m,.3]}
+function mouseT(){if(MX==null||c.style.display==='none')return null;const r=c.getBoundingClientRect();if(!r.width)return null;return[((MX-r.left)/r.width*B-B/2)/R,((MY-r.top)/r.height*B-B/2)/R]}
+const BM=[0,1,2,3].map(i=>({a:i*Math.PI/2+Math.random(),v:(Math.random()-.5)*.8,ph:Math.random()*6.28,w:0}));let BT=0;
+function beams(t){const M=mouseT(),dt=Math.min(.2,Math.max(0,t-BT));BT=t;const ml=M?Math.hypot(M[0],M[1]):99;
+ for(const q of BM){if(!RM){q.v+=(Math.random()-.5)*dt*3;q.v=Math.max(-1,Math.min(1,q.v));q.a+=q.v*dt}
+  const rl=1.55+.3*Math.sin(t*1.7+q.ph),T=[Math.cos(q.a)*rl,Math.sin(q.a)*rl,.3];let want=0,E=T;
+  if(M&&ml>1.02){const m=Math.min(ml,2.05),Mc=[M[0]/ml*m,M[1]/ml*m,.3],dt2=Math.hypot(M[0]-T[0],M[1]-T[1]);want=Math.max(Math.max(0,Math.min(1,(3.2-ml)/1.4)),Math.max(0,Math.min(1,(1.1-dt2)/.6)));E=Mc}
+  q.w+=(want-q.w)*Math.min(1,dt*6);const w=q.w*q.w*(3-2*q.w),P=[T[0]+(E[0]-T[0])*w,T[1]+(E[1]-T[1])*w,.3];
+  const S=[Math.cos(q.a),Math.sin(q.a),.3],C=[T[0]*.7,T[1]*.7,.3];let pv=S;for(let k=1;k<=4;k++){const f=k/4,i1=1-f,n=[i1*i1*S[0]+2*i1*f*C[0]+f*f*P[0],i1*i1*S[1]+2*i1*f*C[1]+f*f*P[1],.3];jag(pv,n,2,.22);pv=n}
+  const ns=RM?2:3+Math.floor(rnd()*3);for(let k=0;k<ns;k++){const an=rnd()*6.283,rr=.15+rnd()*.25;jag(P,[P[0]+Math.cos(an)*rr,P[1]+Math.sin(an)*rr,.3],2,.12)}}}
 function jag(a,b,d,amp){if(d===0){line([a,b],.3,1,2);return}const m=[(a[0]+b[0])/2+(rnd()-.5)*amp,(a[1]+b[1])/2+(rnd()-.5)*amp,(a[2]+b[2])/2];jag(a,m,d-1,amp*.55);jag(m,b,d-1,amp*.55);
  if(d>=2&&rnd()<.3){const e=[m[0]+(rnd()-.5)*amp*1.6,m[1]+(rnd()-.5)*amp*1.6,m[2]];jag(m,e,1,amp*.4)}}
 function beam(P){const l=Math.hypot(...P),u=P.map(v=>v/l);u[2]=.3;const f=Math.hypot(...u);for(let i=0;i<3;i++)u[i]/=f;jag(u,P,4,.35);
@@ -37,7 +45,7 @@ function paint(t){seed=(Math.floor(t*12)%997)+7;buf.fill(0);hue.fill(0);
  grid(t,RM?.3:t*.6,.41,.18,0,0);grid(t,RM?1:-t*.45,1.2,-.6,1,2);
  const nb=RM?1:2+Math.floor(rnd()*3);for(let i=0;i<nb;i++){const a=sp();a[2]=Math.abs(a[2]);const b=sp();b[2]=Math.abs(b[2]);bolt(a,b,3,2)}
  if(!RM&&rnd()<.35){const a=sp(),o=[a[0]*1.45,a[1]*1.45,a[2]];bolt(a,o,2,2)}
- const T=mouseT();if(T){const nb=RM?1:2+Math.floor(rnd()*2);for(let i=0;i<nb;i++){const P=[T[0]+(rnd()-.5)*.15,T[1]+(rnd()-.5)*.15,T[2]];beam(P)}}
+ beams(t);
  const L=LA==null?[-.5,-.5,.7]:[Math.cos(LA)*.88,Math.sin(LA)*.88,.47];
  for(let y=0;y<B;y++)for(let x=0;x<B;x++){const i=y*B+x,o=i*4,nx=(x+.5-B/2)/R,ny=(y+.5-B/2)/R,r2=nx*nx+ny*ny;let v=buf[i];
   const nz=Math.sqrt(Math.max(0,1-r2)),lit=Math.max(0,Math.min(1,.45+(nx*L[0]+ny*L[1]+nz*L[2])*.75));
