@@ -5,14 +5,14 @@ const PB_W=1100,K=1.9,N=320,PR=80,RM=matchMedia('(prefers-reduced-motion: reduce
 const c=document.createElement('canvas');c.width=c.height=N;c.id='pbplanet';c.tabIndex=0;c.setAttribute('role','link');c.setAttribute('aria-label','Sticky Board paper planet - play');
 c.style.cssText='position:absolute;left:0;top:0;z-index:3;image-rendering:pixelated;display:none;touch-action:none;will-change:transform';
 const g=c.getContext('2d');g.imageSmoothingEnabled=false;
-const ld=s=>{const i=new Image();i.src=A+s+'?v=43';return i};
+const ld=s=>{const i=new Image();i.src=A+s+'?v=44';return i};
 const ball=ld('paperball-planet.png');
 const memes=['doge','cheems','pog','sadcat','kekw','gigachad','maxwell','hamster'].map(n=>ld('meme-'+n+'.png'));
 const notes=[0,1,2,3,4,5,6,7].map(n=>ld('note-'+n+'.png'));
-// two tilted rings: inner sticky notes, outer memes
+// V44: perpendicular rings: sticky notes orbit East-West (horizontal equator ring), memes orbit North-South (vertical polar ring)
 const items=[];
-notes.forEach((im,k)=>items.push({im,r:PR+26,a:k/8*Math.PI*2,sp:.32,tilt:.38,sp2:1.3+k*.2,ph:k}));
-memes.forEach((im,k)=>items.push({im,r:PR+58,a:k/8*Math.PI*2+.4,sp:-.2,tilt:.3,sp2:.9+k*.15,ph:k*2}));
+notes.forEach((im,k)=>items.push({im,r:PR+26,a:k/8*Math.PI*2,sp:.32,tilt:.38,ax:0,sp2:1.3+k*.2,ph:k}));
+memes.forEach((im,k)=>items.push({im,r:PR+58,a:k/8*Math.PI*2+.4,sp:-.2,tilt:.3,ax:1,sp2:.9+k*.15,ph:k*2}));
 // V42: sun (F blackhole) relative per-pixel shade baked into the ball sprite's own pixels (sunBake style, no overlay); cached per light angle
 const BAY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5],bc=document.createElement('canvas'),bg=bc.getContext('2d',{willReadFrequently:true});let bK=null,LA=null;
 function litBall(){const W=ball.naturalWidth,H=ball.naturalHeight;if(LA==null)return ball;const k=Math.round(LA*40);if(bK===k&&bc.width===W)return bc;bK=k;
@@ -23,7 +23,7 @@ function litBall(){const W=ball.naturalWidth,H=ball.naturalHeight;if(LA==null)re
   l=nx*sc*L[0]+ny*sc*L[1]+nz*L[2];let v=Math.max(0,Math.min(1,.5+l*.75));v=Math.floor(v*4+BAY[(y&3)*4+(x&3)]/16)/4;const q=.22+.78*Math.min(1,v);
   d[o]=d[o]*q+(1-q)*14;d[o+1]=d[o+1]*q+(1-q)*12;d[o+2]=d[o+2]*q+(1-q)*30}
  bg.putImageData(im,0,0);return bc}
-function paint(t){g.clearRect(0,0,N,N);const cx=N/2,cy=N/2,list=items.map(o=>{const a=o.a+(RM?0:t*o.sp);return{o,x:cx+Math.cos(a)*o.r,y:cy+Math.sin(a)*o.r*o.tilt-Math.cos(a)*o.r*.12,z:Math.sin(a)}});
+function paint(t){g.clearRect(0,0,N,N);const cx=N/2,cy=N/2,list=items.map(o=>{const a=o.a+(RM?0:t*o.sp);const u=Math.cos(a)*o.r,w=Math.sin(a)*o.r*o.tilt;return o.ax?{o,x:cx+w+Math.cos(a)*o.r*.12,y:cy+u,z:Math.sin(a)}:{o,x:cx+u,y:cy+w-Math.cos(a)*o.r*.12,z:Math.sin(a)}});
  const draw=p=>{const im=p.o.im;if(!im.complete||!im.naturalWidth)return;const s=.85+.25*(p.z+1)/2,w=Math.round(im.naturalWidth*s),h=Math.round(im.naturalHeight*s);
   g.save();g.translate(Math.round(p.x),Math.round(p.y));if(!RM)g.rotate(Math.round(Math.sin(t*p.o.sp2+p.o.ph)*2)/16);g.globalAlpha=p.z<0?.75:1;g.drawImage(im,-w>>1,-h>>1,w,h);g.restore()};
  list.filter(p=>p.z<0).sort((a,b)=>a.z-b.z).forEach(draw);

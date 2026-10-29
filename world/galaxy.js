@@ -292,7 +292,7 @@ function isRb(r,g,b){const mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(mx<120||mx-m
 /* V41: clover frames pre-extracted offline into a sprite sheet (80 frames, 128px, 10x8, 70ms each, from clover-planet.gif);
    we step the frame index on a clock ourselves, no browser GIF decode involved */
 const CLF={sh:null,n:80,cols:10,d:70,i:0,t:0};
-{const im=new Image();im.onload=()=>{CLF.sh=im};im.src='world/assets/clover/clover-sheet.png?v=43'}
+{const im=new Image();im.onload=()=>{CLF.sh=im};im.src='world/assets/clover/clover-sheet.png?v=44'}
 window.__clFrameIdx=()=>CLF.i;
 function clFrame(now){if(!CLF.sh)return null;if(!RM){if(!CLF.t)CLF.t=now;const k=Math.floor((now-CLF.t)/CLF.d);if(k>0){CLF.i=(CLF.i+k)%CLF.n;CLF.t+=k*CLF.d;if(now-CLF.t>1000)CLF.t=now}}return CLF.sh}
 function bakeClov(){const cf=clFrame(performance.now());if(!inGal||(!cf&&(!clSrc.complete||!clSrc.naturalWidth)))return;if(clC.width!==CLN){clC.width=clC.height=CLN}const g=clC.getContext('2d',{willReadFrequently:true});
