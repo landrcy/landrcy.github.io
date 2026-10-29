@@ -158,7 +158,7 @@ document.body.appendChild(gal);
 
 const tip=document.getElementById('tip');
 let busy=false,inGal=false,holdTip=false;
-const cam={x:0,y:0,z:1};window.__galView=()=>({cam,GW,GH,inGal,ds:dsPos(),dsZ:dsPos()[1]<0?1:3,pb:pbPos(),pbZ:pbPos()[1]<0?1:3,pbFoc:gfoc==='pb'});
+const cam={x:0,y:0,z:1};window.__galView=()=>({cam,GW,GH,inGal,ds:dsPos(),dsZ:dsPos()[1]<0?1:3,pb:pbPos(),pbZ:pbPos()[1]<0?1:3,pbFoc:gfoc==='pb',pbLa:Math.atan2(-pbPos()[1],bhOff-pbPos()[0])});
 let fin=false,bhOff=0,gfoc=null,GW=1,GH=1,neb=null,stars=[],omniPx=0,omAng=.55,moAng=0,omSf=1,omHov=false,gLast=0,bhT=0,dsAng=3.75,pbAng=.6;
 function clPos(){return[Math.cos(omAng)*ORB,Math.sin(omAng)*ORB*SQ]}
 function pbPos(){return[Math.cos(pbAng)*PB_ORB,Math.sin(pbAng)*PB_ORB*SQ]}
@@ -292,7 +292,7 @@ function isRb(r,g,b){const mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(mx<120||mx-m
 /* V41: clover frames pre-extracted offline into a sprite sheet (80 frames, 128px, 10x8, 70ms each, from clover-planet.gif);
    we step the frame index on a clock ourselves, no browser GIF decode involved */
 const CLF={sh:null,n:80,cols:10,d:70,i:0,t:0};
-{const im=new Image();im.onload=()=>{CLF.sh=im};im.src='world/assets/clover/clover-sheet.png?v=41'}
+{const im=new Image();im.onload=()=>{CLF.sh=im};im.src='world/assets/clover/clover-sheet.png?v=42'}
 window.__clFrameIdx=()=>CLF.i;
 function clFrame(now){if(!CLF.sh)return null;if(!RM){if(!CLF.t)CLF.t=now;const k=Math.floor((now-CLF.t)/CLF.d);if(k>0){CLF.i=(CLF.i+k)%CLF.n;CLF.t+=k*CLF.d;if(now-CLF.t>1000)CLF.t=now}}return CLF.sh}
 function bakeClov(){const cf=clFrame(performance.now());if(!inGal||(!cf&&(!clSrc.complete||!clSrc.naturalWidth)))return;if(clC.width!==CLN){clC.width=clC.height=CLN}const g=clC.getContext('2d',{willReadFrequently:true});
