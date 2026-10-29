@@ -168,7 +168,7 @@ document.body.appendChild(gal);
 
 const tip=document.getElementById('tip');
 let busy=false,inGal=false,holdTip=false;
-const cam={x:0,y:0,z:1};window.__galFz=k=>inGal&&(gfoc===k||window.__galHov===k||(k==='cl'||k==='om')&&omHov&&!gfoc);window.__galView=()=>({cam,GW,GH,inGal,ds:dsPos(),dsZ:dsPos()[1]<0?1:3,pb:pbPos(),pbZ:pbPos()[1]<0?1:3,pbFoc:gfoc==='pb',pbLa:Math.atan2(-pbPos()[1],bhOff-pbPos()[0]),vs:FFC?vsPos():null,vsZ:vsPos()[1]<0?1:3,vsLa:Math.atan2(-vsPos()[1],bhOff-vsPos()[0]),clLa:clLA,clF:CLF.i});
+const cam={x:0,y:0,z:1};window.__galFz=k=>inGal&&(gfoc===k);window.__galView=()=>({cam,GW,GH,inGal,ds:dsPos(),dsZ:dsPos()[1]<0?1:3,pb:pbPos(),pbZ:pbPos()[1]<0?1:3,pbFoc:gfoc==='pb',pbLa:Math.atan2(-pbPos()[1],bhOff-pbPos()[0]),vs:FFC?vsPos():null,vsZ:vsPos()[1]<0?1:3,vsLa:Math.atan2(-vsPos()[1],bhOff-vsPos()[0]),clLa:clLA,clF:CLF.i});
 let fin=false,bhOff=0,gfoc=null,GW=1,GH=1,neb=null,stars=[],omniPx=0,omAng=.55,moAng=0,omSf=1,omHov=false,gLast=0,bhT=0,dsAng=3.75,pbAng=.6,vsAng=2.2;
 function clPos(){return[Math.cos(omAng)*ORB,Math.sin(omAng)*ORB*SQ]}
 function vsPos(){return[Math.cos(vsAng)*VS_ORB,Math.sin(vsAng)*VS_ORB*SQ]}
@@ -359,9 +359,9 @@ function drawGal(now){
   gg.globalAlpha=tw;gg.fillStyle=s.c;gg.fillRect(x,y,ps,ps);gg.globalAlpha=1}
  // soft crimson vignette in chunky bands
  for(let i=0;i<4;i++){const m=(i+1)*Math.max(8,pxScale()*6);gg.fillStyle='rgba(20,2,6,.22)';gg.fillRect(0,0,GW,m);gg.fillRect(0,GH-m,GW,m);gg.fillRect(0,0,m,GH);gg.fillRect(GW-m,0,m,GH)}
- // orbit: hover slows, open CTA stops it (like the hub planets)
+ // orbit: only focus/zoom stops it (V55: hover no longer freezes) (like the hub planets)
  const dt=Math.min(.05,gLast?(now-gLast)/1000:0);gLast=now;
- const tg=RM||gfoc==='cl'||gfoc==='om'||omHov&&!gfoc?0:1;omSf+=(tg-omSf)*Math.min(1,dt*4);omAng+=dt*Math.PI*2/OM_PER*omSf;moAng+=dt*Math.PI*2/MO_PER*omSf;if(!RM){dsAng+=dt*Math.PI*2/DS_PER*(__galFz('ds')?0:1);pbAng+=dt*Math.PI*2/PB_PER*(__galFz('pb')?0:1);vsAng+=dt*Math.PI*2/VS_PER*(__galFz('vs')?0:1);{const os=__galFz('om')?OM_STILL:OM_GIF;if(!RM&&omni.dataset.arm&&!omni.src.endsWith(os))omni.src=os}}
+ const tg=RM||gfoc==='cl'||gfoc==='om'?0:1;omSf+=(tg-omSf)*Math.min(1,dt*4);omAng+=dt*Math.PI*2/OM_PER*omSf;moAng+=dt*Math.PI*2/MO_PER*omSf;if(!RM){dsAng+=dt*Math.PI*2/DS_PER*(__galFz('ds')?0:1);pbAng+=dt*Math.PI*2/PB_PER*(__galFz('pb')?0:1);vsAng+=dt*Math.PI*2/VS_PER*(__galFz('vs')?0:1);{const os=__galFz('om')?OM_STILL:OM_GIF;if(!RM&&omni.dataset.arm&&!omni.src.endsWith(os))omni.src=os}}
  // V43: Sticky Board orbit trail (same style, paper yellow), outer orbit
  if(FFC){const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(PB_ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#ffe066';
   for(let k=1;k<=n;k++){const f=k/n,an=pbAng-arc*f,sx=(Math.cos(an)*PB_ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*PB_ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}

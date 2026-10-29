@@ -11,6 +11,11 @@ const img=bg.createImageData(B,B),D=img.data;let LA=null,seed=1;
 const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
 const PAL=[[40,30,110],[90,60,200],[60,140,255],[90,230,255],[230,250,255]];
 const BAY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+// V55: branching electricity crawling across each plate (local coords, flickers per frame)
+function plArc(sz){const h=sz*.38,zz=(x0,y0,x1,y1,n,j)=>{const pt=[[x0,y0]];for(let k=1;k<n;k++){const f=k/n;pt.push([x0+(x1-x0)*f+(Math.random()-.5)*j,y0+(y1-y0)*f+(Math.random()-.5)*j])}pt.push([x1,y1]);return pt},st=pt=>{g.beginPath();g.moveTo(pt[0][0],pt[0][1]);for(const q of pt)g.lineTo(q[0],q[1]);g.stroke()};
+ const a=Math.random()*6.283,x0=Math.cos(a)*h,y0=Math.sin(a)*h*.6,main=zz(x0,y0,-x0,-y0,7,sz*.12);g.save();g.lineCap='round';g.lineJoin='round';g.globalCompositeOperation='lighter';
+ const br=[main];for(let b=0;b<2;b++){const o=main[1+Math.floor(Math.random()*5)];br.push(zz(o[0],o[1],o[0]+(Math.random()-.5)*h*1.2,o[1]+(Math.random()-.5)*h,4,sz*.08))}
+ for(const[w,c]of[[Math.max(2,sz*.07),'rgba(60,200,255,.35)'],[Math.max(1,sz*.025),'rgba(200,250,255,.95)']]){g.lineWidth=w;g.strokeStyle=c;br.forEach(st)}g.restore()}
 const PL=[1,2,3,4,5,6].map(i=>{const m=new Image();m.src='world/assets/ironsheet/sheet-'+i+'.png';return m});
 let plates=[];
 function platePos(t){const out=[];for(let i=0;i<6;i++){const a=(RM?0:t*.35)+i*Math.PI/3,r=1.75+.08*Math.sin(i*2.1);
@@ -49,7 +54,7 @@ function paint(t){seed=(Math.floor(t*12)%997)+7;buf.fill(0);hue.fill(0);
   else if(r2<1.18&&!RM&&BAY[(y&3)*4+(x&3)]<(Math.sin(t*6)+1.2)*3){D[o]=70;D[o+1]=170;D[o+2]=255;D[o+3]=110}
   else D[o+3]=0}
  bg.putImageData(img,0,0);g.clearRect(0,0,N,N);
- const sk=N/B,dp=q=>{const m=PL[q.i];if(!m.complete||!m.naturalWidth)return;const sz=PS*(1+q.p[2]*.12);g.save();g.translate(N/2+q.p[0]*R*sk,N/2+q.p[1]*R*sk);g.rotate(Math.sin(q.spin)*.5);g.globalAlpha=q.p[2]<0?.7:1;g.drawImage(m,-sz/2,-sz/2,sz,sz);g.restore()};
+ const sk=N/B,dp=q=>{const m=PL[q.i];if(!m.complete||!m.naturalWidth)return;const sz=PS*(1+q.p[2]*.12);g.save();g.translate(N/2+q.p[0]*R*sk,N/2+q.p[1]*R*sk);g.rotate(Math.sin(q.spin)*.5);g.globalAlpha=q.p[2]<0?.7:1;g.drawImage(m,-sz/2,-sz/2,sz,sz);if(!RM&&Math.random()<.7)plArc(sz);g.restore()};
  for(const q of plates)if(q.p[2]<0)dp(q);g.drawImage(bc,0,0,N,N);for(const q of plates)if(q.p[2]>=0)dp(q)}
 const NAME='Volt Sphere';
 const tipOn=(on,e)=>{const t=document.getElementById('tip');if(!t)return;if(on){if(t.textContent!==NAME||!t.classList.contains('on'))window.__blip&&__blip('hover');t.textContent=NAME;t.style.left=(e.clientX+14)+'px';t.style.top=(e.clientY+14)+'px';t.classList.add('on')}else if(t.textContent===NAME)t.classList.remove('on')};
