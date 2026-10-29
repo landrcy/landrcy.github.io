@@ -127,7 +127,7 @@ document.body.appendChild(gal);
 
 const tip=document.getElementById('tip');
 let busy=false,inGal=false,holdTip=false;
-const cam={x:0,y:0,z:1};
+const cam={x:0,y:0,z:1};window.__galView=()=>({cam,GW,GH,inGal});
 let fin=false,bhOff=0,gfoc=null,GW=1,GH=1,neb=null,stars=[],omniPx=0,omAng=.55,moAng=0,omSf=1,omHov=false,gLast=0,bhT=0;
 function clPos(){return[Math.cos(omAng)*ORB,Math.sin(omAng)*ORB*SQ]}
 function omPos(){const[c,d]=clPos();return[c+Math.cos(moAng)*MO,d+Math.sin(moAng)*MO*SQ]}
@@ -376,7 +376,7 @@ function fitZ(){
  const w=2*(ORB+MO)+CL_W*.9,h=2*(ORB+MO)*SQ+CL_W*.8;
  return Math.min(GW*.94/w,GH*.88/h)}
 function clampCam(){
- const lim=(ORB+MO)*1.05;cam.x=Math.max(-lim,Math.min(lim,cam.x));cam.y=Math.max(-lim*SQ,Math.min(lim*SQ,cam.y))}
+ const lim=(ORB+MO)*1.05;cam.x=Math.max(-lim*1.45,Math.min(lim,cam.x));cam.y=Math.max(-lim*SQ*1.5,Math.min(lim*SQ,cam.y))}
 gsky.addEventListener('wheel',e=>{e.preventDefault();gfoc=null;zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*.0014))},{passive:false});
 addEventListener('resize',()=>{if(inGal){resizeGal();cam.z=fitZ()}});
 
