@@ -253,19 +253,6 @@ function skipIntro(){if(!intro)return;if(!intro.ui)uiReveal();intro=null;to(fitX
 // ---- render ----
 let last=performance.now(),FA=0;
 
-// ---- asteroid belt between the Pixel Museum and YouTube ----
-const BELT=[];{const rk=(sz,seed)=>{const n=8,S=[];for(let k=0;k<n;k++){const la=k/n*TAU,c=P.mk(sz,sz),d=c.img.data,lx=Math.cos(la),ly=Math.sin(la);
-  for(let y=0;y<sz;y++)for(let x=0;x<sz;x++){const dx=(x+.5)/sz*2-1,dy=(y+.5)/sz*2-1,a=Math.atan2(dy,dx),rr=.62+.3*P.vn(Math.cos(a)*1.6+seed,Math.sin(a)*1.6+seed*3);if(dx*dx+dy*dy>rr*rr)continue;
-   const nz=Math.sqrt(Math.max(0,1-(dx*dx+dy*dy)/(rr*rr))),l=Math.max(0,-(dx*lx+dy*ly)/rr*.75+nz*.45)+(P.vn(x*.9+seed,y*.9)-.5)*.3;
-   const q=P.hx(P.dq(['#120c1a','#2a2030','#4a3c44','#7a6658','#b09878','#e0c8a0'],Math.min(1,l*.9),x,y)),o=(y*sz+x)*4;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255}
-  c.g.putImageData(c.img,0,0);S.push(c.c)}return S};
- const LIB=[];for(let i=0;i<14;i++)LIB.push(rk([4,5,6,7,8,10,12][i%7],i*7.3));
- for(let i=0;i<340;i++){const u=Math.random(),r=1332+(u+Math.random())*.5*26+((Math.random()-.5)*4);BELT.push({r,a:Math.random()*TAU,sp:.012*Math.pow(360/r,1.5)*(.9+Math.random()*.2),s:LIB[Math.floor(Math.random()*Math.random()*LIB.length)],sc:.6+Math.random()*.9})}}
-function drawBelt(dt,alpha){if(sys!=='main'||alpha<=0)return;const ga=g.globalAlpha;g.globalAlpha=ga*alpha;
- for(const k of BELT){if(!RM)k.a+=dt*k.sp;const wx=Math.cos(k.a)*k.r,wy=Math.sin(k.a)*k.r*SQ,[sx,sy]=W2S(wx,wy);const sw=k.s[0].width,tgt=sw*k.sc*cam.z*.9,rt=REFT(),sz=tgt<sw*.75?Math.max(1,Math.round(tgt/rt))*rt:sw*Math.max(1,Math.min(rt,Math.round(tgt/sw)));if(sx<-sz||sy<-sz||sx>W+sz||sy>H+sz)continue;
-  if(tgt<sw*.75){g.fillStyle='#7a6658';const q=Math.min(sz,rt*3);g.fillRect(Math.round(sx/rt)*rt,Math.round(sy/rt)*rt,q,q);continue}
-  const li=((Math.round(Math.atan2(wy,wx)/TAU*8)%8)+8)%8;g.drawImage(k.s[li],Math.round(sx-sz/2),Math.round(sy-sz/2),sz,sz)}
- g.globalAlpha=ga}
 
 // ---- spaceships (decorative, non-interactive) ----
 const SHIPS=(()=>{const D=[
@@ -341,7 +328,7 @@ function frame(now){if(window.__galaxyHold){last=now;requestAnimationFrame(frame
  for(let k=1;k<=n;k++){const f=k/n,an=b.ang-dr*arc*f,[sx,sy]=W2S(Math.cos(an)*b.orb,Math.sin(an)*b.orb*SQ);if(sx<-4||sy<-4||sx>W+4||sy>H+4)continue;const al=Math.pow(1-f,1.3)*.6*IS.orb;if(al<.02||(k%2&&f>.35))continue;g.globalAlpha=ga0*al;g.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}}g.globalAlpha=ga0}
  if(sys==='main'){const[yx,yy]=pos(MAIN[3]);}
  {const A=MAIN[1],tg=(hover===A||focus===A)?1:0;A.op=(A.op||0)+(tg-(A.op||0))*Math.min(1,dt*(tg?2.2:3));A.arg={open:RM?tg:A.op}}
- drawBelt(dt,IS.orb);drawShips(now,IS.orb);drawDecoWorld(now);
+ drawShips(now,IS.orb);drawDecoWorld(now);
  // sprites, back-to-front
  const draw=[];bodies.forEach((b,i)=>draw.push([b,i]));if(sys==='main')MOONS.forEach((m,i)=>draw.push([m,m.par?MAIN.indexOf(m.par):3]));
  draw.sort((a,b)=>pos(a[0])[1]-pos(b[0])[1]);
