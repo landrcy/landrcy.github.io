@@ -574,7 +574,7 @@ const K={
    for(const[p,q]of E){const n=Math.ceil(Math.hypot(q[0]-p[0],q[1]-p[1]))+1;for(let s=0;s<=n;s++){const f=s/n,x=p[0]+(q[0]-p[0])*f,y=p[1]+(q[1]-p[1])*f,z=p[2]+(q[2]-p[2])*f,cc=hx(dq(TEAL,.45+z*.35+(1-(y/Hh))*.15,Math.round(x),Math.round(y)));put(x,y,cc);if(th){put(x+1,y,cc);put(x,y+1,cc)}}}
    for(const p of V){const cc=hx(p[2]>0?'#ffffff':'#7affe0');put(p[0],p[1],cc);if(W>40){put(p[0]+1,p[1],cc);put(p[0],p[1]+1,cc);put(p[0]+1,p[1]+1,cc)}}
    S.g.putImageData(S.img,0,0)}},
- // LANDRCYVERSE OBSERVATORY: a mini sun, boiling, flaring corona, the script L glowing on its face
+ // LAVERSE OBSERVATORY: a mini sun, boiling, flaring corona, the script L glowing on its face
  lsun:{pre:t=>({t}),
   px(u,v,x,y,P,pw){const r=Math.hypot(u,v),R=.56;
    if(r<R){const Lm=(Math.abs(u+.1)<.065&&v>-.3&&v<.2)||(v>.11&&v<.2&&u>-.16&&u<.2)||(Math.abs(u+.02)<.08&&Math.abs(v+.32)<.035);if(Lm)return dq(['#ffc070','#ffe8c0','#fffbe8'],.5+.5*Math.sin(P.t*2),x,y);

@@ -1,6 +1,6 @@
 (()=>{const P=window.PLANETS,A=window.__ARCH;if(!P||!A)return;
 const m=document.createElement('section');m.id='museum';m.setAttribute('aria-label','Archive space museum');
-m.innerHTML='<canvas id="mbg" aria-hidden="true"></canvas><h1 class="mtitle">Archive Museum</h1><div class="mhall"></div><button type="button" class="mback">← Back to Landrcyverse</button>';
+m.innerHTML='<canvas id="mbg" aria-hidden="true"></canvas><h1 class="mtitle">Archive Museum</h1><div class="mhall"></div><button type="button" class="mback">← Back to Laverse</button>';
 document.body.appendChild(m);const hall=m.querySelector('.mhall'),thumbs=[];
 for(const b of A){const a=document.createElement('a');a.className='case';a.href=b.href;if(/^https?:/.test(b.href)){a.target='_blank';a.rel='noopener'}
  a.innerHTML='<span class="glass"></span><span class="ped"></span><span class="plq"></span>';a.querySelector('.plq').textContent=b.title;const gl=a.querySelector('.glass');

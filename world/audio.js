@@ -1,4 +1,4 @@
-// Landrcyverse sound: original ambient chiptune generated with Web Audio + soft UI blips. Off by default.
+// Laverse sound: original ambient chiptune generated with Web Audio + soft UI blips. Off by default.
 (()=>{const KEY='lv-sound';let on=localStorage.getItem(KEY)==='1',ctx=null,master=null,mus=null,sfx=null,timer=0,nextT=0,step=0;
 const btn=document.createElement('button');btn.type='button';btn.id='sndbtn';btn.className='ui';btn.setAttribute('aria-label','Toggle sound');
 const ico=o=>`<svg viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 4h2v4H1zM3 4h1V3h1V2h1v8H5V9H4V8H3z"/>${o?'<path fill="currentColor" d="M8 4h1v4H8zM10 2h1v8h-1zM9 3h1v1H9zM9 8h1v1H9z"/>':'<path fill="currentColor" d="M8 4h1v1H8zM10 4h1v1h-1zM9 5h1v2H9zM8 7h1v1H8zM10 7h1v1h-1z"/>'}</svg>`;

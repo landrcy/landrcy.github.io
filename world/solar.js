@@ -105,7 +105,7 @@ const CH=[
 const fmt=n=>n==null?'-':n.toLocaleString('en-US'),TV=CH.reduce((a,c)=>a+(c.views||0),0),TS=CH.reduce((a,c)=>a+(c.subs||0),0),MV=Math.max(...CH.map(c=>c.views||0));
 const B=(o)=>Object.assign({ang:0,sf:1,pop:0,next:0},o);
 const MAIN=[
- B({id:'sun',paint:'sun',w:362,x:0,y:0,hr:.36,title:'Landrcyverse',by:'games & websites by Landry',blurb:'Every planet is one of my sites. Click a planet to fly to it.'}),
+ B({id:'sun',paint:'sun',w:362,x:0,y:0,hr:.36,title:'Laverse',by:'games & websites by Landry',blurb:'Every planet is one of my sites. Click a planet to fly to it.'}),
  B({id:'ashaad',paint:'ashaad',w:99,h:90,orb:420,per:50,ph:2.2,hr:.42,title:'The Binding of Ashaad',by:'a brainrot roguelike by landrcy',blurb:'Descend into the basement, shoot your tears, grab cursed items and survive in this browser roguelike. 3 starters, 4 floors, 1 secret Finley boss.',href:'https://landrcy.github.io/binding-of-ashaad/',cta:'▶ Play'}),
  B({id:'sea',paint:'sea',w:183,orb:690,per:72,ph:.4,hr:.4,title:'Sea of Thought',by:'a pixel ocean by landrcy',blurb:'A quiet pixel ocean full of messages in bottles: write one, throw it in, then dive and read what strangers left behind.',href:'https://landrcy.github.io/sea-of-thought/',cta:'▶ Dive in'}),
  B({id:'yt',paint:'yt',w:144,orb:2160,per:140,ph:4.1,hr:.42,title:'LLC Powered Channels',by:'YouTube',yt:1,href:'youtube/'}),
@@ -120,7 +120,7 @@ const MAIN=[
 const MOONS=CH.map((c,i)=>B({id:'m-'+c.id,paint:'moon',arg:c.kind,w:Math.round(12+14*Math.sqrt((c.views||0)/MV)),orb:66+i*9,per:9+i*2.6,ph:i*1.3,dir:1,hr:.42,moon:c,title:c.name}));
 // Pixel Museum room moons: one animated relic per museum room, two rings (west wing sites inside, east wing vaults outside)
 const PMU=MAIN.find(b=>b.id==='pmuseum'),PMURL='https://landrcy.github.io/pixel-museum/#';
-const ROOMS=[['hub','Landrcyverse Observatory','Landrcyverse','lsun',18],['void','The Void Abyss','The Void','voidorb',18],['sea','Sea of Thought','Sea of Thought','bottle',17],['ashaad','The Binding of Ashaad','Ashaad','chained',18],['llc','LLC Broadcast Shrine','LLC Channels','tv',18],['arena','Ball Arena Colosseum','Ball Arena','glove',16],['city','Cooper Sky City','Cooper City','crest',16],
+const ROOMS=[['hub','Laverse Observatory','Laverse','lsun',18],['void','The Void Abyss','The Void','voidorb',18],['sea','Sea of Thought','Sea of Thought','bottle',17],['ashaad','The Binding of Ashaad','Ashaad','chained',18],['llc','LLC Broadcast Shrine','LLC Channels','tv',18],['arena','Ball Arena Colosseum','Ball Arena','glove',16],['city','Cooper Sky City','Cooper City','crest',16],
  ['mecha','Mecha Forge','Mecha Forge','mech',20],['swords','Hall of Blades & Armor','Swords & Armor','sword',22],['books','Arcane Library','Arcane Library','book',20],['dragon','Dragon Hoard','Dragon Hoard','dragon',22],['crystal','Crystal Cavern','Crystal Cavern','crystal',20],['cyber','Neon Cyber Shrine','Cyber Shrine','torii',20],['relic','Starship Relic Vault','Relic Vault','cube',19]];
 const RMOONS=ROOMS.map(([id,title,short,kind,w],i)=>{const outer=i>=7,k=i%7;return B({id:'r-'+id,paint:'rmoon',arg:kind,w,orb:outer?124:84,per:outer?52:34,ph:k*TAU/7+(outer?.45:0),hr:.45,par:PMU,room:id,short,title,href:PMURL+id})});
 MOONS.push(...RMOONS);
