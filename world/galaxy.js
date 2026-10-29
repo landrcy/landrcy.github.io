@@ -252,7 +252,7 @@ let fsT=0;function fitCamSoft(){cancelAnimationFrame(fsT);const a={...cam},z1=fi
 // V36: per-pixel neutral light from the F blackhole (like Deep Sea): dithered pixel shadow mask, lit face toward the BH, no red glare
 const SHN=56,BAY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
 function mkShade(){const c=document.createElement('canvas');c.width=c.height=SHN;c.setAttribute('aria-hidden','true');c.style.cssText='position:absolute;left:0;top:0;pointer-events:none;image-rendering:pixelated;border-radius:50%';return c}
-const shCl=mkShade(),shOm=mkShade(),shDs=mkShade();
+const shDs=mkShade();
 function shade(el,wx,wy,sx,sy,s,z){const a=Math.atan2(-wy,bhOff-wx),k=Math.round(a*40);
  el.style.width=el.style.height=Math.round(s)+'px';el.style.transform='translate('+Math.round(sx-s/2)+'px,'+Math.round(sy-s/2)+'px)';el.style.zIndex=z;
  if(el._k===k)return;el._k=k;const L=[Math.cos(a)*.88,Math.sin(a)*.88,.47],g=el.getContext('2d'),im=g.createImageData(SHN,SHN),d=im.data;
@@ -260,6 +260,21 @@ function shade(el,wx,wy,sx,sy,s,z){const a=Math.atan2(-wy,bhOff-wx),k=Math.round
   const nz=Math.sqrt(1-r2),raw=Math.max(0,dx*L[0]+dy*L[1]+nz*L[2]),lit=Math.max(0,Math.min(1,Math.floor(raw*5+(BAY[(y&3)*4+(x&3)]/16-.5)*.6)/5+.1)),i=(y*SHN+x)*4;
   d[i]=4;d[i+1]=3;d[i+2]=12;d[i+3]=Math.round(Math.max(0,1-lit*1.25)*225)}
  g.putImageData(im,0,0)}
+const clC=document.createElement('canvas');clC.setAttribute('aria-hidden','true');let clLA=0,clMask=null,clMK=null;const CLN=128;
+// dithered light mask (alpha = darkness) for the current light angle; recomputed only when the angle moves
+function clMaskFor(a){const k=Math.round(a*40);if(clMK===k)return clMask;clMK=k;const L=[Math.cos(a)*.88,Math.sin(a)*.88,.47],m=new Float32Array(CLN*CLN*2);
+ for(let y=0;y<CLN;y++)for(let x=0;x<CLN;x++){const dx=(x+.5-CLN/2)/(CLN/2*.84),dy=(y+.5-CLN/2)/(CLN/2*.84),r2=Math.min(1,dx*dx+dy*dy),nz=Math.sqrt(1-r2),
+  raw=Math.max(0,dx*L[0]+dy*L[1]+nz*L[2]),lit=Math.max(0,Math.min(1,Math.floor(raw*5+(BAY[(y&3)*4+(x&3)]/16-.5)*.6)/5+.1)),j=(y*CLN+x)*2;
+  m[j]=Math.max(0,1-lit*1.25)*.85;m[j+1]=Math.max(0,1-raw)*Math.pow(Math.min(1,Math.sqrt(dx*dx+dy*dy)),2)}
+ return clMask=m}
+// bake: copy the current clover frame, darken its own pixels away from the blackhole, and add rainbow light from the TEST UR LUCK rings on the shadow side
+function bakeClov(){if(!inGal||!clov.complete||!clov.naturalWidth)return;if(clC.width!==CLN){clC.width=clC.height=CLN}const g=clC.getContext('2d',{willReadFrequently:true});
+ g.imageSmoothingEnabled=false;g.clearRect(0,0,CLN,CLN);g.drawImage(clov,0,0,CLN,CLN);const im=g.getImageData(0,0,CLN,CLN),d=im.data,m=clMaskFor(clLA),t=performance.now()/1000,ring=cta.hidden?.35:.75;
+ for(let i=0,j=0;i<d.length;i+=4,j+=2){if(!d[i+3])continue;const x=(i>>2)%CLN,y=(i>>2)/CLN|0,k=1-m[j],h=(Math.atan2(y-CLN/2,x-CLN/2)/6.283+t*.15)%1*6,rl=m[j+1]*ring*90;
+  const r=Math.max(0,Math.min(1,Math.abs(h-3)-1)),gg2=Math.max(0,Math.min(1,2-Math.abs(h-2))),b=Math.max(0,Math.min(1,2-Math.abs(h-4)));
+  d[i]=Math.min(255,d[i]*k+r*rl);d[i+1]=Math.min(255,d[i+1]*k+gg2*rl);d[i+2]=Math.min(255,d[i+2]*k+b*rl)}
+ g.putImageData(im,0,0)}
+(function clLoop(){if(inGal)bakeClov();requestAnimationFrame(clLoop)})();
 function placeOmni(){
  const bs=Math.max(40,BH_W*cam.z),bx=(bhOff-cam.x)*cam.z+GW/2,by=(0-cam.y)*cam.z+GH/2;
  bh.style.width=bh.style.height=Math.round(bs)+'px';bh.style.transform='translate('+Math.round(bx-bs/2)+'px,'+Math.round(by-bs/2)+'px)';
@@ -278,8 +293,8 @@ function placeOmni(){
  omni.style.transform='translate('+Math.round(ox-ms/2)+'px,'+Math.round(oy-ms/2)+'px)';
  // CTA is world-anchored to the Omniverse sprite: same world x, centered on the disc, scales with zoom
  {const[dx,dy]=dsPos(),q=Math.max(40,DS_W*1.3*cam.z);dsc.style.transform='translate('+Math.round((dx-cam.x)*cam.z+GW/2)+'px,'+Math.round((dy-cam.y)*cam.z+GH/2)+'px) scale('+(q/1000).toFixed(4)+') translate(-50%,-50%)'}
- if(shCl.parentNode!==gal)gal.append(shCl,shOm);
- shade(shCl,cx,cy,x,y,size*.84,clov.style.zIndex);shade(shOm,mx,my,ox,oy,ms*.8,omni.style.zIndex);
+ // V37: shade is baked into the clover sprite's own pixels (no overlay disc); the Maximum Omniverse stays full-bright
+ if(clC.parentNode!==gal)gal.append(clC);clLA=Math.atan2(-cy,bhOff-cx);clC.style.cssText=clov.style.cssText;clC.style.opacity='';clov.style.opacity='0';bakeClov();
  cta.style.transform='translate('+Math.round(x)+'px,'+Math.round(y)+'px) scale('+(size/1000).toFixed(4)+') translate(-50%,-50%)'}
 function resizeGal(){
  GW=innerWidth;GH=innerHeight;gsky.width=GW;gsky.height=GH;gg.imageSmoothingEnabled=false;
