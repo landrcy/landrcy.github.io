@@ -59,7 +59,7 @@ function frame(ms){
   {const vx=-g.ds[0],vy=-g.ds[1],m=Math.hypot(vx,vy)||1,ax=vx/m*.88,ay=vy/m*.88,az=.47;LT=[ax,ay,az]}}
  else{const v=window.__hubView&&window.__hubView(),b=document.body.classList;
   if(!v||v.sys!=='main'||b.contains('arch')||b.contains('galaxy')||b.contains('intro')){c.style.display='none';return requestAnimationFrame(frame)}
-  place(v.cam.z,v.cam.x,v.cam.y,v.W,v.H)}
+  place(v.cam.z,v.cam.x,v.cam.y,v.W,v.H);{const m=Math.hypot(WX,WY)||1;LT=[-WX/m*.88,-WY/m*.88,.47]}}
  if(c.style.display!=='none'&&ms-last>55){const dt=(ms-last)/1000;last=ms;if(stirring){let any=0;const f=Math.pow(.55,dt);for(let i=0;i<ST.length;i++)if(ST[i]){ST[i]=ST[i]*f<.01?0:ST[i]*f;any=1}stirring=any}paint(ms/1000)}
  requestAnimationFrame(frame)}
 paint(0);requestAnimationFrame(frame)})();
