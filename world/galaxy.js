@@ -52,19 +52,16 @@ const shipImg=document.createElement('img');shipImg.alt='';shipImg.draggable=fal
 back.appendChild(shipImg);
 // Omniverse CTA: tap the omniverse -> "roll for yourself..." + glitchy pixel PLAY link
 const cta=document.createElement('div');cta.id='omcta';cta.hidden=true;
-const ctaT=document.createElement('p');ctaT.textContent='roll for yourself\u2026';
+const ctaT=document.createElement('p');ctaT.className='lgtx';ctaT.textContent='roll for yourself\u2026';
 const play=document.createElement('a');play.id='omplay';play.href='https://rainbowroar14.github.io/RNG/';play.target='_blank';play.rel='noopener';play.setAttribute('aria-label','Play: roll for yourself');
 const pc=document.createElement('canvas');play.appendChild(pc);cta.append(ctaT,play);
-const PF={P:['111','101','111','100','100'],L:['100','100','100','100','111'],A:['010','101','111','101','101'],Y:['101','101','010','010','010'],'\u25B6':['100','110','111','110','100']};
-(()=>{const w='\u25B6 PLAY',S=6,pad=3;let cols=0;[...w].forEach(c=>cols+=c===' '?2:4);
- pc.width=(cols+pad*2-1)*S;pc.height=(5+pad*2)*S})();
+pc.width=16;pc.height=16;
 const px=pc.getContext('2d');
-function drawPlay(){const S=6,pad=3;px.fillStyle='#000';px.fillRect(0,0,pc.width,pc.height);
- px.fillStyle='#fff';px.fillRect(0,0,pc.width,S);px.fillRect(0,pc.height-S,pc.width,S);px.fillRect(0,0,S,pc.height);px.fillRect(pc.width-S,0,S,pc.height);
- let x=pad;for(const c of '\u25B6 PLAY'){if(c===' '){x+=2;continue}PF[c].forEach((r,y)=>[...r].forEach((b,i)=>{if(b==='1')px.fillRect((x+i)*S,(pad+y)*S,S,S)}));x+=4}}
+const PP=[['#7a0014','M4 2h2v1h2v1h2v1h2v1h2v4h-2v1h-2v1h-2v1h-2v1h-2z'],['#ff2a4a','M5 4h1v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-1z'],['#ffd0d8','M5 8h1v3h-1zM6 9h2v1h-2z']];
+function drawPlay(){px.clearRect(0,0,16,16);for(const[f,d]of PP){px.fillStyle=f;px.fill(new Path2D(d))}}
 drawPlay();
 let glT=0;
-function glitch(){if(cta.hidden||RM)return;const S=6,n=2+(Math.random()*5|0);
+function glitch(){if(cta.hidden||RM)return;const S=1,n=2+(Math.random()*5|0);
  for(let k=0;k<n;k++){const w=S*(2+(Math.random()*6|0)),h=S*(1+(Math.random()*2|0));
   const sx=(Math.random()*(pc.width-w)/S|0)*S,sy=(Math.random()*(pc.height-h)/S|0)*S;
   const dx=Math.max(0,Math.min(pc.width-w,sx+S*((Math.random()*7|0)-3)));
