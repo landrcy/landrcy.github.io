@@ -1,5 +1,5 @@
 /* Wormhole in the hub corner. Click it to fall through a hex tunnel into a red blood-nebula galaxy
-   whose centerpiece is the maximum Omniverse. The little ship, empty space,
+   whose center is the F blackhole, with the maximum Omniverse orbiting it. The little ship, empty space,
    or Escape comes back. The portal is a world-space object far out in the white void past the outer orbits, so it pans and zooms with the solar system. */
 (()=>{
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -9,6 +9,10 @@ const WH_GIF='world/assets/wormhole/wormhole-glitch.gif';
 const WH_STILL='world/assets/wormhole/wormhole-still.png';
 const OM_GIF='world/assets/omniverse/omniverse-spin.gif';
 const OM_STILL='world/assets/omniverse/omniverse-max.png';
+// F blackhole: the galaxy's sun. Glitch-in plays once on arrival, then the loop takes over.
+const BH_IN='world/assets/blackhole-f/bh-in.gif',BH_LOOP='world/assets/blackhole-f/bh-loop.gif',BH_STILL='world/assets/blackhole-f/bh-still.png',BH_IN_MS=14*60;
+// world layout: blackhole at origin, the Omniverse orbits it on a flattened ring like the hub planets
+const BH_W=760,OM_W=620,ORB=1250,SQ=.6,OM_PER=46;
 
 const worm=document.createElement('button');
 worm.type='button';worm.id='worm';
@@ -36,11 +40,14 @@ const rg=rush.getContext('2d');
 const gal=document.createElement('div');
 gal.id='galaxy';gal.hidden=true;
 const gsky=document.createElement('canvas');
-gsky.id='gsky';gsky.setAttribute('aria-label','Blood nebula galaxy. The Maximum Omniverse is at the center. Drag to fly; the little ship at the bottom right flies you back to the hub.');
+gsky.id='gsky';gsky.setAttribute('aria-label','Blood nebula galaxy. The F blackhole is at the center, with the Maximum Omniverse orbiting it. Drag to fly; the little ship at the bottom right flies you back to the hub.');
 const gg=gsky.getContext('2d');
 const omni=document.createElement('img');
 omni.id='omni';omni.alt='Maximum Omniverse';omni.draggable=false;
 omni.src=OM_STILL;
+const bh=document.createElement('img');bh.id='bhf';bh.alt='F blackhole';bh.draggable=false;bh.src=BH_STILL;
+bh.style.cssText='position:absolute;left:0;top:0;image-rendering:pixelated;pointer-events:none;user-select:none;z-index:2';
+omni.style.zIndex=3;
 // little pixel ship: the way back out to the hub (the wormhole button is hidden in here)
 const back=document.createElement('button');
 back.type='button';back.id='ship';back.setAttribute('aria-label','Fly the ship back to the hub');
@@ -82,13 +89,14 @@ function glitchLoop(){clearTimeout(glT);if(cta.hidden)return;glT=setTimeout(()=>
 function showCta(on){cta.hidden=!on;if(on){cta.classList.remove('fin');void cta.offsetWidth;cta.classList.add('fin');placeOmni()}if(on){drawPlay();glitchLoop()}else clearTimeout(glT)}
 cta.addEventListener('pointerdown',e=>e.stopPropagation());
 cta.addEventListener('click',e=>e.stopPropagation());
-gal.append(gsky,omni,cta,back);
+cta.style.zIndex=5;gal.append(gsky,bh,omni,cta,back);
 document.body.appendChild(gal);
 
 const tip=document.getElementById('tip');
 let busy=false,inGal=false,holdTip=false;
 const cam={x:0,y:0,z:1};
-let GW=1,GH=1,neb=null,stars=[],omniPx=0;
+let GW=1,GH=1,neb=null,stars=[],omniPx=0,omAng=.55,omSf=1,omHov=false,gLast=0,bhT=0;
+function omPos(){return[Math.cos(omAng)*ORB,Math.sin(omAng)*ORB*SQ]}
 
 function showTip(text,x,y){if(!tip)return;tip.textContent=text;tip.style.left=(x+14)+'px';tip.style.top=(y+14)+'px';tip.classList.add('on');holdTip=true}
 function hideTip(){if(!tip||!holdTip)return;tip.classList.remove('on');holdTip=false}
@@ -191,9 +199,14 @@ function buildStars(){
 
 function fitCam(){cam.z=fitZ();cam.x=0;cam.y=0}
 function placeOmni(){
- const size=Math.max(48,980*cam.z);
+ const bs=Math.max(40,BH_W*cam.z),bx=(0-cam.x)*cam.z+GW/2,by=(0-cam.y)*cam.z+GH/2;
+ bh.style.width=bh.style.height=Math.round(bs)+'px';bh.style.transform='translate('+Math.round(bx-bs/2)+'px,'+Math.round(by-bs/2)+'px)';
+ const[wx,wy]=omPos();
+ const size=Math.max(48,OM_W*cam.z);
  omniPx=size;
- const x=(0-cam.x)*cam.z+GW/2,y=(0-cam.y)*cam.z+GH/2;
+ // behind the blackhole on the far half of the ring, in front on the near half
+ omni.style.zIndex=wy<0?1:3;
+ const x=(wx-cam.x)*cam.z+GW/2,y=(wy-cam.y)*cam.z+GH/2;
  omni.style.width=Math.round(size)+'px';omni.style.height=Math.round(size)+'px';
  omni.style.transform='translate('+Math.round(x-size/2)+'px,'+Math.round(y-size/2)+'px)';
  // CTA is world-anchored to the Omniverse sprite: same world x, centered on the disc, scales with zoom
@@ -215,19 +228,27 @@ function drawGal(now){
   gg.globalAlpha=tw;gg.fillStyle=s.c;gg.fillRect(x,y,ps,ps);gg.globalAlpha=1}
  // soft crimson vignette in chunky bands
  for(let i=0;i<4;i++){const m=(i+1)*Math.max(8,pxScale()*6);gg.fillStyle='rgba(20,2,6,.22)';gg.fillRect(0,0,GW,m);gg.fillRect(0,GH-m,GW,m);gg.fillRect(0,0,m,GH);gg.fillRect(GW-m,0,m,GH)}
+ // orbit: hover slows, open CTA stops it (like the hub planets)
+ const dt=Math.min(.05,gLast?(now-gLast)/1000:0);gLast=now;
+ const tg=RM||!cta.hidden?0:omHov?.35:1;omSf+=(tg-omSf)*Math.min(1,dt*4);omAng+=dt*Math.PI*2/OM_PER*omSf;
+ // orbit ring: fading pixel trail behind the Omniverse
+ {const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#ff8a7a';
+  for(let k=1;k<=n;k++){const f=k/n,an=omAng-arc*f,sx=(Math.cos(an)*ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
  placeOmni()}
 let gLoop=0;
 function galFrame(now){if(!inGal){gLoop=0;return}drawGal(now);gLoop=requestAnimationFrame(galFrame)}
 
 function armOmni(){if(omni.dataset.arm)return;omni.dataset.arm='1';omni.src=RM?OM_STILL:OM_GIF}
+// replay the F glitch-in each arrival, then hand off to the loop
+function bhArrive(){clearTimeout(bhT);if(RM){bh.src=BH_STILL;return}bh.src=BH_IN+'?t='+Date.now();bhT=setTimeout(()=>{if(inGal)bh.src=BH_LOOP},BH_IN_MS)}
 
 function showGalaxy(){
- inGal=true;armOmni();gal.hidden=false;document.body.classList.add('galaxy');
+ inGal=true;armOmni();bhArrive();gLast=0;gal.hidden=false;document.body.classList.add('galaxy');
  window.__galaxyHold=true;resizeGal();fitCam();
  worm.setAttribute('aria-label','Return through the wormhole');
  if(!gLoop)gLoop=requestAnimationFrame(galFrame)}
 function hideGalaxy(){
- inGal=false;showCta(false);document.body.classList.remove('galaxy');gal.hidden=true;
+ inGal=false;clearTimeout(bhT);bh.src=BH_STILL;showCta(false);document.body.classList.remove('galaxy');gal.hidden=true;
  window.__galaxyHold=false;worm.setAttribute('aria-label','Wormhole');hideTip()}
 
 function portalOrigin(){const el=inGal?back:worm,r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,s:inGal?r.width*1.6:r.width}}
@@ -275,7 +296,7 @@ gsky.addEventListener('pointerdown',e=>{
  if(pts.size===2){const[a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),z:cam.z}}});
 gsky.addEventListener('pointermove',e=>{
  if(!pts.has(e.pointerId)){
-  gsky.style.cursor=overOmni(e.clientX,e.clientY)?'pointer':'grab';
+  omHov=overOmni(e.clientX,e.clientY);gsky.style.cursor=omHov?'pointer':'grab';
   if(overOmni(e.clientX,e.clientY))showTip('Maximum Omniverse \u2014 tap to roll',e.clientX,e.clientY);
   else if(holdTip&&tip&&tip.textContent.startsWith('Maximum Omniverse'))hideTip();
   return}
@@ -291,21 +312,21 @@ function endPtr(e){const was=moved;pts.delete(e.pointerId);if(pts.size<2)pinch=n
 gsky.addEventListener('pointerup',endPtr);
 gsky.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);pinch=null;gsky.classList.remove('drag')});
 function zoomAt(sx,sy,f){
- const nz=Math.max(fitZ()*.42,Math.min(fitZ()*3.2,cam.z*f));
+ const nz=Math.max(fitZ()*.42,Math.min(fitZ()*6,cam.z*f));
  const wx=cam.x+(sx-GW/2)/cam.z,wy=cam.y+(sy-GH/2)/cam.z;
  cam.z=nz;cam.x=wx-(sx-GW/2)/nz;cam.y=wy-(sy-GH/2)/nz;clampCam()}
 function fitZ(){
- // the gif has transparent padding; size the box so the ring itself fills the view
- const artW=.92,artH=.66;
- return Math.min(GW*.96/artW,GH*.86/artH)/980}
+ // frame the whole orbit (ring + Omniverse art at both ends) around the blackhole
+ const w=2*ORB+OM_W*.92,h=2*ORB*SQ+OM_W*.66+BH_W*.2;
+ return Math.min(GW*.94/w,GH*.88/h)}
 function clampCam(){
- const lim=980*.55;cam.x=Math.max(-lim,Math.min(lim,cam.x));cam.y=Math.max(-lim*.8,Math.min(lim*.8,cam.y))}
+ const lim=ORB*1.05;cam.x=Math.max(-lim,Math.min(lim,cam.x));cam.y=Math.max(-lim*SQ,Math.min(lim*SQ,cam.y))}
 gsky.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*.0014))},{passive:false});
 addEventListener('resize',()=>{if(inGal){resizeGal();cam.z=fitZ()}});
 
 buildStars();if(P)buildNeb();
 // warm the spin after the hub has painted, so the corner gif stays the first download
-if(!RM)addEventListener('load',()=>{setTimeout(()=>{const i=new Image();i.src=OM_GIF},1200)},{once:true});
+if(!RM)addEventListener('load',()=>{setTimeout(()=>{for(const u of[OM_GIF,BH_IN,BH_LOOP]){const i=new Image();i.src=u}},1200)},{once:true});
 
 window.__worm={
  travel,galaxy:()=>{if(!inGal&&!busy){armOmni();showGalaxy()}},
