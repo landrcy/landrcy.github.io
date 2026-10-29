@@ -347,13 +347,13 @@ function resizeGal(){
 function drawGal(now){
  if(!inGal)return;
  gg.imageSmoothingEnabled=false;gg.fillStyle='#140206';gg.fillRect(0,0,GW,GH);
- const T=512,ox=Math.round(((cam.x*.08)%T+T)%T),oy=Math.round(((cam.y*.08)%T+T)%T);
+ const T=512,ox=0,oy=0;/* V62: background fixed, no drag parallax */
  if(neb){gg.globalAlpha=.92;for(let y=-oy;y<GH;y+=T)for(let x=-ox;x<GW;x+=T)gg.drawImage(neb,x,y,T,T);gg.globalAlpha=1;
   if(FFC){const ps=pxScale(),n=Math.max(40,Math.min(160,Math.round(VS_ORB*cam.z*2.4/(ps*3)))),arc=2.4;for(let k=1;k<=n;k++){const f=k/n,an=vsAng-arc*f,sx=(Math.cos(an)*VS_ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*VS_ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.65;if(al<.02||(k%2&&f>.35))continue;gg.fillStyle=k%5?'#5ee6ff':'#c9a6ff';gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}}
  else{const grd=gg.createRadialGradient(GW/2,GH/2,40,GW/2,GH/2,Math.max(GW,GH)*.7);grd.addColorStop(0,'#6a1420');grd.addColorStop(1,'#140206');gg.fillStyle=grd;gg.fillRect(0,0,GW,GH)}
  const t=now/1000;
  for(const s of stars){
-  let x=((s.x*GW*1.4-cam.x*s.s*.15)%GW+GW)%GW,y=((s.y*GH*1.4-cam.y*s.s*.15)%GH+GH)%GH;
+  let x=((s.x*GW*1.4)%GW+GW)%GW,y=((s.y*GH*1.4)%GH+GH)%GH;
   const ps=s.s;x=Math.round(x/ps)*ps;y=Math.round(y/ps)*ps;
   const tw=RM?1:.55+.45*Math.sin(t*(.6+s.s*.4)+s.p);if(tw<.2&&s.s===1)continue;
   gg.globalAlpha=tw;gg.fillStyle=s.c;gg.fillRect(x,y,ps,ps);gg.globalAlpha=1}
@@ -449,7 +449,7 @@ addEventListener('keydown',e=>{
 // fly the galaxy: drag pans, wheel / pinch zooms, a quiet click on empty space returns
 const pts=new Map();let moved=0,pinch=null;
 function overMoon(x,y){const r=omni.getBoundingClientRect();return Math.hypot(x-r.left-r.width/2,y-r.top-r.height/2)<r.width*.4}
-function unfocusG(){gfoc=null;showCta(false);showDs(false);showPb(false);showVs(false)}
+function unfocusG(){const had=gfoc;gfoc=null;showCta(false);showDs(false);showPb(false);showVs(false);if(had&&inGal&&typeof fitCamSoft==='function')fitCamSoft()/* V62: leave planet zooms out like hub */}
 function overOmni(x,y){const r=clov.getBoundingClientRect();const cx=r.left+r.width/2,cy=r.top+r.height/2,rad=r.width*.42;return Math.hypot(x-cx,y-cy)<rad}
 // V60: planets hand their pointerdown to the sky so drag pans over them; a tap (no drag) runs the planet's own click
 let tapCb=null;window.__galGrab=(e,cb)=>{tapCb=cb||null;gskyDown(e)};
@@ -469,7 +469,7 @@ gsky.addEventListener('pointermove',e=>{
  if(pts.size===2&&pinch){const[a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);zoomAt((a[0]+b[0])/2,(a[1]+b[1])/2,pinch.z*(d/(pinch.d||1))/cam.z)}
  else{gfoc=null;cam.x-=dx/cam.z;cam.y-=dy/cam.z;clampCam()}});
 function endPtr(e){const was=moved,tc=tapCb;tapCb=null;pts.delete(e.pointerId);if(pts.size<2)pinch=null;gsky.classList.remove('drag');
- if(e.type!=='pointerup'||was>=6||busy)return;if(tc){tc(e);return}
+ if(e.type!=='pointerup'||was>=6||busy)return;if(tc&&tc(e)!==false)return;
  if(overMoon(e.clientX,e.clientY)&&omni.style.zIndex>clov.style.zIndex||!overOmni(e.clientX,e.clientY)&&overMoon(e.clientX,e.clientY)){showCta(false);showDs(false);gfoc=gfoc==='om'?null:'om';return}
  if(overOmni(e.clientX,e.clientY)){if(gfoc==='cl'){unfocusG()}else{showDs(false);gfoc='cl';showCta(true)}return}
  if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden||!vsc.hidden)){unfocusG();return}

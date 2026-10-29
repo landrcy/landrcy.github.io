@@ -34,7 +34,7 @@ const onBall=e=>{const r=c.getBoundingClientRect();return Math.hypot((e.clientX-
 let down=null;
 c.addEventListener('pointermove',e=>{if(onBall(e)){c.style.cursor='pointer';tipOn(1,e);window.__galHov='pb'}else{c.style.cursor='';tipOn(0);if(window.__galHov==='pb')window.__galHov=null}});
 c.addEventListener('pointerleave',()=>{tipOn(0);if(window.__galHov==='pb')window.__galHov=null});
-c.addEventListener('pointerdown',e=>{e.stopPropagation();if(window.__galGrab){window.__galGrab(e,ev=>{if(onBall(ev)&&window.__galPB)window.__galPB()});return}if(onBall(e))down=[e.clientX,e.clientY]});
+c.addEventListener('pointerdown',e=>{e.stopPropagation();if(window.__galGrab){window.__galGrab(e,ev=>{if(onBall(ev)&&window.__galPB){window.__galPB();return}return false});return}if(onBall(e))down=[e.clientX,e.clientY]});
 c.addEventListener('pointerup',e=>{if(down){e.stopPropagation();if(Math.hypot(e.clientX-down[0],e.clientY-down[1])<8&&window.__galPB)window.__galPB()}down=null});
 c.addEventListener('click',e=>{if(onBall(e))e.stopPropagation()});
 c.addEventListener('wheel',e=>{const s=document.getElementById('gsky');if(s){e.preventDefault();s.dispatchEvent(new WheelEvent('wheel',e))}},{passive:false});
