@@ -372,7 +372,7 @@ function drawGal(now){
  {const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#7aff8a';
   for(let k=1;k<=n;k++){const f=k/n,an=omAng-arc*f,sx=(Math.cos(an)*ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
  // hub-style focus: fly + zoom the camera onto the clicked body
- if(gfoc){const[fx,fy]=gfoc==='bh'?[0,0]:gfoc==='om'?omPos():gfoc==='ds'?dsPos():gfoc==='pb'?pbPos():gfoc==='vs'?vsPos():clPos(),zt=Math.min(GW,GH)*(gfoc==='bh'?.9:gfoc==='om'?.55:.62)/(gfoc==='bh'?BH_W:gfoc==='om'?OM_W:gfoc==='ds'?DS_W:gfoc==='pb'?PB_W:gfoc==='vs'?VS_W:CL_W),k=Math.min(1,dt*(RM?60:5));cam.x+=(fx-cam.x)*k;cam.y+=(fy-cam.y)*k;cam.z*=Math.pow(zt/cam.z,k)}
+ if(gfoc){const[fx,fy]=gfoc==='bh'?[0,0]:gfoc==='om'?omPos():gfoc==='ds'?dsPos():gfoc==='pb'?pbPos():gfoc==='vs'?vsPos():clPos(),zt=Math.min(GW,GH)*(gfoc==='bh'?.9:gfoc==='om'?.55:.62)/(gfoc==='bh'?BH_W:gfoc==='om'?OM_W:gfoc==='ds'?DS_W:gfoc==='pb'?PB_W:gfoc==='vs'?VS_W:CL_W),k=Math.min(1,dt*(RM?60:5));if(gfoc!==gZf){gZf=gfoc;gZm=1}gZt=zt;cam.x+=(fx-cam.x)*k;cam.y+=(fy-cam.y)*k;cam.z*=Math.pow(zt*gZm/cam.z,k)}
  // V33 (/ffc): WASD flight relative to the F blackhole. W/S fly toward/away from it, A/D strafe around it; the ship always faces it
  if(FFC){let vx=0,vy=0;const kw=gKeys.has('w'),ks=gKeys.has('s'),ka=gKeys.has('a'),kd=gKeys.has('d');
   if(kw||ks||ka||kd){gfoc=null;showCta(false);showDs(false);const r=Math.hypot(cam.x,cam.y/SQ),ux=r>1?-cam.x/r:0,uy=r>1?-cam.y/SQ/r:-1,sp=Math.max(1200,r*.9)*dt;
@@ -475,7 +475,10 @@ function endPtr(e){const was=moved;pts.delete(e.pointerId);if(pts.size<2)pinch=n
  if(!FFC)travel(false)}
 gsky.addEventListener('pointerup',endPtr);
 gsky.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);pinch=null;gsky.classList.remove('drag')});
+// V52: zooming while focused keeps the body centred, only scaling the camera (zoom-in capped at the focus framing)
+let gZm=1,gZf=null,gZt=1;
 function zoomAt(sx,sy,f){
+ if(gfoc){const z=Math.max(fitZ()*.42,Math.min(gZt,cam.z*f));gZm=z/(gZt||1);cam.z=z;return}
  const nz=Math.max(fitZ()*.42,Math.min(fitZ()*40,cam.z*f));
  const wx=cam.x+(sx-GW/2)/cam.z,wy=cam.y+(sy-GH/2)/cam.z;
  cam.z=nz;cam.x=wx-(sx-GW/2)/nz;cam.y=wy-(sy-GH/2)/nz;clampCam()}
@@ -485,7 +488,7 @@ function fitZ(){
  return Math.min(GW*.94/w,GH*.88/h)}
 function clampCam(){
  const lim=Math.max(ORB+MO,DS_ORB+DS_W*.6)*1.05;cam.x=Math.max(-lim*1.45,Math.min(lim,cam.x));cam.y=Math.max(-lim*SQ*1.5,Math.min(lim*SQ,cam.y))}
-gsky.addEventListener('wheel',e=>{e.preventDefault();gfoc=null;zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*.0014))},{passive:false});
+gsky.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*.0014))},{passive:false});
 addEventListener('resize',()=>{if(inGal){resizeGal();cam.z=fitZ()}});
 
 buildStars();if(P)buildNeb();
