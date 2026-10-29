@@ -106,17 +106,17 @@ const fmt=n=>n==null?'-':n.toLocaleString('en-US'),TV=CH.reduce((a,c)=>a+(c.view
 const B=(o)=>Object.assign({ang:0,sf:1,pop:0,next:0},o);
 const MAIN=[
  B({id:'sun',paint:'sun',w:362,x:0,y:0,hr:.36,title:'Laverse',by:'games & websites by Landry',blurb:'Every planet is one of my sites. Click a planet to fly to it.'}),
- B({id:'ashaad',paint:'ashaad',w:99,h:90,orb:420,per:50,ph:2.2,hr:.42,title:'The Binding of Ashaad',by:'a brainrot roguelike by landrcy',blurb:'Descend into the basement, shoot your tears, grab cursed items and survive in this browser roguelike. 3 starters, 4 floors, 1 secret Finley boss.',href:'https://landrcy.github.io/binding-of-ashaad/',cta:'▶ Play'}),
- B({id:'sea',paint:'sea',w:183,orb:690,per:72,ph:.4,hr:.4,title:'Sea of Thought',by:'a pixel ocean by landrcy',blurb:'A quiet pixel ocean full of messages in bottles: write one, throw it in, then dive and read what strangers left behind.',href:'https://landrcy.github.io/sea-of-thought/',cta:'▶ Dive in'}),
- B({id:'yt',paint:'yt',w:144,orb:2160,per:140,ph:4.1,hr:.42,title:'LLC Powered Channels',by:'YouTube',yt:1,href:'youtube/'}),
- B({id:'gow',paint:'crest',w:138,h:111,orb:3990,per:315,ph:5.3,hr:.42,title:'Cooper City'}),
- B({id:'void',paint:'void',w:295,h:295,orb:3290,per:245,ph:5.9,tc:'#c04df0',hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13}),
- B({id:'arena',paint:'arena',w:201,h:165,orb:2840,per:185,ph:2.9,hr:.42,title:'Ball Arena',by:'ball fights from the Langrino channel',href:'https://www.youtube.com/@Langrino',cta:'▶ Watch'}),
- B({id:'pmuseum',paint:'temple',w:225,orb:1100,per:98,ph:1.4,hr:.4,title:'Pixel Museum',href:'https://landrcy.github.io/pixel-museum/',cta:'▶ Visit'}),
- B({id:'typefall',paint:'typef',w:156,orb:1490,per:110,ph:3.3,hr:.32,title:'typefall',href:'/typefall/',cta:'▶ Play'}),
- B({id:'ttt',paint:'tung',w:150,orb:2510,per:160,ph:1.9,hr:.32,title:'Talk to Tung',href:'/ttt/',cta:'▶ Play'}),
- B({id:'lan4drcy',paint:'lan4',w:168,orb:1795,per:125,ph:.9,hr:.42,title:'lan4drcy',href:'/lan4drcy/',cta:'▶ Play'}),
- B({id:'wam',paint:'wam',w:156,orb:3705,per:272,ph:3.6,hr:.4,title:'W.A.M.',href:'https://landrcy.github.io/wam/',cta:'▶ Play'})];
+ B({id:'ashaad',paint:'ashaad',w:99,h:90,orb:375,per:50,ph:2.2,hr:.42,title:'The Binding of Ashaad',by:'a brainrot roguelike by landrcy',blurb:'Descend into the basement, shoot your tears, grab cursed items and survive in this browser roguelike. 3 starters, 4 floors, 1 secret Finley boss.',href:'https://landrcy.github.io/binding-of-ashaad/',cta:'▶ Play'}),
+ B({id:'sea',paint:'sea',w:183,orb:625,per:72,ph:.4,hr:.4,title:'Sea of Thought',by:'a pixel ocean by landrcy',blurb:'A quiet pixel ocean full of messages in bottles: write one, throw it in, then dive and read what strangers left behind.',href:'https://landrcy.github.io/sea-of-thought/',cta:'▶ Dive in'}),
+ B({id:'yt',paint:'yt',w:144,orb:1855,per:140,ph:4.1,hr:.42,title:'LLC Powered Channels',by:'YouTube',yt:1,href:'youtube/'}),
+ B({id:'gow',paint:'crest',w:138,h:111,orb:3470,per:315,ph:5.3,hr:.42,title:'Cooper City'}),
+ B({id:'void',paint:'void',w:295,h:295,orb:2830,per:245,ph:5.9,tc:'#c04df0',hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13}),
+ B({id:'arena',paint:'arena',w:201,h:165,orb:2420,per:185,ph:2.9,hr:.42,title:'Ball Arena',by:'ball fights from the Langrino channel',href:'https://www.youtube.com/@Langrino',cta:'▶ Watch'}),
+ B({id:'pmuseum',paint:'temple',w:225,orb:970,per:98,ph:1.4,hr:.4,title:'Pixel Museum',href:'https://landrcy.github.io/pixel-museum/',cta:'▶ Visit'}),
+ B({id:'typefall',paint:'typef',w:156,orb:1295,per:110,ph:3.3,hr:.32,title:'typefall',href:'/typefall/',cta:'▶ Play'}),
+ B({id:'ttt',paint:'tung',w:150,orb:2115,per:160,ph:1.9,hr:.32,title:'Talk to Tung',href:'/ttt/',cta:'▶ Play'}),
+ B({id:'lan4drcy',paint:'lan4',w:168,orb:1580,per:125,ph:.9,hr:.42,title:'lan4drcy',href:'/lan4drcy/',cta:'▶ Play'}),
+ B({id:'wam',paint:'wam',w:156,orb:3210,per:272,ph:3.6,hr:.4,title:'W.A.M.',href:'https://landrcy.github.io/wam/',cta:'▶ Play'})];
 const MOONS=CH.map((c,i)=>B({id:'m-'+c.id,paint:'moon',arg:c.kind,w:Math.round(12+14*Math.sqrt((c.views||0)/MV)),orb:66+i*9,per:9+i*2.6,ph:i*1.3,dir:1,hr:.42,moon:c,title:c.name}));
 // Pixel Museum room moons: one animated relic per museum room, two rings (west wing sites inside, east wing vaults outside)
 const PMU=MAIN.find(b=>b.id==='pmuseum'),PMURL='https://landrcy.github.io/pixel-museum/#';
@@ -144,7 +144,7 @@ for(const b of [...MAIN,...MOONS,...ARCH]){b.S={N:0};b.L=[].map(([dv0])=>{const 
 let sys='main',bodies=MAIN;
 // ---- camera ----
 const cam={x:0,y:0,z:1};let tw=null,focus=null,hover=null,intro=RM?null:{t0:performance.now()};if(intro)document.body.classList.add('intro');
-function fitZ(){const ext=sys==='main'?(W<H?[4150,3920]:[7170,4440]):(W<H?[490,300]:[490,300]);return Math.min(W/(2*ext[0]),(H-90)/(2*ext[1]))}
+function fitZ(){const ext=sys==='main'?(W<H?[3610,3410]:[6240,3860]):(W<H?[490,300]:[490,300]);return Math.min(W/(2*ext[0]),(H-90)/(2*ext[1]))}
 function fitX(){return 0}
 function fitY(){return 0}
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
@@ -532,7 +532,7 @@ const UFO={sz:22,asp:.5,cap:32,name:'UFO?!',paint:(u,v,x,y,N)=>{const dx=(u-.5)*
 // layout (seeded, stable): only in the empty space between the outer orbit and the tear, never on the planets
 const DECO={back:[],world:[]};
 (function(){const inZone=(x,y,m)=>Math.hypot(x,y/SQ)>4150+m&&inMain(x,y)&&inMain(x+m,y)&&inMain(x-m,y)&&inMain(x,y+m)&&inMain(x,y-m);
- const put=(o,pf,m,tries=300)=>{for(let t=0;t<tries;t++){const x=(DK()*2-1)*6800,y=(DK()*2-1)*8300;if(pf===1?!inZone(x,y,m):!(inMain(x,y)&&Math.hypot(x,y/SQ)>4100+o.sz*.35))continue;if(pf<1&&DECO.back.some(q=>Math.hypot(q.x-x,q.y-y)<(q.sz+o.sz)*.45))continue;if(pf===1&&DECO.world.some(q=>Math.hypot(q.x-x,q.y-y)<q.sz+o.sz+90))continue;o.x=x;o.y=y;return o}return null};
+ const put=(o,pf,m,tries=300)=>{for(let t=0;t<tries;t++){const x=(DK()*2-1)*6800,y=(DK()*2-1)*8300;if(pf===1?!inZone(x,y,m):!(inMain(x,y)&&Math.hypot(x,y/SQ)>3600+o.sz*.35))continue;if(pf<1&&DECO.back.some(q=>Math.hypot(q.x-x,q.y-y)<(q.sz+o.sz)*.45))continue;if(pf===1&&DECO.world.some(q=>Math.hypot(q.x-x,q.y-y)<q.sz+o.sz+90))continue;o.x=x;o.y=y;return o}return null};
  for(let i=0;i<11;i++){const o=put(nebula(i,NPAL[i%3],700+DK()*900),.55,0);if(o){o.pf=.55;o.dx=(DK()-.5)*3;o.dy=(DK()-.5)*2;DECO.back.push(o)}}
  for(let i=0;i<6;i++){const o=put(galaxy(i,i%3===2,110+DK()*150),.3,0);if(o){o.pf=.3;DECO.back.push(o)}}
  for(let i=0;i<5;i++){const o=put(farPlanet(i,45+DK()*80),.4,0);if(o){o.pf=.4;DECO.back.push(o)}}
