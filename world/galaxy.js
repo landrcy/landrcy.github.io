@@ -111,7 +111,7 @@ document.fonts&&document.fonts.load("64px 'Silkscreen'").then(drawDsT);drawDsT()
 const dsP=document.createElement('a');dsP.id='dsplay';dsP.href='https://rainbowroar14.github.io/Sites/DeepSea/';dsP.target='_blank';dsP.rel='noopener';dsP.setAttribute('aria-label','Play Deep Sea');
 {const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d');for(const[f,d]of[['#0a3270',PP[0][1]],['#62b8f4',PP[1][1]],['#c4ecff',PP[2][1]]]){g.fillStyle=f;g.fill(new Path2D(d))}dsP.appendChild(c)}
 dsc.append(dsT,dsP);dsc.style.zIndex=5;
-dsP.addEventListener('pointerdown',e=>e.stopPropagation());dsP.addEventListener('pointermove',e=>{const f=document.getElementById('fishp');if(f)f.dispatchEvent(new PointerEvent('pointermove',{clientX:e.clientX,clientY:e.clientY,pointerId:e.pointerId,bubbles:false}))});dsc.addEventListener('click',e=>e.stopPropagation());
+dsP.addEventListener('pointerdown',e=>e.stopPropagation());dsc.addEventListener('click',e=>e.stopPropagation());
 function showDs(on){dsc.hidden=!on;if(on){dsc.classList.remove('fin');void dsc.offsetWidth;dsc.classList.add('fin')}}
 // V41 paper-ball planet CTA (FFC): same zoom-in title + play pattern as Deep Sea
 const PB_URL='https://rainbowroar14.github.io/FinleyChang.com-Unblocked24/';
@@ -564,3 +564,9 @@ window.__worm={
 // /ffc/ is the alternate dimension as its own page: boot straight into the galaxy and fade the veil away
 if(FFC){const boot=()=>{const so=window.__solar;if(so&&so.skip)so.skip();document.body.classList.remove('intro');showGalaxy();requestAnimationFrame(()=>requestAnimationFrame(()=>{veil.style.opacity='0'}))};document.readyState==='complete'?boot():addEventListener('load',boot,{once:true})}
 })();
+
+// V61: Play buttons stay clickable but forward hover/move to whatever is underneath (planet, water, Volt beams, sky)
+(()=>{const SEL='#omplay,#dsplay,#pbplay,.seaplay,.lgplay',CT='#omcta,#dscta,#pbcta,#vscta,#info';
+document.addEventListener('pointermove',e=>{const b=e.target.closest&&e.target.closest(SEL);if(!b||e.__fw)return;
+ const u=document.elementsFromPoint(e.clientX,e.clientY).find(el=>!el.closest(SEL)&&!el.closest(CT));if(!u)return;
+ const f=new PointerEvent('pointermove',{clientX:e.clientX,clientY:e.clientY,screenX:e.screenX,screenY:e.screenY,pointerId:e.pointerId,pointerType:e.pointerType,bubbles:true});f.__fw=1;u.dispatchEvent(f)},true)})();
