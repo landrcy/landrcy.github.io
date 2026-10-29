@@ -94,15 +94,18 @@ function showCta(on){cta.hidden=!on;if(on){cta.classList.remove('fin');void cta.
 cta.addEventListener('pointerdown',e=>e.stopPropagation());
 cta.addEventListener('click',e=>e.stopPropagation());
 cta.style.zIndex=5;
-// Finley mode: tap F -> it slides aside and "inley" glitches in letter by letter in Allura
+// Finley mode: tap F -> pixel F slides to left edge of the aura, "inley" glitches in rightward (Silkscreen, same as hub text)
 const finW=document.createElement('div');finW.id='finw';finW.setAttribute('aria-hidden','true');
-finW.style.cssText="position:absolute;left:0;top:0;z-index:6;pointer-events:none;font-family:'Allura',cursive;color:#ffe6ea;white-space:nowrap;line-height:1;transform-origin:0 50%;text-shadow:0 0 18px #ff1e32,0 0 4px #000";
-let finT=[];
+finW.style.cssText="position:absolute;left:0;top:0;z-index:6;pointer-events:none;font-family:Silkscreen,monospace;font-weight:700;color:#ffe6ea;white-space:nowrap;line-height:1;transform-origin:0 50%;text-shadow:0 0 18px #ff1e32,0 0 4px #000";
+let finT=[],finP=0,finR=0;
+const coreC=document.createElement('div');coreC.setAttribute('aria-hidden','true');coreC.style.cssText='position:absolute;left:0;top:0;z-index:5;pointer-events:none;border-radius:50%;background:radial-gradient(circle,#000 62%,rgba(0,0,0,0) 72%);opacity:0';
+function finRatio(){if(finR)return finR;const c=document.createElement('canvas').getContext('2d');c.font="700 100px Silkscreen";const w=c.measureText('Finley').width/100;if(document.fonts&&document.fonts.check&&document.fonts.check("700 10px Silkscreen"))finR=w;return w||4.2}
+if(document.fonts&&document.fonts.load)document.fonts.load("700 20px Silkscreen").then(()=>{finR=0});
 function finClear(){finT.forEach(clearTimeout);finT=[]}
 function glitchEl(el,on,done){let n=0;const iv=setInterval(()=>{n++;el.style.opacity=Math.random()<.5?'1':'.2';el.style.transform='translate('+((Math.random()*10-5)|0)+'px,'+((Math.random()*6-3)|0)+'px)';el.style.color=Math.random()<.5?'#ff2a4a':'#5affd8';if(n>5){clearInterval(iv);el.style.transform='';el.style.color='';el.style.opacity=on?'1':'0';done&&done()}},55);finT.push(iv)}
 function finOn(){if(fin)return;fin=true;gfoc=null;showCta(false);finClear();finW.textContent='';
- if(!document.fonts||RM){} 'inley'.split('').forEach((ch,i)=>{const sp=document.createElement('span');sp.textContent=ch;sp.style.opacity='0';sp.style.display='inline-block';finW.appendChild(sp);finT.push(setTimeout(()=>glitchEl(sp,true),RM?0:500+i*260))})}
-function finOff(){if(!fin)return;fin=false;finClear();const sp=[...finW.children].reverse();sp.forEach((el,i)=>finT.push(setTimeout(()=>glitchEl(el,false,()=>el.remove()),RM?0:i*120)))}
+ 'Finley'.split('').forEach((ch,i)=>{const sp=document.createElement('span');sp.textContent=ch;sp.style.display='inline-block';sp.style.opacity=i?'0':'1';finW.appendChild(sp);if(i)finT.push(setTimeout(()=>glitchEl(sp,true),RM?0:700+i*240))})}
+function finOff(){if(!fin)return;fin=false;finClear();const sp=[...finW.children].slice(1).reverse();sp.forEach((el,i)=>finT.push(setTimeout(()=>glitchEl(el,false),RM?0:i*120)));finT.push(setTimeout(()=>{if(!fin)finW.textContent=''},RM?0:900))}
 // F pixel-scramble + Finley letter glitches (occasional)
 const bhG=document.createElement('canvas');bhG.setAttribute('aria-hidden','true');bhG.style.cssText='position:absolute;left:0;top:0;pointer-events:none;image-rendering:pixelated;z-index:4';const bgx=bhG.getContext('2d');
 function fScramble(){if(RM||gal.hidden||!bh.complete||!bh.naturalWidth)return;const W=bh.naturalWidth,H=bh.naturalHeight;bhG.width=W;bhG.height=H;bhG.style.width=bh.style.width;bhG.style.height=bh.style.height;bhG.style.transform=bh.style.transform;
@@ -111,9 +114,9 @@ function fScramble(){if(RM||gal.hidden||!bh.complete||!bh.naturalWidth)return;co
    bgx.fillStyle='#07020d';bgx.fillRect(sx,sy,w,h);bgx.drawImage(bh,sx,sy,w,h,dx,sy,w,h);
    if(Math.random()<.35){bgx.globalCompositeOperation='source-atop';bgx.fillStyle=Math.random()<.5?'rgba(255,42,74,.5)':'rgba(90,255,216,.5)';bgx.fillRect(dx,sy,w,h);bgx.globalCompositeOperation='source-over'}}
   setTimeout(step,50+Math.random()*60)};step()}
-function finGlitch(){const sp=[...finW.children];if(!fin||sp.length!==5||sp.some(e=>e.style.opacity!=='1'))return;const k=1+(Math.random()*2|0);for(let i=0;i<k;i++)glitchEl(sp[Math.random()*5|0],true)}
+function finGlitch(){const sp=[...finW.children];if(!fin||sp.length!==6||sp.some(e=>e.style.opacity!=='1'))return;const k=1+(Math.random()*2|0);for(let i=0;i<k;i++)glitchEl(sp[1+(Math.random()*5|0)],true)}
 (function gLoop(){setTimeout(()=>{if(!gal.hidden&&!document.hidden){if(fin&&Math.random()<.6)finGlitch();else fScramble()}gLoop()},1500+Math.random()*3500)})();
-function overBH(x,y){const r=bh.getBoundingClientRect();return Math.hypot(x-r.left-r.width/2,y-r.top-r.height/2)<r.width*.33}gal.append(gsky,bh,bhG,clov,omni,cta,finW,back);
+function overBH(x,y){const r=bh.getBoundingClientRect();return Math.hypot(x-r.left-r.width/2,y-r.top-r.height/2)<r.width*.33}gal.append(gsky,bh,bhG,coreC,clov,omni,cta,finW,back);
 document.body.appendChild(gal);
 
 const tip=document.getElementById('tip');
@@ -227,7 +230,9 @@ let fsT=0;function fitCamSoft(){cancelAnimationFrame(fsT);const a={...cam},z1=fi
 function placeOmni(){
  const bs=Math.max(40,BH_W*cam.z),bx=(bhOff-cam.x)*cam.z+GW/2,by=(0-cam.y)*cam.z+GH/2;
  bh.style.width=bh.style.height=Math.round(bs)+'px';bh.style.transform='translate('+Math.round(bx-bs/2)+'px,'+Math.round(by-bs/2)+'px)';
- {const fs=BH_W*.36*cam.z;finW.style.fontSize=Math.round(fs)+'px';finW.style.transform='translate('+Math.round(bx+bs*.16)+'px,'+Math.round(by-fs*.55)+'px)'}
+ {const aw=bs*.86,fs=aw/finRatio(),lx=bx-aw/2;finW.style.fontSize=Math.round(fs)+'px';finW.style.transform='translate('+Math.round(lx)+'px,'+Math.round(by-fs*.5)+'px)';
+  const e=finP*finP*(3-2*finP),f0=finW.firstChild;if(f0){const fw=f0.offsetWidth||fs*.8;f0.style.transform='translateX('+Math.round((bx-fw/2-lx)*(1-e))+'px)'}
+  const cr=bs*.5;coreC.style.width=coreC.style.height=Math.round(cr)+'px';coreC.style.transform='translate('+Math.round(bx-cr/2)+'px,'+Math.round(by-cr/2)+'px)';coreC.style.opacity=finW.firstChild?Math.min(1,finP*6+(fin?.6:0)).toFixed(2):'0'}
  const[cx,cy]=clPos(),[mx,my]=omPos();
  const size=Math.max(64,CL_W*cam.z),ms=Math.max(28,OM_W*cam.z);
  omniPx=size;
@@ -265,7 +270,7 @@ function drawGal(now){
   for(let k=1;k<=n;k++){const f=k/n,an=omAng-arc*f,sx=(Math.cos(an)*ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
  // hub-style focus: fly + zoom the camera onto the clicked body
  if(gfoc){const[fx,fy]=gfoc==='om'?omPos():clPos(),zt=Math.min(GW,GH)*(gfoc==='om'?.55:.62)/(gfoc==='om'?OM_W:CL_W),k=Math.min(1,dt*(RM?60:5));cam.x+=(fx-cam.x)*k;cam.y+=(fy-cam.y)*k;cam.z*=Math.pow(zt/cam.z,k)}
- bhOff+=((fin?-BH_W*.42:0)-bhOff)*Math.min(1,dt*(RM?60:3.5));
+ bhOff=0;finP+=((fin?1:0)-finP)*Math.min(1,dt*(RM?60:3.2));
  placeOmni()}
 let gLoop=0;
 function galFrame(now){if(!inGal){gLoop=0;return}drawGal(now);gLoop=requestAnimationFrame(galFrame)}
