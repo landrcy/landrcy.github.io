@@ -354,7 +354,10 @@ worm.addEventListener('click',e=>{
 back.addEventListener('click',e=>{e.stopPropagation();if(!busy)travel(false)});
 
 addEventListener('keydown',e=>{
- if(e.key!=='Escape'||!inGal||busy)return;
+ if(e.key!=='Escape')return;
+ // on /ffc/ Escape never leaves the page: it only backs out of a focused planet/blackhole
+ if(FFC){e.preventDefault();e.stopImmediatePropagation();if(busy)return;if(fin){finOff();return}if(gfoc||!cta.hidden||!dsc.hidden)unfocusG();fitCamSoft();return}
+ if(!inGal||busy)return;
  e.preventDefault();e.stopImmediatePropagation();if(fin){finOff();return}if(gfoc||!cta.hidden||!dsc.hidden){unfocusG();fitCamSoft();return}travel(false)},true);
 
 // fly the galaxy: drag pans, wheel / pinch zooms, a quiet click on empty space returns
