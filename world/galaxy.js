@@ -69,7 +69,7 @@ function glitch(){if(cta.hidden||RM)return;const S=1,n=2+(Math.random()*5|0);
   if(Math.random()<.4){px.fillStyle=Math.random()<.5?'#ff2a4a':'#5affd8';px.globalAlpha=.85;px.fillRect(dx,sy,S*(1+(Math.random()*3|0)),S);px.globalAlpha=1}}
  setTimeout(()=>{drawPlay();if(Math.random()<.5)setTimeout(glitch,70)},90+Math.random()*120)}
 function glitchLoop(){clearTimeout(glT);if(cta.hidden)return;glT=setTimeout(()=>{glitch();glitchLoop()},500+Math.random()*1800)}
-function showCta(on){cta.hidden=!on;if(on){drawPlay();glitchLoop()}else clearTimeout(glT)}
+function showCta(on){cta.hidden=!on;if(on){cta.classList.remove('fin');void cta.offsetWidth;cta.classList.add('fin');placeOmni()}if(on){drawPlay();glitchLoop()}else clearTimeout(glT)}
 cta.addEventListener('pointerdown',e=>e.stopPropagation());
 cta.addEventListener('click',e=>e.stopPropagation());
 gal.append(gsky,omni,cta,back);
@@ -185,7 +185,9 @@ function placeOmni(){
  omniPx=size;
  const x=(0-cam.x)*cam.z+GW/2,y=(0-cam.y)*cam.z+GH/2;
  omni.style.width=Math.round(size)+'px';omni.style.height=Math.round(size)+'px';
- omni.style.transform='translate('+Math.round(x-size/2)+'px,'+Math.round(y-size/2)+'px)'}
+ omni.style.transform='translate('+Math.round(x-size/2)+'px,'+Math.round(y-size/2)+'px)';
+ // CTA is world-anchored to the Omniverse sprite: same world x, offset below disc center in world units, scales with zoom
+ cta.style.transform='translate('+Math.round(x)+'px,'+Math.round(y+size*.06)+'px) scale('+(size/1000).toFixed(4)+') translate(-50%,0)'}
 function resizeGal(){
  GW=innerWidth;GH=innerHeight;gsky.width=GW;gsky.height=GH;gg.imageSmoothingEnabled=false;
  if(inGal&&!busy)placeOmni()}
