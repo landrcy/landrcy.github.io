@@ -50,7 +50,7 @@ omni.src=OM_STILL;
 const clov=document.createElement('img');clov.id='clov';clov.alt='Lucky clover planet';clov.draggable=false;clov.src=CL_STILL;
 clov.style.cssText='position:absolute;left:0;top:0;image-rendering:pixelated;pointer-events:none;user-select:none;z-index:3';
 const bh=document.createElement('img');bh.id='bhf';bh.alt='F blackhole';bh.draggable=false;bh.src=BH_STILL;
-bh.style.cssText='position:absolute;left:0;top:0;image-rendering:pixelated;pointer-events:none;user-select:none;z-index:2';
+bh.style.cssText='position:absolute;left:0;top:0;image-rendering:pixelated;pointer-events:none;user-select:none;z-index:2;-webkit-mask-image:radial-gradient(closest-side,#000 52%,rgba(0,0,0,.85) 64%,rgba(0,0,0,.4) 80%,transparent 100%);mask-image:radial-gradient(closest-side,#000 52%,rgba(0,0,0,.85) 64%,rgba(0,0,0,.4) 80%,transparent 100%);filter:drop-shadow(0 0 18px rgba(90,10,40,.55))';
 omni.style.zIndex=3;
 // little pixel ship: the way back out to the hub (the wormhole button is hidden in here)
 const back=document.createElement('button');
