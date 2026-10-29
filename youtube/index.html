@@ -180,18 +180,26 @@ function drawCharts(){if(!copen)return;line('c-subs','subs',0);line('c-views','v
  const n=ALL.reduce((a,c)=>a+hist(c.id).length,0);document.getElementById('cinfo').textContent=`${n} stored samples`}
 document.getElementById('ctog').onclick=e=>{copen=!copen;document.getElementById('charts').hidden=!copen;e.target.textContent=(copen?'▼ HIDE':'▶ SHOW')+' CHARTS';e.target.setAttribute('aria-expanded',copen);drawCharts()};
 document.querySelectorAll('#charts .ctl button').forEach(b=>b.onclick=()=>{cb=b.dataset.b;document.querySelectorAll('#charts .ctl button').forEach(q=>q.classList.toggle('on',q===b));drawCharts()});
-let last=0,delay=8000,i=0;
-async function fetchOne(c){try{const r=await fetch('https://api.socialcounts.org/youtube-live-subscriber-count/'+c.id,{cache:'no-store'});
-  const rl=r.headers.get('RateLimit');const rem=rl&&+(/remaining=(\d+)/.exec(rl)||[])[1];
-  if(r.status===429){delay=Math.min(120000,delay*2);return}
+let last=0,delay=8000,i=0,busy=false;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function fetchOne(c,opts){opts=opts||{};if(busy&&!opts.force)return;busy=true;
+ try{for(let attempt=0;attempt<4;attempt++){
+  const r=await fetch('https://api.socialcounts.org/youtube-live-subscriber-count/'+c.id,{cache:'no-store'});
+  const rl=r.headers.get('ratelimit')||r.headers.get('RateLimit');
+  const rem=rl&&+(/remaining=(\d+)/i.exec(rl)||[])[1];
+  if(r.status===429){delay=Math.min(120000,Math.max(delay*2,15000));await sleep(delay);continue}
   if(!r.ok)throw 0;const j=await r.json(),a=j.counters&&(j.counters.api||j.counters.estimation);
   if(!a)throw 0;
-  const empty=!a.videoCount&&!a.viewCount;
-  c.subs=empty?null:a.subscriberCount;c.views=empty?null:a.viewCount;c.ok=!empty;last=Date.now();addSample(c);
-  delay=rem!=null&&rem<20?60000:8000;
- }catch(e){c.subs=c.subs??null;c.views=c.views??null}finally{c.tried=true}}
-async function boot(){await Promise.all(ALL.map(fetchOne));render();loop()}
-async function loop(){await new Promise(r=>setTimeout(r,delay));if(!document.hidden){await fetchOne(ALL[i++%ALL.length]);render()}loop()}
+  // treat missing both counts as empty; allow 0-sub / 0-view channels that still have videos
+  const empty=(a.subscriberCount==null&&a.viewCount==null)||(!a.videoCount&&!a.viewCount&&!a.subscriberCount);
+  c.subs=empty?null:a.subscriberCount;c.views=empty?null:a.viewCount;c.ok=!empty;c.tried=true;last=Date.now();addSample(c);
+  delay=rem!=null&&rem<20?60000:Math.max(5000,delay>30000?15000:8000);
+  return
+ } // exhausted 429 retries — leave untried so loop will try again
+ }catch(e){c.subs=c.subs??null;c.views=c.views??null;c.tried=true}
+ finally{busy=false}}
+async function boot(){for(const c of ALL){await fetchOne(c,{force:true});render();await sleep(1200)}loop()}
+async function loop(){await sleep(delay);if(!document.hidden){await fetchOne(ALL[i++%ALL.length],{force:true});render()}loop()}
 setInterval(()=>{document.getElementById('foot').textContent=last?`Live counts from socialcounts.org · refreshing a channel every ${Math.round(delay/1000)}s · last update ${Math.round((Date.now()-last)/1000)}s ago`:'Loading live counts…'},1000);
 addEventListener('resize',render);render();boot();
 const sky=document.getElementById('sky'),g=sky.getContext('2d');let st=[];
