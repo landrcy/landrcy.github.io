@@ -214,7 +214,11 @@ async function fetchOne(c,opts){opts=opts||{};if(busy&&!opts.force)return;busy=t
  } // exhausted 429 retries — leave untried so loop will try again
  }catch(e){c.subs=c.subs??null;c.views=c.views??null;c.tried=true}
  finally{busy=false}}
-async function boot(){for(const c of ALL){await fetchOne(c,{force:true});render();await sleep(400)}loop()}
+// instant paint: seed each channel from its last stored sample, then refresh live in parallel
+ALL.forEach(c=>{const l=hist(c.id).slice(-1)[0];if(l&&c.subs==null){c.subs=l.subs;c.views=l.views;c.ok=true;c.tried=true}});
+async function boot(){const q=[...ALL];let pend=0;
+ const worker=async()=>{while(q.length){await fetchOne(q.shift(),{force:true});if(!pend++)requestAnimationFrame(()=>{pend=0;render()})}};
+ await Promise.all(Array.from({length:4},worker));render();loop()}
 async function loop(){await sleep(delay);if(!document.hidden){await fetchOne(ALL[i++%ALL.length],{force:true});render()}loop()}
 setInterval(()=>{document.getElementById('foot').textContent=last?`Live counts from socialcounts.org · refreshing a channel every ${Math.round(delay/1000)}s · last update ${Math.round((Date.now()-last)/1000)}s ago`:'Loading live counts…'},1000);
 
@@ -222,13 +226,15 @@ setInterval(()=>{document.getElementById('foot').textContent=last?`Live counts f
 const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function slist(id,arr,shame){const el=document.getElementById(id);if(!arr.length){el.innerHTML='<li><span class="na">no shorts yet</span></li>';return}
  el.innerHTML=arr.map((v,i)=>`<li class="${i===0?'first':''}"><div class="rk">#${i+1}</div>${i===0?(shame?'<span class="skull">☠</span>':CROWN):''}<div class="t"><a href="https://www.youtube.com/shorts/${v.id}" target="_blank" rel="noopener">${esc(v.title.replace(/\s*#shorts?\b/gi,''))}</a><small>${esc(v.ch)}</small></div><div class="st"><b>${v.views.toLocaleString('en-US')}</b> views</div></li>`).join('')}
-async function shorts(){try{const r=await fetch('shorts.json?t='+Date.now(),{cache:'no-store'});const d=await r.json();const now=Date.now();
+function shortsRender(d){const now=Date.now();
  for(const gk of['llc','ffc']){const a=d[gk]||[];
   const fame=[...a].sort((x,y)=>y.views-x.views).slice(0,5);
   const old=a.filter(v=>(v.first||0)<now-48*36e5),pool=old.length>=5?old:a;
   const shame=[...pool].sort((x,y)=>x.views-y.views).slice(0,5);
   slist('fame-'+gk,fame,false);slist('shame-'+gk,shame,true)}
- document.getElementById('sfoot').textContent=`Shorts stats updated ${Math.max(0,Math.round((now-d.updated)/60000))} min ago · rescraped every ~10 min · page re-checks every 60s`}catch(e){}}
+ document.getElementById('sfoot').textContent=`Shorts stats updated ${Math.max(0,Math.round((now-d.updated)/60000))} min ago · rescraped every ~10 min · page re-checks every 60s`}
+async function shorts(){try{const r=await fetch('shorts.json?t='+Date.now(),{cache:'no-store'});const d=await r.json();shortsRender(d);try{localStorage.setItem('pc-shorts',JSON.stringify(d))}catch(e){}}catch(e){}}
+try{const c=JSON.parse(localStorage.getItem('pc-shorts'));if(c)shortsRender(c)}catch(e){}
 shorts();setInterval(()=>{if(!document.hidden)shorts()},60000);
 addEventListener('resize',render);render();boot();
 const sky=document.getElementById('sky'),g=sky.getContext('2d');let st=[];
