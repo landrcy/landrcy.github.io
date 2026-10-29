@@ -1,5 +1,5 @@
 // V50 FFC only: Volt Sphere, a wireframe globe of electric lines and lightning bolts, two grids spinning on crossed axes.
-// V53: six bent polished iron plates orbit the sphere, tethered by constant branching electric beams.
+// V58: iron plates removed; branching electric beams reach from the sphere toward the mouse cursor.
 // Procedural pixel art (low-res buffer, nearest upscale), F blackhole light baked per pixel. Click zooms to it (title showcase).
 (()=>{if(!window.__FFC)return;
 const VS_W=900,K=1.9,N=512,B=128,R=30,SC=128/80,PS=64,RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -11,18 +11,11 @@ const img=bg.createImageData(B,B),D=img.data;let LA=null,seed=1;
 const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
 const PAL=[[40,30,110],[90,60,200],[60,140,255],[90,230,255],[230,250,255]];
 const BAY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
-// V55: branching electricity crawling across each plate (local coords, flickers per frame)
-function plArc(sz){const h=sz*.38,zz=(x0,y0,x1,y1,n,j)=>{const pt=[[x0,y0]];for(let k=1;k<n;k++){const f=k/n;pt.push([x0+(x1-x0)*f+(Math.random()-.5)*j,y0+(y1-y0)*f+(Math.random()-.5)*j])}pt.push([x1,y1]);return pt},st=pt=>{g.beginPath();g.moveTo(pt[0][0],pt[0][1]);for(const q of pt)g.lineTo(q[0],q[1]);g.stroke()};
- const a=Math.random()*6.283,x0=Math.cos(a)*h,y0=Math.sin(a)*h*.6,main=zz(x0,y0,-x0,-y0,7,sz*.12);g.save();g.lineCap='round';g.lineJoin='round';g.globalCompositeOperation='lighter';
- const br=[main];for(let b=0;b<2;b++){const o=main[1+Math.floor(Math.random()*5)];br.push(zz(o[0],o[1],o[0]+(Math.random()-.5)*h*1.2,o[1]+(Math.random()-.5)*h,4,sz*.08))}
- for(const[w,c]of[[Math.max(2,sz*.07),'rgba(60,200,255,.35)'],[Math.max(1,sz*.025),'rgba(200,250,255,.95)']]){g.lineWidth=w;g.strokeStyle=c;br.forEach(st)}g.restore()}
-const PL=[1,2,3,4,5,6].map(i=>{const m=new Image();m.src='world/assets/ironsheet/sheet-'+i+'.png';return m});
-let plates=[];
-function platePos(t){const out=[];for(let i=0;i<6;i++){const a=(RM?0:t*.35)+i*Math.PI/3,r=1.75+.08*Math.sin(i*2.1);
- p=rot([Math.cos(a)*r,Math.sin(i*1.7+t*.6)*.12,Math.sin(a)*r],0,.38,.22);out.push({p,i,spin:(RM?0:t*.9)*(i%2?1:-1)+i})}return out}
+let MX=null,MY=null;addEventListener('pointermove',e=>{MX=e.clientX;MY=e.clientY},{passive:true});
+function mouseT(){if(MX==null||c.style.display==='none')return null;const r=c.getBoundingClientRect();if(!r.width)return null;let x=((MX-r.left)/r.width*B-B/2)/R,y=((MY-r.top)/r.height*B-B/2)/R;const l=Math.hypot(x,y)||1e-3,m=Math.min(l,2.05);if(l<1.05)return null;return[x/l*m,y/l*m,.3]}
 function jag(a,b,d,amp){if(d===0){line([a,b],.3,1,2);return}const m=[(a[0]+b[0])/2+(rnd()-.5)*amp,(a[1]+b[1])/2+(rnd()-.5)*amp,(a[2]+b[2])/2];jag(a,m,d-1,amp*.55);jag(m,b,d-1,amp*.55);
  if(d>=2&&rnd()<.3){const e=[m[0]+(rnd()-.5)*amp*1.6,m[1]+(rnd()-.5)*amp*1.6,m[2]];jag(m,e,1,amp*.4)}}
-function beam(P){const l=Math.hypot(...P),u=P.map(v=>v/l);jag(u,P,4,.35);
+function beam(P){const l=Math.hypot(...P),u=P.map(v=>v/l);u[2]=.3;const f=Math.hypot(...u);for(let i=0;i<3;i++)u[i]/=f;jag(u,P,4,.35);
  const ns=RM?2:3+Math.floor(rnd()*4);for(let k=0;k<ns;k++){const an=rnd()*Math.PI*2,rr=.18+rnd()*.22,e=[P[0]+Math.cos(an)*rr,P[1]+Math.sin(an)*rr,P[2]];jag(P,e,2,.12)}}
 const buf=new Float32Array(B*B),hue=new Float32Array(B*B);
 function plot(x,y,v,h){x|=0;y|=0;if(x<0||y<0||x>=B||y>=B)return;const i=y*B+x;if(v>buf[i]){buf[i]=v;hue[i]=h}}
@@ -44,7 +37,7 @@ function paint(t){seed=(Math.floor(t*12)%997)+7;buf.fill(0);hue.fill(0);
  grid(t,RM?.3:t*.6,.41,.18,0,0);grid(t,RM?1:-t*.45,1.2,-.6,1,2);
  const nb=RM?1:2+Math.floor(rnd()*3);for(let i=0;i<nb;i++){const a=sp();a[2]=Math.abs(a[2]);const b=sp();b[2]=Math.abs(b[2]);bolt(a,b,3,2)}
  if(!RM&&rnd()<.35){const a=sp(),o=[a[0]*1.45,a[1]*1.45,a[2]];bolt(a,o,2,2)}
- plates=platePos(t);for(const q of plates)beam(q.p);
+ const T=mouseT();if(T){const nb=RM?1:2+Math.floor(rnd()*2);for(let i=0;i<nb;i++){const P=[T[0]+(rnd()-.5)*.15,T[1]+(rnd()-.5)*.15,T[2]];beam(P)}}
  const L=LA==null?[-.5,-.5,.7]:[Math.cos(LA)*.88,Math.sin(LA)*.88,.47];
  for(let y=0;y<B;y++)for(let x=0;x<B;x++){const i=y*B+x,o=i*4,nx=(x+.5-B/2)/R,ny=(y+.5-B/2)/R,r2=nx*nx+ny*ny;let v=buf[i];
   const nz=Math.sqrt(Math.max(0,1-r2)),lit=Math.max(0,Math.min(1,.45+(nx*L[0]+ny*L[1]+nz*L[2])*.75));
@@ -54,8 +47,7 @@ function paint(t){seed=(Math.floor(t*12)%997)+7;buf.fill(0);hue.fill(0);
   else if(r2<1.18&&!RM&&BAY[(y&3)*4+(x&3)]<(Math.sin(t*6)+1.2)*3){D[o]=70;D[o+1]=170;D[o+2]=255;D[o+3]=110}
   else D[o+3]=0}
  bg.putImageData(img,0,0);g.clearRect(0,0,N,N);
- const sk=N/B,dp=q=>{const m=PL[q.i];if(!m.complete||!m.naturalWidth)return;const sz=PS*(1+q.p[2]*.12);g.save();g.translate(N/2+q.p[0]*R*sk,N/2+q.p[1]*R*sk);g.rotate(Math.sin(q.spin)*.5);g.globalAlpha=q.p[2]<0?.7:1;g.drawImage(m,-sz/2,-sz/2,sz,sz);if(!RM&&Math.random()<.7)plArc(sz);g.restore()};
- for(const q of plates)if(q.p[2]<0)dp(q);g.drawImage(bc,0,0,N,N);for(const q of plates)if(q.p[2]>=0)dp(q)}
+ g.drawImage(bc,0,0,N,N)}
 const NAME='Volt Sphere';
 const tipOn=(on,e)=>{const t=document.getElementById('tip');if(!t)return;if(on){if(t.textContent!==NAME||!t.classList.contains('on'))window.__blip&&__blip('hover');t.textContent=NAME;t.style.left=(e.clientX+14)+'px';t.style.top=(e.clientY+14)+'px';t.classList.add('on')}else if(t.textContent===NAME)t.classList.remove('on')};
 const onBall=e=>{const r=c.getBoundingClientRect();return Math.hypot((e.clientX-r.left)/r.width*N-N/2,(e.clientY-r.top)/r.height*N-N/2)<R*N/B*1.15};
