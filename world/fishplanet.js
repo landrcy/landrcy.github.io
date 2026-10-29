@@ -40,8 +40,8 @@ const onDisc=(x,y)=>Math.hypot(x-N/2,y-N/2)<N*.44;
 let down=null;
 // V35: hub-style hover tip (name only)
 const dsTip=(on,e)=>{const t=document.getElementById('tip');if(!t)return;if(on){if(t.textContent!=='Deep Sea'||!t.classList.contains('on'))window.__blip&&__blip('hover');t.textContent='Deep Sea';t.style.left=(e.clientX+14)+'px';t.style.top=(e.clientY+14)+'px';t.classList.add('on')}else if(t.textContent==='Deep Sea')t.classList.remove('on')};
-c.addEventListener('pointermove',e=>{const[x,y]=loc(e);if(onDisc(x,y)){mx=x;my=y;stir(x,y);dsTip(1,e)}else dsTip(0);e.stopPropagation()});
-c.addEventListener('pointerleave',()=>dsTip(0));
+c.addEventListener('pointermove',e=>{const[x,y]=loc(e);if(onDisc(x,y)){mx=x;my=y;stir(x,y);dsTip(1,e);window.__galHov='ds'}else{dsTip(0);if(window.__galHov==='ds')window.__galHov=null}e.stopPropagation()});
+c.addEventListener('pointerleave',()=>{dsTip(0);if(window.__galHov==='ds')window.__galHov=null});
 c.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];e.stopPropagation()});
 c.addEventListener('pointerup',e=>{e.stopPropagation();if(down&&Math.hypot(e.clientX-down[0],e.clientY-down[1])<8){const[x,y]=loc(e);if(onDisc(x,y)){if(FFC&&window.__galDS)window.__galDS();else location.href=URL}}down=null});
 c.addEventListener('click',e=>e.stopPropagation());
@@ -60,6 +60,6 @@ function frame(ms){
  else{const v=window.__hubView&&window.__hubView(),b=document.body.classList;
   if(!v||v.sys!=='main'||b.contains('arch')||b.contains('galaxy')||b.contains('intro')){c.style.display='none';return requestAnimationFrame(frame)}
   place(v.cam.z,v.cam.x,v.cam.y,v.W,v.H);{const m=Math.hypot(WX,WY)||1;LT=[-WX/m*.88,-WY/m*.88,.47]}}
- if(c.style.display!=='none'&&ms-last>55){const dt=(ms-last)/1000;last=ms;if(stirring){let any=0;const f=Math.pow(.55,dt);for(let i=0;i<ST.length;i++)if(ST[i]){ST[i]=ST[i]*f<.01?0:ST[i]*f;any=1}stirring=any}paint(ms/1000)}
+ if(c.style.display!=='none'&&ms-last>55){const dt=(ms-last)/1000;last=ms;if(stirring){let any=0;const f=Math.pow(.55,dt);for(let i=0;i<ST.length;i++)if(ST[i]){ST[i]=ST[i]*f<.01?0:ST[i]*f;any=1}stirring=any}{const fz=FFC&&window.__galFz&&__galFz('ds');if(!fz&&frame.pm)frame.at=(frame.at||0)+(ms-frame.pm)/1000;frame.pm=ms;paint(FFC?(frame.at||0):ms/1000)}}
  requestAnimationFrame(frame)}
 paint(0);requestAnimationFrame(frame)})();

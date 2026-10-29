@@ -43,20 +43,20 @@ const NAME='Volt Sphere';
 const tipOn=(on,e)=>{const t=document.getElementById('tip');if(!t)return;if(on){if(t.textContent!==NAME||!t.classList.contains('on'))window.__blip&&__blip('hover');t.textContent=NAME;t.style.left=(e.clientX+14)+'px';t.style.top=(e.clientY+14)+'px';t.classList.add('on')}else if(t.textContent===NAME)t.classList.remove('on')};
 const onBall=e=>{const r=c.getBoundingClientRect();return Math.hypot((e.clientX-r.left)/r.width*N-N/2,(e.clientY-r.top)/r.height*N-N/2)<R*N/B*1.15};
 let down=null;
-c.addEventListener('pointermove',e=>{if(onBall(e)){c.style.cursor='pointer';tipOn(1,e)}else{c.style.cursor='';tipOn(0)}});
-c.addEventListener('pointerleave',()=>tipOn(0));
+c.addEventListener('pointermove',e=>{if(onBall(e)){c.style.cursor='pointer';tipOn(1,e);window.__galHov='vs'}else{c.style.cursor='';tipOn(0);if(window.__galHov==='vs')window.__galHov=null}});
+c.addEventListener('pointerleave',()=>{tipOn(0);if(window.__galHov==='vs')window.__galHov=null});
 c.addEventListener('pointerdown',e=>{if(onBall(e)){down=[e.clientX,e.clientY];e.stopPropagation()}});
 c.addEventListener('pointerup',e=>{if(down){e.stopPropagation();if(Math.hypot(e.clientX-down[0],e.clientY-down[1])<8&&window.__galVS)window.__galVS()}down=null});
 c.addEventListener('click',e=>{if(onBall(e))e.stopPropagation()});
 c.addEventListener('wheel',e=>{const s=document.getElementById('gsky');if(s){e.preventDefault();s.dispatchEvent(new WheelEvent('wheel',e))}},{passive:false});
 c.addEventListener('keydown',e=>{if(e.key==='Enter'&&window.__galVS)window.__galVS()});
-let last=0;
+let last=0,at=0,pm=0;
 function frame(ms){const v=window.__galView&&window.__galView(),gal=document.getElementById('galaxy');
  if(!v||!gal||!v.inGal||!v.vs){c.style.display='none';return requestAnimationFrame(frame)}
  if(v.vsLa!=null)LA=v.vsLa;if(c.parentNode!==gal)gal.appendChild(c);
  const z=v.cam.z,s=Math.max(2,Math.round(VS_W*K*z)),x=(v.vs[0]-v.cam.x)*z+v.GW/2,y=(v.vs[1]-v.cam.y)*z+v.GH/2;
  c.style.zIndex=v.vsZ;c.style.width=c.style.height=s+'px';c.style.transform='translate('+Math.round(x-s/2)+'px,'+Math.round(y-s/2)+'px)';
  c.style.display=(x<-s||y<-s||x>v.GW+s||y>v.GH+s)?'none':'';
- if(c.style.display!=='none'&&(ms-last>60||!last)){last=ms;paint(ms/1000)}
+ if(c.style.display!=='none'&&(ms-last>60||!last)){const fz=window.__galFz&&__galFz('vs');if(!fz&&pm)at+=(ms-pm)/1000;pm=ms;last=ms;paint(at)}
  requestAnimationFrame(frame)}
 requestAnimationFrame(frame)})();
