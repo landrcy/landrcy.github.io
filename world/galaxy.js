@@ -14,7 +14,7 @@ const BH_IN='world/assets/blackhole-f/bh-in.gif',BH_LOOP='world/assets/blackhole
 // world layout: blackhole at origin, the Omniverse orbits it on a flattened ring like the hub planets
 const CL_GIF='world/assets/clover/clover-planet.gif',CL_STILL='world/assets/clover/clover-planet.png';
 // F is 5x bigger; the clover planet orbits far out, Max Omniverse is its moon
-const DS_ORB=6400,DS_PER=120,DS_W=1500,BH_W=9200,CL_W=1300,ORB=9800,SQ=.6,OM_PER=70,OM_W=420,MO=980,MO_PER=16;
+const DS_ORB=14000,DS_PER=120,DS_W=1500,BH_W=9200,CL_W=1300,ORB=10200,SQ=.6,OM_PER=70,OM_W=420,MO=1400,MO_PER=16;
 
 const worm=document.createElement('button');
 worm.type='button';worm.id='worm';
@@ -287,6 +287,9 @@ function drawGal(now){
  // orbit: hover slows, open CTA stops it (like the hub planets)
  const dt=Math.min(.05,gLast?(now-gLast)/1000:0);gLast=now;
  const tg=RM?0:omHov&&!gfoc?.35:1;omSf+=(tg-omSf)*Math.min(1,dt*4);omAng+=dt*Math.PI*2/OM_PER*omSf;moAng+=dt*Math.PI*2/MO_PER*omSf;if(!RM)dsAng+=dt*Math.PI*2/DS_PER*(gfoc==='ds'?.35:1);
+ // Deep Sea orbit trail (same style, ocean blue)
+ {const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(DS_ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#4ac8ff';
+  for(let k=1;k<=n;k++){const f=k/n,an=dsAng-arc*f,sx=(Math.cos(an)*DS_ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*DS_ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
  // orbit ring: fading pixel trail behind the Omniverse
  {const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#7aff8a';
   for(let k=1;k<=n;k++){const f=k/n,an=omAng-arc*f,sx=(Math.cos(an)*ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
@@ -389,7 +392,7 @@ function zoomAt(sx,sy,f){
  cam.z=nz;cam.x=wx-(sx-GW/2)/nz;cam.y=wy-(sy-GH/2)/nz;clampCam()}
 function fitZ(){
  // frame the whole orbit (ring + Omniverse art at both ends) around the blackhole
- const w=2*(ORB+MO)+CL_W*.9,h=2*(ORB+MO)*SQ+CL_W*.8;
+ const R=Math.max(ORB+MO,DS_ORB+DS_W*.6),w=2*R+CL_W*.9,h=2*R*SQ+CL_W*.8;
  return Math.min(GW*.94/w,GH*.88/h)}
 function clampCam(){
  const lim=Math.max(ORB+MO,DS_ORB+DS_W*.6)*1.05;cam.x=Math.max(-lim*1.45,Math.min(lim,cam.x));cam.y=Math.max(-lim*SQ*1.5,Math.min(lim*SQ,cam.y))}
