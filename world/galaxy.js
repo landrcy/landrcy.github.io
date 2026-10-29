@@ -48,7 +48,7 @@ const rg=rush.getContext('2d');
 const gal=document.createElement('div');
 gal.id='galaxy';gal.hidden=true;gal.style.opacity='0';gal.style.transition='opacity 1.4s cubic-bezier(.33,0,.2,1)';
 const gsky=document.createElement('canvas');
-gsky.id='gsky';gsky.setAttribute('aria-label','Blood nebula galaxy. The F blackhole is at the center, with the lucky clover planet orbiting it and the Maximum Omniverse as its moon. Drag to fly; the little ship at the bottom right flies you back to the hub.');
+gsky.id='gsky';gsky.setAttribute('aria-label','Blood nebula galaxy. The F blackhole is at the center, with the lucky clover planet orbiting it and the Maximum Omniverse as its moon. Drag or use W A S D to fly; the little ship at the bottom right flies you back to the hub.');
 const gg=gsky.getContext('2d');
 const omni=document.createElement('img');
 omni.id='omni';omni.alt='Maximum Omniverse';omni.draggable=false;
@@ -304,6 +304,11 @@ function drawGal(now){
   for(let k=1;k<=n;k++){const f=k/n,an=omAng-arc*f,sx=(Math.cos(an)*ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
  // hub-style focus: fly + zoom the camera onto the clicked body
  if(gfoc){const[fx,fy]=gfoc==='bh'?[0,0]:gfoc==='om'?omPos():gfoc==='ds'?dsPos():clPos(),zt=Math.min(GW,GH)*(gfoc==='bh'?.9:gfoc==='om'?.55:.62)/(gfoc==='bh'?BH_W:gfoc==='om'?OM_W:gfoc==='ds'?DS_W:CL_W),k=Math.min(1,dt*(RM?60:5));cam.x+=(fx-cam.x)*k;cam.y+=(fy-cam.y)*k;cam.z*=Math.pow(zt/cam.z,k)}
+ // V33 (/ffc): WASD flight relative to the F blackhole. W/S fly toward/away from it, A/D strafe around it; the ship always faces it
+ if(FFC){let vx=0,vy=0;const kw=gKeys.has('w'),ks=gKeys.has('s'),ka=gKeys.has('a'),kd=gKeys.has('d');
+  if(kw||ks||ka||kd){gfoc=null;showCta(false);showDs(false);const r=Math.hypot(cam.x,cam.y/SQ),ux=r>1?-cam.x/r:0,uy=r>1?-cam.y/SQ/r:-1,sp=Math.max(1200,r*.9)*dt;
+   const f=(kw?1:0)-(ks?1:0),st=(kd?1:0)-(ka?1:0);if(kw&&r<sp)vx=-cam.x,vy=-cam.y;else{vx=(ux*f-uy*st)*sp;vy=(uy*f+ux*st)*sp*SQ}cam.x+=vx;cam.y+=vy;clampCam()}
+  const bx=(0-cam.x)*cam.z+GW/2,by=(0-cam.y)*cam.z+GH/2,r2=back.getBoundingClientRect();if(r2.width){const ang=Math.atan2(by-(r2.top+r2.height/2),bx-(r2.left+r2.width/2))+Math.PI/2;shipImg.style.transform='rotate('+ang.toFixed(3)+'rad)'}}
  bhOff=0;finP+=((fin?1:0)-finP)*Math.min(1,dt*(RM?60:3.2));if(!fin&&finP<.02&&finW.firstChild&&!finT.length)finW.textContent='';finW.style.visibility=(fin||finP>.02)?'visible':'hidden';
  placeOmni()}
 let gLoop=0;
@@ -362,6 +367,9 @@ worm.addEventListener('click',e=>{
  travel(!inGal)});
 back.addEventListener('click',e=>{e.stopPropagation();if(!busy)travel(false)});
 
+const gKeys=new Set();
+addEventListener('keydown',e=>{const c=(e.code||'').replace('Key','').toLowerCase();if(FFC&&inGal&&!busy&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&'wasd'.includes(c)&&c.length===1&&!/INPUT|TEXTAREA/.test((e.target&&e.target.tagName)||'')){gKeys.add(c);e.preventDefault()}});
+addEventListener('keyup',e=>{gKeys.delete((e.code||'').replace('Key','').toLowerCase())});addEventListener('blur',()=>gKeys.clear());
 addEventListener('keydown',e=>{
  if(e.key!=='Escape')return;
  // on /ffc/ Escape never leaves the page: it only backs out of a focused planet/blackhole
