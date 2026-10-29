@@ -34,13 +34,19 @@ function placeWorm(){
  requestAnimationFrame(placeWorm)}
 requestAnimationFrame(placeWorm);
 
+const FFC=!!window.__FFC;
+// full-screen veil used to blend wormhole travel into a page navigation (hub <-> /ffc/)
+const veil=document.createElement('div');veil.id='veil';veil.setAttribute('aria-hidden','true');
+veil.style.cssText='position:fixed;inset:0;z-index:40;pointer-events:none;background:#05040c;opacity:'+(FFC?1:0)+';transition:opacity .9s cubic-bezier(.4,0,.2,1)';
+document.body.appendChild(veil);
+function goTo(url){veil.style.transition='opacity .55s ease-in';veil.style.pointerEvents='auto';requestAnimationFrame(()=>{veil.style.opacity='1'});setTimeout(()=>{location.href=url},RM?60:600)}
 const rush=document.createElement('canvas');
 rush.id='rush';rush.hidden=true;rush.setAttribute('aria-hidden','true');
 document.body.appendChild(rush);
 const rg=rush.getContext('2d');
 
 const gal=document.createElement('div');
-gal.id='galaxy';gal.hidden=true;
+gal.id='galaxy';gal.hidden=true;gal.style.opacity='0';gal.style.transition='opacity 1.4s cubic-bezier(.33,0,.2,1)';
 const gsky=document.createElement('canvas');
 gsky.id='gsky';gsky.setAttribute('aria-label','Blood nebula galaxy. The F blackhole is at the center, with the lucky clover planet orbiting it and the Maximum Omniverse as its moon. Drag to fly; the little ship at the bottom right flies you back to the hub.');
 const gg=gsky.getContext('2d');
@@ -280,12 +286,12 @@ function armOmni(){if(omni.dataset.arm)return;omni.dataset.arm='1';omni.src=RM?O
 function bhArrive(){clearTimeout(bhT);if(RM){bh.src=BH_STILL;return}bh.src=BH_IN+'?t='+Date.now();bhT=setTimeout(()=>{if(inGal)bh.src=BH_LOOP},BH_IN_MS)}
 
 function showGalaxy(){
- inGal=true;armOmni();bhArrive();gLast=0;gal.hidden=false;document.body.classList.add('galaxy');
+ inGal=true;armOmni();bhArrive();gLast=0;gal.hidden=false;gal.style.opacity='0';requestAnimationFrame(()=>requestAnimationFrame(()=>{gal.style.opacity='1'}));document.body.classList.add('galaxy');
  window.__galaxyHold=true;resizeGal();fitCam();
  worm.setAttribute('aria-label','Return through the wormhole');
  if(!gLoop)gLoop=requestAnimationFrame(galFrame)}
 function hideGalaxy(){
- inGal=false;fin=false;finClear();finW.textContent='';bhOff=0;clearTimeout(bhT);bh.src=BH_STILL;showCta(false);document.body.classList.remove('galaxy');gal.hidden=true;
+ inGal=false;fin=false;finClear();finW.textContent='';bhOff=0;clearTimeout(bhT);bh.src=BH_STILL;showCta(false);document.body.classList.remove('galaxy');gal.hidden=true;gal.style.opacity='0';
  window.__galaxyHold=false;worm.setAttribute('aria-label','Wormhole');hideTip()}
 
 let srcWorm=worm;
@@ -314,6 +320,8 @@ function travel(toGalaxy){
   if(u<1)requestAnimationFrame(step);
   else finish()};
  const finish=()=>{
+  if(toGalaxy&&!FFC){goTo('ffc/');return}
+  if(!toGalaxy&&FFC){goTo('../');return}
   rush.hidden=true;document.body.classList.remove('traveling');
   if(toGalaxy)showGalaxy();else hideGalaxy();
   busy=false};
@@ -356,7 +364,7 @@ function endPtr(e){const was=moved;pts.delete(e.pointerId);if(pts.size<2)pinch=n
  if(gfoc||!cta.hidden){unfocusG();fitCamSoft();return}
  if(overBH(e.clientX,e.clientY)){if(fin)finOff();showCta(false);gfoc='bh';return}
  if(fin){finOff();return}
- travel(false)}
+ if(!FFC)travel(false)}
 gsky.addEventListener('pointerup',endPtr);
 gsky.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);pinch=null;gsky.classList.remove('drag')});
 function zoomAt(sx,sy,f){
@@ -385,13 +393,13 @@ worm2.setAttribute('aria-label','Wormhole (cracked open)');document.body.appendC
 let w2=null,crack=null,clicks=[];
 worm2.addEventListener('click',e=>{e.stopPropagation();if(busy||document.body.classList.contains('arch'))return;srcWorm=worm2;travel(true)});
 worm2.addEventListener('pointerenter',e=>showTip('Wormhole',e.clientX,e.clientY));worm2.addEventListener('pointerleave',hideTip);
-function mkCrack(){const br=[],N=7+Math.floor(Math.random()*3);
- for(let i=0;i<N;i++){let a=i/N*Math.PI*2+Math.random()*.6,x=0,y=0;const pts=[[0,0]],L=10+Math.floor(Math.random()*8);
-  for(let k=0;k<L;k++){a+=(Math.random()-.5)*.9;x+=Math.cos(a)*14;y+=Math.sin(a)*14;pts.push([x,y]);
-   if(Math.random()<.22)br.push({pts:[[x,y],[x+Math.cos(a+1.1)*22,y+Math.sin(a+1.1)*22],[x+Math.cos(a+.8)*40,y+Math.sin(a+.8)*40]],d:k/L})}
-  br.push({pts,d:0})}
+// jagged pixel fissures: main trunks with sharp kinks, forking side branches; points are in crack units (1u ~ 1 crack pixel)
+function mkCrack(){const br=[],N=6+Math.floor(Math.random()*3);
+ const walk=(x,y,a,L,w,d)=>{const pts=[[x,y]];for(let k=0;k<L;k++){a+=(Math.random()<.35?(Math.random()-.5)*1.4:(Math.random()-.5)*.35);const st=4+Math.random()*6;x+=Math.cos(a)*st;y+=Math.sin(a)*st;pts.push([x,y]);
+   if(w>1&&Math.random()<.18)walk(x,y,a+(Math.random()<.5?1:-1)*(.5+Math.random()*.7),Math.ceil(L*.45),w-1,d+k/L*.6)}
+  br.push({pts,w,d})};
+ for(let i=0;i<N;i++)walk(0,0,i/N*Math.PI*2+(Math.random()-.5)*.7,12+Math.floor(Math.random()*10),3,0);
  return br}
-function pxLine(x0,y0,x1,y1,ps){const n=Math.max(1,Math.ceil(Math.hypot(x1-x0,y1-y0)/ps));for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n,y=y0+(y1-y0)*i/n;cg.fillRect(Math.round(x/ps)*ps,Math.round(y/ps)*ps,ps,ps)}}
 function drawCrack(now){
  const v=window.__hubView&&window.__hubView();
  if(crk.width!==innerWidth||crk.height!==innerHeight){crk.width=innerWidth;crk.height=innerHeight}
@@ -400,13 +408,17 @@ function drawCrack(now){
   if(w2){const z=v.cam.z,s=Math.max(72,Math.round(WS*.8*z)),x=(w2.x-v.cam.x)*z+v.W/2,y=(w2.y-v.cam.y)*z+v.H/2;
    worm2.style.width=worm2.style.height=s+'px';worm2.style.transform='translate('+Math.round(x-s/2)+'px,'+Math.round(y-s/2)+'px)';
    worm2.style.display=(x<-s||y<-s||x>v.W+s||y>v.H+s)?'none':''}
-  if(crack){const z=v.cam.z,cx=(crack.x-v.cam.x)*z+v.W/2,cy=(crack.y-v.cam.y)*z+v.H/2,k=Math.min(1,(now-crack.t0)/(RM?200:1300)),sc=Math.max(.6,z*3),ps=Math.max(2,Math.round(3*Math.min(1.6,sc)));
-   const fade=w2?Math.max(0,1-(now-w2.t0)/2500):1;
-   for(const pass of[[ps*2,'rgba(120,40,200,.35)'],[ps,'#1a0a2a'],[Math.max(1,ps/2|0),'#ff9ad8']]){cg.fillStyle=pass[1];cg.globalAlpha=fade;
-    for(const b of crack.br){const g0=Math.max(0,Math.min(1,(k-b.d*.6)/.5));if(g0<=0)continue;const m=(b.pts.length-1)*g0;
-     for(let i=0;i<Math.floor(m);i++){const p=b.pts[i],q=b.pts[i+1];pxLine(cx+p[0]*sc,cy+p[1]*sc,cx+q[0]*sc,cy+q[1]*sc,pass[0])}}}
+  if(crack){const z=v.cam.z,cx=Math.round((crack.x-v.cam.x)*z+v.W/2),cy=Math.round((crack.y-v.cam.y)*z+v.H/2),k=Math.min(1,(now-crack.t0)/(RM?200:1600)),ps=Math.max(2,Math.min(5,Math.round(3*Math.max(.7,z*2.5))));
+   const fade=w2?Math.max(0,1-(now-w2.t0)/2200):1,fl=.75+.25*Math.sin(now/90);
+   // passes: soft purple halo (dithered), magenta body, pink-white hot core; all solid pixel squares, no fills
+   const PAL=[[2,'#3a1470',.5],[1,'#8a34d8',1],[0,'#e070f0',1],[-1,'#ffc8f4',1]];
+   for(const[pad,col,dens]of PAL){cg.fillStyle=col;cg.globalAlpha=fade*(pad===2?.55*fl:1);
+    for(const b of crack.br){const g0=Math.max(0,Math.min(1,(k-b.d)/(1-b.d*.8)));if(g0<=0)continue;const th=b.w+pad;if(th<1&&pad<0&&b.w<3)continue;const m=(b.pts.length-1)*g0;
+     for(let i=0;i<Math.ceil(m);i++){const p=b.pts[i],q=b.pts[i+1],f=Math.min(1,m-i),qx=p[0]+(q[0]-p[0])*f,qy=p[1]+(q[1]-p[1])*f,taper=1-i/(b.pts.length);const t2=Math.max(pad<0?1:0,Math.round(Math.max(1,th)*(.5+taper*.7)));
+      const n=Math.max(1,Math.ceil(Math.hypot(qx-p[0],qy-p[1])/1.5));for(let j=0;j<=n;j++){const ux=Math.round((p[0]+(qx-p[0])*j/n)*ps/ps),uy=Math.round(p[1]+(qy-p[1])*j/n);
+       for(let oy=-(t2>>1);oy<=(t2-1>>1)+(pad===2?1:0);oy++)for(let ox=-(t2>>1);ox<=(t2-1>>1)+(pad===2?1:0);ox++){if(dens<1&&((ux+ox+uy+oy)&1))continue;cg.fillRect(cx+(ux+ox)*ps-(ps>>1),cy+(uy+oy)*ps-(ps>>1),ps,ps)}}}}}
    cg.globalAlpha=1;
-   if(k>=1&&!w2){w2={x:crack.x,y:crack.y,t0:now};window.__sfx&&__sfx('whoosh');worm2.style.display='';worm2.style.animation='pxin .7s steps(5) both'}
+   if(k>=1&&!w2){w2={x:crack.x,y:crack.y,t0:now};window.__sfx&&__sfx('whoosh');worm2.style.display='';worm2.style.animation='wgrow 1.3s cubic-bezier(.2,.9,.25,1) both'}
    if(w2&&fade<=0)crack=null}
  }else worm2.style.display='none';
  requestAnimationFrame(drawCrack)}
@@ -428,4 +440,6 @@ window.__worm={
  frame(u){const snap=snapshot();rush.hidden=false;document.body.classList.add('traveling');drawTravel(u,snap,portalOrigin())},
  clear(){rush.hidden=true;document.body.classList.remove('traveling');if(!inGal)window.__galaxyHold=false}
 };
+// /ffc/ is the alternate dimension as its own page: boot straight into the galaxy and fade the veil away
+if(FFC){const boot=()=>{const so=window.__solar;if(so&&so.skip)so.skip();document.body.classList.remove('intro');showGalaxy();requestAnimationFrame(()=>requestAnimationFrame(()=>{veil.style.opacity='0'}))};document.readyState==='complete'?boot():addEventListener('load',boot,{once:true})}
 })();
