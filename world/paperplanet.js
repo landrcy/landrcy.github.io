@@ -5,7 +5,7 @@ const PB_W=1100,K=1.9,N=320,PR=80,RM=matchMedia('(prefers-reduced-motion: reduce
 const c=document.createElement('canvas');c.width=c.height=N;c.id='pbplanet';c.tabIndex=0;c.setAttribute('role','link');c.setAttribute('aria-label','Sticky Board paper planet - play');
 c.style.cssText='position:absolute;left:0;top:0;z-index:3;image-rendering:pixelated;display:none;touch-action:none;will-change:transform';
 const g=c.getContext('2d');g.imageSmoothingEnabled=false;
-const ld=s=>{const i=new Image();i.src=A+s+'?v=44';return i};
+const ld=s=>{const i=new Image();i.src=A+s+'?v=46';return i};
 const ball=ld('paperball-planet.png');
 const memes=['doge','cheems','pog','sadcat','kekw','gigachad','maxwell','hamster'].map(n=>ld('meme-'+n+'.png'));
 const notes=[0,1,2,3,4,5,6,7].map(n=>ld('note-'+n+'.png'));
