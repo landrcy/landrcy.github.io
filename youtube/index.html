@@ -1,101 +1,201 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LLC Powered Channels · Live</title>
+<title>LLC &amp; FFC Powered Channels · Live</title>
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}html,body{margin:0;background:#07050f;color:#f3ecdf;font-family:'VT323',monospace;font-size:20px;min-height:100%}
 #sky{position:fixed;inset:0;width:100%;height:100%;z-index:-1;image-rendering:pixelated}
-main{max-width:760px;margin:0 auto;padding:28px 16px 48px}
+main{max-width:1180px;margin:0 auto;padding:28px 16px 48px}
 a.back{font-family:Silkscreen;font-size:12px;color:#b9b0d0;text-decoration:none;letter-spacing:1px}a.back:hover{color:#fff}
-h1{font-family:Silkscreen;font-weight:700;font-size:clamp(22px,5vw,36px);margin:18px 0 4px;display:flex;align-items:center;gap:12px}
-h1 svg{width:44px;height:31px;flex:none}
-.sub{color:#b9b0d0;margin:0 0 22px}
+.top{margin:16px 0 22px}.top h1{font-family:Silkscreen;font-weight:700;font-size:clamp(18px,3.5vw,28px);margin:0 0 6px}
+.sub{color:#b9b0d0;margin:0}
 .live{display:inline-flex;align-items:center;gap:6px;font-family:Silkscreen;font-size:11px;color:#ff4d6a}
 .live i{width:8px;height:8px;background:#ff0033;display:inline-block;animation:bl 1.2s steps(2) infinite}@keyframes bl{50%{opacity:.25}}
-.tot{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px}
-.card{background:#120c1e;border:3px solid #2c2244;box-shadow:4px 4px 0 #000;padding:14px 16px}
-.card h2{font-family:Silkscreen;font-size:12px;letter-spacing:1px;margin:0 0 8px;color:#b9b0d0;font-weight:400}
-.odo{font-family:Silkscreen;font-weight:700;font-size:clamp(26px,7vw,48px);display:flex;line-height:1;height:1em;overflow:hidden}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.brand{min-width:0}
+.brand>h2{font-family:Silkscreen;font-weight:700;font-size:clamp(16px,2.6vw,22px);margin:0 0 10px;display:flex;align-items:center;gap:10px}
+.brand>h2 svg{width:36px;height:25px;flex:none}
+.brand.ffc>h2{color:#9ef0e8}
+.tot{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.card{background:#120c1e;border:3px solid #2c2244;box-shadow:4px 4px 0 #000;padding:12px 14px}
+.card h3{font-family:Silkscreen;font-size:11px;letter-spacing:1px;margin:0 0 8px;color:#b9b0d0;font-weight:400}
+.odo{font-family:Silkscreen;font-weight:700;font-size:clamp(22px,4.5vw,36px);display:flex;line-height:1;height:1em;overflow:hidden}
 .odo .d{display:inline-block;height:1em;overflow:hidden;width:.82em;text-align:center}
 .odo .d span{display:flex;flex-direction:column;transition:transform .9s cubic-bezier(.2,.8,.2,1)}
 .odo .d span b{height:1em;font-weight:700}
 .odo .c{width:.4em;text-align:center}
 .card.s .odo{color:#ff4d6a}.card.v .odo{color:#ffcc4d}
-.note{font-size:16px;color:#8d84a6;margin-top:6px}
-h3{font-family:Silkscreen;font-size:14px;letter-spacing:1px;margin:0 0 10px}
-#board{position:relative}
-.row{position:absolute;left:0;right:0;height:62px;display:flex;align-items:center;gap:12px;padding:0 14px;background:#120c1e;border:3px solid #2c2244;box-shadow:4px 4px 0 #000;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.brand.ffc .card.s .odo{color:#38e1d0}.brand.ffc .card.v .odo{color:#7c6cff}
+.brand.ffc .card{border-color:#1e3a44}
+.note{font-size:15px;color:#8d84a6;margin-top:6px}
+.lb{font-family:Silkscreen;font-size:13px;letter-spacing:1px;margin:0 0 10px}
+.board{position:relative}
+.row{position:absolute;left:0;right:0;height:66px;display:flex;align-items:center;gap:12px;padding:0 14px;background:#120c1e;border:3px solid #2c2244;box-shadow:4px 4px 0 #000;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.brand.ffc .row{border-color:#1e3a44}
 .row.first{border-color:#ffcc4d}
-.rk{font-family:Silkscreen;font-weight:700;width:34px;font-size:18px;color:#b9b0d0;position:relative}
-.crown{width:30px;height:18px;flex:none;margin-right:8px;vertical-align:-2px}.nm{display:flex;align-items:center}
-.nm{flex:1;min-width:0}.nm a{color:#f3ecdf;text-decoration:none;font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}.nm a:hover{color:#fff;text-decoration:underline}
-.st{text-align:right;font-family:Silkscreen;font-size:13px;line-height:1.5;white-space:nowrap}.st b{color:#ff4d6a}.st em{font-style:normal;color:#ffcc4d}.st .na{color:#6e6588}
-footer{margin-top:24px;font-size:16px;color:#8d84a6}
-@media(max-width:520px){.tot{grid-template-columns:1fr}.row{height:58px;gap:8px;padding:0 10px}.nm a{font-size:19px}.st{font-size:11px}}
+.brand.ffc .row.first{border-color:#38e1d0}
+.rk{font-family:Silkscreen;font-weight:700;width:34px;font-size:18px;color:#b9b0d0}
+.crown{width:30px;height:18px;flex:none;margin-right:8px;vertical-align:-2px}
+.nm{flex:1;min-width:0;display:flex;align-items:center}
+.nm a{color:#f3ecdf;text-decoration:none;font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}.nm a:hover{color:#fff;text-decoration:underline}
+.st{text-align:right;font-family:Silkscreen;font-size:12px;line-height:1.35;white-space:nowrap}.st b{color:#ff4d6a}.st em{font-style:normal;color:#ffcc4d}.st .na{color:#6e6588}
+.brand.ffc .st b{color:#38e1d0}.brand.ffc .st em{color:#a89cff}
+.d24{font-family:Silkscreen;font-size:11px;margin-top:6px;color:#b9b0d0;letter-spacing:.5px}.d24 .up{color:#7dff9a}.d24 .dn{color:#ff6b6b}.d24 .tr{color:#6e6588}
+.st .d24{margin-top:0;font-size:9px}
+.ctog{font-family:Silkscreen;font-size:12px;background:#120c1e;color:#ffcc4d;border:3px solid #2c2244;box-shadow:3px 3px 0 #000;padding:8px 12px;cursor:pointer;margin:26px 0 12px}.ctog:hover{color:#fff}
+#charts[hidden]{display:none}#charts .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+#charts .card canvas{width:100%;height:180px;display:block;image-rendering:pixelated}
+#charts .ctl{font-family:Silkscreen;font-size:11px;margin-bottom:10px;color:#b9b0d0}#charts .ctl button{font:inherit;background:#07050f;color:#b9b0d0;border:2px solid #2c2244;padding:4px 8px;cursor:pointer}#charts .ctl button.on{color:#fff;border-color:#ffcc4d}
+@media(max-width:820px){#charts .cgrid{grid-template-columns:1fr}}
+footer{margin-top:28px;font-size:16px;color:#8d84a6}
+@media(max-width:820px){.cols{grid-template-columns:1fr}.tot{grid-template-columns:1fr}}
+@media(max-width:520px){.row{height:58px;gap:8px;padding:0 10px}.nm a{font-size:19px}.st{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.odo .d span,.row{transition:none}.live i{animation:none}}
 </style></head><body><canvas id="sky"></canvas>
 <main>
 <a class="back" href="/">◀ BACK TO THE HUB</a>
-<h1><svg viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#ff0033" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#b8001f" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#fff" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg>LLC Powered Channels</h1>
-<p class="sub"><span class="live"><i></i>LIVE</span> &nbsp;combined counts across every channel</p>
-<section class="tot">
- <div class="card s"><h2>TOTAL SUBSCRIBERS</h2><div class="odo" id="ts">–</div><div class="note" id="tsn"></div></div>
- <div class="card v"><h2>TOTAL VIEWS</h2><div class="odo" id="tv">–</div><div class="note" id="tvn"></div></div>
+<div class="top">
+ <h1>Powered Channels</h1>
+ <p class="sub"><span class="live"><i></i>LIVE</span> &nbsp;LLC + FFC combined live counts</p>
+</div>
+<div class="cols">
+ <section class="brand llc" data-group="llc">
+  <h2><svg viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#ff0033" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#b8001f" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#fff" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg>LLC Powered Channels</h2>
+  <div class="tot">
+   <div class="card s"><h3>TOTAL SUBSCRIBERS</h3><div class="odo" id="ts-llc">–</div><div class="note" id="tsn-llc"></div></div>
+   <div class="card v"><h3>TOTAL VIEWS</h3><div class="odo" id="tv-llc">–</div><div class="note" id="tvn-llc"></div></div>
+  </div>
+  <div class="card d24c"><h3>LAST 24H</h3><div class="d24" id="d24-llc">tracking…</div></div><p class="lb" style="margin-top:14px">LEADERBOARD · BY SUBSCRIBERS</p>
+  <div class="board" id="board-llc"></div>
+ </section>
+ <section class="brand ffc" data-group="ffc">
+  <h2><svg viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#38e1d0" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#0e6a62" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#07201e" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg>FFC Powered Channels</h2>
+  <div class="tot">
+   <div class="card s"><h3>TOTAL SUBSCRIBERS</h3><div class="odo" id="ts-ffc">–</div><div class="note" id="tsn-ffc"></div></div>
+   <div class="card v"><h3>TOTAL VIEWS</h3><div class="odo" id="tv-ffc">–</div><div class="note" id="tvn-ffc"></div></div>
+  </div>
+  <div class="card d24c"><h3>LAST 24H</h3><div class="d24" id="d24-ffc">tracking…</div></div><p class="lb" style="margin-top:14px">LEADERBOARD · BY SUBSCRIBERS</p>
+  <div class="board" id="board-ffc"></div>
+ </section>
+</div>
+<button class="ctog" id="ctog" aria-expanded="false">▶ SHOW CHARTS</button>
+<section id="charts" hidden>
+ <div class="ctl">BRAND: <button data-b="both" class="on">BOTH</button> <button data-b="llc">LLC</button> <button data-b="ffc">FFC</button> &nbsp;<span id="cinfo"></span></div>
+ <div class="cgrid">
+  <div class="card"><h3>SUBSCRIBERS OVER TIME</h3><canvas id="c-subs" width="320" height="120"></canvas></div>
+  <div class="card"><h3>VIEWS OVER TIME</h3><canvas id="c-views" width="320" height="120"></canvas></div>
+  <div class="card" style="grid-column:1/-1"><h3>CURRENT SUBS BY CHANNEL</h3><canvas id="c-bar" width="640" height="120"></canvas></div>
+ </div>
+ <div class="note">History comes from samples this browser has stored (localStorage). Lines fill in as the page stays open / is revisited.</div>
 </section>
-<h3>LEADERBOARD · BY SUBSCRIBERS</h3>
-<div id="board"></div>
 <footer id="foot">Loading live counts…</footer>
 </main>
 <script>
-const CH=[
- {id:'UCT3ciRCc8ouYTix5_Heyrhg',name:'Langrino',url:'https://www.youtube.com/@Langrino'},
- {id:'UCCo7JOIyE3W--C9ANfWdObA',name:'clutchclips',url:'https://www.youtube.com/@clutchclipscrate'},
- {id:'UCNBQ7mBPy16upVp0EhbdTgA',name:'bowlfuloftrivia',url:'https://www.youtube.com/@bowlfuloftrivia'},
- {id:'UCRegZeMyJ1B5B9n64rfgKAw',name:'RedditStoryADay',url:'https://www.youtube.com/channel/UCRegZeMyJ1B5B9n64rfgKAw'},
- {id:'UCfDhWTThokF3gKW03iEGijg',name:'SAT in a Minute',url:'https://www.youtube.com/channel/UCfDhWTThokF3gKW03iEGijg'}];
-CH.forEach(c=>{c.subs=null;c.views=null;c.ok=false;c.tried=false});
+const GROUPS={
+ llc:{
+  channels:[
+   {id:'UCT3ciRCc8ouYTix5_Heyrhg',name:'Langrino',url:'https://www.youtube.com/@Langrino'},
+   {id:'UCCo7JOIyE3W--C9ANfWdObA',name:'clutchclips',url:'https://www.youtube.com/@clutchclipscrate'},
+   {id:'UCNBQ7mBPy16upVp0EhbdTgA',name:'bowlfuloftrivia',url:'https://www.youtube.com/@bowlfuloftrivia'},
+   {id:'UCRegZeMyJ1B5B9n64rfgKAw',name:'RedditStoryADay',url:'https://www.youtube.com/channel/UCRegZeMyJ1B5B9n64rfgKAw'},
+   {id:'UCfDhWTThokF3gKW03iEGijg',name:'SAT in a Minute',url:'https://www.youtube.com/channel/UCfDhWTThokF3gKW03iEGijg'}
+  ]
+ },
+ ffc:{
+  channels:[
+   {id:'UCIcfr7SXegLIyvpNiDzFLEw',name:'Quackatron',url:'https://www.youtube.com/@Quackatron'},
+   {id:'UCGl9SSbOrCg2jgBLrGO4aIw',name:'loocixe',url:'https://www.youtube.com/@loocixe'}
+  ]
+ }
+};
+const ALL=[];
+for(const [key,g] of Object.entries(GROUPS)){
+ g.key=key;g.rows={};
+ g.channels.forEach(c=>{c.subs=null;c.views=null;c.ok=false;c.tried=false;c.group=key;ALL.push(c)});
+}
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
-// ---- odometer ----
 function odo(el,n){if(n==null){el.textContent='unavailable';el.dataset.v='';return}
  const s=n.toLocaleString('en-US');if(el.dataset.v===s)return;
  if(el.dataset.len!=String(s.length)){el.innerHTML=[...s].map(ch=>/\d/.test(ch)?`<span class="d"><span>${'0123456789'.split('').map(x=>`<b>${x}</b>`).join('')}</span></span>`:`<span class="c">${ch}</span>`).join('');el.dataset.len=s.length;
   if(!RM){el.querySelectorAll('.d>span').forEach(sp=>{sp.style.transition='none';sp.style.transform='translateY(0)';sp.offsetHeight;sp.style.transition=''})}}
  const ds=[...s].filter(ch=>/\d/.test(ch));el.querySelectorAll('.d>span').forEach((sp,i)=>sp.style.transform=`translateY(-${ds[i]}em)`);el.dataset.v=s}
-// ---- board ----
-const board=document.getElementById('board'),rows={};const CROWN='<svg class="crown" viewBox="0 0 15 9" shape-rendering="crispEdges"><path fill="#ffcc4d" d="M0 1h1v1h1v1h1v-1h1v-1h1v1h1v1h1v-3h1v3h1v-1h1v-1h1v1h1v1h1v-1h1v-1h1v8h-15z"/><path fill="#c98a12" d="M0 7h15v2h-15z"/><path fill="#ff0033" d="M7 5h1v1h-1z"/></svg>';
+const CROWN='<svg class="crown" viewBox="0 0 15 9" shape-rendering="crispEdges"><path fill="#ffcc4d" d="M0 1h1v1h1v1h1v-1h1v-1h1v1h1v1h1v-3h1v3h1v-1h1v-1h1v1h1v1h1v-1h1v-1h1v8h-15z"/><path fill="#c98a12" d="M0 7h15v2h-15z"/><path fill="#ff0033" d="M7 5h1v1h-1z"/></svg>';
 const fmt=n=>n==null?'<span class="na">unavailable</span>':n.toLocaleString('en-US');
-CH.forEach(c=>{const r=document.createElement('div');r.className='row';r.innerHTML=`<div class="rk"></div><div class="nm"><a href="${c.url}" target="_blank" rel="noopener">${c.name}</a></div><div class="st"></div>`;board.appendChild(r);rows[c.id]=r});
-function render(){
+for(const g of Object.values(GROUPS)){
+ const board=document.getElementById('board-'+g.key);
+ g.channels.forEach(c=>{const r=document.createElement('div');r.className='row';r.innerHTML=`<div class="rk"></div><div class="nm"><a href="${c.url}" target="_blank" rel="noopener">${c.name}</a></div><div class="st"></div>`;board.appendChild(r);g.rows[c.id]=r});
+}
+function renderGroup(g){
  const H=innerWidth<=520?66:72;
- const order=[...CH].sort((a,b)=>(b.subs??-1)-(a.subs??-1)||(b.views??-1)-(a.views??-1));
- order.forEach((c,i)=>{const r=rows[c.id];r.style.transform=`translateY(${i*H}px)`;r.classList.toggle('first',i===0&&c.subs!=null);
+ const order=[...g.channels].sort((a,b)=>(b.subs??-1)-(a.subs??-1)||(b.views??-1)-(a.views??-1));
+ order.forEach((c,i)=>{const r=g.rows[c.id];r.style.transform=`translateY(${i*H}px)`;r.classList.toggle('first',i===0&&c.subs!=null);
   r.querySelector('.rk').textContent='#'+(i+1);const nm=r.querySelector('.nm'),cr=nm.querySelector('.crown');if(i===0&&c.subs!=null){if(!cr)nm.insertAdjacentHTML('afterbegin',CROWN)}else if(cr)cr.remove();
   r.querySelector('.st').innerHTML=c.tried?`<b>${fmt(c.subs)}</b> subs<br><em>${fmt(c.views)}</em> views`:'<span class="na">loading…</span>'});
- board.style.height=CH.length*H+'px';
- const okS=CH.filter(c=>c.subs!=null),okV=CH.filter(c=>c.views!=null),done=CH.every(c=>c.tried);
- if(okS.length)odo(document.getElementById('ts'),okS.reduce((a,c)=>a+c.subs,0));
- if(okV.length)odo(document.getElementById('tv'),okV.reduce((a,c)=>a+c.views,0));
- const miss=(k)=>{const m=CH.filter(c=>c.tried&&c[k]==null).map(c=>c.name);return m.length?'not counted (unavailable): '+m.join(', '):''};
- document.getElementById('tsn').textContent=done?miss('subs'):'';document.getElementById('tvn').textContent=done?miss('views'):'';
+ document.getElementById('board-'+g.key).style.height=g.channels.length*H+'px';
+ const okS=g.channels.filter(c=>c.subs!=null),okV=g.channels.filter(c=>c.views!=null),done=g.channels.every(c=>c.tried);
+ if(okS.length)odo(document.getElementById('ts-'+g.key),okS.reduce((a,c)=>a+c.subs,0));
+ if(okV.length)odo(document.getElementById('tv-'+g.key),okV.reduce((a,c)=>a+c.views,0));
+ const miss=(k)=>{const m=g.channels.filter(c=>c.tried&&c[k]==null).map(c=>c.name);return m.length?'not counted (unavailable): '+m.join(', '):''};
+ document.getElementById('tsn-'+g.key).textContent=done?miss('subs'):'';
+ document.getElementById('tvn-'+g.key).textContent=done?miss('views'):'';
 }
-// ---- live data: socialcounts.org public API (CORS-enabled, ~100 req/hour) ----
+function render(){Object.values(GROUPS).forEach(g=>{renderGroup(g);renderD24(g)});drawCharts()}
+
+// ---- trailing samples (localStorage) ----
+const HK='pc-hist:',CAP=200,MINGAP=5*60e3;
+const hist=id=>{try{return JSON.parse(localStorage.getItem(HK+id))||[]}catch(e){return[]}};
+function addSample(c){if(c.subs==null&&c.views==null)return;const a=hist(c.id),t=Date.now(),l=a[a.length-1];
+ if(l&&t-l.t<MINGAP){l.t=t;l.subs=c.subs;l.views=c.views;if(a.length>1&&a.length<3){}}else a.push({t,subs:c.subs,views:c.views});
+ // keep at most CAP, thinning old points but always keeping a point near 24h
+ while(a.length>CAP){let k=1;for(let j=2;j<a.length-1;j++)if(a[j+1].t-a[j-1].t<a[k+1].t-a[k-1].t)k=j;a.splice(k,1)}
+ try{localStorage.setItem(HK+c.id,JSON.stringify(a))}catch(e){}}
+function at24(a,k){const tgt=Date.now()-864e5;const v=a.filter(p=>p[k]!=null);if(!v.length||v[0].t>Date.now()-23*36e5)return null;
+ for(let j=0;j<v.length-1;j++)if(v[j].t<=tgt&&v[j+1].t>=tgt){const f=(tgt-v[j].t)/(v[j+1].t-v[j].t||1);return v[j][k]+(v[j+1][k]-v[j][k])*f}
+ const o=v[0];return o.t>=Date.now()-25*36e5?o[k]:(v.filter(p=>p.t<=tgt).pop()||o)[k]}
+function d24(c){const a=hist(c.id);const r={};for(const k of['subs','views']){const b=at24(a,k);r[k]=(b==null||c[k]==null)?null:Math.round(c[k]-b)}
+ r.age=a.length?Date.now()-a[0].t:0;return r}
+const cmp=n=>Math.abs(n)>=1e6?(n/1e6).toFixed(1)+'M':Math.abs(n)>=1e3?(n/1e3).toFixed(1)+'K':String(n);
+const sg=n=>`<span class="${n<0?'dn':'up'}">${n<0?'−':'+'}${cmp(Math.abs(n))}</span>`;
+function trk(age){const h=Math.max(0,24-age/36e5);return `<span class="tr">tracking… need ~${Math.ceil(h)}h more</span>`}
+function d24html(r){return r.subs==null&&r.views==null?trk(r.age):`${r.subs==null?'?':sg(r.subs)} subs · ${r.views==null?'?':sg(r.views)} views`}
+function renderD24(g){let s=0,v=0,ns=0,nv=0,age=Infinity;g.channels.forEach(c=>{const r=d24(c);age=Math.min(age,r.age);if(r.subs!=null){s+=r.subs;ns++}if(r.views!=null){v+=r.views;nv++}
+  const st=g.rows[c.id].querySelector('.st');if(c.tried)st.insertAdjacentHTML('beforeend',`<div class="d24">${d24html(r)}</div>`)});
+ const el=document.getElementById('d24-'+g.key);const live=g.channels.filter(c=>c.subs!=null).length;
+ el.innerHTML=(!ns&&!nv)?trk(age===Infinity?0:age):`${ns?sg(s):'?'} subs · ${nv?sg(v):'?'} views`+(ns<live?` <span class="tr">(${ns}/${live} ch. have 24h)</span>`:'')}
+// ---- charts (hand-drawn canvas) ----
+let cb='both',copen=false;const COL={llc:['#ff4d6a','#ffcc4d'],ffc:['#38e1d0','#7c6cff']};
+function series(gk,k){const ch=GROUPS[gk].channels,hs=ch.map(c=>hist(c.id).filter(p=>p[k]!=null));const ts=[...new Set(hs.flat().map(p=>p.t))].sort((a,b)=>a-b);
+ return ts.map(t=>{let sum=0,ok=0;hs.forEach(h=>{const p=h.filter(q=>q.t<=t).pop();if(p){sum+=p[k];ok++}});return{t,v:sum,ok}}).filter(p=>p.ok)}
+function line(id,k,ci){const cv=document.getElementById(id),x=cv.getContext('2d'),W=cv.width,H=cv.height;x.fillStyle='#07050f';x.fillRect(0,0,W,H);
+ x.fillStyle='#2c2244';for(let i=1;i<4;i++)x.fillRect(0,H*i/4|0,W,1);
+ const gs=cb==='both'?['llc','ffc']:[cb];let any=false;x.font='8px monospace';
+ gs.forEach((gk,gi)=>{const s=series(gk,k);if(s.length<2)return;any=true;const t0=s[0].t,t1=s[s.length-1].t||t0+1,lo=Math.min(...s.map(p=>p.v)),hi=Math.max(...s.map(p=>p.v));
+  const X=t=>4+(W-8)*(t-t0)/((t1-t0)||1),Y=v=>H-6-(H-14)*(hi===lo?.5:(v-lo)/(hi-lo));x.fillStyle=COL[gk][ci];
+  for(let j=1;j<s.length;j++){let ax=X(s[j-1].t)|0,ay=Y(s[j-1].v)|0;const bx=X(s[j].t)|0,by=Y(s[j].v)|0;x.fillRect(ax,ay,bx-ax+1,2);x.fillRect(bx,Math.min(ay,by),2,Math.abs(by-ay)+1)}
+  x.fillText(gk.toUpperCase()+' '+cmp(s[s.length-1].v),4,10+gi*10)});
+ if(!any){x.fillStyle='#6e6588';x.fillText('collecting samples… need 2+ points',8,H/2)}}
+function bars(){const cv=document.getElementById('c-bar'),x=cv.getContext('2d'),W=cv.width,H=cv.height;x.fillStyle='#07050f';x.fillRect(0,0,W,H);
+ const cs=ALL.filter(c=>(cb==='both'||c.group===cb)&&c.subs!=null).sort((a,b)=>b.subs-a.subs);if(!cs.length)return;const mx=cs[0].subs||1,bh=Math.floor((H-4)/cs.length);x.font='8px monospace';
+ cs.forEach((c,i)=>{const w=Math.max(2,((W-200)*c.subs/mx)|0),y=2+i*bh;x.fillStyle='#b9b0d0';x.fillText(c.name.slice(0,16),2,y+bh/2+3);x.fillStyle=COL[c.group][0];x.fillRect(90,y+1,w,bh-3);x.fillStyle='#f3ecdf';x.fillText(c.subs.toLocaleString('en-US'),94+w,y+bh/2+3)})}
+function drawCharts(){if(!copen)return;line('c-subs','subs',0);line('c-views','views',1);bars();
+ const n=ALL.reduce((a,c)=>a+hist(c.id).length,0);document.getElementById('cinfo').textContent=`${n} stored samples`}
+document.getElementById('ctog').onclick=e=>{copen=!copen;document.getElementById('charts').hidden=!copen;e.target.textContent=(copen?'▼ HIDE':'▶ SHOW')+' CHARTS';e.target.setAttribute('aria-expanded',copen);drawCharts()};
+document.querySelectorAll('#charts .ctl button').forEach(b=>b.onclick=()=>{cb=b.dataset.b;document.querySelectorAll('#charts .ctl button').forEach(q=>q.classList.toggle('on',q===b));drawCharts()});
 let last=0,delay=8000,i=0;
 async function fetchOne(c){try{const r=await fetch('https://api.socialcounts.org/youtube-live-subscriber-count/'+c.id,{cache:'no-store'});
   const rl=r.headers.get('RateLimit');const rem=rl&&+(/remaining=(\d+)/.exec(rl)||[])[1];
   if(r.status===429){delay=Math.min(120000,delay*2);return}
   if(!r.ok)throw 0;const j=await r.json(),a=j.counters&&(j.counters.api||j.counters.estimation);
   if(!a)throw 0;
-  // a channel with no videos and no views returns all zeros: its stats aren't really available
   const empty=!a.videoCount&&!a.viewCount;
-  c.subs=empty?null:a.subscriberCount;c.views=empty?null:a.viewCount;c.ok=!empty;last=Date.now();
+  c.subs=empty?null:a.subscriberCount;c.views=empty?null:a.viewCount;c.ok=!empty;last=Date.now();addSample(c);
   delay=rem!=null&&rem<20?60000:8000;
  }catch(e){c.subs=c.subs??null;c.views=c.views??null}finally{c.tried=true}}
-async function boot(){await Promise.all(CH.map(fetchOne));render();loop()}
-async function loop(){await new Promise(r=>setTimeout(r,delay));if(!document.hidden){await fetchOne(CH[i++%CH.length]);render()}loop()}
+async function boot(){await Promise.all(ALL.map(fetchOne));render();loop()}
+async function loop(){await new Promise(r=>setTimeout(r,delay));if(!document.hidden){await fetchOne(ALL[i++%ALL.length]);render()}loop()}
 setInterval(()=>{document.getElementById('foot').textContent=last?`Live counts from socialcounts.org · refreshing a channel every ${Math.round(delay/1000)}s · last update ${Math.round((Date.now()-last)/1000)}s ago`:'Loading live counts…'},1000);
 addEventListener('resize',render);render();boot();
-// ---- starfield ----
 const sky=document.getElementById('sky'),g=sky.getContext('2d');let st=[];
-function sz(){sky.width=Math.ceil(innerWidth/3);sky.height=Math.ceil(innerHeight/3);st=Array.from({length:sky.width*sky.height/350|0},()=>({x:Math.random()*sky.width,y:Math.random()*sky.height,p:Math.random()*6,c:['#fff','#b9b0d0','#ffcc4d','#ff9ab0'][Math.random()*4|0]}))}
+function sz(){sky.width=Math.ceil(innerWidth/3);sky.height=Math.ceil(innerHeight/3);st=Array.from({length:sky.width*sky.height/350|0},()=>({x:Math.random()*sky.width,y:Math.random()*sky.height,p:Math.random()*6,c:['#fff','#b9b0d0','#ffcc4d','#ff9ab0','#38e1d0'][Math.random()*5|0]}))}
 function draw(t){g.fillStyle='#07050f';g.fillRect(0,0,sky.width,sky.height);for(const s of st){g.globalAlpha=RM?.8:.45+.45*Math.sin(t/700+s.p);g.fillStyle=s.c;g.fillRect(s.x|0,s.y|0,1,1)}g.globalAlpha=1;if(!RM)requestAnimationFrame(draw)}
 addEventListener('resize',()=>{sz();if(RM)draw(0)});sz();requestAnimationFrame(draw);
 </script></body></html>
