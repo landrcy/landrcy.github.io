@@ -1,6 +1,6 @@
 /* Wormhole in the hub corner. Click it to fall through a hex tunnel into a red blood-nebula galaxy
    whose center is the F blackhole, with the maximum Omniverse orbiting it. The little ship, empty space,
-   or Escape comes back. The portal is a world-space object far out in the white void past the outer orbits, so it pans and zooms with the solar system. */
+   or Escape comes back. The portal is a world-space object far out in deep space past the outer orbits, so it pans and zooms with the solar system. */
 (()=>{
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const P=window.PLANETS;
@@ -24,7 +24,7 @@ wimg.alt='';wimg.draggable=false;
 wimg.src=RM?WH_STILL:WH_GIF;
 worm.appendChild(wimg);
 document.body.appendChild(worm);
-// world-space anchor: bottom-right, out in the white void past the tear edge (~2670,1670 on that diagonal), framed by the zoomed-out default overview (z~.23 @1440x900)
+// world-space anchor: bottom-right, out in deep space past the outer orbits (~2670,1670 on that diagonal), framed by the zoomed-out default overview (z~.23 @1440x900)
 const WX=2900,WY=1700,WS=520;
 function placeWorm(){
  const v=window.__hubView&&window.__hubView();
@@ -105,7 +105,7 @@ function finClear(){finT.forEach(clearTimeout);finT=[]}
 function glitchEl(el,on,done){let n=0;const iv=setInterval(()=>{n++;el.style.opacity=Math.random()<.5?'1':'.2';el.style.transform='translate('+((Math.random()*10-5)|0)+'px,'+((Math.random()*6-3)|0)+'px)';el.style.color=Math.random()<.5?'#ff2a4a':'#5affd8';if(n>5){clearInterval(iv);el.style.transform='';el.style.color='';el.style.opacity=on?'1':'0';done&&done()}},55);finT.push(iv)}
 function finOn(){if(fin)return;fin=true;gfoc=null;showCta(false);finClear();finW.textContent='';
  'Finley'.split('').forEach((ch,i)=>{const sp=document.createElement('span');sp.textContent=ch;sp.style.display='inline-block';sp.style.opacity=i?'0':'1';finW.appendChild(sp);if(i)finT.push(setTimeout(()=>glitchEl(sp,true),RM?0:700+i*240))})}
-function finOff(){if(!fin)return;fin=false;finClear();const sp=[...finW.children].slice(1).reverse();sp.forEach((el,i)=>finT.push(setTimeout(()=>glitchEl(el,false),RM?0:i*120)));finT.push(setTimeout(()=>{if(!fin)finW.textContent=''},RM?0:900))}
+function finOff(){if(!fin)return;fin=false;finClear();const sp=[...finW.children].slice(1).reverse();sp.forEach((el,i)=>finT.push(setTimeout(()=>glitchEl(el,false),RM?0:i*120)));finT.push(setTimeout(()=>{if(!fin){finClear();finW.textContent=''}},RM?0:900))}
 // F pixel-scramble + Finley letter glitches (occasional)
 const bhG=document.createElement('canvas');bhG.setAttribute('aria-hidden','true');bhG.style.cssText='position:absolute;left:0;top:0;pointer-events:none;image-rendering:pixelated;z-index:4';const bgx=bhG.getContext('2d');
 function fScramble(){if(RM||gal.hidden||!bh.complete||!bh.naturalWidth)return;const W=bh.naturalWidth,H=bh.naturalHeight;bhG.width=W;bhG.height=H;bhG.style.width=bh.style.width;bhG.style.height=bh.style.height;bhG.style.transform=bh.style.transform;
@@ -186,7 +186,7 @@ function drawTravel(u,snap,origin){
  const ps=origin.s||100,zEnd=Math.max(W,H)*1.5/ps,z=Math.exp(Math.log(zEnd)*a);
  const cx=origin.x+(W/2-origin.x)*a,cy=origin.y+(H/2-origin.y)*a;
  if(u<.62){
-  rg.fillStyle=inGal?'#140206':'#ffffff';rg.fillRect(0,0,W,H);
+  rg.fillStyle=inGal?'#140206':'#05040c';rg.fillRect(0,0,W,H);
   rg.save();rg.translate(cx,cy);rg.scale(z,z);rg.translate(-origin.x,-origin.y);
   rg.drawImage(snap,0,0,W,H);
   if(wimg.complete)rg.drawImage(wimg,origin.x-ps/2,origin.y-ps/2,ps,ps);
@@ -201,10 +201,10 @@ function drawTravel(u,snap,origin){
   const tz=1+Math.max(0,u-.3)*.6;
   rg.save();rg.translate(W/2,H/2);rg.scale(tz,tz);rg.drawImage(drawTravel.buf,-bw*S/2,-bh*S/2,bw*S,bh*S);rg.restore();
   rg.globalAlpha=1}
- // 3) arrive: crimson flash into the destination (white when heading home)
+ // 3) arrive: crimson flash into the destination (deep violet when heading home)
  if(u>.82){
   const k=Math.min(1,(u-.82)/.18);
-  rg.globalAlpha=k;rg.fillStyle=inGal?'#ffffff':'#3a0610';rg.fillRect(0,0,W,H);rg.globalAlpha=1}
+  rg.globalAlpha=k;rg.fillStyle=inGal?'#1a0e3a':'#3a0610';rg.fillRect(0,0,W,H);rg.globalAlpha=1}
 }
 
 function buildNeb(){
@@ -270,7 +270,7 @@ function drawGal(now){
   for(let k=1;k<=n;k++){const f=k/n,an=omAng-arc*f,sx=(Math.cos(an)*ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
  // hub-style focus: fly + zoom the camera onto the clicked body
  if(gfoc){const[fx,fy]=gfoc==='om'?omPos():clPos(),zt=Math.min(GW,GH)*(gfoc==='om'?.55:.62)/(gfoc==='om'?OM_W:CL_W),k=Math.min(1,dt*(RM?60:5));cam.x+=(fx-cam.x)*k;cam.y+=(fy-cam.y)*k;cam.z*=Math.pow(zt/cam.z,k)}
- bhOff=0;finP+=((fin?1:0)-finP)*Math.min(1,dt*(RM?60:3.2));
+ bhOff=0;finP+=((fin?1:0)-finP)*Math.min(1,dt*(RM?60:3.2));if(!fin&&finP<.02&&finW.firstChild&&!finT.length)finW.textContent='';finW.style.visibility=(fin||finP>.02)?'visible':'hidden';
  placeOmni()}
 let gLoop=0;
 function galFrame(now){if(!inGal){gLoop=0;return}drawGal(now);gLoop=requestAnimationFrame(galFrame)}

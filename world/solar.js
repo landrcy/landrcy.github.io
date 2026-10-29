@@ -245,7 +245,7 @@ function revealMask(R){const cs=4,mw=Math.ceil(W/cs),mh=Math.ceil(H/cs);if(!rvC|
  const d=rvI.data,[cx,cy]=W2S(0,0),band=Math.max(20,Math.min(Math.min(W,H)*RVB,R*.5));
  for(let y=0;y<mh;y++)for(let x=0;x<mw;x++){const p=clamp((R-Math.hypot(x*cs+2-cx,y*cs+2-cy))/band),s=p<.34?4:p<.67?2:1,o=(y*mw+x)*4;
   // chunky blocks far from the front, fine dither near it
-  const th=B4[((y/s|0)&3)*4+((x/s|0)&3)];if(p>th){d[o+3]=0;continue}const e=p>0&&p>th-.18,h=(x*7+y*13+((performance.now()/120)|0))%5;const c=e?(h<2?[255,255,255]:h<4?[215,156,255]:[180,92,240]):[5,4,12];d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}
+  const th=B4[((y/s|0)&3)*4+((x/s|0)&3)];if(p>th){d[o+3]=0;continue}const e=p>0&&p<.2&&p>th-.06,h=(x*7+y*13+((performance.now()/120)|0))%7;const c=e?(h<1?[196,150,255]:h<3?[120,70,200]:[40,22,78]):[5,4,12];d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}
  rvG.putImageData(rvI,0,0);g.imageSmoothingEnabled=false;g.drawImage(rvC,0,0,mw*cs,mh*cs)}
 const B4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v=>(v+.5)/16);
 function uiReveal(){document.body.classList.remove('intro');document.body.classList.add('uirv');setTimeout(()=>document.body.classList.remove('uirv'),2000)}
