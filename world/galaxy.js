@@ -55,6 +55,9 @@ omni.id='omni';omni.alt='Maximum Omniverse';omni.draggable=false;
 omni.src=OM_STILL;
 const clov=document.createElement('img');clov.id='clov';clov.alt='Lucky clover planet';clov.draggable=false;clov.src=CL_STILL;
 clov.style.cssText='position:absolute;left:0;top:0;image-rendering:pixelated;pointer-events:none;user-select:none;z-index:3';
+/* V39: clSrc is a tiny always-painted GIF decoder; browsers pause GIFs on opacity-0 imgs, so bakeClov samples this instead of clov */
+const clSrc=document.createElement('img');clSrc.alt='';clSrc.setAttribute('aria-hidden','true');clSrc.draggable=false;clSrc.src=CL_STILL;
+clSrc.style.cssText='position:fixed;right:0;bottom:0;width:2px;height:2px;opacity:.01;pointer-events:none;user-select:none;z-index:0';document.body.appendChild(clSrc);
 const bh=document.createElement('img');bh.id='bhf';bh.alt='F blackhole';bh.draggable=false;bh.src=BH_STILL;
 bh.style.cssText='position:absolute;left:0;top:0;image-rendering:pixelated;pointer-events:none;user-select:none;z-index:2;-webkit-mask-image:radial-gradient(closest-side,#000 52%,rgba(0,0,0,.85) 64%,rgba(0,0,0,.4) 80%,transparent 100%);mask-image:radial-gradient(closest-side,#000 52%,rgba(0,0,0,.85) 64%,rgba(0,0,0,.4) 80%,transparent 100%);filter:drop-shadow(0 0 18px rgba(90,10,40,.55))';
 omni.style.zIndex=3;
@@ -271,8 +274,8 @@ function clMaskFor(a){const k=Math.round(a*40);if(clMK===k)return clMask;clMK=k;
 // emissive and their blurred colors are added back as light on the clover (V38: sampled from the rings, not an invented hue sweep)
 const GN=32,clG=document.createElement('canvas');clG.width=clG.height=GN;const clGg=clG.getContext('2d',{willReadFrequently:true});
 function isRb(r,g,b){const mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(mx<120||mx-mn<mx*.55)return false;return !(g>=r&&g>=b&&g-Math.max(r,b)>20&&r<200)}
-function bakeClov(){if(!inGal||!clov.complete||!clov.naturalWidth)return;if(clC.width!==CLN){clC.width=clC.height=CLN}const g=clC.getContext('2d',{willReadFrequently:true});
- g.imageSmoothingEnabled=false;g.clearRect(0,0,CLN,CLN);g.drawImage(clov,0,0,CLN,CLN);const im=g.getImageData(0,0,CLN,CLN),d=im.data,m=clMaskFor(clLA),ring=cta.hidden?1:1.5,st=CLN/GN;
+function bakeClov(){if(!inGal||!clSrc.complete||!clSrc.naturalWidth)return;if(clC.width!==CLN){clC.width=clC.height=CLN}const g=clC.getContext('2d',{willReadFrequently:true});
+ g.imageSmoothingEnabled=false;g.clearRect(0,0,CLN,CLN);g.drawImage(clSrc,0,0,CLN,CLN);const im=g.getImageData(0,0,CLN,CLN),d=im.data,m=clMaskFor(clLA),ring=cta.hidden?1:1.5,st=CLN/GN;
  const em=new ImageData(GN,GN),e=em.data;
  for(let i=0;i<d.length;i+=4){if(d[i+3]<128||!isRb(d[i],d[i+1],d[i+2]))continue;const x=(i>>2)%CLN,y=(i>>2)/CLN|0,o=((y/st|0)*GN+(x/st|0))*4;e[o]+=d[i]/st/st*3;e[o+1]+=d[i+1]/st/st*3;e[o+2]+=d[i+2]/st/st*3}
  for(let o=3;o<e.length;o+=4)e[o]=255;
@@ -342,7 +345,7 @@ function drawGal(now){
 let gLoop=0;
 function galFrame(now){if(!inGal){gLoop=0;return}drawGal(now);gLoop=requestAnimationFrame(galFrame)}
 
-function armOmni(){if(omni.dataset.arm)return;omni.dataset.arm='1';omni.src=RM?OM_STILL:OM_GIF;clov.src=RM?CL_STILL:CL_GIF}
+function armOmni(){if(omni.dataset.arm)return;omni.dataset.arm='1';omni.src=RM?OM_STILL:OM_GIF;clov.src=clSrc.src=RM?CL_STILL:CL_GIF}
 // replay the F glitch-in each arrival, then hand off to the loop
 function bhArrive(){clearTimeout(bhT);if(RM){bh.src=BH_STILL;return}bh.src=BH_IN+'?t='+Date.now();bhT=setTimeout(()=>{if(inGal)bh.src=BH_LOOP},BH_IN_MS)}
 
