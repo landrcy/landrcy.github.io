@@ -1,6 +1,6 @@
-/* Wormhole in the hub corner. Click it to fall through a hex tunnel into a warped purple glitch galaxy
+/* Wormhole in the hub corner. Click it to fall through a hex tunnel into a red blood-nebula galaxy
    whose centerpiece is the maximum Omniverse. The little ship, empty space,
-   or Escape comes back. Not a planet — the portal is a fixed overlay. */
+   or Escape comes back. The portal is a world-space object far out in the white void past the outer orbits, so it pans and zooms with the solar system. */
 (()=>{
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const P=window.PLANETS;
@@ -18,6 +18,15 @@ wimg.alt='';wimg.draggable=false;
 wimg.src=RM?WH_STILL:WH_GIF;
 worm.appendChild(wimg);
 document.body.appendChild(worm);
+// world-space anchor: deep in the empty white void, bottom-right, past the outermost orbit (1590) and outside the dark rift tear (~3000x3650)
+const WX=3230,WY=2700,WS=520;
+function placeWorm(){
+ const v=window.__hubView&&window.__hubView();
+ if(v&&v.sys==='main'){const z=v.cam.z,s=Math.max(44,Math.round(WS*z)),x=(WX-v.cam.x)*z+v.W/2,y=(WY-v.cam.y)*z+v.H/2;
+  worm.style.width=worm.style.height=s+'px';worm.style.transform='translate('+Math.round(x-s/2)+'px,'+Math.round(y-s/2)+'px)';
+  worm.style.display=(x<-s||y<-s||x>v.W+s||y>v.H+s)?'none':''}
+ requestAnimationFrame(placeWorm)}
+requestAnimationFrame(placeWorm);
 
 const rush=document.createElement('canvas');
 rush.id='rush';rush.hidden=true;rush.setAttribute('aria-hidden','true');
@@ -27,7 +36,7 @@ const rg=rush.getContext('2d');
 const gal=document.createElement('div');
 gal.id='galaxy';gal.hidden=true;
 const gsky=document.createElement('canvas');
-gsky.id='gsky';gsky.setAttribute('aria-label','Warped glitch galaxy. The Maximum Omniverse is at the center. Drag to fly; the little ship at the bottom right flies you back to the hub.');
+gsky.id='gsky';gsky.setAttribute('aria-label','Blood nebula galaxy. The Maximum Omniverse is at the center. Drag to fly; the little ship at the bottom right flies you back to the hub.');
 const gg=gsky.getContext('2d');
 const omni=document.createElement('img');
 omni.id='omni';omni.alt='Maximum Omniverse';omni.draggable=false;
@@ -109,7 +118,7 @@ function drawTravel(u,snap,origin){
  const ps=origin.s||100,zEnd=Math.max(W,H)*1.5/ps,z=Math.exp(Math.log(zEnd)*a);
  const cx=origin.x+(W/2-origin.x)*a,cy=origin.y+(H/2-origin.y)*a;
  if(u<.62){
-  rg.fillStyle=inGal?'#0c0418':'#ffffff';rg.fillRect(0,0,W,H);
+  rg.fillStyle=inGal?'#140206':'#ffffff';rg.fillRect(0,0,W,H);
   rg.save();rg.translate(cx,cy);rg.scale(z,z);rg.translate(-origin.x,-origin.y);
   rg.drawImage(snap,0,0,W,H);
   if(wimg.complete)rg.drawImage(wimg,origin.x-ps/2,origin.y-ps/2,ps,ps);
@@ -124,17 +133,16 @@ function drawTravel(u,snap,origin){
   const tz=1+Math.max(0,u-.3)*.6;
   rg.save();rg.translate(W/2,H/2);rg.scale(tz,tz);rg.drawImage(drawTravel.buf,-bw*S/2,-bh*S/2,bw*S,bh*S);rg.restore();
   rg.globalAlpha=1}
- // 3) arrive: chromatic glitch flash into the destination
+ // 3) arrive: crimson flash into the destination (white when heading home)
  if(u>.82){
   const k=Math.min(1,(u-.82)/.18);
-  rg.globalAlpha=k;rg.fillStyle=inGal?'#ffffff':'#1a0830';rg.fillRect(0,0,W,H);rg.globalAlpha=1;
-  if(!RM&&k<.95)for(let i=0;i<10;i++){const y=Math.random()*H|0,h=4+Math.random()*24|0;rg.fillStyle=i&1?'rgba(90,255,230,.55)':'rgba(255,60,200,.55)';rg.fillRect((Math.random()-.5)*60,y,W,h)}}
+  rg.globalAlpha=k;rg.fillStyle=inGal?'#ffffff':'#3a0610';rg.fillRect(0,0,W,H);rg.globalAlpha=1}
 }
 
 function buildNeb(){
  if(!P){neb=null;return}
  const N=320,S=P.mk(N,N),d=S.img.data;
- const R=['#0a0216','#1c0838','#36125e','#5a2296','#8a3ad0','#3a1a7a','#120428'];
+ const R=['#100204','#2c060e','#5c1018','#8e2430','#c43a46','#6a1420','#1a0408'];
  // edge-blended so the tile wraps — a hard repeat was reading as a checkerboard
  const f=(x,y)=>P.fbm(x/78+2,y/78)*1.2+P.fbm(x/28+6,y/28)*.42-.2;
  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
@@ -146,7 +154,7 @@ function buildNeb(){
  S.g.putImageData(S.img,0,0);neb=S.c}
 function buildStars(){
  stars=[];
- const cols=['#e0d0ff','#5affd8','#ff6ad8','#ffd27a','#ffffff','#8a7aff'];
+ const cols=['#ffd0c4','#ff6a62','#ffb098','#ffd27a','#fff0e4','#e04058'];
  for(let i=0;i<220;i++)stars.push({x:Math.random(),y:Math.random(),s:i%17===0?3:i%5===0?2:1,c:cols[i%cols.length],p:Math.random()*6.28})}
 
 function fitCam(){cam.z=fitZ();cam.x=0;cam.y=0}
@@ -161,25 +169,18 @@ function resizeGal(){
  if(inGal&&!busy)placeOmni()}
 function drawGal(now){
  if(!inGal)return;
- gg.imageSmoothingEnabled=false;gg.fillStyle='#0c0418';gg.fillRect(0,0,GW,GH);
+ gg.imageSmoothingEnabled=false;gg.fillStyle='#140206';gg.fillRect(0,0,GW,GH);
  const T=512,ox=Math.round(((cam.x*.08)%T+T)%T),oy=Math.round(((cam.y*.08)%T+T)%T);
  if(neb){gg.globalAlpha=.92;for(let y=-oy;y<GH;y+=T)for(let x=-ox;x<GW;x+=T)gg.drawImage(neb,x,y,T,T);gg.globalAlpha=1}
- else{const grd=gg.createRadialGradient(GW/2,GH/2,40,GW/2,GH/2,Math.max(GW,GH)*.7);grd.addColorStop(0,'#5a2296');grd.addColorStop(1,'#0c0418');gg.fillStyle=grd;gg.fillRect(0,0,GW,GH)}
+ else{const grd=gg.createRadialGradient(GW/2,GH/2,40,GW/2,GH/2,Math.max(GW,GH)*.7);grd.addColorStop(0,'#6a1420');grd.addColorStop(1,'#140206');gg.fillStyle=grd;gg.fillRect(0,0,GW,GH)}
  const t=now/1000;
  for(const s of stars){
   let x=((s.x*GW*1.4-cam.x*s.s*.15)%GW+GW)%GW,y=((s.y*GH*1.4-cam.y*s.s*.15)%GH+GH)%GH;
   const ps=s.s;x=Math.round(x/ps)*ps;y=Math.round(y/ps)*ps;
   const tw=RM?1:.55+.45*Math.sin(t*(.6+s.s*.4)+s.p);if(tw<.2&&s.s===1)continue;
   gg.globalAlpha=tw;gg.fillStyle=s.c;gg.fillRect(x,y,ps,ps);gg.globalAlpha=1}
- // warp glitch: hex ripple rings + chromatic slice tears, like the inside of the wormhole
- const cx=GW/2-cam.x*cam.z,cy=GH/2-cam.y*cam.z,mr=Math.hypot(GW,GH)*.6;
- gg.lineWidth=Math.max(2,pxScale());
- for(let i=0;i<7;i++){const rr=((i/7+(RM?0:t*.06))%1)*mr;gg.strokeStyle=i%2?'rgba(90,255,230,.10)':'rgba(200,90,255,.16)';gg.beginPath();
-  for(let k=0;k<=6;k++){const an=k/6*6.2832+.5236;const x=cx+Math.cos(an)*rr,y=cy+Math.sin(an)*rr;k?gg.lineTo(x,y):gg.moveTo(x,y)}gg.stroke()}
- if(!RM){const seed=Math.floor(t*9);for(let i=0;i<6;i++){const h=((seed*131+i*977)%997)/997;if(h>.55)continue;
-  const y=Math.floor(h*1.8*GH),hh=3+((seed+i*7)%5)*5,sh=Math.round((h-.27)*90);
-  gg.drawImage(gsky,0,y,GW,hh,sh,y,GW,hh);
-  gg.fillStyle=i&1?'rgba(90,255,230,.18)':'rgba(255,60,200,.18)';gg.fillRect(sh*-.4,y,GW,Math.max(1,hh>>1))}}
+ // soft crimson vignette in chunky bands
+ for(let i=0;i<4;i++){const m=(i+1)*Math.max(8,pxScale()*6);gg.fillStyle='rgba(20,2,6,.22)';gg.fillRect(0,0,GW,m);gg.fillRect(0,GH-m,GW,m);gg.fillRect(0,0,m,GH);gg.fillRect(GW-m,0,m,GH)}
  placeOmni()}
 let gLoop=0;
 function galFrame(now){if(!inGal){gLoop=0;return}drawGal(now);gLoop=requestAnimationFrame(galFrame)}

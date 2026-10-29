@@ -92,15 +92,15 @@ body.uirv #sndbtn{animation-delay:.15s}body.uirv #sat{animation:pxin .7s steps(5
 #info.lg .lgwam{width:88cqw;filter:drop-shadow(0 0 4px #000)}#info[data-p^="w"] .lgplay{flex-shrink:0}
 #info[data-p="ashaad"] .lgrow{transform:translateY(30cqmin)}
 
-/* wormhole: fixed corner portal, low in the bottom-right white void, beside (not above) sound; art is padded so the whole glitch silhouette shows */
-#worm{position:fixed;z-index:8;right:calc(env(safe-area-inset-right,0px) + .1rem);bottom:calc(env(safe-area-inset-bottom,0px) - 1.1rem);width:150px;height:150px;padding:0;border:0;background:transparent;cursor:pointer;image-rendering:pixelated;overflow:visible}
+/* wormhole: a world-space object far out in the bottom-right white void; galaxy.js sets size + translate from the hub camera each frame */
+#worm{position:fixed;z-index:8;left:0;top:0;width:130px;height:130px;padding:0;border:0;background:transparent;cursor:pointer;image-rendering:pixelated;overflow:visible;will-change:transform}
 #worm img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(0 0 5px rgba(90,20,140,.5))}
 #worm:hover img,#worm:focus-visible img{filter:drop-shadow(0 0 8px rgba(255,140,40,.8)) brightness(1.12)}
 #worm:focus-visible{outline:2px solid #ffb45a;outline-offset:-24px}
 body.intro #worm{visibility:hidden}
 body.uirv #worm{animation:pxin .7s steps(5) both}
 body.arch #worm,body.galaxy #worm{visibility:hidden}
-@media(max-width:520px){#worm{width:112px;height:112px;right:env(safe-area-inset-right,0px);bottom:calc(env(safe-area-inset-bottom,0px) - .8rem)}#sndbtn{right:calc(6.4rem + env(safe-area-inset-right,0px))}}
+@media(max-width:520px){#sndbtn{right:calc(6.4rem + env(safe-area-inset-right,0px))}}
 @media(prefers-reduced-motion:reduce){body.uirv #worm,body.galaxy #ship{animation:none}#worm img{filter:drop-shadow(0 0 4px rgba(90,20,140,.7))}}
 #ship{position:fixed;right:calc(1.2rem + env(safe-area-inset-right,0px));bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));z-index:26;width:54px;height:60px;padding:0;border:0;background:transparent;cursor:pointer;display:none;filter:drop-shadow(0 0 6px rgba(90,255,230,.6))}
 #ship img{width:100%;height:100%;image-rendering:pixelated;pointer-events:none}

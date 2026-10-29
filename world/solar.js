@@ -115,6 +115,7 @@ function to(x,y,z,ms=900,done){mv.on=0;if(RM)ms=1;tw={a:{...cam},b:{x,y,z},t0:pe
 const parent=b=>b.moon?MAIN[3]:b.par||null;
 function pos(b){if(b.orb==null)return[b.x,b.y];const c=b.moon?pos(MAIN[3]):b.par?pos(b.par):[0,0];return[c[0]+Math.cos(b.ang)*b.orb,c[1]+Math.sin(b.ang)*b.orb*SQ]}
 const S2W=(sx,sy)=>[cam.x+(sx-W/2)/cam.z,cam.y+(sy-H/2)/cam.z],W2S=(x,y)=>[(x-cam.x)*cam.z+W/2,(y-cam.y)*cam.z+H/2];
+window.__hubView=()=>({cam,W,H,sys,inMain});
 // ---- starfield + nebula ----
 const STARS=[];for(let l=0;l<3;l++)for(let i=0;i<(l===0?260:l===1?110:40);i++)STARS.push({x:Math.random(),y:Math.random(),l,p:Math.random()*TAU,c:['#8a90c8','#cfd4ff','#fff6d8','#ffd0f0'][Math.floor(Math.random()*4)]});
 let neb=null;
