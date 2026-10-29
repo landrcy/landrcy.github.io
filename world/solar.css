@@ -91,3 +91,29 @@ body.uirv #sndbtn{animation-delay:.15s}body.uirv #sat{animation:pxin .7s steps(5
 #info[data-p="pmuseum"] .lgplay{flex-shrink:0}
 #info.lg .lgwam{width:88cqw;filter:drop-shadow(0 0 4px #000)}#info[data-p^="w"] .lgplay{flex-shrink:0}
 #info[data-p="ashaad"] .lgrow{transform:translateY(30cqmin)}
+
+/* wormhole: fixed corner portal, not a planet. Sits above the sound button. */
+#worm{position:fixed;z-index:8;right:max(10px,env(safe-area-inset-right));bottom:calc(max(1rem,env(safe-area-inset-bottom)) + 3.15rem);width:104px;height:104px;padding:0;border:0;background:transparent;cursor:pointer;image-rendering:pixelated}
+#worm img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(0 0 6px rgba(90,20,140,.65))}
+#worm:hover img,#worm:focus-visible img{filter:drop-shadow(0 0 8px rgba(255,140,40,.8)) brightness(1.12)}
+#worm:focus-visible{outline:2px solid #ffb45a;outline-offset:2px}
+body.intro #worm{visibility:hidden}
+body.uirv #worm{animation:pxin .7s steps(5) both}
+body.arch #worm{visibility:hidden}
+@media(max-width:520px){#worm{width:76px;height:76px;bottom:calc(max(.7rem,env(safe-area-inset-bottom)) + 2.9rem)}}
+@media(prefers-reduced-motion:reduce){body.uirv #worm{animation:none}#worm img{filter:drop-shadow(0 0 4px rgba(90,20,140,.7))}}
+
+#rush{position:fixed;inset:0;z-index:30;width:100%;height:100%;image-rendering:pixelated;pointer-events:none;background:transparent}
+body.traveling #rush{pointer-events:auto}
+#galaxy{position:fixed;inset:0;z-index:20;display:none;background:#140206;touch-action:none}
+body.galaxy #galaxy{display:block}
+#gsky{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated;cursor:grab;touch-action:none}
+#gsky.drag{cursor:grabbing}
+#omni{position:absolute;left:0;top:0;image-rendering:pixelated;pointer-events:none;user-select:none;-webkit-user-drag:none}
+#gback{left:1rem;z-index:26;display:none}
+body.galaxy #gback{display:block}
+body.galaxy #home,body.galaxy #sat{visibility:hidden}
+body.galaxy #info{display:none!important}
+body.galaxy #sndbtn{z-index:26}
+body.galaxy #worm{z-index:27}
+body.traveling #worm,body.traveling #gback,body.traveling #sndbtn,body.traveling #home,body.traveling #sat{visibility:hidden}
