@@ -1,6 +1,6 @@
 // water planet "Deep Sea": 3 biomes (green shallows, blue sea, dark ocean) on the hub sphere painter; visibly spins;
 // stir it with the cursor and the biomes/water mix where you touch; click to play. Hub: background far top-left. FFC: far out in the wormhole galaxy.
-(()=>{const P=window.PLANETS;if(!P)return;const FFC=!!window.__FFC,URL='https://rainbowroar14.github.io/Sites/DeepSea/';
+(()=>{const P=window.PLANETS;if(!P)return;const FFC=!!window.__FFC;if(!FFC)return;/* V40: Deep Sea lives only on /ffc/ */const URL='https://rainbowroar14.github.io/Sites/DeepSea/';
 const N=96,WX=FFC?-6300:-3500,WY=FFC?-3500:-1950,WS=FFC?1500:560;
 const S=P.mk(N,N),c=S.c;c.id='fishp';c.setAttribute('role','link');c.setAttribute('aria-label','Deep Sea water planet - play');
 c.style.cssText='position:'+(FFC?'absolute':'fixed')+';left:0;top:0;z-index:'+(FFC?3:1)+';cursor:pointer;touch-action:none;image-rendering:pixelated;opacity:'+(FFC?1:.9)+';will-change:transform;display:none;border-radius:50%';
@@ -48,7 +48,7 @@ c.addEventListener('click',e=>e.stopPropagation());
 c.addEventListener('wheel',e=>{const g=document.getElementById(FFC?'gsky':'sky');if(g){e.preventDefault();g.dispatchEvent(new WheelEvent('wheel',e))}},{passive:false});
 c.addEventListener('keydown',e=>{if(e.key==='Enter'){if(FFC&&window.__galDS)window.__galDS();else location.href=URL}});c.tabIndex=0;
 let last=0;
-function place(z,cx,cy,W,H2,o){const wx=o?o[0]:WX,wy=o?o[1]:WY,s=Math.max(40,Math.round(WS*z)),x=(wx-cx)*z+W/2,y=(wy-cy)*z+H2/2;
+function place(z,cx,cy,W,H2,o){const wx=o?o[0]:WX,wy=o?o[1]:WY,s=Math.max(2,Math.round(WS*z)),x=(wx-cx)*z+W/2,y=(wy-cy)*z+H2/2;
  c.style.width=c.style.height=s+'px';c.style.transform='translate('+Math.round(x-s/2)+'px,'+Math.round(y-s/2)+'px)';
  c.style.display=(x<-s||y<-s||x>W+s||y>H2+s)?'none':'';}
 function frame(ms){

@@ -57,7 +57,7 @@ const clov=document.createElement('img');clov.id='clov';clov.alt='Lucky clover p
 clov.style.cssText='position:absolute;left:0;top:0;image-rendering:pixelated;pointer-events:none;user-select:none;z-index:3';
 /* V39: clSrc is a tiny always-painted GIF decoder; browsers pause GIFs on opacity-0 imgs, so bakeClov samples this instead of clov */
 const clSrc=document.createElement('img');clSrc.alt='';clSrc.setAttribute('aria-hidden','true');clSrc.draggable=false;clSrc.src=CL_STILL;
-clSrc.style.cssText='position:fixed;right:0;bottom:0;width:2px;height:2px;opacity:.01;pointer-events:none;user-select:none;z-index:0';document.body.appendChild(clSrc);
+{const box=document.createElement('div');box.setAttribute('aria-hidden','true');box.style.cssText='position:fixed;right:0;bottom:0;width:1px;height:1px;overflow:hidden;opacity:.02;pointer-events:none;z-index:0';clSrc.style.cssText='display:block;width:64px;height:64px';box.appendChild(clSrc);document.body.appendChild(box)}
 const bh=document.createElement('img');bh.id='bhf';bh.alt='F blackhole';bh.draggable=false;bh.src=BH_STILL;
 bh.style.cssText='position:absolute;left:0;top:0;image-rendering:pixelated;pointer-events:none;user-select:none;z-index:2;-webkit-mask-image:radial-gradient(closest-side,#000 52%,rgba(0,0,0,.85) 64%,rgba(0,0,0,.4) 80%,transparent 100%);mask-image:radial-gradient(closest-side,#000 52%,rgba(0,0,0,.85) 64%,rgba(0,0,0,.4) 80%,transparent 100%);filter:drop-shadow(0 0 18px rgba(90,10,40,.55))';
 omni.style.zIndex=3;
@@ -274,8 +274,13 @@ function clMaskFor(a){const k=Math.round(a*40);if(clMK===k)return clMask;clMK=k;
 // emissive and their blurred colors are added back as light on the clover (V38: sampled from the rings, not an invented hue sweep)
 const GN=32,clG=document.createElement('canvas');clG.width=clG.height=GN;const clGg=clG.getContext('2d',{willReadFrequently:true});
 function isRb(r,g,b){const mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(mx<120||mx-mn<mx*.55)return false;return !(g>=r&&g>=b&&g-Math.max(r,b)>20&&r<200)}
-function bakeClov(){if(!inGal||!clSrc.complete||!clSrc.naturalWidth)return;if(clC.width!==CLN){clC.width=clC.height=CLN}const g=clC.getContext('2d',{willReadFrequently:true});
- g.imageSmoothingEnabled=false;g.clearRect(0,0,CLN,CLN);g.drawImage(clSrc,0,0,CLN,CLN);const im=g.getImageData(0,0,CLN,CLN),d=im.data,m=clMaskFor(clLA),ring=cta.hidden?1:1.5,st=CLN/GN;
+/* V40: decode clover GIF frames with ImageDecoder and cycle them ourselves, so coins/rainbows animate even if the browser pauses the hidden img */
+const CLF={fr:null,i:0,t:0};
+if(!RM&&window.ImageDecoder)fetch(CL_GIF).then(r=>r.arrayBuffer()).then(async buf=>{const dec=new ImageDecoder({data:buf,type:'image/gif'});await dec.tracks.ready;const n=dec.tracks.selectedTrack.frameCount,fr=[];
+ for(let k=0;k<n;k++){const{image}=await dec.decode({frameIndex:k});fr.push({b:await createImageBitmap(image),d:Math.max(20,(image.duration||100000)/1000)});image.close()}if(fr.length)CLF.fr=fr}).catch(()=>{});
+function clFrame(now){const F=CLF.fr;if(!F)return null;if(!CLF.t)CLF.t=now;while(now-CLF.t>=F[CLF.i].d){CLF.t+=F[CLF.i].d;CLF.i=(CLF.i+1)%F.length;if(now-CLF.t>2000)CLF.t=now}return F[CLF.i].b}
+function bakeClov(){const cf=clFrame(performance.now());if(!inGal||(!cf&&(!clSrc.complete||!clSrc.naturalWidth)))return;if(clC.width!==CLN){clC.width=clC.height=CLN}const g=clC.getContext('2d',{willReadFrequently:true});
+ g.imageSmoothingEnabled=false;g.clearRect(0,0,CLN,CLN);g.drawImage(cf||clSrc,0,0,CLN,CLN);const im=g.getImageData(0,0,CLN,CLN),d=im.data,m=clMaskFor(clLA),ring=cta.hidden?1:1.5,st=CLN/GN;
  const em=new ImageData(GN,GN),e=em.data;
  for(let i=0;i<d.length;i+=4){if(d[i+3]<128||!isRb(d[i],d[i+1],d[i+2]))continue;const x=(i>>2)%CLN,y=(i>>2)/CLN|0,o=((y/st|0)*GN+(x/st|0))*4;e[o]+=d[i]/st/st*3;e[o+1]+=d[i+1]/st/st*3;e[o+2]+=d[i+2]/st/st*3}
  for(let o=3;o<e.length;o+=4)e[o]=255;
@@ -287,13 +292,13 @@ function bakeClov(){if(!inGal||!clSrc.complete||!clSrc.naturalWidth)return;if(cl
  g.putImageData(im,0,0)}
 (function clLoop(){if(inGal)bakeClov();requestAnimationFrame(clLoop)})();
 function placeOmni(){
- const bs=Math.max(40,BH_W*cam.z),bx=(bhOff-cam.x)*cam.z+GW/2,by=(0-cam.y)*cam.z+GH/2;
+ const bs=Math.max(2,BH_W*cam.z),bx=(bhOff-cam.x)*cam.z+GW/2,by=(0-cam.y)*cam.z+GH/2;
  bh.style.width=bh.style.height=Math.round(bs)+'px';bh.style.transform='translate('+Math.round(bx-bs/2)+'px,'+Math.round(by-bs/2)+'px)';
  {const aw=bs*.86,fs=aw/finRatio(),lx=bx-aw/2;finW.style.fontSize=Math.round(fs)+'px';finW.style.transform='translate('+Math.round(lx)+'px,'+Math.round(by-fs*.5)+'px)';
   const e=finP*finP*(3-2*finP),f0=finW.firstChild;if(f0){const fw=f0.offsetWidth||fs*.8;f0.style.transform='translateX('+Math.round((bx-fw/2-lx)*(1-e))+'px)'}
   const cr=bs*.5;coreC.style.width=coreC.style.height=Math.round(cr)+'px';coreC.style.transform='translate('+Math.round(bx-cr/2)+'px,'+Math.round(by-cr/2)+'px)';coreC.style.opacity=finW.firstChild?Math.min(1,finP*6+(fin?.6:0)).toFixed(2):'0'}
  const[cx,cy]=clPos(),[mx,my]=omPos();
- const size=Math.max(64,CL_W*cam.z),ms=Math.max(28,OM_W*cam.z);
+ const size=Math.max(2,CL_W*cam.z),ms=Math.max(2,OM_W*cam.z);
  omniPx=size;
  // behind the blackhole on the far half of the ring, in front on the near half; the moon passes behind the clover on its far side
  clov.style.zIndex=cy<0?1:3;omni.style.zIndex=Math.sin(moAng)<0?(cy<0?0:2):(cy<0?2:4);
@@ -303,7 +308,7 @@ function placeOmni(){
  omni.style.width=omni.style.height=Math.round(ms)+'px';
  omni.style.transform='translate('+Math.round(ox-ms/2)+'px,'+Math.round(oy-ms/2)+'px)';
  // CTA is world-anchored to the Omniverse sprite: same world x, centered on the disc, scales with zoom
- {const[dx,dy]=dsPos(),q=Math.max(40,DS_W*1.3*cam.z);dsc.style.transform='translate('+Math.round((dx-cam.x)*cam.z+GW/2)+'px,'+Math.round((dy-cam.y)*cam.z+GH/2)+'px) scale('+(q/1000).toFixed(4)+') translate(-50%,-50%)'}
+ {const[dx,dy]=dsPos(),q=Math.max(2,DS_W*1.3*cam.z);dsc.style.transform='translate('+Math.round((dx-cam.x)*cam.z+GW/2)+'px,'+Math.round((dy-cam.y)*cam.z+GH/2)+'px) scale('+(q/1000).toFixed(4)+') translate(-50%,-50%)'}
  // V37: shade is baked into the clover sprite's own pixels (no overlay disc); the Maximum Omniverse stays full-bright
  if(clC.parentNode!==gal)gal.append(clC);clLA=Math.atan2(-cy,bhOff-cx);clC.style.cssText=clov.style.cssText;clC.style.opacity='';clov.style.opacity='0';bakeClov();
  cta.style.transform='translate('+Math.round(x)+'px,'+Math.round(y)+'px) scale('+(size/1000).toFixed(4)+') translate(-50%,-50%)'}
