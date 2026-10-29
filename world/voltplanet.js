@@ -19,10 +19,10 @@ function line(pts,amp,base,h){for(let k=0;k<pts.length-1;k++){const[a,b]=[pts[k]
  for(let s=0;s<st;s++){const f=s/st,x=a[0]+(b[0]-a[0])*f,y=a[1]+(b[1]-a[1])*f,z=a[2]+(b[2]-a[2])*f,j=(rnd()-.5)*amp;
   const v=base*(z<0?.35:1);plot(B/2+x*R+j,B/2+y*R+(rnd()-.5)*amp,v,h)}}}
 function grid(t,a,tx,tz,h,pulse){
- for(let la=-1;la<=1;la++){const ph=la*Math.PI/4,pts=[];for(let k=0;k<=36;k++){const lo=k/36*Math.PI*2;pts.push(rot([Math.cos(ph)*Math.cos(lo),Math.sin(ph),Math.cos(ph)*Math.sin(lo)],a,tx,tz))}
-  line(pts,.2,.55+.45*Math.max(0,Math.sin(t*4+la*1.3+pulse)),h)}
- for(let lo=0;lo<4;lo++){const L=lo*Math.PI/4,pts=[];for(let k=0;k<=36;k++){const p=k/36*Math.PI*2;pts.push(rot([Math.cos(p)*Math.cos(L),Math.sin(p),Math.cos(p)*Math.sin(L)],a,tx,tz))}
-  line(pts,.2,.55+.45*Math.max(0,Math.sin(t*3.2+lo*1.1+pulse+1)),h)}}
+ for(let la=-3;la<=3;la++){const ph=la*Math.PI/8,pts=[];for(let k=0;k<=36;k++){const lo=k/36*Math.PI*2;pts.push(rot([Math.cos(ph)*Math.cos(lo),Math.sin(ph),Math.cos(ph)*Math.sin(lo)],a,tx,tz))}
+  line(pts,.05,.55+.45*Math.max(0,Math.sin(t*4+la*1.3+pulse)),h)}
+ for(let lo=0;lo<8;lo++){const L=lo*Math.PI/8,pts=[];for(let k=0;k<=36;k++){const p=k/36*Math.PI*2;pts.push(rot([Math.cos(p)*Math.cos(L),Math.sin(p),Math.cos(p)*Math.sin(L)],a,tx,tz))}
+  line(pts,.05,.55+.45*Math.max(0,Math.sin(t*3.2+lo*1.1+pulse+1)),h)}}
 function bolt(a,b,d,h){if(d===0){line([a,b],.4,1,h);return}const m=[(a[0]+b[0])/2+(rnd()-.5)*.25,(a[1]+b[1])/2+(rnd()-.5)*.25,(a[2]+b[2])/2],l=Math.hypot(...m)||1;
  const mm=m.map(v=>v/l*(1+rnd()*.12));bolt(a,mm,d-1,h);bolt(mm,b,d-1,h);if(d===3&&rnd()<.5){const e=[mm[0]+(rnd()-.5)*.5,mm[1]+(rnd()-.5)*.5,mm[2]];bolt(mm,e,1,h)}}
 const sp=()=>{const u=rnd()*2-1,a=rnd()*Math.PI*2,s=Math.sqrt(1-u*u);return[s*Math.cos(a),u,s*Math.sin(a)]};
