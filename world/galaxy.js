@@ -386,8 +386,8 @@ gsky.addEventListener('pointerdown',e=>{
 gsky.addEventListener('pointermove',e=>{
  if(!pts.has(e.pointerId)){
   omHov=overOmni(e.clientX,e.clientY)||overMoon(e.clientX,e.clientY);gsky.style.cursor=omHov?'pointer':'grab';
-  if(overOmni(e.clientX,e.clientY))showTip('Lucky clover \u2014 test ur luck',e.clientX,e.clientY);
-  else if(overMoon(e.clientX,e.clientY))showTip('Maximum Omniverse \u2014 moon',e.clientX,e.clientY);
+  if(overOmni(e.clientX,e.clientY))showTip('Lucky clover',e.clientX,e.clientY);
+  else if(overMoon(e.clientX,e.clientY))showTip('Maximum Omniverse',e.clientX,e.clientY);
   else if(holdTip&&tip&&/^(Lucky clover|Maximum Omniverse)/.test(tip.textContent))hideTip();
   return}
  const p=pts.get(e.pointerId),dx=e.clientX-p[0],dy=e.clientY-p[1];pts.set(e.pointerId,[e.clientX,e.clientY]);

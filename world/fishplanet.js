@@ -2,7 +2,7 @@
 // stir it with the cursor and the biomes/water mix where you touch; click to play. Hub: background far top-left. FFC: far out in the wormhole galaxy.
 (()=>{const P=window.PLANETS;if(!P)return;const FFC=!!window.__FFC,URL='https://rainbowroar14.github.io/Sites/DeepSea/';
 const N=96,WX=FFC?-6300:-3500,WY=FFC?-3500:-1950,WS=FFC?1500:560;
-const S=P.mk(N,N),c=S.c;c.id='fishp';c.setAttribute('role','link');c.setAttribute('aria-label','Deep Sea water planet - play');c.title='Deep Sea \u2014 click to play';
+const S=P.mk(N,N),c=S.c;c.id='fishp';c.setAttribute('role','link');c.setAttribute('aria-label','Deep Sea water planet - play');
 c.style.cssText='position:'+(FFC?'absolute':'fixed')+';left:0;top:0;z-index:'+(FFC?3:1)+';cursor:pointer;touch-action:none;image-rendering:pixelated;opacity:'+(FFC?1:.9)+';will-change:transform;display:none;border-radius:50%';
 if(!FFC)document.body.appendChild(c);
 const GRN=['#06281e','#0e4a34','#1a7a52','#2fa872','#6ad8a0','#c8f8dc'],
@@ -38,7 +38,10 @@ const paint=t=>{const rot=t*.55;
 const loc=e=>{const r=c.getBoundingClientRect();return[Math.floor((e.clientX-r.left)/r.width*N),Math.floor((e.clientY-r.top)/r.height*N)]};
 const onDisc=(x,y)=>Math.hypot(x-N/2,y-N/2)<N*.44;
 let down=null;
-c.addEventListener('pointermove',e=>{const[x,y]=loc(e);if(onDisc(x,y)){mx=x;my=y;stir(x,y)}e.stopPropagation()});
+// V35: hub-style hover tip (name only)
+const dsTip=(on,e)=>{const t=document.getElementById('tip');if(!t)return;if(on){if(t.textContent!=='Deep Sea'||!t.classList.contains('on'))window.__blip&&__blip('hover');t.textContent='Deep Sea';t.style.left=(e.clientX+14)+'px';t.style.top=(e.clientY+14)+'px';t.classList.add('on')}else if(t.textContent==='Deep Sea')t.classList.remove('on')};
+c.addEventListener('pointermove',e=>{const[x,y]=loc(e);if(onDisc(x,y)){mx=x;my=y;stir(x,y);dsTip(1,e)}else dsTip(0);e.stopPropagation()});
+c.addEventListener('pointerleave',()=>dsTip(0));
 c.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];e.stopPropagation()});
 c.addEventListener('pointerup',e=>{e.stopPropagation();if(down&&Math.hypot(e.clientX-down[0],e.clientY-down[1])<8){const[x,y]=loc(e);if(onDisc(x,y)){if(FFC&&window.__galDS)window.__galDS();else location.href=URL}}down=null});
 c.addEventListener('click',e=>e.stopPropagation());
