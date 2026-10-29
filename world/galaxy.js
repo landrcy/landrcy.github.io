@@ -126,7 +126,7 @@ const pbP=document.createElement('a');pbP.id='pbplay';pbP.href=PB_URL;pbP.target
 pbc.append(pbT,pbP);pbc.style.zIndex=5;
 pbc.addEventListener('pointerdown',e=>e.stopPropagation());pbc.addEventListener('click',e=>e.stopPropagation());
 function showPb(on){pbc.hidden=!on;if(on){pbc.classList.remove('fin');void pbc.offsetWidth;pbc.classList.add('fin')}}
-window.__galPB=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='pb'){unfocusG();fitCamSoft();return}showCta(false);showDs(false);showVs(false);gfoc='pb';showPb(true)};
+window.__galPB=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='pb'){unfocusG();return}showCta(false);showDs(false);showVs(false);gfoc='pb';showPb(true)};
 // V49 Volt Sphere: zoom-in title showcase only (no link yet)
 const vsc=document.createElement('div');vsc.id='vscta';vsc.className='pbcta';vsc.hidden=true;
 const vsT=document.createElement('canvas');vsT.className='lgtx';vsT.setAttribute('role','img');vsT.setAttribute('aria-label','Volt Sphere');
@@ -136,8 +136,8 @@ function drawVsT(){const x=vsT.getContext('2d'),T='VOLT SPHERE',f="400 64px 'Sil
 document.fonts&&document.fonts.load("64px 'Silkscreen'").then(drawVsT);drawVsT();
 vsc.append(vsT);vsc.style.zIndex=5;vsc.addEventListener('pointerdown',e=>e.stopPropagation());vsc.addEventListener('click',e=>e.stopPropagation());
 function showVs(on){vsc.hidden=!on;if(on){vsc.classList.remove('fin');void vsc.offsetWidth;vsc.classList.add('fin')}}
-window.__galVS=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='vs'){unfocusG();fitCamSoft();return}showCta(false);showDs(false);showPb(false);gfoc='vs';showVs(true)};
-window.__galDS=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='ds'){unfocusG();fitCamSoft();return}showCta(false);showPb(false);showVs(false);gfoc='ds';showDs(true)};
+window.__galVS=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='vs'){unfocusG();return}showCta(false);showDs(false);showPb(false);gfoc='vs';showVs(true)};
+window.__galDS=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='ds'){unfocusG();return}showCta(false);showPb(false);showVs(false);gfoc='ds';showDs(true)};
 cta.addEventListener('pointerdown',e=>e.stopPropagation());
 cta.addEventListener('click',e=>e.stopPropagation());
 cta.style.zIndex=5;
@@ -442,9 +442,9 @@ addEventListener('keyup',e=>{gKeys.delete((e.code||'').replace('Key','').toLower
 addEventListener('keydown',e=>{
  if(e.key!=='Escape')return;
  // on /ffc/ Escape never leaves the page: it only backs out of a focused planet/blackhole
- if(FFC){e.preventDefault();e.stopImmediatePropagation();if(busy)return;if(fin){finOff();return}if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden||!vsc.hidden))unfocusG();fitCamSoft();return}
+ if(FFC){e.preventDefault();e.stopImmediatePropagation();if(busy)return;if(fin){finOff();return}if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden||!vsc.hidden))unfocusG();return}
  if(!inGal||busy)return;
- e.preventDefault();e.stopImmediatePropagation();if(fin){finOff();return}if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden||!vsc.hidden)){unfocusG();fitCamSoft();return}travel(false)},true);
+ e.preventDefault();e.stopImmediatePropagation();if(fin){finOff();return}if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden||!vsc.hidden)){unfocusG();return}travel(false)},true);
 
 // fly the galaxy: drag pans, wheel / pinch zooms, a quiet click on empty space returns
 const pts=new Map();let moved=0,pinch=null;
@@ -467,9 +467,9 @@ gsky.addEventListener('pointermove',e=>{
  else{gfoc=null;cam.x-=dx/cam.z;cam.y-=dy/cam.z;clampCam()}});
 function endPtr(e){const was=moved;pts.delete(e.pointerId);if(pts.size<2)pinch=null;gsky.classList.remove('drag');
  if(e.type!=='pointerup'||was>=6||busy)return;
- if(overMoon(e.clientX,e.clientY)&&omni.style.zIndex>clov.style.zIndex||!overOmni(e.clientX,e.clientY)&&overMoon(e.clientX,e.clientY)){showCta(false);showDs(false);gfoc=gfoc==='om'?null:'om';if(!gfoc)fitCamSoft();return}
- if(overOmni(e.clientX,e.clientY)){if(gfoc==='cl'){unfocusG();fitCamSoft()}else{showDs(false);gfoc='cl';showCta(true)}return}
- if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden||!vsc.hidden)){unfocusG();fitCamSoft();return}
+ if(overMoon(e.clientX,e.clientY)&&omni.style.zIndex>clov.style.zIndex||!overOmni(e.clientX,e.clientY)&&overMoon(e.clientX,e.clientY)){showCta(false);showDs(false);gfoc=gfoc==='om'?null:'om';return}
+ if(overOmni(e.clientX,e.clientY)){if(gfoc==='cl'){unfocusG()}else{showDs(false);gfoc='cl';showCta(true)}return}
+ if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden||!vsc.hidden)){unfocusG();return}
  if(overBH(e.clientX,e.clientY)){if(fin)finOff();showCta(false);showDs(false);gfoc='bh';return}
  if(fin){finOff();return}
  if(!FFC)travel(false)}
