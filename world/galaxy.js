@@ -269,7 +269,7 @@ function drawGal(now){
  {const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#7aff8a';
   for(let k=1;k<=n;k++){const f=k/n,an=omAng-arc*f,sx=(Math.cos(an)*ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
  // hub-style focus: fly + zoom the camera onto the clicked body
- if(gfoc){const[fx,fy]=gfoc==='om'?omPos():clPos(),zt=Math.min(GW,GH)*(gfoc==='om'?.55:.62)/(gfoc==='om'?OM_W:CL_W),k=Math.min(1,dt*(RM?60:5));cam.x+=(fx-cam.x)*k;cam.y+=(fy-cam.y)*k;cam.z*=Math.pow(zt/cam.z,k)}
+ if(gfoc){const[fx,fy]=gfoc==='bh'?[0,0]:gfoc==='om'?omPos():clPos(),zt=Math.min(GW,GH)*(gfoc==='bh'?.9:gfoc==='om'?.55:.62)/(gfoc==='bh'?BH_W:gfoc==='om'?OM_W:CL_W),k=Math.min(1,dt*(RM?60:5));cam.x+=(fx-cam.x)*k;cam.y+=(fy-cam.y)*k;cam.z*=Math.pow(zt/cam.z,k)}
  bhOff=0;finP+=((fin?1:0)-finP)*Math.min(1,dt*(RM?60:3.2));if(!fin&&finP<.02&&finW.firstChild&&!finT.length)finW.textContent='';finW.style.visibility=(fin||finP>.02)?'visible':'hidden';
  placeOmni()}
 let gLoop=0;
@@ -288,10 +288,14 @@ function hideGalaxy(){
  inGal=false;fin=false;finClear();finW.textContent='';bhOff=0;clearTimeout(bhT);bh.src=BH_STILL;showCta(false);document.body.classList.remove('galaxy');gal.hidden=true;
  window.__galaxyHold=false;worm.setAttribute('aria-label','Wormhole');hideTip()}
 
-function portalOrigin(){const el=inGal?back:worm,r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,s:inGal?r.width*1.6:r.width}}
+let srcWorm=worm;
+function portalOrigin(){const el=inGal?back:srcWorm,r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,s:inGal?r.width*1.6:r.width}}
 
+// any click during the travel animation snaps straight to the destination
+let skipT=false;
+rush.addEventListener('pointerdown',e=>{if(busy){e.preventDefault();e.stopPropagation();skipT=true}});
 function travel(toGalaxy){
- if(busy)return;busy=true;hideTip();
+ if(busy)return;busy=true;skipT=false;hideTip();
  const solar=window.__solar;
  if(solar&&solar.intro&&solar.skip)solar.skip();
  if(solar&&solar.unfocus)solar.unfocus();
@@ -305,6 +309,7 @@ function travel(toGalaxy){
  window.__galaxyHold=true;
  const step=now=>{
   const u=Math.min(1,(now-t0)/dur);
+  if(skipT){finish();return}
   drawTravel(RM?Math.max(u,.86):u,snap,origin);
   if(u<1)requestAnimationFrame(step);
   else finish()};
@@ -315,7 +320,7 @@ function travel(toGalaxy){
  requestAnimationFrame(step)}
 
 worm.addEventListener('click',e=>{
- e.stopPropagation();
+ e.stopPropagation();srcWorm=worm;
  if(document.body.classList.contains('intro')&&window.__solar&&__solar.skip)__solar.skip();
  if(busy||document.body.classList.contains('arch'))return;
  travel(!inGal)});
@@ -349,7 +354,7 @@ function endPtr(e){const was=moved;pts.delete(e.pointerId);if(pts.size<2)pinch=n
  if(overMoon(e.clientX,e.clientY)&&omni.style.zIndex>clov.style.zIndex||!overOmni(e.clientX,e.clientY)&&overMoon(e.clientX,e.clientY)){showCta(false);gfoc=gfoc==='om'?null:'om';if(!gfoc)fitCamSoft();return}
  if(overOmni(e.clientX,e.clientY)){if(gfoc==='cl'){unfocusG();fitCamSoft()}else{gfoc='cl';showCta(true)}return}
  if(gfoc||!cta.hidden){unfocusG();fitCamSoft();return}
- if(overBH(e.clientX,e.clientY)){fin?finOff():finOn();return}
+ if(overBH(e.clientX,e.clientY)){if(fin)finOff();showCta(false);gfoc='bh';return}
  if(fin){finOff();return}
  travel(false)}
 gsky.addEventListener('pointerup',endPtr);
@@ -370,6 +375,50 @@ addEventListener('resize',()=>{if(inGal){resizeGal();cam.z=fitZ()}});
 buildStars();if(P)buildNeb();
 // warm the spin after the hub has painted, so the corner gif stays the first download
 if(!RM)addEventListener('load',()=>{setTimeout(()=>{for(const u of[OM_GIF,CL_GIF,BH_IN,BH_LOOP]){const i=new Image();i.src=u}},1200)},{once:true});
+
+// 5 clicks on the main solar system map within ~4s: the sky cracks there and a second wormhole tears open
+const crk=document.createElement('canvas');crk.id='crack';crk.setAttribute('aria-hidden','true');
+crk.style.cssText='position:fixed;left:0;top:0;pointer-events:none;z-index:7;image-rendering:pixelated';
+document.body.appendChild(crk);const cg=crk.getContext('2d');
+const worm2=worm.cloneNode(true);worm2.id='worm2';worm2.style.display='none';
+worm2.setAttribute('aria-label','Wormhole (cracked open)');document.body.appendChild(worm2);
+let w2=null,crack=null,clicks=[];
+worm2.addEventListener('click',e=>{e.stopPropagation();if(busy||document.body.classList.contains('arch'))return;srcWorm=worm2;travel(true)});
+worm2.addEventListener('pointerenter',e=>showTip('Wormhole',e.clientX,e.clientY));worm2.addEventListener('pointerleave',hideTip);
+function mkCrack(){const br=[],N=7+Math.floor(Math.random()*3);
+ for(let i=0;i<N;i++){let a=i/N*Math.PI*2+Math.random()*.6,x=0,y=0;const pts=[[0,0]],L=10+Math.floor(Math.random()*8);
+  for(let k=0;k<L;k++){a+=(Math.random()-.5)*.9;x+=Math.cos(a)*14;y+=Math.sin(a)*14;pts.push([x,y]);
+   if(Math.random()<.22)br.push({pts:[[x,y],[x+Math.cos(a+1.1)*22,y+Math.sin(a+1.1)*22],[x+Math.cos(a+.8)*40,y+Math.sin(a+.8)*40]],d:k/L})}
+  br.push({pts,d:0})}
+ return br}
+function pxLine(x0,y0,x1,y1,ps){const n=Math.max(1,Math.ceil(Math.hypot(x1-x0,y1-y0)/ps));for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n,y=y0+(y1-y0)*i/n;cg.fillRect(Math.round(x/ps)*ps,Math.round(y/ps)*ps,ps,ps)}}
+function drawCrack(now){
+ const v=window.__hubView&&window.__hubView();
+ if(crk.width!==innerWidth||crk.height!==innerHeight){crk.width=innerWidth;crk.height=innerHeight}
+ cg.clearRect(0,0,crk.width,crk.height);
+ if(v&&v.sys==='main'){
+  if(w2){const z=v.cam.z,s=Math.max(72,Math.round(WS*.8*z)),x=(w2.x-v.cam.x)*z+v.W/2,y=(w2.y-v.cam.y)*z+v.H/2;
+   worm2.style.width=worm2.style.height=s+'px';worm2.style.transform='translate('+Math.round(x-s/2)+'px,'+Math.round(y-s/2)+'px)';
+   worm2.style.display=(x<-s||y<-s||x>v.W+s||y>v.H+s)?'none':''}
+  if(crack){const z=v.cam.z,cx=(crack.x-v.cam.x)*z+v.W/2,cy=(crack.y-v.cam.y)*z+v.H/2,k=Math.min(1,(now-crack.t0)/(RM?200:1300)),sc=Math.max(.6,z*3),ps=Math.max(2,Math.round(3*Math.min(1.6,sc)));
+   const fade=w2?Math.max(0,1-(now-w2.t0)/2500):1;
+   for(const pass of[[ps*2,'rgba(120,40,200,.35)'],[ps,'#1a0a2a'],[Math.max(1,ps/2|0),'#ff9ad8']]){cg.fillStyle=pass[1];cg.globalAlpha=fade;
+    for(const b of crack.br){const g0=Math.max(0,Math.min(1,(k-b.d*.6)/.5));if(g0<=0)continue;const m=(b.pts.length-1)*g0;
+     for(let i=0;i<Math.floor(m);i++){const p=b.pts[i],q=b.pts[i+1];pxLine(cx+p[0]*sc,cy+p[1]*sc,cx+q[0]*sc,cy+q[1]*sc,pass[0])}}}
+   cg.globalAlpha=1;
+   if(k>=1&&!w2){w2={x:crack.x,y:crack.y,t0:now};window.__sfx&&__sfx('whoosh');worm2.style.display='';worm2.style.animation='pxin .7s steps(5) both'}
+   if(w2&&fade<=0)crack=null}
+ }else worm2.style.display='none';
+ requestAnimationFrame(drawCrack)}
+requestAnimationFrame(drawCrack);
+(()=>{const sky=document.getElementById('sky');if(!sky)return;let d=null;
+ sky.addEventListener('pointerdown',e=>{d=[e.clientX,e.clientY]});
+ sky.addEventListener('pointerup',e=>{if(!d||Math.hypot(e.clientX-d[0],e.clientY-d[1])>6)return;d=null;
+  const v=window.__hubView&&window.__hubView();if(!v||v.sys!=='main'||busy||crack||document.body.classList.contains('intro'))return;
+  const now=performance.now();clicks=clicks.filter(c=>now-c.t<4000);clicks.push({t:now});
+  if(clicks.length>=5){const z=v.cam.z,wx=(e.clientX-v.W/2)/z+v.cam.x,wy=(e.clientY-v.H/2)/z+v.cam.y;clicks=[];
+   if(w2){w2=null;worm2.style.display='none'}
+   crack={x:wx,y:wy,t0:now,br:mkCrack()}}})})();
 
 window.__worm={
  travel,galaxy:()=>{if(!inGal&&!busy){armOmni();showGalaxy()}},

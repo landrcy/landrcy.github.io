@@ -99,7 +99,7 @@ body.uirv #sndbtn{animation-delay:.15s}body.uirv #sat{animation:pxin .7s steps(5
 #worm:focus-visible{outline:2px solid #ffb45a;outline-offset:-24px}
 body.intro #worm{visibility:hidden}
 body.uirv #worm{animation:pxin .7s steps(5) both}
-body.arch #worm,body.galaxy #worm{visibility:hidden}
+body.arch #worm,body.galaxy #worm,body.arch #worm2,body.galaxy #worm2,body.intro #worm2,body.traveling #worm2,body.arch #crack,body.galaxy #crack{visibility:hidden}
 @media(max-width:520px){#sndbtn{right:calc(6.4rem + env(safe-area-inset-right,0px))}}
 @media(prefers-reduced-motion:reduce){body.uirv #worm,body.galaxy #ship{animation:none}#worm img{filter:drop-shadow(0 0 4px rgba(90,20,140,.7))}}
 #ship{position:fixed;right:calc(1.2rem + env(safe-area-inset-right,0px));bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));z-index:26;width:54px;height:60px;padding:0;border:0;background:transparent;cursor:pointer;display:none;filter:drop-shadow(0 0 6px rgba(90,255,230,.6))}
