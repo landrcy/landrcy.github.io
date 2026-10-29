@@ -12,10 +12,10 @@ const H=(a,b)=>{let h=(a*374761393+b*668265263)|0;h=Math.imul(h^h>>>13,127412617
 function vn(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),w=yf*yf*(3-2*yf);
  return(H(xi,yi)*(1-u)+H(xi+1,yi)*u)*(1-w)+(H(xi,yi+1)*(1-u)+H(xi+1,yi+1)*u)*w}
 const fbm=(x,y)=>vn(x,y)*.55+vn(x*2.1,y*2.1)*.3+vn(x*4.3,y*4.3)*.15;
-const LX=-.62,LY=-.5,LZ=.6,SHD=[34,28,66];
+const LX=-.62,LY=-.5,LZ=.6,SHD=[34,28,66];const GLX=LX,GLY=LY,GLZ=LZ;
 function mk(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');return{c,g,img:g.createImageData(w,h)}}
 // generic sphere painter: fn(lon,lat,lit,x,y,nz) -> '#rrggbb' or null
-function sphere(S,R,cx,cy,rot,fn,atm,shp){const{img}=S,W=img.width,d=img.data;
+function sphere(S,R,cx,cy,rot,fn,atm,shp){const{img}=S,W=img.width,d=img.data;const[LX,LY,LZ]=atm&&atm.L?atm.L:[GLX,GLY,GLZ];
  for(let y=0;y<img.height;y++)for(let x=0;x<W;x++){let dx=(x+.5-cx)/R,dy=(y+.5-cy)/R;if(shp){const k=shp(Math.atan2(dy,dx));dx/=k;dy/=k}const r2=dx*dx+dy*dy;let col=null;
   if(r2<=1){const nz=Math.sqrt(1-r2),raw=Math.max(0,dx*LX+dy*LY+nz*LZ);const lit=Math.max(0,Math.min(1,Math.floor(raw*5+(bay(x,y)-.5)*.6)/5+.1));const lat=Math.asin(dy),lon=Math.atan2(dx,nz)+rot;col=fn(lon,lat,lit,x,y,nz,dx,dy);
    if(col){let c=typeof col==='string'?hx(col):col;const sv=raw+(bay(x,y)-.5)*.08;

@@ -272,9 +272,7 @@ function placeOmni(){
  omni.style.transform='translate('+Math.round(ox-ms/2)+'px,'+Math.round(oy-ms/2)+'px)';
  // CTA is world-anchored to the Omniverse sprite: same world x, centered on the disc, scales with zoom
  {const[dx,dy]=dsPos(),q=Math.max(40,DS_W*1.3*cam.z);dsc.style.transform='translate('+Math.round((dx-cam.x)*cam.z+GW/2)+'px,'+Math.round((dy-cam.y)*cam.z+GH/2)+'px) scale('+(q/1000).toFixed(4)+') translate(-50%,-50%)'}
- if(shCl.parentNode!==gal)gal.append(shCl,shOm);if(gal.lastChild!==shDs)gal.appendChild(shDs);
- shade(shCl,cx,cy,x,y,size,clov.style.zIndex);shade(shOm,mx,my,ox,oy,ms,omni.style.zIndex);
- {const[dx,dy]=dsPos(),ds=Math.max(40,DS_W*cam.z);shade(shDs,dx,dy,(dx-cam.x)*cam.z+GW/2,(dy-cam.y)*cam.z+GH/2,ds,dy<0?1:3);shDs.style.display=dsc.parentNode&&document.querySelector('#galaxy canvas[tabindex]')?.style.display==='none'?'none':''}
+// V34: red CSS glare overlays removed (planets shade their own pixels)
  cta.style.transform='translate('+Math.round(x)+'px,'+Math.round(y)+'px) scale('+(size/1000).toFixed(4)+') translate(-50%,-50%)'}
 function resizeGal(){
  GW=innerWidth;GH=innerHeight;gsky.width=GW;gsky.height=GH;gg.imageSmoothingEnabled=false;

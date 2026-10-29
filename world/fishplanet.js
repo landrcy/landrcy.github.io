@@ -15,6 +15,7 @@ const ST=new Float32Array(N*N);let mx=-1,my=-1,stirring=0;
 const stir=(px,py)=>{for(let y=Math.max(0,py-9);y<Math.min(N,py+10);y++)for(let x=Math.max(0,px-9);x<Math.min(N,px+10);x++){const d=Math.hypot(x-px,y-py);if(d<9){const i=y*N+x;ST[i]=Math.min(1,ST[i]+(1-d/9)*.35)}}stirring=1};
 const mixHex=(a,b,k)=>{const A=hx(a),B=hx(b);return'#'+[0,1,2].map(i=>Math.round(A[i]+(B[i]-A[i])*k).toString(16).padStart(2,'0')).join('')};
 const pal=b=>b>.58?GRN:b>.42?BLU:DRK;
+let LT=null;
 const paint=t=>{const rot=t*.55;
  P.sphere(S,N*.4,N/2,N/2,rot,(lon,lat,lit,x,y)=>{
   const k=ST[y*N+x]||0;
@@ -32,7 +33,7 @@ const paint=t=>{const rot=t*.55;
    return mixHex(c1,c2,Math.min(1,k*1.1)*.85)}
   if(lit>.3&&((edge&&H(x,y+Math.floor(t*5))>.5)||(sw>.8&&r!==DRK&&H(x+Math.floor(t*6),y)>.55)))return dq(FOAM,lit,x,y);
   if(lit>.7&&sw>.6&&H(x,y*3+Math.floor(t*3))>.93)return '#ffffff';
-  return dq(r,v,x,y,th)},{w:Math.max(2,N*.4*.08),r:['#1a4a8a','#6ad0f4']})};
+  return dq(r,v,x,y,th)},{w:Math.max(2,N*.4*.08),r:['#1a4a8a','#6ad0f4'],L:LT})};
 // input: hover stirs, click (no drag) plays
 const loc=e=>{const r=c.getBoundingClientRect();return[Math.floor((e.clientX-r.left)/r.width*N),Math.floor((e.clientY-r.top)/r.height*N)]};
 const onDisc=(x,y)=>Math.hypot(x-N/2,y-N/2)<N*.44;
@@ -50,7 +51,9 @@ function place(z,cx,cy,W,H2,o){const wx=o?o[0]:WX,wy=o?o[1]:WY,s=Math.max(40,Mat
 function frame(ms){
  if(FFC){const g=window.__galView&&window.__galView(),gal=document.getElementById('galaxy');
   if(!g||!gal||!g.inGal){c.style.display='none';return requestAnimationFrame(frame)}
-  if(c.parentNode!==gal)gal.appendChild(c);c.style.zIndex=g.dsZ;place(g.cam.z,g.cam.x,g.cam.y,g.GW,g.GH,g.ds)}
+  if(c.parentNode!==gal)gal.appendChild(c);c.style.zIndex=g.dsZ;place(g.cam.z,g.cam.x,g.cam.y,g.GW,g.GH,g.ds);
+  // V34: neutral light FROM the blackhole (world origin): lit face points at the BH
+  {const vx=-g.ds[0],vy=-g.ds[1],m=Math.hypot(vx,vy)||1,ax=vx/m*.88,ay=vy/m*.88,az=.47;LT=[ax,ay,az]}}
  else{const v=window.__hubView&&window.__hubView(),b=document.body.classList;
   if(!v||v.sys!=='main'||b.contains('arch')||b.contains('galaxy')||b.contains('intro')){c.style.display='none';return requestAnimationFrame(frame)}
   place(v.cam.z,v.cam.x,v.cam.y,v.W,v.H)}
