@@ -37,22 +37,60 @@ P.typef=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;const fi=Math.f
  const src=g.getImageData(0,0,W,Hh).data;for(let o=0;o<d.length;o+=4){const al=src[o+3];if(al>110){d[o]=src[o];d[o+1]=src[o+1];d[o+2]=src[o+2];d[o+3]=255}else d[o+3]=0}
  S.g.putImageData(S.img,0,0);if(TFC.size>1200)TFC.clear();TFC.set(ck,new ImageData(new Uint8ClampedArray(d),W,Hh))};
 
-// Talk to Tung: a pixel wooden log planet (tree-ring face, carved eyes and mouth) with a little bat moon
-const TTC=new Map(),TTF=120,TTO=document.createElement('canvas'),TTG=TTO.getContext('2d',{willReadFrequently:true});
+// Talk to Tung: a pixel wooden log planet (tree-ring face, carved eyes and mouth) with a little bat moon.
+// Endgrain is dense on purpose: bark rind, eccentric early/late rings, medullary rays, knots and drying checks.
+const TTC=new Map(),TTF=120;
+const TTBARK=['#140c06','#2c180c','#4a2c14','#6e4422','#946038'];
+const TTLATE=['#3a1e0c','#5c3416','#7a4820','#96602e'];
+const TTEARLY=['#a67c40','#c49858','#dcb472','#f0cc90','#ffe2b0'];
+const TTHEART=['#5a3014','#7a441c','#9a5c2c','#bc7840','#d89858'];
+const TTHLATE=['#241208','#402010','#5c3418','#7a4824'];
+const BATCOL={D:'#301c0c',E:'#6e4622',e:'#3a2010',B:'#9e6834',b:'#603a1c',X:'#0e0804',W:'#fff8e6',M:'#e2b26e',m:'#8c5c30'};
+const BATUP=['...............E...E...............','..............EEe.eEE..............','..............EEE.EEE..............','..DDDDDDDD.......B.......DDDDDDDD..','DDMMMmmMMMDDD..BWBWB..DDDMMMmmMMMDD','.DDMMmDDDMmmMDDBXBXBDDMmmMDDDmMMDD.','...DDD...DDmMMMBBBBBMMMmDD...DDD...','.....D.....DMMDMBBBMDMMD.....D.....','...........DDD.BBBBB.DDD...........','...............BBBBB...............','...............BBbBB...............','...............BbbbB...............','................BBB................'];
+const BATDN=['..............E...E..............','.............EEe.eEE.............','.............EEE.EEE.............','................B................','..............BWBWB..............','..............BXBXB..............','..............BBBBB..............','...............BBB...............','........DDDD..BBBBB..DDDD........','....DDDDMMmMDDBBBBBDDMmMMDDDD....','..DDMmMMMMmMMMBBbBBMMMmMMMMmMDD..','DDMMMDDDDDmMDDBbbbBDDMmDDDDDMMMDD','DDDMD.....DD...BBB...DD.....DMDDD','...DD.......................DD...'];
+const BATTINY=['.D.E.E.D.','DMMMBMMMD','.MBBBBBM.','..M.B.M..','...B.B...'];
 P.tung=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;const fi=Math.floor(((t*.2)%1+1)%1*TTF),ck=W+'x'+Hh+':'+fi;
  if(TTC.has(ck)){S.g.putImageData(TTC.get(ck),0,0);return}
- const ph=fi/TTF*TAU,cx=W/2,cy=Hh/2,R=W*.32;TTO.width=W;TTO.height=Hh;const g=TTG;g.clearRect(0,0,W,Hh);
- g.fillStyle='#8a5a2b';g.beginPath();g.arc(cx,cy,R,0,TAU);g.fill();
- g.save();g.beginPath();g.arc(cx,cy,R,0,TAU);g.clip();
- for(let k=6;k>0;k--){g.fillStyle=k%2?'#c8955a':'#a8743e';g.beginPath();g.arc(cx-R*.1,cy-R*.08,R*k/6*.95,0,TAU);g.fill()}
- g.fillStyle='#5a3416';g.beginPath();g.arc(cx+R*.4,cy+R*.35,R*.9,-.2,1.9);g.lineTo(cx+R*2,cy+R*2);g.fill();
- g.fillStyle='#1a0e06';const e=Math.max(1,R*.13),bl=Math.sin(ph*3)>.95?.25:1;g.fillRect(cx-R*.42,cy-R*.3,e*1.4,e*1.4*bl);g.fillRect(cx+R*.18,cy-R*.3,e*1.4,e*1.4*bl);
- g.fillStyle='#fff';if(bl>.5){g.fillRect(cx-R*.42,cy-R*.3,Math.max(1,e*.6),Math.max(1,e*.6));g.fillRect(cx+R*.18,cy-R*.3,Math.max(1,e*.6),Math.max(1,e*.6))}
- g.fillStyle='#1a0e06';const mo=(Math.sin(ph*4)+1)/2;g.fillRect(cx-R*.25,cy+R*.2,R*.5,Math.max(1,R*(.08+.18*mo)));
- g.restore();
- const ma=ph,mx=cx+Math.cos(ma)*R*1.45,my=cy+Math.sin(ma)*R*.6,bw=Math.max(3,W*.16),bh=Math.max(1,W*.035);
- g.save();g.translate(mx,my);g.rotate(ma*2);g.fillStyle='#d9a866';g.fillRect(-bw/2,-bh/2,bw,bh);g.fillStyle='#8a5a2b';g.fillRect(bw*.15,-bh,bw*.35,bh*2);g.restore();
- const src=g.getImageData(0,0,W,Hh).data;for(let o=0;o<d.length;o+=4){const al=src[o+3];if(al>110){d[o]=src[o];d[o+1]=src[o+1];d[o+2]=src[o+2];d[o+3]=255}else d[o+3]=0}
+ const ph=fi/TTF*TAU,{dq,bay,hx,vn,H}=P,cx=W/2,cy=Hh/2,R=W*.32;
+ d.fill(0);
+ const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh||!c)return;const o=(y*W+x)*4,q=typeof c==='string'?hx(c):c;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
+ const litAt=(x,y)=>Math.max(0,Math.min(1,.58-(x+.5-cx)/R*.42-(y+.5-cy)/R*.34));
+ const rings=Math.max(5,Math.min(17,Math.round(R/3.15))),lateCut=R<18?.56:.74,px0=cx-R*.09,py0=cy-R*.05;
+ const knots=[[.06,-.58,.072],[.58,.22,.048]];
+ for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){
+  const dx=x+.5-cx,dy=y+.5-cy,ang=Math.atan2(dy,dx),r=Math.hypot(dx,dy)/R;
+  const jag=.04*Math.sin(ang*5+1.1)+.026*Math.sin(ang*12+2.2)+.016*Math.sin(ang*21)+(vn(Math.cos(ang)*3.2+2,Math.sin(ang)*3.2)-.5)*.035;
+  const edge=1+jag;
+  if(r>edge+.06)continue;
+  const lit=litAt(x,y);
+  if(r>edge){if((r-edge)*R<1.7&&bay(x,y)<.45&&Math.sin(ang*18)>.15)put(x,y,dq(TTBARK,.3+vn(x*.5,y*.5)*.35,x,y));continue}
+  const barkW=.105+.03*Math.sin(ang*7+.6)+.018*Math.sin(ang*16+1.4);
+  if(r>edge-barkW){const u=(edge-r)/barkW,ridge=.5+.5*Math.sin(ang*24+u*5),crack=Math.abs((ang*9/(Math.PI))%1-.5)<.04;let v=u*.5+ridge*.32+lit*.28;if(crack)v*=.32;if(u<.14)v=Math.max(v,.82);put(x,y,dq(TTBARK,v,x,y));continue}
+  const qx=x+.5-px0,qy=y+.5-py0,pa=Math.atan2(qy,qx);
+  let rw=Math.hypot(qx,qy)/R/(1+.075*Math.cos(pa-.35));
+  rw+=.018*Math.sin(pa*3+1.2)+.01*Math.sin(pa*8+2)+(vn(Math.cos(pa)*2.2,Math.sin(pa)*2.2+rw*1.4)-.5)*.012;
+  let knot=0;
+  for(const[kx,ky,kr]of knots){const kd=Math.hypot(dx/R-kx,dy/R-ky);if(kd<kr*2.1){const f=1-kd/(kr*2.1);rw-=f*f*.028;if(kd<kr)knot=kd<kr*.32?1:kd>kr*.7&&kd<kr*.9?2:3}}
+  const heart=rw<.45,rf=rw*rings,ri=Math.floor(Math.max(0,rf)),fr=rf-ri,late=fr>lateCut;
+  let v=lit*.86+(vn(x*1.4+ri,y*.7)-.5)*.1+(late?-.05:.04);
+  if(!late&&R>22&&fr>.22&&fr<lateCut-.1&&H(ri*13+Math.floor((pa+4)*8),1)>.86)v-=.2;
+  if(R>18&&rw>.42&&rw<.88&&!late){for(let i=0;i<6;i++){const a0=i/6*TAU+.55,dA=Math.abs(Math.atan2(Math.sin(pa-a0),Math.cos(pa-a0)));if(dA<.45/(rw*R)&&((Math.floor(rw*9)+i)&1)){v=Math.min(1,v+.1);break}}}
+  let col;
+  if(knot===1)col=dq(['#120804','#2a140a','#4a2812'],lit*.55,x,y);
+  else if(knot===2)col=dq(TTHLATE,.2+lit*.35,x,y);
+  else if(knot===3)col=dq(heart?TTHEART:TTEARLY,v*.75,x,y);
+  else if(late)col=dq(heart?TTHLATE:TTLATE,Math.max(0,v),x,y);
+  else col=dq(heart?TTHEART:TTEARLY,v,x,y);
+  if(R>14){for(const ca of[-2.45,1.05]){const cd=Math.atan2(Math.sin(pa-ca),Math.cos(pa-ca));if(Math.abs(cd)<.016+.01*Math.sin(rw*18+ca)&&rw>.16&&rw<.9){col='#1a0c06';break}}}
+  put(x,y,col)}
+ const carve=(x0,y0,w,h)=>{const x1=x0+w,y1=y0+h;for(let y=Math.floor(y0)-1;y<=Math.ceil(y1);y++)for(let x=Math.floor(x0)-1;x<=Math.ceil(x1);x++){const ix=x+.5,iy=y+.5,inn=ix>=x0&&ix<x1&&iy>=y0&&iy<y1;if(inn){const u=(ix-x0)/w,v=(iy-y0)/h;put(x,y,u<.16||v<.18?dq(['#4a3018','#8a6240','#e6c898'],.4+(1-u)*.35+(1-v)*.3,x,y):dq(['#070402','#140c06','#2a180c'],v*.55+u*.12,x,y))}else if(ix>=x0-1&&ix<x1+1&&iy>=y0&&iy<y1+1&&bay(x,y)<.8)put(x,y,dq(TTHLATE,.25,x,y))}};
+ const e=Math.max(1,R*.13),open=Math.sin(ph*3)<=.95,eh=open?e*1.4:Math.max(1,e*.28),ey=cy-R*.3+(open?0:e*.55);
+ carve(cx-R*.42,ey,e*1.4,eh);carve(cx+R*.18,ey,e*1.4,eh);
+ if(open){const s=Math.max(1,e*.6),gl=(x,y)=>{for(let yy=0;yy<s;yy++)for(let xx=0;xx<s;xx++)put(x+xx,y+yy,xx+yy<=s*.6?'#fffef8':'#ffe6b0')};gl(cx-R*.42,ey);gl(cx+R*.18,ey)}
+ const mo=(Math.sin(ph*4)+1)/2,mh=Math.max(1,R*(.08+.18*mo)),mx0=cx-R*.25,my0=cy+R*.2;carve(mx0,my0,R*.5,mh);
+ if(mh>4){for(let k=0;k<3;k++){const x=mx0+R*(.12+k*.13);for(let y=my0+mh*.55;y<my0+mh-.4;y++)if(bay(x|0,y|0)>.35)put(x,y,'#060302')}}
+ const ma=ph,flap=Math.sin(ph*5),span=Math.max(7,W*.22),ax=Math.min(R*1.28,W/2-span*.52-1),ay=Math.min(R*1.18,Hh/2-span*.24-1),bx=cx+Math.cos(ma)*ax,by=cy+Math.sin(ma)*ay,rows=span<26?BATTINY:(flap>=0?BATUP:BATDN),bw=rows[0].length,bh=rows.length,sc=span/bw,ang=flap*.4,ca=Math.cos(ang),sa=Math.sin(ang),rad=Math.ceil(span*.62);
+ for(let y=-rad;y<=rad;y++)for(let x=-rad;x<=rad;x++){const lx=(x*ca+y*sa)/sc+bw/2,ly=(-x*sa+y*ca)/sc+bh/2,i=Math.floor(lx),j=Math.floor(ly);if(i<0||j<0||i>=bw||j>=bh)continue;const ch=rows[j][i];if(ch!=='.')put(bx+x,by+y,BATCOL[ch])}
  S.g.putImageData(S.img,0,0);if(TTC.size>1200)TTC.clear();TTC.set(ck,new ImageData(new Uint8ClampedArray(d),W,Hh))};
 
 const cv=document.getElementById('sky'),g=cv.getContext('2d'),info=document.getElementById('info'),tip=document.getElementById('tip'),backBtn=document.getElementById('back'),homeBtn=document.getElementById('home'),archBtn=document.getElementById('archbtn');
