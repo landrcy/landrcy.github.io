@@ -14,7 +14,7 @@ const BH_IN='world/assets/blackhole-f/bh-in.gif',BH_LOOP='world/assets/blackhole
 // world layout: blackhole at origin, the Omniverse orbits it on a flattened ring like the hub planets
 const CL_GIF='world/assets/clover/clover-planet.gif',CL_STILL='world/assets/clover/clover-planet.png';
 // F is 5x bigger; the clover planet orbits far out, Max Omniverse is its moon
-const PB_ORB=17500,PB_PER=150,PB_W=1100,DS_ORB=14000,DS_PER=120,DS_W=1500,BH_W=9200,CL_W=1300,ORB=10200,SQ=.6,OM_PER=70,OM_W=420,MO=1400,MO_PER=16;
+const VS_ORB=21000,VS_PER=190,VS_W=900,PB_ORB=17500,PB_PER=150,PB_W=1100,DS_ORB=14000,DS_PER=120,DS_W=1500,BH_W=9200,CL_W=1300,ORB=10200,SQ=.6,OM_PER=70,OM_W=420,MO=1400,MO_PER=16;
 
 const worm=document.createElement('button');
 worm.type='button';worm.id='worm';
@@ -126,8 +126,18 @@ const pbP=document.createElement('a');pbP.id='pbplay';pbP.href=PB_URL;pbP.target
 pbc.append(pbT,pbP);pbc.style.zIndex=5;
 pbc.addEventListener('pointerdown',e=>e.stopPropagation());pbc.addEventListener('click',e=>e.stopPropagation());
 function showPb(on){pbc.hidden=!on;if(on){pbc.classList.remove('fin');void pbc.offsetWidth;pbc.classList.add('fin')}}
-window.__galPB=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='pb'){unfocusG();fitCamSoft();return}showCta(false);showDs(false);gfoc='pb';showPb(true)};
-window.__galDS=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='ds'){unfocusG();fitCamSoft();return}showCta(false);showPb(false);gfoc='ds';showDs(true)};
+window.__galPB=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='pb'){unfocusG();fitCamSoft();return}showCta(false);showDs(false);showVs(false);gfoc='pb';showPb(true)};
+// V49 Volt Sphere: zoom-in title showcase only (no link yet)
+const vsc=document.createElement('div');vsc.id='vscta';vsc.className='pbcta';vsc.hidden=true;
+const vsT=document.createElement('canvas');vsT.className='lgtx';vsT.setAttribute('role','img');vsT.setAttribute('aria-label','Volt Sphere');
+function drawVsT(){const x=vsT.getContext('2d'),T='VOLT SPHERE',f="400 64px 'Silkscreen',monospace";x.font=f;const w=Math.ceil(x.measureText(T).width)+24;if(vsT.width!==w){vsT.width=w;vsT.height=92}
+ x.clearRect(0,0,vsT.width,vsT.height);x.font=f;x.textBaseline='middle';x.textAlign='center';const cx=vsT.width/2,cy=vsT.height/2;
+ x.fillStyle='#0b0730';for(const[dx,dy]of[[-5,0],[5,0],[0,-5],[0,5],[-4,-4],[4,-4],[-4,4],[4,4],[0,8]])x.fillText(T,cx+dx,cy+dy);x.fillStyle='#5ee6ff';x.fillText(T,cx,cy)}
+document.fonts&&document.fonts.load("64px 'Silkscreen'").then(drawVsT);drawVsT();
+vsc.append(vsT);vsc.style.zIndex=5;vsc.addEventListener('pointerdown',e=>e.stopPropagation());vsc.addEventListener('click',e=>e.stopPropagation());
+function showVs(on){vsc.hidden=!on;if(on){vsc.classList.remove('fin');void vsc.offsetWidth;vsc.classList.add('fin')}}
+window.__galVS=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='vs'){unfocusG();fitCamSoft();return}showCta(false);showDs(false);showPb(false);gfoc='vs';showVs(true)};
+window.__galDS=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='ds'){unfocusG();fitCamSoft();return}showCta(false);showPb(false);showVs(false);gfoc='ds';showDs(true)};
 cta.addEventListener('pointerdown',e=>e.stopPropagation());
 cta.addEventListener('click',e=>e.stopPropagation());
 cta.style.zIndex=5;
@@ -153,14 +163,15 @@ function fScramble(){if(RM||gal.hidden||!bh.complete||!bh.naturalWidth)return;co
   setTimeout(step,50+Math.random()*60)};step()}
 function finGlitch(){const sp=[...finW.children];if(!fin||sp.length!==6||sp.some(e=>e.style.opacity!=='1'))return;const k=1+(Math.random()*2|0);for(let i=0;i<k;i++)glitchEl(sp[1+(Math.random()*5|0)],true)}
 (function gLoop(){setTimeout(()=>{if(!gal.hidden&&!document.hidden){if(fin&&Math.random()<.6)finGlitch();else fScramble()}gLoop()},1500+Math.random()*3500)})();
-function overBH(x,y){const r=bh.getBoundingClientRect();return Math.hypot(x-r.left-r.width/2,y-r.top-r.height/2)<r.width*.33}gal.append(gsky,bh,bhG,coreC,clov,omni,cta,dsc,pbc,finW,back);
+function overBH(x,y){const r=bh.getBoundingClientRect();return Math.hypot(x-r.left-r.width/2,y-r.top-r.height/2)<r.width*.33}gal.append(gsky,bh,bhG,coreC,clov,omni,cta,dsc,pbc,vsc,finW,back);
 document.body.appendChild(gal);
 
 const tip=document.getElementById('tip');
 let busy=false,inGal=false,holdTip=false;
-const cam={x:0,y:0,z:1};window.__galView=()=>({cam,GW,GH,inGal,ds:dsPos(),dsZ:dsPos()[1]<0?1:3,pb:pbPos(),pbZ:pbPos()[1]<0?1:3,pbFoc:gfoc==='pb',pbLa:Math.atan2(-pbPos()[1],bhOff-pbPos()[0]),clLa:clLA,clF:CLF.i});
-let fin=false,bhOff=0,gfoc=null,GW=1,GH=1,neb=null,stars=[],omniPx=0,omAng=.55,moAng=0,omSf=1,omHov=false,gLast=0,bhT=0,dsAng=3.75,pbAng=.6;
+const cam={x:0,y:0,z:1};window.__galView=()=>({cam,GW,GH,inGal,ds:dsPos(),dsZ:dsPos()[1]<0?1:3,pb:pbPos(),pbZ:pbPos()[1]<0?1:3,pbFoc:gfoc==='pb',pbLa:Math.atan2(-pbPos()[1],bhOff-pbPos()[0]),vs:window.__FFC?vsPos():null,vsZ:vsPos()[1]<0?1:3,vsLa:Math.atan2(-vsPos()[1],bhOff-vsPos()[0]),clLa:clLA,clF:CLF.i});
+let fin=false,bhOff=0,gfoc=null,GW=1,GH=1,neb=null,stars=[],omniPx=0,omAng=.55,moAng=0,omSf=1,omHov=false,gLast=0,bhT=0,dsAng=3.75,pbAng=.6,vsAng=2.2;
 function clPos(){return[Math.cos(omAng)*ORB,Math.sin(omAng)*ORB*SQ]}
+function vsPos(){return[Math.cos(vsAng)*VS_ORB,Math.sin(vsAng)*VS_ORB*SQ]}
 function pbPos(){return[Math.cos(pbAng)*PB_ORB,Math.sin(pbAng)*PB_ORB*SQ]}
 function dsPos(){return[Math.cos(dsAng)*DS_ORB,Math.sin(dsAng)*DS_ORB*SQ]}
 function omPos(){const[c,d]=clPos();return[c+Math.cos(moAng)*MO,d+Math.sin(moAng)*MO*SQ]}
@@ -324,6 +335,7 @@ function placeOmni(){
  omni.style.width=omni.style.height=Math.round(ms)+'px';
  omni.style.transform='translate('+Math.round(ox-ms/2)+'px,'+Math.round(oy-ms/2)+'px)';
  // CTA is world-anchored to the Omniverse sprite: same world x, centered on the disc, scales with zoom
+ {const[px,py]=vsPos(),q=Math.max(2,VS_W*1.3*cam.z);vsc.style.transform='translate('+Math.round((px-cam.x)*cam.z+GW/2)+'px,'+Math.round((py-cam.y)*cam.z+GH/2)+'px) scale('+(q/1000).toFixed(4)+') translate(-50%,-50%)'}
  {const[px,py]=pbPos(),q=Math.max(2,PB_W*1.3*cam.z);pbc.style.transform='translate('+Math.round((px-cam.x)*cam.z+GW/2)+'px,'+Math.round((py-cam.y)*cam.z+GH/2)+'px) scale('+(q/1000).toFixed(4)+') translate(-50%,-50%)'}
  {const[dx,dy]=dsPos(),q=Math.max(2,DS_W*1.3*cam.z);dsc.style.transform='translate('+Math.round((dx-cam.x)*cam.z+GW/2)+'px,'+Math.round((dy-cam.y)*cam.z+GH/2)+'px) scale('+(q/1000).toFixed(4)+') translate(-50%,-50%)'}
  // V37: shade is baked into the clover sprite's own pixels (no overlay disc); the Maximum Omniverse stays full-bright
@@ -336,7 +348,8 @@ function drawGal(now){
  if(!inGal)return;
  gg.imageSmoothingEnabled=false;gg.fillStyle='#140206';gg.fillRect(0,0,GW,GH);
  const T=512,ox=Math.round(((cam.x*.08)%T+T)%T),oy=Math.round(((cam.y*.08)%T+T)%T);
- if(neb){gg.globalAlpha=.92;for(let y=-oy;y<GH;y+=T)for(let x=-ox;x<GW;x+=T)gg.drawImage(neb,x,y,T,T);gg.globalAlpha=1}
+ if(neb){gg.globalAlpha=.92;for(let y=-oy;y<GH;y+=T)for(let x=-ox;x<GW;x+=T)gg.drawImage(neb,x,y,T,T);gg.globalAlpha=1;
+  {const n=Math.max(40,Math.min(160,Math.round(VS_ORB*cam.z*2.4/(ps*3)))),arc=2.4;for(let k=1;k<=n;k++){const f=k/n,an=vsAng-arc*f,sx=(Math.cos(an)*VS_ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*VS_ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.65;if(al<.02||(k%2&&f>.35))continue;gg.fillStyle=k%5?'#5ee6ff':'#c9a6ff';gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}}
  else{const grd=gg.createRadialGradient(GW/2,GH/2,40,GW/2,GH/2,Math.max(GW,GH)*.7);grd.addColorStop(0,'#6a1420');grd.addColorStop(1,'#140206');gg.fillStyle=grd;gg.fillRect(0,0,GW,GH)}
  const t=now/1000;
  for(const s of stars){
@@ -348,7 +361,7 @@ function drawGal(now){
  for(let i=0;i<4;i++){const m=(i+1)*Math.max(8,pxScale()*6);gg.fillStyle='rgba(20,2,6,.22)';gg.fillRect(0,0,GW,m);gg.fillRect(0,GH-m,GW,m);gg.fillRect(0,0,m,GH);gg.fillRect(GW-m,0,m,GH)}
  // orbit: hover slows, open CTA stops it (like the hub planets)
  const dt=Math.min(.05,gLast?(now-gLast)/1000:0);gLast=now;
- const tg=RM?0:omHov&&!gfoc?.35:1;omSf+=(tg-omSf)*Math.min(1,dt*4);omAng+=dt*Math.PI*2/OM_PER*omSf;moAng+=dt*Math.PI*2/MO_PER*omSf;if(!RM){dsAng+=dt*Math.PI*2/DS_PER*(gfoc==='ds'?.35:1);pbAng+=dt*Math.PI*2/PB_PER*(gfoc==='pb'?.35:1)}
+ const tg=RM?0:omHov&&!gfoc?.35:1;omSf+=(tg-omSf)*Math.min(1,dt*4);omAng+=dt*Math.PI*2/OM_PER*omSf;moAng+=dt*Math.PI*2/MO_PER*omSf;if(!RM){dsAng+=dt*Math.PI*2/DS_PER*(gfoc==='ds'?.35:1);pbAng+=dt*Math.PI*2/PB_PER*(gfoc==='pb'?.35:1);vsAng+=dt*Math.PI*2/VS_PER*(gfoc==='vs'?.35:1)}
  // V43: Sticky Board orbit trail (same style, paper yellow), outer orbit
  if(FFC){const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(PB_ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#ffe066';
   for(let k=1;k<=n;k++){const f=k/n,an=pbAng-arc*f,sx=(Math.cos(an)*PB_ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*PB_ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
@@ -359,7 +372,7 @@ function drawGal(now){
  {const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#7aff8a';
   for(let k=1;k<=n;k++){const f=k/n,an=omAng-arc*f,sx=(Math.cos(an)*ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
  // hub-style focus: fly + zoom the camera onto the clicked body
- if(gfoc){const[fx,fy]=gfoc==='bh'?[0,0]:gfoc==='om'?omPos():gfoc==='ds'?dsPos():gfoc==='pb'?pbPos():clPos(),zt=Math.min(GW,GH)*(gfoc==='bh'?.9:gfoc==='om'?.55:.62)/(gfoc==='bh'?BH_W:gfoc==='om'?OM_W:gfoc==='ds'?DS_W:gfoc==='pb'?PB_W:CL_W),k=Math.min(1,dt*(RM?60:5));cam.x+=(fx-cam.x)*k;cam.y+=(fy-cam.y)*k;cam.z*=Math.pow(zt/cam.z,k)}
+ if(gfoc){const[fx,fy]=gfoc==='bh'?[0,0]:gfoc==='om'?omPos():gfoc==='ds'?dsPos():gfoc==='pb'?pbPos():gfoc==='vs'?vsPos():clPos(),zt=Math.min(GW,GH)*(gfoc==='bh'?.9:gfoc==='om'?.55:.62)/(gfoc==='bh'?BH_W:gfoc==='om'?OM_W:gfoc==='ds'?DS_W:gfoc==='pb'?PB_W:gfoc==='vs'?VS_W:CL_W),k=Math.min(1,dt*(RM?60:5));cam.x+=(fx-cam.x)*k;cam.y+=(fy-cam.y)*k;cam.z*=Math.pow(zt/cam.z,k)}
  // V33 (/ffc): WASD flight relative to the F blackhole. W/S fly toward/away from it, A/D strafe around it; the ship always faces it
  if(FFC){let vx=0,vy=0;const kw=gKeys.has('w'),ks=gKeys.has('s'),ka=gKeys.has('a'),kd=gKeys.has('d');
   if(kw||ks||ka||kd){gfoc=null;showCta(false);showDs(false);const r=Math.hypot(cam.x,cam.y/SQ),ux=r>1?-cam.x/r:0,uy=r>1?-cam.y/SQ/r:-1,sp=Math.max(1200,r*.9)*dt;
@@ -380,7 +393,7 @@ function showGalaxy(){
  worm.setAttribute('aria-label','Return through the wormhole');
  if(!gLoop)gLoop=requestAnimationFrame(galFrame)}
 function hideGalaxy(){
- inGal=false;showDs(false);showPb(false);fin=false;finClear();finW.textContent='';bhOff=0;clearTimeout(bhT);bh.src=BH_STILL;showCta(false);document.body.classList.remove('galaxy');gal.hidden=true;gal.style.opacity='0';
+ inGal=false;showDs(false);showPb(false);showVs(false);fin=false;finClear();finW.textContent='';bhOff=0;clearTimeout(bhT);bh.src=BH_STILL;showCta(false);document.body.classList.remove('galaxy');gal.hidden=true;gal.style.opacity='0';
  window.__galaxyHold=false;worm.setAttribute('aria-label','Wormhole');hideTip()}
 
 let srcWorm=worm;
@@ -429,14 +442,14 @@ addEventListener('keyup',e=>{gKeys.delete((e.code||'').replace('Key','').toLower
 addEventListener('keydown',e=>{
  if(e.key!=='Escape')return;
  // on /ffc/ Escape never leaves the page: it only backs out of a focused planet/blackhole
- if(FFC){e.preventDefault();e.stopImmediatePropagation();if(busy)return;if(fin){finOff();return}if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden))unfocusG();fitCamSoft();return}
+ if(FFC){e.preventDefault();e.stopImmediatePropagation();if(busy)return;if(fin){finOff();return}if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden||!vsc.hidden))unfocusG();fitCamSoft();return}
  if(!inGal||busy)return;
- e.preventDefault();e.stopImmediatePropagation();if(fin){finOff();return}if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden)){unfocusG();fitCamSoft();return}travel(false)},true);
+ e.preventDefault();e.stopImmediatePropagation();if(fin){finOff();return}if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden||!vsc.hidden)){unfocusG();fitCamSoft();return}travel(false)},true);
 
 // fly the galaxy: drag pans, wheel / pinch zooms, a quiet click on empty space returns
 const pts=new Map();let moved=0,pinch=null;
 function overMoon(x,y){const r=omni.getBoundingClientRect();return Math.hypot(x-r.left-r.width/2,y-r.top-r.height/2)<r.width*.4}
-function unfocusG(){gfoc=null;showCta(false);showDs(false);showPb(false)}
+function unfocusG(){gfoc=null;showCta(false);showDs(false);showPb(false);showVs(false)}
 function overOmni(x,y){const r=clov.getBoundingClientRect();const cx=r.left+r.width/2,cy=r.top+r.height/2,rad=r.width*.42;return Math.hypot(x-cx,y-cy)<rad}
 gsky.addEventListener('pointerdown',e=>{
  gsky.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);moved=0;
@@ -456,7 +469,7 @@ function endPtr(e){const was=moved;pts.delete(e.pointerId);if(pts.size<2)pinch=n
  if(e.type!=='pointerup'||was>=6||busy)return;
  if(overMoon(e.clientX,e.clientY)&&omni.style.zIndex>clov.style.zIndex||!overOmni(e.clientX,e.clientY)&&overMoon(e.clientX,e.clientY)){showCta(false);showDs(false);gfoc=gfoc==='om'?null:'om';if(!gfoc)fitCamSoft();return}
  if(overOmni(e.clientX,e.clientY)){if(gfoc==='cl'){unfocusG();fitCamSoft()}else{showDs(false);gfoc='cl';showCta(true)}return}
- if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden)){unfocusG();fitCamSoft();return}
+ if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden||!vsc.hidden)){unfocusG();fitCamSoft();return}
  if(overBH(e.clientX,e.clientY)){if(fin)finOff();showCta(false);showDs(false);gfoc='bh';return}
  if(fin){finOff();return}
  if(!FFC)travel(false)}
