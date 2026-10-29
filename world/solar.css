@@ -92,28 +92,32 @@ body.uirv #sndbtn{animation-delay:.15s}body.uirv #sat{animation:pxin .7s steps(5
 #info.lg .lgwam{width:88cqw;filter:drop-shadow(0 0 4px #000)}#info[data-p^="w"] .lgplay{flex-shrink:0}
 #info[data-p="ashaad"] .lgrow{transform:translateY(30cqmin)}
 
-/* wormhole: fixed corner portal, slipped off the bottom-right edge into the white void */
-#worm{position:fixed;z-index:8;right:calc(env(safe-area-inset-right,0px) - 26px);bottom:calc(env(safe-area-inset-bottom,0px) - 22px);width:120px;height:120px;padding:0;border:0;background:transparent;cursor:pointer;image-rendering:pixelated}
-#worm img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(0 0 6px rgba(90,20,140,.65))}
+/* wormhole: fixed corner portal, low in the bottom-right white void, beside (not above) sound; art is padded so the whole glitch silhouette shows */
+#worm{position:fixed;z-index:8;right:calc(env(safe-area-inset-right,0px) + .1rem);bottom:calc(env(safe-area-inset-bottom,0px) - 1.1rem);width:150px;height:150px;padding:0;border:0;background:transparent;cursor:pointer;image-rendering:pixelated;overflow:visible}
+#worm img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(0 0 5px rgba(90,20,140,.5))}
 #worm:hover img,#worm:focus-visible img{filter:drop-shadow(0 0 8px rgba(255,140,40,.8)) brightness(1.12)}
-#worm:focus-visible{outline:2px solid #ffb45a;outline-offset:2px}
+#worm:focus-visible{outline:2px solid #ffb45a;outline-offset:-24px}
 body.intro #worm{visibility:hidden}
 body.uirv #worm{animation:pxin .7s steps(5) both}
-body.arch #worm{visibility:hidden}
-@media(max-width:520px){#worm{width:96px;height:96px;right:calc(env(safe-area-inset-right,0px) - 16px);bottom:calc(env(safe-area-inset-bottom,0px) - 14px)}#sndbtn{right:calc(5.75rem + env(safe-area-inset-right,0px))}}
-@media(prefers-reduced-motion:reduce){body.uirv #worm{animation:none}#worm img{filter:drop-shadow(0 0 4px rgba(90,20,140,.7))}}
+body.arch #worm,body.galaxy #worm{visibility:hidden}
+@media(max-width:520px){#worm{width:112px;height:112px;right:env(safe-area-inset-right,0px);bottom:calc(env(safe-area-inset-bottom,0px) - .8rem)}#sndbtn{right:calc(6.4rem + env(safe-area-inset-right,0px))}}
+@media(prefers-reduced-motion:reduce){body.uirv #worm,body.galaxy #ship{animation:none}#worm img{filter:drop-shadow(0 0 4px rgba(90,20,140,.7))}}
+#ship{position:fixed;right:calc(1.2rem + env(safe-area-inset-right,0px));bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));z-index:26;width:54px;height:60px;padding:0;border:0;background:transparent;cursor:pointer;display:none;filter:drop-shadow(0 0 6px rgba(90,255,230,.6))}
+#ship img{width:100%;height:100%;image-rendering:pixelated;pointer-events:none}
+#ship:hover,#ship:focus-visible{filter:drop-shadow(0 0 9px rgba(255,160,60,.9))}
+#ship:focus-visible{outline:2px solid #5affd8;outline-offset:4px}
+body.galaxy #ship{display:block;animation:shipbob 2.4s steps(6) infinite}
+@keyframes shipbob{50%{transform:translateY(-5px)}}
+@media(max-width:520px){#ship{width:42px;height:47px}}
 
 #rush{position:fixed;inset:0;z-index:30;width:100%;height:100%;image-rendering:pixelated;pointer-events:none;background:transparent}
 body.traveling #rush{pointer-events:auto}
-#galaxy{position:fixed;inset:0;z-index:20;display:none;background:#140206;touch-action:none}
+#galaxy{position:fixed;inset:0;z-index:20;display:none;background:#0c0418;touch-action:none}
 body.galaxy #galaxy{display:block}
 #gsky{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated;cursor:grab;touch-action:none}
 #gsky.drag{cursor:grabbing}
 #omni{position:absolute;left:0;top:0;image-rendering:pixelated;pointer-events:none;user-select:none;-webkit-user-drag:none}
-#gback{left:1rem;z-index:26;display:none}
-body.galaxy #gback{display:block}
 body.galaxy #home,body.galaxy #sat{visibility:hidden}
 body.galaxy #info{display:none!important}
 body.galaxy #sndbtn{z-index:26}
-body.galaxy #worm{z-index:27}
-body.traveling #worm,body.traveling #gback,body.traveling #sndbtn,body.traveling #home,body.traveling #sat{visibility:hidden}
+body.traveling #worm,body.traveling #ship,body.traveling #sndbtn,body.traveling #home,body.traveling #sat{visibility:hidden}

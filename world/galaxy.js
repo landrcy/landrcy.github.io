@@ -1,5 +1,5 @@
-/* Wormhole in the hub corner. Click it to fall through a hex tunnel into a blood-nebula galaxy
-   whose centerpiece is the maximum Omniverse. A second click, the fly-home button, empty space,
+/* Wormhole in the hub corner. Click it to fall through a hex tunnel into a warped purple glitch galaxy
+   whose centerpiece is the maximum Omniverse. The little ship, empty space,
    or Escape comes back. Not a planet — the portal is a fixed overlay. */
 (()=>{
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -27,13 +27,20 @@ const rg=rush.getContext('2d');
 const gal=document.createElement('div');
 gal.id='galaxy';gal.hidden=true;
 const gsky=document.createElement('canvas');
-gsky.id='gsky';gsky.setAttribute('aria-label','Blood nebula galaxy. The Maximum Omniverse is at the center. Drag to fly, click empty space or the wormhole to return.');
+gsky.id='gsky';gsky.setAttribute('aria-label','Warped glitch galaxy. The Maximum Omniverse is at the center. Drag to fly; the little ship at the bottom right flies you back to the hub.');
 const gg=gsky.getContext('2d');
 const omni=document.createElement('img');
 omni.id='omni';omni.alt='Maximum Omniverse';omni.draggable=false;
-omni.src=RM?OM_STILL:OM_STILL;
+omni.src=OM_STILL;
+// little pixel ship: the way back out to the hub (the wormhole button is hidden in here)
 const back=document.createElement('button');
-back.type='button';back.id='gback';back.className='ui';back.textContent='fly home';
+back.type='button';back.id='ship';back.setAttribute('aria-label','Fly the ship back to the hub');
+const shipImg=document.createElement('img');shipImg.alt='';shipImg.draggable=false;
+(()=>{const M=['....1....','...121...','...131...','..12221..','..12221..','.1122211.','112222211','1.14441.1','...5.5...','...6.6...'];
+ const C={1:'#2a1440',2:'#cfd0ff',3:'#5affd8',4:'#8a7aff',5:'#ff9a30',6:'#ffe080'};
+ const c=document.createElement('canvas');c.width=9;c.height=10;const x=c.getContext('2d');
+ M.forEach((r,y)=>[...r].forEach((k,i)=>{if(C[k]){x.fillStyle=C[k];x.fillRect(i,y,1,1)}}));shipImg.src=c.toDataURL()})();
+back.appendChild(shipImg);
 gal.append(gsky,omni,back);
 document.body.appendChild(gal);
 
@@ -72,14 +79,14 @@ function paintTunnel(buf,bw,bh,u){
    const band=(((Math.log(hd*.9+1.7)*2.35-rushSp)%1)+1)%1;
    let r,g,b;
    if(hd<2.4){r=10;g=2;b=18}
-   else if(band<.11){r=255;g=138;b=28}
-   else if(band<.2){r=196;g=68;b=10}
-   else if(band<.36){r=22;g=42;b=148}
-   else if(band<.48){r=12;g=18;b=72}
-   else if(band<.6){r=232;g=104;b=18}
-   else if(band<.74){r=92;g=36;b=168}
-   else if(band<.86){r=42;g=12;b=78}
-   else{r=16;g=4;b=32}
+   else if(band<.11){r=255;g=150;b=40}
+   else if(band<.2){r=200;g=80;b=20}
+   else if(band<.36){r=40;g=70;b=190}
+   else if(band<.48){r=20;g=22;b=90}
+   else if(band<.6){r=150;g=70;b=230}
+   else if(band<.74){r=90;g=30;b=170}
+   else if(band<.86){r=44;g=12;b=86}
+   else{r=16;g=4;b=34}
    const sh=.38+depth*.72;
    r*=sh;g*=sh;b*=sh;
    const bay=B4[(y&3)*4+(x&3)];
@@ -96,39 +103,38 @@ function drawTravel(u,snap,origin){
  const W=innerWidth,H=innerHeight,S=pxScale();
  if(rush.width!==W||rush.height!==H){rush.width=W;rush.height=H}
  rg.imageSmoothingEnabled=false;rg.setTransform(1,0,0,1,0,0);rg.clearRect(0,0,W,H);
- const suck=Math.min(1,u/.42),e=suck*suck*(3-2*suck);
- const px=origin.x+(W/2-origin.x)*Math.min(1,u/.45);
- const py=origin.y+(H/2-origin.y)*Math.min(1,u/.45);
+ const sm=k=>k*k*(3-2*k);
+ // 1) hub-style fly-in: uniform zoom toward the portal, the portal drifting to centre (no stretch)
+ const ZU=.42,a=sm(Math.min(1,u/ZU));
+ const ps=origin.s||100,zEnd=Math.max(W,H)*1.5/ps,z=Math.exp(Math.log(zEnd)*a);
+ const cx=origin.x+(W/2-origin.x)*a,cy=origin.y+(H/2-origin.y)*a;
  if(u<.62){
-  rg.fillStyle='#010103';rg.fillRect(0,0,W,H);
-  const z=1+e*3.1,stretch=1+e*.9;
-  rg.save();rg.translate(px,py);rg.scale(z,z*stretch);rg.translate(-px,-py);
-  rg.globalAlpha=Math.max(0,1-e*.85);
-  rg.drawImage(snap,0,0,W,H);rg.restore();rg.globalAlpha=1}
- // growing portal sprite, then the hex rush
- const grow=RM?.55:(u<.4?.18+u*1.1:.55+(u-.4)*2.4);
- const sz=Math.min(W,H)*grow;
- if(u<.72&&wimg.complete){
-  rg.save();rg.translate(px,py);rg.scale(1,1+Math.min(1,u)*0.35);rg.globalAlpha=u<.45?1:Math.max(0,1-(u-.45)/.27);
-  rg.drawImage(wimg,-sz/2,-sz/2,sz,sz);rg.restore();rg.globalAlpha=1}
+  rg.fillStyle=inGal?'#0c0418':'#ffffff';rg.fillRect(0,0,W,H);
+  rg.save();rg.translate(cx,cy);rg.scale(z,z);rg.translate(-origin.x,-origin.y);
+  rg.drawImage(snap,0,0,W,H);
+  if(wimg.complete)rg.drawImage(wimg,origin.x-ps/2,origin.y-ps/2,ps,ps);
+  rg.restore()}
+ // 2) through the tunnel
  if(u>.3){
   const bw=Math.max(8,Math.ceil(W/S)),bh=Math.max(8,Math.ceil(H/S));
-  if(!drawTravel.buf||drawTravel.buf.width!==bw){const c=document.createElement('canvas');c.width=bw;c.height=bh;drawTravel.buf=c;drawTravel.im=c.getContext('2d').createImageData(bw,bh)}
+  if(!drawTravel.buf||drawTravel.buf.width!==bw||drawTravel.buf.height!==bh){const c=document.createElement('canvas');c.width=bw;c.height=bh;drawTravel.buf=c;drawTravel.im=c.getContext('2d').createImageData(bw,bh)}
   paintTunnel(drawTravel.im,bw,bh,u);
-  const bx=drawTravel.buf.getContext('2d');bx.putImageData(drawTravel.im,0,0);
-  rg.globalAlpha=RM?Math.min(1,(u-.3)/.2):Math.min(1,(u-.3)/.22);
-  rg.drawImage(drawTravel.buf,0,0,bw*S,bh*S);
+  drawTravel.buf.getContext('2d').putImageData(drawTravel.im,0,0);
+  rg.globalAlpha=Math.min(1,(u-.3)/.14);
+  const tz=1+Math.max(0,u-.3)*.6;
+  rg.save();rg.translate(W/2,H/2);rg.scale(tz,tz);rg.drawImage(drawTravel.buf,-bw*S/2,-bh*S/2,bw*S,bh*S);rg.restore();
   rg.globalAlpha=1}
- if(u>.78){
-  rg.fillStyle='#3a0610';
-  rg.globalAlpha=Math.min(1,(u-.78)/.22);
-  rg.fillRect(0,0,W,H);rg.globalAlpha=1}
+ // 3) arrive: chromatic glitch flash into the destination
+ if(u>.82){
+  const k=Math.min(1,(u-.82)/.18);
+  rg.globalAlpha=k;rg.fillStyle=inGal?'#ffffff':'#1a0830';rg.fillRect(0,0,W,H);rg.globalAlpha=1;
+  if(!RM&&k<.95)for(let i=0;i<10;i++){const y=Math.random()*H|0,h=4+Math.random()*24|0;rg.fillStyle=i&1?'rgba(90,255,230,.55)':'rgba(255,60,200,.55)';rg.fillRect((Math.random()-.5)*60,y,W,h)}}
 }
 
 function buildNeb(){
  if(!P){neb=null;return}
  const N=320,S=P.mk(N,N),d=S.img.data;
- const R=['#100204','#2c060e','#5c1018','#8e2430','#c43a46','#6a1420','#1a0408'];
+ const R=['#0a0216','#1c0838','#36125e','#5a2296','#8a3ad0','#3a1a7a','#120428'];
  // edge-blended so the tile wraps — a hard repeat was reading as a checkerboard
  const f=(x,y)=>P.fbm(x/78+2,y/78)*1.2+P.fbm(x/28+6,y/28)*.42-.2;
  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
@@ -140,7 +146,7 @@ function buildNeb(){
  S.g.putImageData(S.img,0,0);neb=S.c}
 function buildStars(){
  stars=[];
- const cols=['#ffd0c4','#ff6a62','#ffb098','#ffd27a','#fff0e4','#e04058'];
+ const cols=['#e0d0ff','#5affd8','#ff6ad8','#ffd27a','#ffffff','#8a7aff'];
  for(let i=0;i<220;i++)stars.push({x:Math.random(),y:Math.random(),s:i%17===0?3:i%5===0?2:1,c:cols[i%cols.length],p:Math.random()*6.28})}
 
 function fitCam(){cam.z=fitZ();cam.x=0;cam.y=0}
@@ -155,17 +161,25 @@ function resizeGal(){
  if(inGal&&!busy)placeOmni()}
 function drawGal(now){
  if(!inGal)return;
- gg.imageSmoothingEnabled=false;gg.fillStyle='#140206';gg.fillRect(0,0,GW,GH);
+ gg.imageSmoothingEnabled=false;gg.fillStyle='#0c0418';gg.fillRect(0,0,GW,GH);
  const T=512,ox=Math.round(((cam.x*.08)%T+T)%T),oy=Math.round(((cam.y*.08)%T+T)%T);
  if(neb){gg.globalAlpha=.92;for(let y=-oy;y<GH;y+=T)for(let x=-ox;x<GW;x+=T)gg.drawImage(neb,x,y,T,T);gg.globalAlpha=1}
- else{const grd=gg.createRadialGradient(GW/2,GH/2,40,GW/2,GH/2,Math.max(GW,GH)*.7);grd.addColorStop(0,'#6a1420');grd.addColorStop(1,'#140206');gg.fillStyle=grd;gg.fillRect(0,0,GW,GH)}
+ else{const grd=gg.createRadialGradient(GW/2,GH/2,40,GW/2,GH/2,Math.max(GW,GH)*.7);grd.addColorStop(0,'#5a2296');grd.addColorStop(1,'#0c0418');gg.fillStyle=grd;gg.fillRect(0,0,GW,GH)}
  const t=now/1000;
  for(const s of stars){
   let x=((s.x*GW*1.4-cam.x*s.s*.15)%GW+GW)%GW,y=((s.y*GH*1.4-cam.y*s.s*.15)%GH+GH)%GH;
   const ps=s.s;x=Math.round(x/ps)*ps;y=Math.round(y/ps)*ps;
   const tw=RM?1:.55+.45*Math.sin(t*(.6+s.s*.4)+s.p);if(tw<.2&&s.s===1)continue;
   gg.globalAlpha=tw;gg.fillStyle=s.c;gg.fillRect(x,y,ps,ps);gg.globalAlpha=1}
- // vignette in chunky bands
+ // warp glitch: hex ripple rings + chromatic slice tears, like the inside of the wormhole
+ const cx=GW/2-cam.x*cam.z,cy=GH/2-cam.y*cam.z,mr=Math.hypot(GW,GH)*.6;
+ gg.lineWidth=Math.max(2,pxScale());
+ for(let i=0;i<7;i++){const rr=((i/7+(RM?0:t*.06))%1)*mr;gg.strokeStyle=i%2?'rgba(90,255,230,.10)':'rgba(200,90,255,.16)';gg.beginPath();
+  for(let k=0;k<=6;k++){const an=k/6*6.2832+.5236;const x=cx+Math.cos(an)*rr,y=cy+Math.sin(an)*rr;k?gg.lineTo(x,y):gg.moveTo(x,y)}gg.stroke()}
+ if(!RM){const seed=Math.floor(t*9);for(let i=0;i<6;i++){const h=((seed*131+i*977)%997)/997;if(h>.55)continue;
+  const y=Math.floor(h*1.8*GH),hh=3+((seed+i*7)%5)*5,sh=Math.round((h-.27)*90);
+  gg.drawImage(gsky,0,y,GW,hh,sh,y,GW,hh);
+  gg.fillStyle=i&1?'rgba(90,255,230,.18)':'rgba(255,60,200,.18)';gg.fillRect(sh*-.4,y,GW,Math.max(1,hh>>1))}}
  placeOmni()}
 let gLoop=0;
 function galFrame(now){if(!inGal){gLoop=0;return}drawGal(now);gLoop=requestAnimationFrame(galFrame)}
@@ -181,7 +195,7 @@ function hideGalaxy(){
  inGal=false;document.body.classList.remove('galaxy');gal.hidden=true;
  window.__galaxyHold=false;worm.setAttribute('aria-label','Wormhole');hideTip()}
 
-function portalOrigin(){const r=worm.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2}}
+function portalOrigin(){const el=inGal?back:worm,r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,s:inGal?r.width*1.6:r.width}}
 
 function travel(toGalaxy){
  if(busy)return;busy=true;hideTip();
@@ -192,9 +206,9 @@ function travel(toGalaxy){
  window.__sfx&&__sfx('whoosh');
  const snap=snapshot();
  const origin=portalOrigin();
- const dur=RM?320:2000;
+ const dur=RM?320:2400;
  const t0=performance.now();
- rush.hidden=false;document.body.classList.add('traveling');
+ document.body.classList.add('traveling');rush.hidden=false;
  window.__galaxyHold=true;
  const step=now=>{
   const u=Math.min(1,(now-t0)/dur);
