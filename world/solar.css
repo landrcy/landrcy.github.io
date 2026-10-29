@@ -93,7 +93,7 @@ body.uirv #sndbtn{animation-delay:.15s}body.uirv #sat{animation:pxin .9s cubic-b
 #info[data-p="ashaad"] .lgrow{transform:translateY(30cqmin)}
 
 /* wormhole: a world-space object far out in the bottom-right white void; galaxy.js sets size + translate from the hub camera each frame */
-#worm,#worm2{position:fixed;z-index:8;left:0;top:0;width:130px;height:130px;padding:0;border:0;background:transparent;cursor:pointer;image-rendering:pixelated;overflow:visible;will-change:transform}
+#worm,#worm2{position:fixed;z-index:3;left:0;top:0;width:130px;height:130px;padding:0;border:0;background:transparent none;-webkit-appearance:none;appearance:none;cursor:pointer;image-rendering:pixelated;overflow:visible;will-change:transform}
 #worm img,#worm2 img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(0 0 5px rgba(90,20,140,.5))}
 #worm:hover img,#worm:focus-visible img,#worm2:hover img{filter:drop-shadow(0 0 8px rgba(255,140,40,.8)) brightness(1.12)}
 #worm:focus-visible{outline:2px solid #ffb45a;outline-offset:-24px}

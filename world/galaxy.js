@@ -386,10 +386,12 @@ if(!RM)addEventListener('load',()=>{setTimeout(()=>{for(const u of[OM_GIF,CL_GIF
 
 // 5 clicks on the main solar system map within ~4s: the sky cracks there and a second wormhole tears open
 const crk=document.createElement('canvas');crk.id='crack';crk.setAttribute('aria-hidden','true');
-crk.style.cssText='position:fixed;left:0;top:0;pointer-events:none;z-index:7;image-rendering:pixelated';
+crk.style.cssText='position:fixed;left:0;top:0;pointer-events:none;z-index:3;image-rendering:pixelated';
 document.body.appendChild(crk);const cg=crk.getContext('2d');
-const worm2=worm.cloneNode(true);worm2.id='worm2';worm2.style.display='none';
-worm2.setAttribute('aria-label','Wormhole (cracked open)');document.body.appendChild(worm2);
+const worm2=document.createElement('div');worm2.id='worm2';worm2.setAttribute('role','button');worm2.tabIndex=0;
+worm2.style.cssText='position:fixed;z-index:2;left:0;top:0;width:130px;height:130px;padding:0;margin:0;border:0;outline:0;background:transparent none;box-shadow:none;-webkit-appearance:none;appearance:none;cursor:pointer;overflow:visible;image-rendering:pixelated;display:none';
+{const i2=document.createElement('img');i2.alt='';i2.draggable=false;i2.src=RM?WH_STILL:WH_GIF;i2.style.cssText='display:block;width:100%;height:100%;object-fit:contain;background:transparent;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(0 0 5px rgba(90,20,140,.5))';worm2.appendChild(i2)}
+worm2.setAttribute('aria-label','Wormhole (cracked open)');worm.after(worm2);
 let w2=null,crack=null,clicks=[];
 worm2.addEventListener('click',e=>{e.stopPropagation();if(busy||document.body.classList.contains('arch'))return;srcWorm=worm2;travel(true)});
 worm2.addEventListener('pointerenter',e=>showTip('Wormhole',e.clientX,e.clientY));worm2.addEventListener('pointerleave',hideTip);
@@ -405,7 +407,7 @@ function drawCrack(now){
  if(crk.width!==innerWidth||crk.height!==innerHeight){crk.width=innerWidth;crk.height=innerHeight}
  cg.clearRect(0,0,crk.width,crk.height);
  if(v&&v.sys==='main'){
-  if(w2){const z=v.cam.z,s=Math.max(72,Math.round(WS*.8*z)),x=(w2.x-v.cam.x)*z+v.W/2,y=(w2.y-v.cam.y)*z+v.H/2;
+  const wp=w2||crack;if(wp){const z=v.cam.z,s=Math.max(72,Math.round(WS*.8*z)),x=(wp.x-v.cam.x)*z+v.W/2,y=(wp.y-v.cam.y)*z+v.H/2;
    worm2.style.width=worm2.style.height=s+'px';worm2.style.transform='translate('+Math.round(x-s/2)+'px,'+Math.round(y-s/2)+'px)';
    worm2.style.display=(x<-s||y<-s||x>v.W+s||y>v.H+s)?'none':''}
   if(crack){const z=v.cam.z,cx=Math.round((crack.x-v.cam.x)*z+v.W/2),cy=Math.round((crack.y-v.cam.y)*z+v.H/2),k=Math.min(1,(now-crack.t0)/(RM?200:1600)),ps=Math.max(2,Math.min(5,Math.round(3*Math.max(.7,z*2.5))));
@@ -418,7 +420,12 @@ function drawCrack(now){
       const n=Math.max(1,Math.ceil(Math.hypot(qx-p[0],qy-p[1])/1.5));for(let j=0;j<=n;j++){const ux=Math.round((p[0]+(qx-p[0])*j/n)*ps/ps),uy=Math.round(p[1]+(qy-p[1])*j/n);
        for(let oy=-(t2>>1);oy<=(t2-1>>1)+(pad===2?1:0);oy++)for(let ox=-(t2>>1);ox<=(t2-1>>1)+(pad===2?1:0);ox++){if(dens<1&&((ux+ox+uy+oy)&1))continue;cg.fillRect(cx+(ux+ox)*ps-(ps>>1),cy+(uy+oy)*ps-(ps>>1),ps,ps)}}}}}
    cg.globalAlpha=1;
-   if(k>=1&&!w2){w2={x:crack.x,y:crack.y,t0:now};window.__sfx&&__sfx('whoosh');worm2.style.display='';worm2.style.animation='wgrow 1.3s cubic-bezier(.2,.9,.25,1) both'}
+   if(!w2){const op=Math.max(0,(k-.15)/.85);worm2.style.animation='none';worm2.style.clipPath='circle('+(op*46).toFixed(1)+'% at 50% 50%)';if(op>0)worm2.style.display='';else worm2.style.display='none';
+    const R=Math.max(6,Math.round(WS*.8*z*.46*op)),GC=['#0a0418','#2a0c55','#6a24c0','#e070f0','#7af0ff','#ffffff'];
+    for(let n=0;n<Math.round(40+R*1.2);n++){const a=Math.random()*Math.PI*2,rr=R*(.75+Math.random()*.45);cg.fillStyle=GC[(Math.random()*GC.length)|0];cg.globalAlpha=.55+Math.random()*.45;
+     cg.fillRect(Math.round((cx+Math.cos(a)*rr)/ps)*ps,Math.round((cy+Math.sin(a)*rr)/ps)*ps,ps*(1+(Math.random()*2|0)),ps)}
+    cg.globalAlpha=1}
+   if(k>=1&&!w2){w2={x:crack.x,y:crack.y,t0:now};{const z=v.cam.z,s2=Math.max(72,Math.round(WS*.8*z));worm2.style.width=worm2.style.height=s2+'px';worm2.style.transform='translate('+Math.round((w2.x-v.cam.x)*z+v.W/2-s2/2)+'px,'+Math.round((w2.y-v.cam.y)*z+v.H/2-s2/2)+'px)'}window.__sfx&&__sfx('whoosh');worm2.style.display='';worm2.style.clipPath='none';worm2.style.animation='wgrow .5s ease-out both'}
    if(w2&&fade<=0)crack=null}
  }else worm2.style.display='none';
  requestAnimationFrame(drawCrack)}
@@ -429,7 +436,7 @@ requestAnimationFrame(drawCrack);
   const v=window.__hubView&&window.__hubView();if(!v||v.sys!=='main'||busy||crack||document.body.classList.contains('intro'))return;
   const now=performance.now();clicks=clicks.filter(c=>now-c.t<4000);clicks.push({t:now});
   if(clicks.length>=5){const z=v.cam.z,wx=(e.clientX-v.W/2)/z+v.cam.x,wy=(e.clientY-v.H/2)/z+v.cam.y;clicks=[];
-   if(w2){w2=null;worm2.style.display='none'}
+   if(w2){w2=null;worm2.style.display='none';worm2.style.clipPath='circle(0% at 50% 50%)'}
    crack={x:wx,y:wy,t0:now,br:mkCrack()}}})})();
 
 window.__worm={
