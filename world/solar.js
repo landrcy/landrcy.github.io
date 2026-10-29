@@ -212,7 +212,8 @@ function dotPat(s){if(s===dotS&&dotT)return dotT;dotS=s;const c=document.createE
 // is the whole screen inside the main tear (and no small rift on screen)? then there is nothing outside to draw
 function allInside(){const[a,b]=S2W(0,0),[c,d]=S2W(W,H);for(let i=0;i<=6;i++)for(let j=0;j<=6;j++)if(!inMain(a+(c-a)*i/6,b+(d-b)*j/6))return false;return true}
 let RCUT=null,RGLO=null;
-function drawOutside(now){if(window.__noRift||sys!=='main')return;if(allInside())return;
+function drawOutside(now){return;// white void removed: whole hub map is continuous space
+ if(window.__noRift||sys!=="main")return;if(allInside())return;
  const z=cam.z,fr=RM?0:Math.floor(now/140)%3,key=[W,H,cam.x.toFixed(2),cam.y.toFixed(2),z.toFixed(4),fr].join();
  if(key!==ocK){ocK=key;
   if(!OC||OC.width!==W||OC.height!==H){OC=document.createElement('canvas');OC.width=W;OC.height=H;OG=OC.getContext('2d')}
@@ -244,7 +245,7 @@ function revealMask(R){const cs=4,mw=Math.ceil(W/cs),mh=Math.ceil(H/cs);if(!rvC|
  const d=rvI.data,[cx,cy]=W2S(0,0),band=Math.max(20,Math.min(Math.min(W,H)*RVB,R*.5));
  for(let y=0;y<mh;y++)for(let x=0;x<mw;x++){const p=clamp((R-Math.hypot(x*cs+2-cx,y*cs+2-cy))/band),s=p<.34?4:p<.67?2:1,o=(y*mw+x)*4;
   // chunky blocks far from the front, fine dither near it
-  const th=B4[((y/s|0)&3)*4+((x/s|0)&3)];if(p>th){d[o+3]=0;continue}const e=p>0&&p>th-.18,h=(x*7+y*13+((performance.now()/120)|0))%5;const c=e?(h<2?[255,255,255]:h<4?[215,156,255]:[180,92,240]):[255,255,255];d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}
+  const th=B4[((y/s|0)&3)*4+((x/s|0)&3)];if(p>th){d[o+3]=0;continue}const e=p>0&&p>th-.18,h=(x*7+y*13+((performance.now()/120)|0))%5;const c=e?(h<2?[255,255,255]:h<4?[215,156,255]:[180,92,240]):[5,4,12];d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}
  rvG.putImageData(rvI,0,0);g.imageSmoothingEnabled=false;g.drawImage(rvC,0,0,mw*cs,mh*cs)}
 const B4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v=>(v+.5)/16);
 function uiReveal(){document.body.classList.remove('intro');document.body.classList.add('uirv');setTimeout(()=>document.body.classList.remove('uirv'),2000)}

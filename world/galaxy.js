@@ -25,7 +25,7 @@ wimg.src=RM?WH_STILL:WH_GIF;
 worm.appendChild(wimg);
 document.body.appendChild(worm);
 // world-space anchor: bottom-right, out in the white void past the tear edge (~2670,1670 on that diagonal), framed by the zoomed-out default overview (z~.23 @1440x900)
-const WX=2900,WY=1700,WS=320;
+const WX=2900,WY=1700,WS=520;
 function placeWorm(){
  const v=window.__hubView&&window.__hubView();
  if(v&&v.sys==='main'){const z=v.cam.z,s=Math.max(44,Math.round(WS*z)),x=(WX-v.cam.x)*z+v.W/2,y=(WY-v.cam.y)*z+v.H/2;
