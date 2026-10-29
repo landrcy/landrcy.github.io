@@ -12,7 +12,9 @@ const OM_STILL='world/assets/omniverse/omniverse-max.png';
 // F blackhole: the galaxy's sun. Glitch-in plays once on arrival, then the loop takes over.
 const BH_IN='world/assets/blackhole-f/bh-in.gif',BH_LOOP='world/assets/blackhole-f/bh-loop.gif',BH_STILL='world/assets/blackhole-f/bh-still.png',BH_IN_MS=14*60;
 // world layout: blackhole at origin, the Omniverse orbits it on a flattened ring like the hub planets
-const BH_W=760,OM_W=620,ORB=1250,SQ=.6,OM_PER=46;
+const CL_GIF='world/assets/clover/clover-planet.gif',CL_STILL='world/assets/clover/clover-planet.png';
+// F is 5x bigger; the clover planet orbits far out, Max Omniverse is its moon
+const BH_W=3800,CL_W=1300,ORB=4300,SQ=.6,OM_PER=70,OM_W=420,MO=980,MO_PER=16;
 
 const worm=document.createElement('button');
 worm.type='button';worm.id='worm';
@@ -40,11 +42,13 @@ const rg=rush.getContext('2d');
 const gal=document.createElement('div');
 gal.id='galaxy';gal.hidden=true;
 const gsky=document.createElement('canvas');
-gsky.id='gsky';gsky.setAttribute('aria-label','Blood nebula galaxy. The F blackhole is at the center, with the Maximum Omniverse orbiting it. Drag to fly; the little ship at the bottom right flies you back to the hub.');
+gsky.id='gsky';gsky.setAttribute('aria-label','Blood nebula galaxy. The F blackhole is at the center, with the lucky clover planet orbiting it and the Maximum Omniverse as its moon. Drag to fly; the little ship at the bottom right flies you back to the hub.');
 const gg=gsky.getContext('2d');
 const omni=document.createElement('img');
 omni.id='omni';omni.alt='Maximum Omniverse';omni.draggable=false;
 omni.src=OM_STILL;
+const clov=document.createElement('img');clov.id='clov';clov.alt='Lucky clover planet';clov.draggable=false;clov.src=CL_STILL;
+clov.style.cssText='position:absolute;left:0;top:0;image-rendering:pixelated;pointer-events:none;user-select:none;z-index:3';
 const bh=document.createElement('img');bh.id='bhf';bh.alt='F blackhole';bh.draggable=false;bh.src=BH_STILL;
 bh.style.cssText='position:absolute;left:0;top:0;image-rendering:pixelated;pointer-events:none;user-select:none;z-index:2';
 omni.style.zIndex=3;
@@ -59,20 +63,20 @@ const shipImg=document.createElement('img');shipImg.alt='';shipImg.draggable=fal
 back.appendChild(shipImg);
 // Omniverse CTA: tap the omniverse -> "roll for yourself..." + glitchy pixel PLAY link
 const cta=document.createElement('div');cta.id='omcta';cta.hidden=true;
-const ctaT=document.createElement('canvas');ctaT.className='lgtx';ctaT.setAttribute('role','img');ctaT.setAttribute('aria-label','Roll for yourself');
-const tx=ctaT.getContext('2d');const TXT='ROLL FOR YOURSELF\u2026';
+const ctaT=document.createElement('canvas');ctaT.className='lgtx';ctaT.setAttribute('role','img');ctaT.setAttribute('aria-label','Test ur luck');
+const tx=ctaT.getContext('2d');const TXT='TEST UR LUCK';
 function drawTxt(){const f="400 64px 'Silkscreen',monospace";tx.font=f;const w=Math.ceil(tx.measureText(TXT).width)+24;if(ctaT.width!==w){ctaT.width=w;ctaT.height=92}
  tx.clearRect(0,0,ctaT.width,ctaT.height);tx.font=f;tx.textBaseline='middle';tx.textAlign='center';tx.lineJoin='miter';
- const cx=ctaT.width/2,cy=ctaT.height/2;tx.fillStyle='#1a0004';for(const[dx,dy]of[[-5,0],[5,0],[0,-5],[0,5],[-4,-4],[4,-4],[-4,4],[4,4],[0,8]])tx.fillText(TXT,cx+dx,cy+dy);
- tx.fillStyle='#ff1e32';tx.fillText(TXT,cx,cy);tx.fillStyle='#ff8a94';tx.fillRect(0,0,0,0)}
+ const cx=ctaT.width/2,cy=ctaT.height/2;tx.fillStyle='#021a06';for(const[dx,dy]of[[-5,0],[5,0],[0,-5],[0,5],[-4,-4],[4,-4],[-4,4],[4,4],[0,8]])tx.fillText(TXT,cx+dx,cy+dy);
+ tx.fillStyle='#3cff5a';tx.fillText(TXT,cx,cy);tx.fillStyle='#ff8a94';tx.fillRect(0,0,0,0)}
 function glitchTxt(){const W=ctaT.width,H=ctaT.height,n=2+(Math.random()*4|0);for(let k=0;k<n;k++){const h=4*(1+(Math.random()*4|0)),w=8*(4+(Math.random()*20|0)),sx=Math.random()*(W-w)|0,sy=Math.random()*(H-h)|0,dx=Math.max(0,Math.min(W-w,sx+4*((Math.random()*9|0)-4)));
- const d=tx.getImageData(sx,sy,w,h);tx.putImageData(d,dx,sy);if(Math.random()<.4){tx.globalAlpha=.8;tx.fillStyle=Math.random()<.5?'#ff2a4a':'#5affd8';tx.fillRect(dx,sy,4*(2+(Math.random()*6|0)),4);tx.globalAlpha=1}}}
+ const d=tx.getImageData(sx,sy,w,h);tx.putImageData(d,dx,sy);if(Math.random()<.4){tx.globalAlpha=.8;tx.fillStyle=Math.random()<.5?'#3cff5a':'#ffe14a';tx.fillRect(dx,sy,4*(2+(Math.random()*6|0)),4);tx.globalAlpha=1}}}
 document.fonts&&document.fonts.load("64px 'Silkscreen'").then(drawTxt);drawTxt();
-const play=document.createElement('a');play.id='omplay';play.href='https://rainbowroar14.github.io/RNG/';play.target='_blank';play.rel='noopener';play.setAttribute('aria-label','Play: roll for yourself');
+const play=document.createElement('a');play.id='omplay';play.href='https://rainbowroar14.github.io/RNG/';play.target='_blank';play.rel='noopener';play.setAttribute('aria-label','Play: test ur luck');
 const pc=document.createElement('canvas');play.appendChild(pc);cta.append(ctaT,play);
 pc.width=16;pc.height=16;
 const px=pc.getContext('2d');
-const PP=[['#7a0014','M4 2h2v1h2v1h2v1h2v1h2v4h-2v1h-2v1h-2v1h-2v1h-2z'],['#ff2a4a','M5 4h1v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-1z'],['#ffd0d8','M5 8h1v3h-1zM6 9h2v1h-2z']];
+const PP=[['#0a5a14','M4 2h2v1h2v1h2v1h2v1h2v4h-2v1h-2v1h-2v1h-2v1h-2z'],['#3cff5a','M5 4h1v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-1z'],['#d8ffd0','M5 8h1v3h-1zM6 9h2v1h-2z']];
 function drawPlay0(){px.clearRect(0,0,16,16);for(const[f,d]of PP){px.fillStyle=f;px.fill(new Path2D(d))}}
 function drawPlay(){drawPlay0();drawTxt()}
 drawPlay();
@@ -82,21 +86,32 @@ function glitch(){if(cta.hidden||RM)return;const S=1,n=2+(Math.random()*5|0);
   const sx=(Math.random()*(pc.width-w)/S|0)*S,sy=(Math.random()*(pc.height-h)/S|0)*S;
   const dx=Math.max(0,Math.min(pc.width-w,sx+S*((Math.random()*7|0)-3)));
   const d=px.getImageData(sx,sy,w,h);px.putImageData(d,dx,sy);
-  if(Math.random()<.4){px.fillStyle=Math.random()<.5?'#ff2a4a':'#5affd8';px.globalAlpha=.85;px.fillRect(dx,sy,S*(1+(Math.random()*3|0)),S);px.globalAlpha=1}}
+  if(Math.random()<.4){px.fillStyle=Math.random()<.5?'#3cff5a':'#ffe14a';px.globalAlpha=.85;px.fillRect(dx,sy,S*(1+(Math.random()*3|0)),S);px.globalAlpha=1}}
  glitchTxt();
  setTimeout(()=>{drawPlay();if(Math.random()<.5)setTimeout(glitch,70)},90+Math.random()*120)}
 function glitchLoop(){clearTimeout(glT);if(cta.hidden)return;glT=setTimeout(()=>{glitch();glitchLoop()},500+Math.random()*1800)}
 function showCta(on){cta.hidden=!on;if(on){cta.classList.remove('fin');void cta.offsetWidth;cta.classList.add('fin');placeOmni()}if(on){drawPlay();glitchLoop()}else clearTimeout(glT)}
 cta.addEventListener('pointerdown',e=>e.stopPropagation());
 cta.addEventListener('click',e=>e.stopPropagation());
-cta.style.zIndex=5;gal.append(gsky,bh,omni,cta,back);
+cta.style.zIndex=5;
+// Finley mode: tap F -> it slides aside and "inley" glitches in letter by letter in Allura
+const finW=document.createElement('div');finW.id='finw';finW.setAttribute('aria-hidden','true');
+finW.style.cssText="position:absolute;left:0;top:0;z-index:6;pointer-events:none;font-family:'Allura',cursive;color:#ffe6ea;white-space:nowrap;line-height:1;transform-origin:0 50%;text-shadow:0 0 18px #ff1e32,0 0 4px #000";
+let finT=[];
+function finClear(){finT.forEach(clearTimeout);finT=[]}
+function glitchEl(el,on,done){let n=0;const iv=setInterval(()=>{n++;el.style.opacity=Math.random()<.5?'1':'.2';el.style.transform='translate('+((Math.random()*10-5)|0)+'px,'+((Math.random()*6-3)|0)+'px)';el.style.color=Math.random()<.5?'#ff2a4a':'#5affd8';if(n>5){clearInterval(iv);el.style.transform='';el.style.color='';el.style.opacity=on?'1':'0';done&&done()}},55);finT.push(iv)}
+function finOn(){if(fin)return;fin=true;gfoc=null;showCta(false);finClear();finW.textContent='';
+ if(!document.fonts||RM){} 'inley'.split('').forEach((ch,i)=>{const sp=document.createElement('span');sp.textContent=ch;sp.style.opacity='0';sp.style.display='inline-block';finW.appendChild(sp);finT.push(setTimeout(()=>glitchEl(sp,true),RM?0:500+i*260))})}
+function finOff(){if(!fin)return;fin=false;finClear();const sp=[...finW.children].reverse();sp.forEach((el,i)=>finT.push(setTimeout(()=>glitchEl(el,false,()=>el.remove()),RM?0:i*120)))}
+function overBH(x,y){const r=bh.getBoundingClientRect();return Math.hypot(x-r.left-r.width/2,y-r.top-r.height/2)<r.width*.33}gal.append(gsky,bh,clov,omni,cta,finW,back);
 document.body.appendChild(gal);
 
 const tip=document.getElementById('tip');
 let busy=false,inGal=false,holdTip=false;
 const cam={x:0,y:0,z:1};
-let GW=1,GH=1,neb=null,stars=[],omniPx=0,omAng=.55,omSf=1,omHov=false,gLast=0,bhT=0;
-function omPos(){return[Math.cos(omAng)*ORB,Math.sin(omAng)*ORB*SQ]}
+let fin=false,bhOff=0,gfoc=null,GW=1,GH=1,neb=null,stars=[],omniPx=0,omAng=.55,moAng=0,omSf=1,omHov=false,gLast=0,bhT=0;
+function clPos(){return[Math.cos(omAng)*ORB,Math.sin(omAng)*ORB*SQ]}
+function omPos(){const[c,d]=clPos();return[c+Math.cos(moAng)*MO,d+Math.sin(moAng)*MO*SQ]}
 
 function showTip(text,x,y){if(!tip)return;tip.textContent=text;tip.style.left=(x+14)+'px';tip.style.top=(y+14)+'px';tip.classList.add('on');holdTip=true}
 function hideTip(){if(!tip||!holdTip)return;tip.classList.remove('on');holdTip=false}
@@ -110,7 +125,7 @@ function hexDist(x,y){x=Math.abs(x);y=Math.abs(y);return Math.max(y,x*0.8660254+
 function snapshot(){
  const c=document.createElement('canvas');c.width=innerWidth;c.height=innerHeight;
  const x=c.getContext('2d');x.imageSmoothingEnabled=false;
- if(inGal){x.drawImage(gsky,0,0);const r=omni.getBoundingClientRect();if(r.width>2)x.drawImage(omni,r.left,r.top,r.width,r.height)}
+ if(inGal){x.drawImage(gsky,0,0);const r=clov.getBoundingClientRect();if(r.width>2)x.drawImage(clov,r.left,r.top,r.width,r.height)}
  else{const sky=document.getElementById('sky');if(sky)x.drawImage(sky,0,0)}
  return c}
 
@@ -197,18 +212,22 @@ function buildStars(){
  const cols=['#ffd0c4','#ff6a62','#ffb098','#ffd27a','#fff0e4','#e04058'];
  for(let i=0;i<220;i++)stars.push({x:Math.random(),y:Math.random(),s:i%17===0?3:i%5===0?2:1,c:cols[i%cols.length],p:Math.random()*6.28})}
 
-function fitCam(){cam.z=fitZ();cam.x=0;cam.y=0}
+function fitCam(){gfoc=null;cam.z=fitZ();cam.x=0;cam.y=0}
+let fsT=0;function fitCamSoft(){cancelAnimationFrame(fsT);const a={...cam},z1=fitZ(),t0=performance.now(),st=n=>{if(gfoc)return;const u=Math.min(1,(n-t0)/(RM?1:700)),e=u*u*(3-2*u);cam.x=a.x*(1-e);cam.y=a.y*(1-e);cam.z=a.z*Math.pow(z1/a.z,e);if(u<1)fsT=requestAnimationFrame(st)};fsT=requestAnimationFrame(st)}
 function placeOmni(){
- const bs=Math.max(40,BH_W*cam.z),bx=(0-cam.x)*cam.z+GW/2,by=(0-cam.y)*cam.z+GH/2;
+ const bs=Math.max(40,BH_W*cam.z),bx=(bhOff-cam.x)*cam.z+GW/2,by=(0-cam.y)*cam.z+GH/2;
  bh.style.width=bh.style.height=Math.round(bs)+'px';bh.style.transform='translate('+Math.round(bx-bs/2)+'px,'+Math.round(by-bs/2)+'px)';
- const[wx,wy]=omPos();
- const size=Math.max(48,OM_W*cam.z);
+ {const fs=BH_W*.36*cam.z;finW.style.fontSize=Math.round(fs)+'px';finW.style.transform='translate('+Math.round(bx+bs*.16)+'px,'+Math.round(by-fs*.55)+'px)'}
+ const[cx,cy]=clPos(),[mx,my]=omPos();
+ const size=Math.max(64,CL_W*cam.z),ms=Math.max(28,OM_W*cam.z);
  omniPx=size;
- // behind the blackhole on the far half of the ring, in front on the near half
- omni.style.zIndex=wy<0?1:3;
- const x=(wx-cam.x)*cam.z+GW/2,y=(wy-cam.y)*cam.z+GH/2;
- omni.style.width=Math.round(size)+'px';omni.style.height=Math.round(size)+'px';
- omni.style.transform='translate('+Math.round(x-size/2)+'px,'+Math.round(y-size/2)+'px)';
+ // behind the blackhole on the far half of the ring, in front on the near half; the moon passes behind the clover on its far side
+ clov.style.zIndex=cy<0?1:3;omni.style.zIndex=Math.sin(moAng)<0?(cy<0?0:2):(cy<0?2:4);
+ const x=(cx-cam.x)*cam.z+GW/2,y=(cy-cam.y)*cam.z+GH/2,ox=(mx-cam.x)*cam.z+GW/2,oy=(my-cam.y)*cam.z+GH/2;
+ clov.style.width=clov.style.height=Math.round(size)+'px';
+ clov.style.transform='translate('+Math.round(x-size/2)+'px,'+Math.round(y-size/2)+'px)';
+ omni.style.width=omni.style.height=Math.round(ms)+'px';
+ omni.style.transform='translate('+Math.round(ox-ms/2)+'px,'+Math.round(oy-ms/2)+'px)';
  // CTA is world-anchored to the Omniverse sprite: same world x, centered on the disc, scales with zoom
  cta.style.transform='translate('+Math.round(x)+'px,'+Math.round(y)+'px) scale('+(size/1000).toFixed(4)+') translate(-50%,-50%)'}
 function resizeGal(){
@@ -230,15 +249,18 @@ function drawGal(now){
  for(let i=0;i<4;i++){const m=(i+1)*Math.max(8,pxScale()*6);gg.fillStyle='rgba(20,2,6,.22)';gg.fillRect(0,0,GW,m);gg.fillRect(0,GH-m,GW,m);gg.fillRect(0,0,m,GH);gg.fillRect(GW-m,0,m,GH)}
  // orbit: hover slows, open CTA stops it (like the hub planets)
  const dt=Math.min(.05,gLast?(now-gLast)/1000:0);gLast=now;
- const tg=RM||!cta.hidden?0:omHov?.35:1;omSf+=(tg-omSf)*Math.min(1,dt*4);omAng+=dt*Math.PI*2/OM_PER*omSf;
+ const tg=RM?0:omHov&&!gfoc?.35:1;omSf+=(tg-omSf)*Math.min(1,dt*4);omAng+=dt*Math.PI*2/OM_PER*omSf;moAng+=dt*Math.PI*2/MO_PER*omSf;
  // orbit ring: fading pixel trail behind the Omniverse
- {const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#ff8a7a';
+ {const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#7aff8a';
   for(let k=1;k<=n;k++){const f=k/n,an=omAng-arc*f,sx=(Math.cos(an)*ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
+ // hub-style focus: fly + zoom the camera onto the clicked body
+ if(gfoc){const[fx,fy]=gfoc==='om'?omPos():clPos(),zt=Math.min(GW,GH)*(gfoc==='om'?.55:.62)/(gfoc==='om'?OM_W:CL_W),k=Math.min(1,dt*(RM?60:5));cam.x+=(fx-cam.x)*k;cam.y+=(fy-cam.y)*k;cam.z*=Math.pow(zt/cam.z,k)}
+ bhOff+=((fin?-BH_W*.42:0)-bhOff)*Math.min(1,dt*(RM?60:3.5));
  placeOmni()}
 let gLoop=0;
 function galFrame(now){if(!inGal){gLoop=0;return}drawGal(now);gLoop=requestAnimationFrame(galFrame)}
 
-function armOmni(){if(omni.dataset.arm)return;omni.dataset.arm='1';omni.src=RM?OM_STILL:OM_GIF}
+function armOmni(){if(omni.dataset.arm)return;omni.dataset.arm='1';omni.src=RM?OM_STILL:OM_GIF;clov.src=RM?CL_STILL:CL_GIF}
 // replay the F glitch-in each arrival, then hand off to the loop
 function bhArrive(){clearTimeout(bhT);if(RM){bh.src=BH_STILL;return}bh.src=BH_IN+'?t='+Date.now();bhT=setTimeout(()=>{if(inGal)bh.src=BH_LOOP},BH_IN_MS)}
 
@@ -248,7 +270,7 @@ function showGalaxy(){
  worm.setAttribute('aria-label','Return through the wormhole');
  if(!gLoop)gLoop=requestAnimationFrame(galFrame)}
 function hideGalaxy(){
- inGal=false;clearTimeout(bhT);bh.src=BH_STILL;showCta(false);document.body.classList.remove('galaxy');gal.hidden=true;
+ inGal=false;fin=false;finClear();finW.textContent='';bhOff=0;clearTimeout(bhT);bh.src=BH_STILL;showCta(false);document.body.classList.remove('galaxy');gal.hidden=true;
  window.__galaxyHold=false;worm.setAttribute('aria-label','Wormhole');hideTip()}
 
 function portalOrigin(){const el=inGal?back:worm,r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,s:inGal?r.width*1.6:r.width}}
@@ -286,47 +308,53 @@ back.addEventListener('click',e=>{e.stopPropagation();if(!busy)travel(false)});
 
 addEventListener('keydown',e=>{
  if(e.key!=='Escape'||!inGal||busy)return;
- e.preventDefault();e.stopImmediatePropagation();if(!cta.hidden){showCta(false);return}travel(false)},true);
+ e.preventDefault();e.stopImmediatePropagation();if(fin){finOff();return}if(gfoc||!cta.hidden){unfocusG();fitCamSoft();return}travel(false)},true);
 
 // fly the galaxy: drag pans, wheel / pinch zooms, a quiet click on empty space returns
 const pts=new Map();let moved=0,pinch=null;
-function overOmni(x,y){const r=omni.getBoundingClientRect();const cx=r.left+r.width/2,cy=r.top+r.height/2,rad=r.width*.42;return Math.hypot(x-cx,y-cy)<rad}
+function overMoon(x,y){const r=omni.getBoundingClientRect();return Math.hypot(x-r.left-r.width/2,y-r.top-r.height/2)<r.width*.4}
+function unfocusG(){gfoc=null;showCta(false)}
+function overOmni(x,y){const r=clov.getBoundingClientRect();const cx=r.left+r.width/2,cy=r.top+r.height/2,rad=r.width*.42;return Math.hypot(x-cx,y-cy)<rad}
 gsky.addEventListener('pointerdown',e=>{
  gsky.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);moved=0;
  if(pts.size===2){const[a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),z:cam.z}}});
 gsky.addEventListener('pointermove',e=>{
  if(!pts.has(e.pointerId)){
-  omHov=overOmni(e.clientX,e.clientY);gsky.style.cursor=omHov?'pointer':'grab';
-  if(overOmni(e.clientX,e.clientY))showTip('Maximum Omniverse \u2014 tap to roll',e.clientX,e.clientY);
-  else if(holdTip&&tip&&tip.textContent.startsWith('Maximum Omniverse'))hideTip();
+  omHov=overOmni(e.clientX,e.clientY)||overMoon(e.clientX,e.clientY);gsky.style.cursor=omHov?'pointer':'grab';
+  if(overOmni(e.clientX,e.clientY))showTip('Lucky clover \u2014 test ur luck',e.clientX,e.clientY);
+  else if(overMoon(e.clientX,e.clientY))showTip('Maximum Omniverse \u2014 moon',e.clientX,e.clientY);
+  else if(holdTip&&tip&&/^(Lucky clover|Maximum Omniverse)/.test(tip.textContent))hideTip();
   return}
  const p=pts.get(e.pointerId),dx=e.clientX-p[0],dy=e.clientY-p[1];pts.set(e.pointerId,[e.clientX,e.clientY]);
  moved+=Math.abs(dx)+Math.abs(dy);if(moved<6)return;gsky.classList.add('drag');
  if(pts.size===2&&pinch){const[a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);zoomAt((a[0]+b[0])/2,(a[1]+b[1])/2,pinch.z*(d/(pinch.d||1))/cam.z)}
- else{cam.x-=dx/cam.z;cam.y-=dy/cam.z;clampCam()}});
+ else{gfoc=null;cam.x-=dx/cam.z;cam.y-=dy/cam.z;clampCam()}});
 function endPtr(e){const was=moved;pts.delete(e.pointerId);if(pts.size<2)pinch=null;gsky.classList.remove('drag');
  if(e.type!=='pointerup'||was>=6||busy)return;
- if(overOmni(e.clientX,e.clientY)){showCta(cta.hidden);return}
- if(!cta.hidden){showCta(false);return}
+ if(overMoon(e.clientX,e.clientY)&&omni.style.zIndex>clov.style.zIndex||!overOmni(e.clientX,e.clientY)&&overMoon(e.clientX,e.clientY)){showCta(false);gfoc=gfoc==='om'?null:'om';if(!gfoc)fitCamSoft();return}
+ if(overOmni(e.clientX,e.clientY)){if(gfoc==='cl'){unfocusG();fitCamSoft()}else{gfoc='cl';showCta(true)}return}
+ if(gfoc||!cta.hidden){unfocusG();fitCamSoft();return}
+ if(overBH(e.clientX,e.clientY)){fin?finOff():finOn();return}
+ if(fin){finOff();return}
  travel(false)}
 gsky.addEventListener('pointerup',endPtr);
 gsky.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);pinch=null;gsky.classList.remove('drag')});
 function zoomAt(sx,sy,f){
- const nz=Math.max(fitZ()*.42,Math.min(fitZ()*6,cam.z*f));
+ const nz=Math.max(fitZ()*.42,Math.min(fitZ()*40,cam.z*f));
  const wx=cam.x+(sx-GW/2)/cam.z,wy=cam.y+(sy-GH/2)/cam.z;
  cam.z=nz;cam.x=wx-(sx-GW/2)/nz;cam.y=wy-(sy-GH/2)/nz;clampCam()}
 function fitZ(){
  // frame the whole orbit (ring + Omniverse art at both ends) around the blackhole
- const w=2*ORB+OM_W*.92,h=2*ORB*SQ+OM_W*.66+BH_W*.2;
+ const w=2*(ORB+MO)+CL_W*.9,h=2*(ORB+MO)*SQ+CL_W*.8;
  return Math.min(GW*.94/w,GH*.88/h)}
 function clampCam(){
- const lim=ORB*1.05;cam.x=Math.max(-lim,Math.min(lim,cam.x));cam.y=Math.max(-lim*SQ,Math.min(lim*SQ,cam.y))}
-gsky.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*.0014))},{passive:false});
+ const lim=(ORB+MO)*1.05;cam.x=Math.max(-lim,Math.min(lim,cam.x));cam.y=Math.max(-lim*SQ,Math.min(lim*SQ,cam.y))}
+gsky.addEventListener('wheel',e=>{e.preventDefault();gfoc=null;zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*.0014))},{passive:false});
 addEventListener('resize',()=>{if(inGal){resizeGal();cam.z=fitZ()}});
 
 buildStars();if(P)buildNeb();
 // warm the spin after the hub has painted, so the corner gif stays the first download
-if(!RM)addEventListener('load',()=>{setTimeout(()=>{for(const u of[OM_GIF,BH_IN,BH_LOOP]){const i=new Image();i.src=u}},1200)},{once:true});
+if(!RM)addEventListener('load',()=>{setTimeout(()=>{for(const u of[OM_GIF,CL_GIF,BH_IN,BH_LOOP]){const i=new Image();i.src=u}},1200)},{once:true});
 
 window.__worm={
  travel,galaxy:()=>{if(!inGal&&!busy){armOmni();showGalaxy()}},

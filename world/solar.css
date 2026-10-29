@@ -125,8 +125,8 @@ body.traveling #worm,body.traveling #ship,body.traveling #sndbtn,body.traveling 
 #omcta{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform;z-index:25;display:flex;flex-direction:column;align-items:center;gap:18px;pointer-events:auto;text-align:center;width:max-content}
 #omcta.fin{animation:omfade .9s ease-out both}@keyframes omfade{from{opacity:0}to{opacity:1}}
 #omcta[hidden]{display:none}
-#omcta .lgtx{display:block;width:auto;height:92px;image-rendering:pixelated;filter:drop-shadow(0 0 8px rgba(20,0,4,.8))}
-#omplay{display:block;line-height:0;touch-action:manipulation;width:130px;aspect-ratio:1;filter:drop-shadow(0 0 6px color-mix(in srgb,#ff2a4a 55%,transparent));transition:transform .15s}
+#omcta .lgtx{display:block;width:auto;height:92px;image-rendering:pixelated;filter:drop-shadow(0 0 8px rgba(0,20,4,.8))}
+#omplay{display:block;line-height:0;touch-action:manipulation;width:130px;aspect-ratio:1;filter:drop-shadow(0 0 6px color-mix(in srgb,#3cff5a 55%,transparent));transition:transform .15s}
 #omplay canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
 #omplay:hover,#omplay:focus-visible{transform:scale(1.08)}
 #omplay:focus-visible{outline:2px solid #fff;outline-offset:4px}
