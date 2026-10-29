@@ -105,18 +105,18 @@ const CH=[
 const fmt=n=>n==null?'-':n.toLocaleString('en-US'),TV=CH.reduce((a,c)=>a+(c.views||0),0),TS=CH.reduce((a,c)=>a+(c.subs||0),0),MV=Math.max(...CH.map(c=>c.views||0));
 const B=(o)=>Object.assign({ang:0,sf:1,pop:0,next:0},o);
 const MAIN=[
- B({id:'sun',paint:'sun',w:250,x:0,y:0,hr:.36,title:'Landrcyverse',by:'games & websites by Landry',blurb:'Every planet is one of my sites. Click a planet to fly to it.'}),
- B({id:'ashaad',paint:'ashaad',w:66,h:60,orb:220,per:50,ph:2.2,hr:.42,title:'The Binding of Ashaad',by:'a brainrot roguelike by landrcy',blurb:'Descend into the basement, shoot your tears, grab cursed items and survive in this browser roguelike. 3 starters, 4 floors, 1 secret Finley boss.',href:'https://landrcy.github.io/binding-of-ashaad/',cta:'▶ Play'}),
- B({id:'sea',paint:'sea',w:122,orb:325,per:72,ph:.4,hr:.4,title:'Sea of Thought',by:'a pixel ocean by landrcy',blurb:'A quiet pixel ocean full of messages in bottles: write one, throw it in, then dive and read what strangers left behind.',href:'https://landrcy.github.io/sea-of-thought/',cta:'▶ Dive in'}),
- B({id:'yt',paint:'yt',w:96,orb:885,per:140,ph:4.1,hr:.42,title:'LLC Powered Channels',by:'YouTube',yt:1,href:'youtube/'}),
- B({id:'gow',paint:'crest',w:92,h:74,orb:1590,per:315,ph:5.3,hr:.42,title:'Cooper City'}),
- B({id:'void',paint:'void',w:236,h:236,orb:1255,per:245,ph:5.9,tc:'#c04df0',hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13}),
- B({id:'arena',paint:'arena',w:134,h:110,orb:1080,per:185,ph:2.9,hr:.42,title:'Ball Arena',by:'ball fights from the Langrino channel',href:'https://www.youtube.com/@Langrino',cta:'▶ Watch'}),
- B({id:'pmuseum',paint:'temple',w:150,orb:525,per:98,ph:1.4,hr:.4,title:'Pixel Museum',href:'https://landrcy.github.io/pixel-museum/',cta:'▶ Visit'}),
- B({id:'typefall',paint:'typef',w:104,orb:660,per:110,ph:3.3,hr:.32,title:'typefall',href:'/typefall/',cta:'▶ Play'}),
- B({id:'ttt',paint:'tung',w:100,orb:975,per:160,ph:1.9,hr:.32,title:'Talk to Tung',href:'/ttt/',cta:'▶ Play'}),
- B({id:'lan4drcy',paint:'lan4',w:112,orb:790,per:125,ph:.9,hr:.42,title:'lan4drcy',href:'/lan4drcy/',cta:'▶ Play'}),
- B({id:'wam',paint:'wam',w:104,orb:1425,per:272,ph:3.6,hr:.4,title:'W.A.M.',href:'https://landrcy.github.io/wam/',cta:'▶ Play'})];
+ B({id:'sun',paint:'sun',w:362,x:0,y:0,hr:.36,title:'Landrcyverse',by:'games & websites by Landry',blurb:'Every planet is one of my sites. Click a planet to fly to it.'}),
+ B({id:'ashaad',paint:'ashaad',w:99,h:90,orb:420,per:50,ph:2.2,hr:.42,title:'The Binding of Ashaad',by:'a brainrot roguelike by landrcy',blurb:'Descend into the basement, shoot your tears, grab cursed items and survive in this browser roguelike. 3 starters, 4 floors, 1 secret Finley boss.',href:'https://landrcy.github.io/binding-of-ashaad/',cta:'▶ Play'}),
+ B({id:'sea',paint:'sea',w:183,orb:690,per:72,ph:.4,hr:.4,title:'Sea of Thought',by:'a pixel ocean by landrcy',blurb:'A quiet pixel ocean full of messages in bottles: write one, throw it in, then dive and read what strangers left behind.',href:'https://landrcy.github.io/sea-of-thought/',cta:'▶ Dive in'}),
+ B({id:'yt',paint:'yt',w:144,orb:2160,per:140,ph:4.1,hr:.42,title:'LLC Powered Channels',by:'YouTube',yt:1,href:'youtube/'}),
+ B({id:'gow',paint:'crest',w:138,h:111,orb:3990,per:315,ph:5.3,hr:.42,title:'Cooper City'}),
+ B({id:'void',paint:'void',w:295,h:295,orb:3290,per:245,ph:5.9,tc:'#c04df0',hr:.16,title:'The Void',by:'a pixel space game by landrcy',blurb:'A pixel space game at the edge of a black hole. Fall in.',href:'https://landrcy.github.io/the-void/',cta:'▶ Play',fs:.13}),
+ B({id:'arena',paint:'arena',w:201,h:165,orb:2840,per:185,ph:2.9,hr:.42,title:'Ball Arena',by:'ball fights from the Langrino channel',href:'https://www.youtube.com/@Langrino',cta:'▶ Watch'}),
+ B({id:'pmuseum',paint:'temple',w:225,orb:1100,per:98,ph:1.4,hr:.4,title:'Pixel Museum',href:'https://landrcy.github.io/pixel-museum/',cta:'▶ Visit'}),
+ B({id:'typefall',paint:'typef',w:156,orb:1490,per:110,ph:3.3,hr:.32,title:'typefall',href:'/typefall/',cta:'▶ Play'}),
+ B({id:'ttt',paint:'tung',w:150,orb:2510,per:160,ph:1.9,hr:.32,title:'Talk to Tung',href:'/ttt/',cta:'▶ Play'}),
+ B({id:'lan4drcy',paint:'lan4',w:168,orb:1795,per:125,ph:.9,hr:.42,title:'lan4drcy',href:'/lan4drcy/',cta:'▶ Play'}),
+ B({id:'wam',paint:'wam',w:156,orb:3705,per:272,ph:3.6,hr:.4,title:'W.A.M.',href:'https://landrcy.github.io/wam/',cta:'▶ Play'})];
 const MOONS=CH.map((c,i)=>B({id:'m-'+c.id,paint:'moon',arg:c.kind,w:Math.round(12+14*Math.sqrt((c.views||0)/MV)),orb:66+i*9,per:9+i*2.6,ph:i*1.3,dir:1,hr:.42,moon:c,title:c.name}));
 // Pixel Museum room moons: one animated relic per museum room, two rings (west wing sites inside, east wing vaults outside)
 const PMU=MAIN.find(b=>b.id==='pmuseum'),PMURL='https://landrcy.github.io/pixel-museum/#';
@@ -144,7 +144,7 @@ for(const b of [...MAIN,...MOONS,...ARCH]){b.S={N:0};b.L=[].map(([dv0])=>{const 
 let sys='main',bodies=MAIN;
 // ---- camera ----
 const cam={x:0,y:0,z:1};let tw=null,focus=null,hover=null,intro=RM?null:{t0:performance.now()};if(intro)document.body.classList.add('intro');
-function fitZ(){const ext=sys==='main'?(W<H?[1650,1560]:[2856,1768]):(W<H?[490,300]:[490,300]);return Math.min(W/(2*ext[0]),(H-90)/(2*ext[1]))}
+function fitZ(){const ext=sys==='main'?(W<H?[4150,3920]:[7170,4440]):(W<H?[490,300]:[490,300]);return Math.min(W/(2*ext[0]),(H-90)/(2*ext[1]))}
 function fitX(){return 0}
 function fitY(){return 0}
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
@@ -169,7 +169,7 @@ const clamp=v=>Math.max(0,Math.min(1,v)),seg=(t,a,b)=>clamp((t-a)/(b-a));
 function introState(now){if(!intro)return{stars:1,ign:1,fl:1,L:1,orb:1,pop:()=>1};const t=(now-intro.t0)/1000;
  return{t,R:revealR(t),stars:1,ign:seg(t,.5,1.7),fl:seg(t,1.6,3.0),L:seg(t,1.7,3.7),orb:1,pop:()=>1,popOld:i=>{const p=seg(t,5.2+i*.32,5.75+i*.32);return p<=0?0:1+Math.sin(p*Math.PI)*.25*(1-p)-(1-p)*(1-p)*.9}}}
 // ---- the rift: the solar system is a jagged pixel tear in the old white dot-grid space; small tears peek into archived versions ----
-const RC=5,RX=3900,RY=4700,RGW=RX*2/RC|0,RGH=RY*2/RC|0;
+const RC=8,RX=9800,RY=11800,RGW=RX*2/RC|0,RGH=RY*2/RC|0;
 const hsh=(a,b)=>{let h=(a*374761393+b*668265263)^0x5bd1e995;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296};
 const an1=(a,f,s)=>{const x=a/TAU*f,i=Math.floor(x),u=x-i,k=u*u*(3-2*u);return hsh(((i%f)+f)%f,s)*(1-k)+hsh((((i+1)%f)+f)%f,s)*k};
 // piecewise-linear angular noise: hard corners instead of smooth waves
@@ -193,7 +193,7 @@ function riftCracks(m,gw,gh,cell,cx,cy,ax,ay,seed){let r=seed*131+7;const rnd=()
 const RPAL=['#ffffff','#f0ddff','#d79cff','#b45cf0','#8a34d8','#5a1ea8'].map(c=>P.hx(c));
 // mask (inside opaque) + 3 shimmer frames of the crackling edge, all at 1px per cell
 
-const MR=riftGrid(RGW,RGH,RC,RX,RY,3000,3650,11);riftCracks(MR,RGW,RGH,RC,RX,RY,3000,3650,11);
+const MR=riftGrid(RGW,RGH,RC,RX,RY,7500,9150,11);riftCracks(MR,RGW,RGH,RC,RX,RY,7500,9150,11);
 // coarse distance fields (cells) used to skip the bulk; the edge itself is evaluated per screen texel
 const cham=(inside)=>{const gw=RGW,gh=RGH,D=new Uint8Array(gw*gh).fill(9);for(let k=0;k<D.length;k++)if((MR[k]===1)!==inside)D[k]=0;
  for(let j=0;j<gh;j++)for(let i=0;i<gw;i++){const k=j*gw+i;let v=D[k];if(!v)continue;if(i>0)v=Math.min(v,D[k-1]+1);if(j>0){v=Math.min(v,D[k-gw]+1);if(i>0)v=Math.min(v,D[k-gw-1]+1);if(i<gw-1)v=Math.min(v,D[k-gw+1]+1)}D[k]=v}
@@ -201,7 +201,7 @@ const cham=(inside)=>{const gw=RGW,gh=RGH,D=new Uint8Array(gw*gh).fill(9);for(le
 const DOUT=cham(false),DIN=cham(true),SGH=new Map();
 SEGS.forEach((g,n)=>{const p=g[4]+14,i0=Math.floor((Math.min(g[0],g[2])-p+RX)/RC),i1=Math.floor((Math.max(g[0],g[2])+p+RX)/RC),j0=Math.floor((Math.min(g[1],g[3])-p+RY)/RC),j1=Math.floor((Math.max(g[1],g[3])+p+RY)/RC);
  for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const k=j*RGW+i;let L=SGH.get(k);if(!L)SGH.set(k,L=[]);L.push(n)}});
-const RAX=3000,RAY=3650;let rHair=1e9;
+const RAX=7500,RAY=9150;let rHair=1e9;
 function riftSD(x,y,k){const a=Math.atan2(y/RAY,x/RAX),rr=Math.hypot(x/RAX,y/RAY),e=1+jag(a,11);let d=(rr-e)/Math.max(rr,1e-3)*Math.hypot(x,y);rHair=1e9;
  const L=SGH.get(k);if(L)for(const n of L){const g=SEGS[n],vx=g[2]-g[0],vy=g[3]-g[1],l2=vx*vx+vy*vy||1;let t=((x-g[0])*vx+(y-g[1])*vy)/l2;t=t<0?0:t>1?1:t;const q=Math.hypot(x-g[0]-vx*t,y-g[1]-vy*t);if(g[4]<RC*.75){if(q<rHair)rHair=q}else{const dd=q-g[4];if(dd<d)d=dd}}return d}
 
@@ -260,7 +260,7 @@ const BELT=[];{const rk=(sz,seed)=>{const n=8,S=[];for(let k=0;k<n;k++){const la
    const q=P.hx(P.dq(['#120c1a','#2a2030','#4a3c44','#7a6658','#b09878','#e0c8a0'],Math.min(1,l*.9),x,y)),o=(y*sz+x)*4;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255}
   c.g.putImageData(c.img,0,0);S.push(c.c)}return S};
  const LIB=[];for(let i=0;i<14;i++)LIB.push(rk([4,5,6,7,8,10,12][i%7],i*7.3));
- for(let i=0;i<340;i++){const u=Math.random(),r=680+(u+Math.random())*.5*70+((Math.random()-.5)*12);BELT.push({r,a:Math.random()*TAU,sp:.012*Math.pow(360/r,1.5)*(.9+Math.random()*.2),s:LIB[Math.floor(Math.random()*Math.random()*LIB.length)],sc:.6+Math.random()*.9})}}
+ for(let i=0;i<340;i++){const u=Math.random(),r=1332+(u+Math.random())*.5*26+((Math.random()-.5)*4);BELT.push({r,a:Math.random()*TAU,sp:.012*Math.pow(360/r,1.5)*(.9+Math.random()*.2),s:LIB[Math.floor(Math.random()*Math.random()*LIB.length)],sc:.6+Math.random()*.9})}}
 function drawBelt(dt,alpha){if(sys!=='main'||alpha<=0)return;const ga=g.globalAlpha;g.globalAlpha=ga*alpha;
  for(const k of BELT){if(!RM)k.a+=dt*k.sp;const wx=Math.cos(k.a)*k.r,wy=Math.sin(k.a)*k.r*SQ,[sx,sy]=W2S(wx,wy);const sw=k.s[0].width,tgt=sw*k.sc*cam.z*.9,rt=REFT(),sz=tgt<sw*.75?Math.max(1,Math.round(tgt/rt))*rt:sw*Math.max(1,Math.min(rt,Math.round(tgt/sw)));if(sx<-sz||sy<-sz||sx>W+sz||sy>H+sz)continue;
   if(tgt<sw*.75){g.fillStyle='#7a6658';const q=Math.min(sz,rt*3);g.fillRect(Math.round(sx/rt)*rt,Math.round(sy/rt)*rt,q,q);continue}
@@ -320,7 +320,7 @@ function lens(){if(sys!=='main')return;const b=MAIN.find(q=>q.id==='void'),[vx0,
    const j=(Y*w+X)*4,m=1-fall*fall*fall,m2=m*m*(3-2*m);o[i]=a[j];o[i+1]=a[j+1];o[i+2]=a[j+2];o[i+3]=255*m2}
   lc.putImageData(out,0,0);lensR=[x0,y0,D]}
  g.drawImage(lensC,x0,y0,D,D)}
-function frame(now){if(window.__galaxyHold){last=now;requestAnimationFrame(frame);return}if(sys==='archive'&&!warp&&document.body.classList.contains('arch')){last=now;requestAnimationFrame(frame);return}const dt=Math.min(.05,(now-last)/1000);last=now;const IS=introState(now);FA+=((focus?1:0)-FA)*Math.min(1,dt*4);if(mv.on&&!tw){const k=Math.pow(.9,dt*60);mv.x*=k;mv.y*=k;cam.x+=mv.x*dt*60;cam.y+=mv.y*dt*60;if(Math.hypot(mv.x,mv.y)*cam.z<.1)mv.on=0}if(!tw&&!intro&&!focus&&sys==='main'){const bx=W<H?2200:2600,by=W<H?2700:2300;cam.x=clamp2(cam.x,fitX()-bx,fitX()+bx);cam.y=clamp2(cam.y,fitY()-by,fitY()+by)}
+function frame(now){if(window.__galaxyHold){last=now;requestAnimationFrame(frame);return}if(sys==='archive'&&!warp&&document.body.classList.contains('arch')){last=now;requestAnimationFrame(frame);return}const dt=Math.min(.05,(now-last)/1000);last=now;const IS=introState(now);FA+=((focus?1:0)-FA)*Math.min(1,dt*4);if(mv.on&&!tw){const k=Math.pow(.9,dt*60);mv.x*=k;mv.y*=k;cam.x+=mv.x*dt*60;cam.y+=mv.y*dt*60;if(Math.hypot(mv.x,mv.y)*cam.z<.1)mv.on=0}if(!tw&&!intro&&!focus&&sys==='main'){const bx=W<H?5500:6500,by=W<H?6750:5750;cam.x=clamp2(cam.x,fitX()-bx,fitX()+bx);cam.y=clamp2(cam.y,fitY()-by,fitY()+by)}
  if(intro){if(IS.t<3.9){cam.x=0;cam.y=0;cam.z=Math.min(W,H)*.82/(250*.72)}else if(!intro.zoomed){intro.zoomed=1;to(fitX(),fitY(),fitZ(),2200)}if(IS.t>7.4&&!intro.ui){intro.ui=1;uiReveal()}if(IS.t>8.8)intro=null}
  if(tw){const k=ease(clamp((now-tw.t0)/tw.ms));const zl=Math.exp(Math.log(tw.a.z)+(Math.log(tw.b.z)-Math.log(tw.a.z))*k);cam.x=tw.a.x+(tw.b.x-tw.a.x)*k;cam.y=tw.a.y+(tw.b.y-tw.a.y)*k;cam.z=zl;if(k>=1){const d=tw.done;tw=null;d&&d()}}
  // orbit motion: hover/focus slows to a stop
@@ -349,7 +349,7 @@ function frame(now){if(window.__galaxyHold){last=now;requestAnimationFrame(frame
   const[x,y]=pos(b),[sx,sy]=W2S(x,y),w=b.w*cam.z*pp,h=(b.h||b.w)*cam.z*pp;
   if(sx+w<0||sx-w>W||sy+h<0||sy-h>H)return;
   // resolution chosen from on-screen size: redraw at that res, integer pixel scale, no colour-quantised downsample
-  const capB=b.paint==='void'?Math.round(b.w*1.1):b.paint==='crest'?128:b.paint==='sun'?(intro?140:380):b.paint==='arena'?180:b.paint==='rmoon'?96:160,cap=Math.max(6,Math.round(capB*(b.rv<1?Math.max(.08,b.rv*b.rv):1))),pw=Math.max(2,w),ps=Math.max(1,Math.ceil(pw/cap)),Nt=Math.max(6,Math.round(pw/ps)),asp=(b.h||b.w)/b.w;
+  const capB=b.paint==='void'?Math.round(b.w*1.1):b.paint==='crest'?220:b.paint==='sun'?(intro?140:560):b.paint==='arena'?270:b.paint==='rmoon'?96:b.moon?160:(b.paint==='lan4'||b.paint==='typef'||b.paint==='tung')?200:240,cap=Math.max(6,Math.round(capB*(b.rv<1?Math.max(.08,b.rv*b.rv):1))),pw=Math.max(2,w),ps=Math.max(1,Math.ceil(pw/cap)),Nt=Math.max(6,Math.round(pw/ps)),asp=(b.h||b.w)/b.w;
   let S=b.S;const ga=g.globalAlpha;
   if(!S.N||Math.abs(Nt-S.N)/Nt>.06&&now>=(b.rz||0)){const S2=P.mk(Nt,Math.max(4,Math.round(Nt*asp)));S2.N=Nt;if(S.N){b.prev=S;b.xf=now}b.S=S=S2;b.nx=0;b.rz=now+40}
   if(now>=(b.nx||0)||(b.id==='sun'&&intro)){let o=b.id==='sun'?{ign:IS.ign,fl:IS.fl,L:IS.L}:b.arg;if(b.id==='sun'&&!intro&&S.N>200&&S.full){const ch=Math.ceil(S.N/10),y0=(S.row||0);o={...o,y0,y1:y0+ch};S.row=y0+ch>=S.N?0:y0+ch}else if(b.id==='sun')S.full=1;if(b.id==='void'&&!RM&&S.N>140&&S.full){const HH=S.img.height,ch=Math.ceil(HH/3),y0=(S.row||0);o={y0,y1:y0+ch};S.row=y0+ch>=HH?0:y0+ch}else if(b.id==='void')S.full=1;P.setFlat(b.id==='sun'&&intro?0:S.N<cap*.55);const tn=RM?7:now/1000+(b.ph||0)*3;P[b.paint](S,tn,o);P.setFlat(0);b.nx=RM?Infinity:now+(b.id==='void'&&S.N>140&&S.full&&!RM?22:b.paint==='sun'?(S.N>200&&!intro?16:S.N>200?90:S.N>100?110:70):S.N>140?66:S.N>60?44:60)+Math.random()*8}
@@ -544,8 +544,8 @@ const UFO={sz:22,asp:.5,cap:32,name:'UFO?!',paint:(u,v,x,y,N)=>{const dx=(u-.5)*
   if(Math.abs(dy-.2)<.32&&Math.abs(dx)<1-Math.abs(dy-.2)*.9){if(Math.abs(dy-.25)<.07&&(Math.floor(u*N/3))%2)return dpk('#ffe66d');return ramp(MTL,lite(dx,dy)+.2,x,y)}return 0}};
 // layout (seeded, stable): only in the empty space between the outer orbit and the tear, never on the planets
 const DECO={back:[],world:[]};
-(function(){const inZone=(x,y,m)=>Math.hypot(x,y/SQ)>1700+m&&inMain(x,y)&&inMain(x+m,y)&&inMain(x-m,y)&&inMain(x,y+m)&&inMain(x,y-m);
- const put=(o,pf,m,tries=300)=>{for(let t=0;t<tries;t++){const x=(DK()*2-1)*2700,y=(DK()*2-1)*3300;if(pf===1?!inZone(x,y,m):!(inMain(x,y)&&Math.hypot(x,y/SQ)>1660+o.sz*.35))continue;if(pf<1&&DECO.back.some(q=>Math.hypot(q.x-x,q.y-y)<(q.sz+o.sz)*.45))continue;if(pf===1&&DECO.world.some(q=>Math.hypot(q.x-x,q.y-y)<q.sz+o.sz+90))continue;o.x=x;o.y=y;return o}return null};
+(function(){const inZone=(x,y,m)=>Math.hypot(x,y/SQ)>4150+m&&inMain(x,y)&&inMain(x+m,y)&&inMain(x-m,y)&&inMain(x,y+m)&&inMain(x,y-m);
+ const put=(o,pf,m,tries=300)=>{for(let t=0;t<tries;t++){const x=(DK()*2-1)*6800,y=(DK()*2-1)*8300;if(pf===1?!inZone(x,y,m):!(inMain(x,y)&&Math.hypot(x,y/SQ)>4100+o.sz*.35))continue;if(pf<1&&DECO.back.some(q=>Math.hypot(q.x-x,q.y-y)<(q.sz+o.sz)*.45))continue;if(pf===1&&DECO.world.some(q=>Math.hypot(q.x-x,q.y-y)<q.sz+o.sz+90))continue;o.x=x;o.y=y;return o}return null};
  for(let i=0;i<11;i++){const o=put(nebula(i,NPAL[i%3],700+DK()*900),.55,0);if(o){o.pf=.55;o.dx=(DK()-.5)*3;o.dy=(DK()-.5)*2;DECO.back.push(o)}}
  for(let i=0;i<6;i++){const o=put(galaxy(i,i%3===2,110+DK()*150),.3,0);if(o){o.pf=.3;DECO.back.push(o)}}
  for(let i=0;i<5;i++){const o=put(farPlanet(i,45+DK()*80),.4,0);if(o){o.pf=.4;DECO.back.push(o)}}

@@ -262,6 +262,16 @@ const CR={1:['#06060c','#14141e','#262634'],2:['#34343e','#55555f','#83838f'],3:
 P.crest=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data;d.fill(0);const bob=Math.sin(t*1.2)*Hh*.035,rot=Math.sin(t*.7)*.045,ca=Math.cos(rot),sa=Math.sin(rot),sc=CREST.w/(W*.94),cx=W/2,cy=Hh/2+bob;
  for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){const X=x+.5-cx,Y=y+.5-cy,rx=(X*ca+Y*sa)*sc,ry=(-X*sa+Y*ca)*sc;let u=rx/CREST.w+.5,v=ry/CREST.h+.5;
   if(v>.74)v+=Math.sin(u*14-t*3.2)*.018*Math.min(1,Math.abs(u-.5)*3);if(u<0||v<0||u>=1||v>=1)continue;
+  // shattered fragments: jagged seams split the crest into separate shards that float apart (no stitches), each bobbing on its own
+  {const NX=4,NY=4,gp=.02,J=(uu,vv)=>[uu*NX+(Math.sin(vv*23.1)*.03+Math.sin(vv*57.3+1.7)*.014)*NX,vv*NY+(Math.sin(uu*19.7+.6)*.028+Math.sin(uu*49.9)*.012)*NY],RN=n=>{const z=Math.sin(n*127.1+311.7)*43758.5453;return z-Math.floor(z)};
+   u=(u-.5)*1.62+.5;v=(v-.5)*1.62+.5;let hit=0;
+   for(let cj=0;cj<NY&&!hit;cj++)for(let ci=0;ci<NX&&!hit;ci++){const sd=ci*7+cj*13,r1=RN(sd),r2=RN(sd+3.1),r3=RN(sd+5.7),r4=RN(sd+9.3),
+     ox=(ci+.5-NX/2)*(.11+r1*.07)+(r2-.5)*.07+Math.sin(t*(.5+r3*.9)+sd)*.016,oy=(cj+.5-NY/2)*(.11+r2*.07)+(r3-.5)*.07+Math.cos(t*(.4+r1*.8)+sd*1.3)*.016,
+     ang=(r4-.5)*.5+Math.sin(t*(.3+r2*.6)+sd)*(.08+r3*.1),scx=(ci+.5)/NX+ox,scy=(cj+.5)/NY+oy,ca2=Math.cos(ang),sa2=Math.sin(ang),du0=u-scx,dv0=v-scy,
+     uu=du0*ca2+dv0*sa2+(ci+.5)/NX,vv=-du0*sa2+dv0*ca2+(cj+.5)/NY;
+    if(uu<0||vv<0||uu>=1||vv>=1)continue;const[fu,fv]=J(uu,vv);if(Math.floor(fu)!==ci||Math.floor(fv)!==cj)continue;
+    const du=Math.min(fu-ci,ci+1-fu)/NX,dv=Math.min(fv-cj,cj+1-fv)/NY;if((du<gp&&ci>0&&fu-ci<.5)||(du<gp&&ci<NX-1&&fu-ci>=.5)||(dv<gp&&cj>0&&fv-cj<.5)||(dv<gp&&cj<NY-1&&fv-cj>=.5))continue;u=uu;v=vv;hit=1}
+   if(!hit)continue}
   const si=Math.floor(u*CREST.w),sj=Math.floor(v*CREST.h),k=CREST.d[sj*CREST.w+si];if(!k)continue;
   const lit=Math.max(0,Math.min(1,.68-(u-.5)*.7-(v-.5)*.55));const shield=u>.3&&u<.7&&v>.2&&v<.78;let c;
   if(k===4&&!shield&&v<.76){const f=vn(u*16,v*14+t*2.2)*.6+vn(u*30,v*30+t*4)*.4;c=dq(CFL,lit*.75+(f-.5)*.7+(.7-v)*.2,x,y)}
