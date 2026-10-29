@@ -248,6 +248,12 @@ function buildStars(){
 
 function fitCam(){gfoc=null;cam.z=fitZ();cam.x=0;cam.y=0}
 let fsT=0;function fitCamSoft(){cancelAnimationFrame(fsT);const a={...cam},z1=fitZ(),t0=performance.now(),st=n=>{if(gfoc)return;const u=Math.min(1,(n-t0)/(RM?1:700)),e=u*u*(3-2*u);cam.x=a.x*(1-e);cam.y=a.y*(1-e);cam.z=a.z*Math.pow(z1/a.z,e);if(u<1)fsT=requestAnimationFrame(st)};fsT=requestAnimationFrame(st)}
+// V32: ominous blackhole light. Each planet gets a shade disc: the side facing the F blackhole glows blood-red, the far side falls into shadow
+function mkShade(){const d=document.createElement('div');d.setAttribute('aria-hidden','true');d.style.cssText='position:absolute;left:0;top:0;pointer-events:none;border-radius:50%;mix-blend-mode:normal';return d}
+const shCl=mkShade(),shOm=mkShade(),shDs=mkShade();
+function shade(el,wx,wy,sx,sy,s,z){const a=Math.atan2(-wy,-wx),lx=50+Math.cos(a)*38,ly=50+Math.sin(a)*38,d=s*.92;
+ el.style.width=el.style.height=Math.round(d)+'px';el.style.transform='translate('+Math.round(sx-d/2)+'px,'+Math.round(sy-d/2)+'px)';el.style.zIndex=z;
+ el.style.background='radial-gradient(circle at '+lx.toFixed(1)+'% '+ly.toFixed(1)+'%,rgba(255,40,70,.42) 0%,rgba(200,20,50,.18) 28%,rgba(0,0,0,0) 48%,rgba(12,0,6,.55) 78%,rgba(5,0,3,.82) 100%)'}
 function placeOmni(){
  const bs=Math.max(40,BH_W*cam.z),bx=(bhOff-cam.x)*cam.z+GW/2,by=(0-cam.y)*cam.z+GH/2;
  bh.style.width=bh.style.height=Math.round(bs)+'px';bh.style.transform='translate('+Math.round(bx-bs/2)+'px,'+Math.round(by-bs/2)+'px)';
@@ -266,6 +272,9 @@ function placeOmni(){
  omni.style.transform='translate('+Math.round(ox-ms/2)+'px,'+Math.round(oy-ms/2)+'px)';
  // CTA is world-anchored to the Omniverse sprite: same world x, centered on the disc, scales with zoom
  {const[dx,dy]=dsPos(),q=Math.max(40,DS_W*1.3*cam.z);dsc.style.transform='translate('+Math.round((dx-cam.x)*cam.z+GW/2)+'px,'+Math.round((dy-cam.y)*cam.z+GH/2)+'px) scale('+(q/1000).toFixed(4)+') translate(-50%,-50%)'}
+ if(shCl.parentNode!==gal)gal.append(shCl,shOm);if(gal.lastChild!==shDs)gal.appendChild(shDs);
+ shade(shCl,cx,cy,x,y,size,clov.style.zIndex);shade(shOm,mx,my,ox,oy,ms,omni.style.zIndex);
+ {const[dx,dy]=dsPos(),ds=Math.max(40,DS_W*cam.z);shade(shDs,dx,dy,(dx-cam.x)*cam.z+GW/2,(dy-cam.y)*cam.z+GH/2,ds,dy<0?1:3);shDs.style.display=dsc.parentNode&&document.querySelector('#galaxy canvas[tabindex]')?.style.display==='none'?'none':''}
  cta.style.transform='translate('+Math.round(x)+'px,'+Math.round(y)+'px) scale('+(size/1000).toFixed(4)+') translate(-50%,-50%)'}
 function resizeGal(){
  GW=innerWidth;GH=innerHeight;gsky.width=GW;gsky.height=GH;gg.imageSmoothingEnabled=false;
