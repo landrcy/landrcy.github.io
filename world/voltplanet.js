@@ -17,7 +17,7 @@ const BM=[0,1,2,3].map(i=>({a:i*Math.PI/2+Math.random(),v:(Math.random()-.5)*.8,
 function beams(t){const M=mouseT(),dt=Math.min(.2,Math.max(0,t-BT));BT=t;const ml=M?Math.hypot(M[0],M[1]):99;
  for(const q of BM){if(!RM){q.v+=(Math.random()-.5)*dt*3;q.v=Math.max(-1,Math.min(1,q.v));q.a+=q.v*dt}
   const rl=1.55+.3*Math.sin(t*1.7+q.ph),T=[Math.cos(q.a)*rl,Math.sin(q.a)*rl,.3];let want=0,E=T;
-  if(M&&ml>1.02){const m=Math.min(ml,2.05),Mc=[M[0]/ml*m,M[1]/ml*m,.3],dt2=Math.hypot(M[0]-T[0],M[1]-T[1]);want=Math.max(Math.max(0,Math.min(1,(3.2-ml)/1.4)),Math.max(0,Math.min(1,(1.1-dt2)/.6)));E=Mc}
+  if(M&&ml>.01){const m=Math.min(ml,2.05),Mc=[M[0]/ml*m,M[1]/ml*m,.3],dt2=Math.hypot(M[0]-T[0],M[1]-T[1]);want=Math.max(Math.max(0,Math.min(1,(3.2-ml)/1.4)),Math.max(0,Math.min(1,(1.1-dt2)/.6)));E=Mc}
   q.w+=(want-q.w)*Math.min(1,dt*6);const w=q.w*q.w*(3-2*q.w),P=[T[0]+(E[0]-T[0])*w,T[1]+(E[1]-T[1])*w,.3];
   const S=[Math.cos(q.a),Math.sin(q.a),.3],C=[T[0]*.7,T[1]*.7,.3];let pv=S;for(let k=1;k<=4;k++){const f=k/4,i1=1-f,n=[i1*i1*S[0]+2*i1*f*C[0]+f*f*P[0],i1*i1*S[1]+2*i1*f*C[1]+f*f*P[1],.3];jag(pv,n,2,.22);pv=n}
   const ns=RM?2:3+Math.floor(rnd()*3);for(let k=0;k<ns;k++){const an=rnd()*6.283,rr=.15+rnd()*.25;jag(P,[P[0]+Math.cos(an)*rr,P[1]+Math.sin(an)*rr,.3],2,.12)}}}
@@ -62,7 +62,7 @@ const onBall=e=>{const r=c.getBoundingClientRect();return Math.hypot((e.clientX-
 let down=null;
 c.addEventListener('pointermove',e=>{if(onBall(e)){c.style.cursor='pointer';tipOn(1,e);window.__galHov='vs'}else{c.style.cursor='';tipOn(0);if(window.__galHov==='vs')window.__galHov=null}});
 c.addEventListener('pointerleave',()=>{tipOn(0);if(window.__galHov==='vs')window.__galHov=null});
-c.addEventListener('pointerdown',e=>{if(onBall(e)){down=[e.clientX,e.clientY];e.stopPropagation()}});
+c.addEventListener('pointerdown',e=>{e.stopPropagation();if(window.__galGrab){window.__galGrab(e,ev=>{if(onBall(ev)&&window.__galVS)window.__galVS()});return}if(onBall(e))down=[e.clientX,e.clientY]});
 c.addEventListener('pointerup',e=>{if(down){e.stopPropagation();if(Math.hypot(e.clientX-down[0],e.clientY-down[1])<8&&window.__galVS)window.__galVS()}down=null});
 c.addEventListener('click',e=>{if(onBall(e))e.stopPropagation()});
 c.addEventListener('wheel',e=>{const s=document.getElementById('gsky');if(s){e.preventDefault();s.dispatchEvent(new WheelEvent('wheel',e))}},{passive:false});

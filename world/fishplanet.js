@@ -42,7 +42,7 @@ let down=null;
 const dsTip=(on,e)=>{const t=document.getElementById('tip');if(!t)return;if(on){if(t.textContent!=='Deep Sea'||!t.classList.contains('on'))window.__blip&&__blip('hover');t.textContent='Deep Sea';t.style.left=(e.clientX+14)+'px';t.style.top=(e.clientY+14)+'px';t.classList.add('on')}else if(t.textContent==='Deep Sea')t.classList.remove('on')};
 c.addEventListener('pointermove',e=>{const[x,y]=loc(e);if(onDisc(x,y)){mx=x;my=y;stir(x,y);dsTip(1,e);window.__galHov='ds'}else{dsTip(0);if(window.__galHov==='ds')window.__galHov=null}e.stopPropagation()});
 c.addEventListener('pointerleave',()=>{dsTip(0);if(window.__galHov==='ds')window.__galHov=null});
-c.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];e.stopPropagation()});
+c.addEventListener('pointerdown',e=>{e.stopPropagation();const tap=ev=>{const[x,y]=loc(ev);if(onDisc(x,y)){if(FFC&&window.__galDS)window.__galDS();else location.href=URL}};if(window.__galGrab){window.__galGrab(e,tap);return}down=[e.clientX,e.clientY]});
 c.addEventListener('pointerup',e=>{e.stopPropagation();if(down&&Math.hypot(e.clientX-down[0],e.clientY-down[1])<8){const[x,y]=loc(e);if(onDisc(x,y)){if(FFC&&window.__galDS)window.__galDS();else location.href=URL}}down=null});
 c.addEventListener('click',e=>e.stopPropagation());
 c.addEventListener('wheel',e=>{const g=document.getElementById(FFC?'gsky':'sky');if(g){e.preventDefault();g.dispatchEvent(new WheelEvent('wheel',e))}},{passive:false});

@@ -111,7 +111,7 @@ document.fonts&&document.fonts.load("64px 'Silkscreen'").then(drawDsT);drawDsT()
 const dsP=document.createElement('a');dsP.id='dsplay';dsP.href='https://rainbowroar14.github.io/Sites/DeepSea/';dsP.target='_blank';dsP.rel='noopener';dsP.setAttribute('aria-label','Play Deep Sea');
 {const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d');for(const[f,d]of[['#0a3270',PP[0][1]],['#62b8f4',PP[1][1]],['#c4ecff',PP[2][1]]]){g.fillStyle=f;g.fill(new Path2D(d))}dsP.appendChild(c)}
 dsc.append(dsT,dsP);dsc.style.zIndex=5;
-dsc.addEventListener('pointerdown',e=>e.stopPropagation());dsc.addEventListener('click',e=>e.stopPropagation());
+dsP.addEventListener('pointerdown',e=>e.stopPropagation());dsP.addEventListener('pointermove',e=>{const f=document.getElementById('fishp');if(f)f.dispatchEvent(new PointerEvent('pointermove',{clientX:e.clientX,clientY:e.clientY,pointerId:e.pointerId,bubbles:false}))});dsc.addEventListener('click',e=>e.stopPropagation());
 function showDs(on){dsc.hidden=!on;if(on){dsc.classList.remove('fin');void dsc.offsetWidth;dsc.classList.add('fin')}}
 // V41 paper-ball planet CTA (FFC): same zoom-in title + play pattern as Deep Sea
 const PB_URL='https://rainbowroar14.github.io/FinleyChang.com-Unblocked24/';
@@ -124,7 +124,7 @@ document.fonts&&document.fonts.load("64px 'Silkscreen'").then(drawPbT);drawPbT()
 const pbP=document.createElement('a');pbP.id='pbplay';pbP.href=PB_URL;pbP.target='_blank';pbP.rel='noopener';pbP.setAttribute('aria-label','Play Sticky Board');
 {const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d');for(const[f,d]of[['#1c1917',PP[0][1]],['#ffe566',PP[1][1]],['#fffef8',PP[2][1]]]){g.fillStyle=f;g.fill(new Path2D(d))}pbP.appendChild(c)}
 pbc.append(pbT,pbP);pbc.style.zIndex=5;
-pbc.addEventListener('pointerdown',e=>e.stopPropagation());pbc.addEventListener('click',e=>e.stopPropagation());
+pbP.addEventListener('pointerdown',e=>e.stopPropagation());pbc.addEventListener('click',e=>e.stopPropagation());
 function showPb(on){pbc.hidden=!on;if(on){pbc.classList.remove('fin');void pbc.offsetWidth;pbc.classList.add('fin')}}
 window.__galPB=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='pb'){unfocusG();return}showCta(false);showDs(false);showVs(false);gfoc='pb';showPb(true)};
 // V49 Volt Sphere: zoom-in title showcase only (no link yet)
@@ -134,7 +134,7 @@ function drawVsT(){const x=vsT.getContext('2d'),T='VOLT SPHERE',f="400 64px 'Sil
  x.clearRect(0,0,vsT.width,vsT.height);x.font=f;x.textBaseline='middle';x.textAlign='center';const cx=vsT.width/2,cy=vsT.height/2;
  x.fillStyle='#0b0730';for(const[dx,dy]of[[-5,0],[5,0],[0,-5],[0,5],[-4,-4],[4,-4],[-4,4],[4,4],[0,8]])x.fillText(T,cx+dx,cy+dy);x.fillStyle='#5ee6ff';x.fillText(T,cx,cy)}
 document.fonts&&document.fonts.load("64px 'Silkscreen'").then(drawVsT);drawVsT();
-vsc.append(vsT);vsc.style.zIndex=5;vsc.addEventListener('pointerdown',e=>e.stopPropagation());vsc.addEventListener('click',e=>e.stopPropagation());
+vsc.append(vsT);vsc.style.zIndex=5;vsc.addEventListener('click',e=>e.stopPropagation());
 function showVs(on){vsc.hidden=!on;if(on){vsc.classList.remove('fin');void vsc.offsetWidth;vsc.classList.add('fin')}}
 window.__galVS=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='vs'){unfocusG();return}showCta(false);showDs(false);showPb(false);gfoc='vs';showVs(true)};
 window.__galDS=()=>{if(!inGal||busy)return;if(fin)finOff();if(gfoc==='ds'){unfocusG();return}showCta(false);showPb(false);showVs(false);gfoc='ds';showDs(true)};
@@ -451,9 +451,12 @@ const pts=new Map();let moved=0,pinch=null;
 function overMoon(x,y){const r=omni.getBoundingClientRect();return Math.hypot(x-r.left-r.width/2,y-r.top-r.height/2)<r.width*.4}
 function unfocusG(){gfoc=null;showCta(false);showDs(false);showPb(false);showVs(false)}
 function overOmni(x,y){const r=clov.getBoundingClientRect();const cx=r.left+r.width/2,cy=r.top+r.height/2,rad=r.width*.42;return Math.hypot(x-cx,y-cy)<rad}
-gsky.addEventListener('pointerdown',e=>{
- gsky.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);moved=0;
- if(pts.size===2){const[a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),z:cam.z}}});
+// V60: planets hand their pointerdown to the sky so drag pans over them; a tap (no drag) runs the planet's own click
+let tapCb=null;window.__galGrab=(e,cb)=>{tapCb=cb||null;gskyDown(e)};
+gsky.addEventListener('pointerdown',e=>{tapCb=null;gskyDown(e)});
+function gskyDown(e){
+ try{gsky.setPointerCapture(e.pointerId)}catch(_){}pts.set(e.pointerId,[e.clientX,e.clientY]);moved=0;
+ if(pts.size===2){const[a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),z:cam.z}}}
 gsky.addEventListener('pointermove',e=>{
  if(!pts.has(e.pointerId)){
   omHov=overOmni(e.clientX,e.clientY)||overMoon(e.clientX,e.clientY);{const hk=overOmni(e.clientX,e.clientY)?"cl":overMoon(e.clientX,e.clientY)?"om":null;if(hk)window.__galHov=hk;else if(window.__galHov==="cl"||window.__galHov==="om")window.__galHov=null}gsky.style.cursor=omHov?'pointer':'grab';
@@ -465,8 +468,8 @@ gsky.addEventListener('pointermove',e=>{
  moved+=Math.abs(dx)+Math.abs(dy);if(moved<6)return;gsky.classList.add('drag');
  if(pts.size===2&&pinch){const[a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);zoomAt((a[0]+b[0])/2,(a[1]+b[1])/2,pinch.z*(d/(pinch.d||1))/cam.z)}
  else{gfoc=null;cam.x-=dx/cam.z;cam.y-=dy/cam.z;clampCam()}});
-function endPtr(e){const was=moved;pts.delete(e.pointerId);if(pts.size<2)pinch=null;gsky.classList.remove('drag');
- if(e.type!=='pointerup'||was>=6||busy)return;
+function endPtr(e){const was=moved,tc=tapCb;tapCb=null;pts.delete(e.pointerId);if(pts.size<2)pinch=null;gsky.classList.remove('drag');
+ if(e.type!=='pointerup'||was>=6||busy)return;if(tc){tc(e);return}
  if(overMoon(e.clientX,e.clientY)&&omni.style.zIndex>clov.style.zIndex||!overOmni(e.clientX,e.clientY)&&overMoon(e.clientX,e.clientY)){showCta(false);showDs(false);gfoc=gfoc==='om'?null:'om';return}
  if(overOmni(e.clientX,e.clientY)){if(gfoc==='cl'){unfocusG()}else{showDs(false);gfoc='cl';showCta(true)}return}
  if(gfoc||!cta.hidden||(!dsc.hidden||!pbc.hidden||!vsc.hidden)){unfocusG();return}
@@ -474,7 +477,7 @@ function endPtr(e){const was=moved;pts.delete(e.pointerId);if(pts.size<2)pinch=n
  if(fin){finOff();return}
  if(!FFC)travel(false)}
 gsky.addEventListener('pointerup',endPtr);
-gsky.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);pinch=null;gsky.classList.remove('drag')});
+gsky.addEventListener('pointercancel',e=>{tapCb=null;pts.delete(e.pointerId);pinch=null;gsky.classList.remove('drag')});
 // V52: zooming while focused keeps the body centred, only scaling the camera (zoom-in capped at the focus framing)
 let gZm=1,gZf=null,gZt=1;
 function zoomAt(sx,sy,f){
