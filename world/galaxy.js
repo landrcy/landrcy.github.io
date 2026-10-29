@@ -14,7 +14,7 @@ const BH_IN='world/assets/blackhole-f/bh-in.gif',BH_LOOP='world/assets/blackhole
 // world layout: blackhole at origin, the Omniverse orbits it on a flattened ring like the hub planets
 const CL_GIF='world/assets/clover/clover-planet.gif',CL_STILL='world/assets/clover/clover-planet.png';
 // F is 5x bigger; the clover planet orbits far out, Max Omniverse is its moon
-const BH_W=4600,CL_W=1300,ORB=4300,SQ=.6,OM_PER=70,OM_W=420,MO=980,MO_PER=16;
+const BH_W=9200,CL_W=1300,ORB=4300,SQ=.6,OM_PER=70,OM_W=420,MO=980,MO_PER=16;
 
 const worm=document.createElement('button');
 worm.type='button';worm.id='worm';
