@@ -267,12 +267,20 @@ function clMaskFor(a){const k=Math.round(a*40);if(clMK===k)return clMask;clMK=k;
   raw=Math.max(0,dx*L[0]+dy*L[1]+nz*L[2]),lit=Math.max(0,Math.min(1,Math.floor(raw*5+(BAY[(y&3)*4+(x&3)]/16-.5)*.6)/5+.1)),j=(y*CLN+x)*2;
   m[j]=Math.max(0,1-lit*1.25)*.85;m[j+1]=Math.max(0,1-raw)*Math.pow(Math.min(1,Math.sqrt(dx*dx+dy*dy)),2)}
  return clMask=m}
-// bake: copy the current clover frame, darken its own pixels away from the blackhole, and add rainbow light from the TEST UR LUCK rings on the shadow side
+// bake: copy the current clover frame, darken its own pixels away from the blackhole; the sprite's real rainbow ring pixels stay
+// emissive and their blurred colors are added back as light on the clover (V38: sampled from the rings, not an invented hue sweep)
+const GN=32,clG=document.createElement('canvas');clG.width=clG.height=GN;const clGg=clG.getContext('2d',{willReadFrequently:true});
+function isRb(r,g,b){const mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(mx<120||mx-mn<mx*.55)return false;return !(g>=r&&g>=b&&g-Math.max(r,b)>20&&r<200)}
 function bakeClov(){if(!inGal||!clov.complete||!clov.naturalWidth)return;if(clC.width!==CLN){clC.width=clC.height=CLN}const g=clC.getContext('2d',{willReadFrequently:true});
- g.imageSmoothingEnabled=false;g.clearRect(0,0,CLN,CLN);g.drawImage(clov,0,0,CLN,CLN);const im=g.getImageData(0,0,CLN,CLN),d=im.data,m=clMaskFor(clLA),t=performance.now()/1000,ring=cta.hidden?.35:.75;
- for(let i=0,j=0;i<d.length;i+=4,j+=2){if(!d[i+3])continue;const x=(i>>2)%CLN,y=(i>>2)/CLN|0,k=1-m[j],h=(Math.atan2(y-CLN/2,x-CLN/2)/6.283+t*.15)%1*6,rl=m[j+1]*ring*90;
-  const r=Math.max(0,Math.min(1,Math.abs(h-3)-1)),gg2=Math.max(0,Math.min(1,2-Math.abs(h-2))),b=Math.max(0,Math.min(1,2-Math.abs(h-4)));
-  d[i]=Math.min(255,d[i]*k+r*rl);d[i+1]=Math.min(255,d[i+1]*k+gg2*rl);d[i+2]=Math.min(255,d[i+2]*k+b*rl)}
+ g.imageSmoothingEnabled=false;g.clearRect(0,0,CLN,CLN);g.drawImage(clov,0,0,CLN,CLN);const im=g.getImageData(0,0,CLN,CLN),d=im.data,m=clMaskFor(clLA),ring=cta.hidden?1:1.5,st=CLN/GN;
+ const em=new ImageData(GN,GN),e=em.data;
+ for(let i=0;i<d.length;i+=4){if(d[i+3]<128||!isRb(d[i],d[i+1],d[i+2]))continue;const x=(i>>2)%CLN,y=(i>>2)/CLN|0,o=((y/st|0)*GN+(x/st|0))*4;e[o]+=d[i]/st/st*3;e[o+1]+=d[i+1]/st/st*3;e[o+2]+=d[i+2]/st/st*3}
+ for(let o=3;o<e.length;o+=4)e[o]=255;
+ clGg.clearRect(0,0,GN,GN);clGg.putImageData(em,0,0);clGg.filter='blur(3px)';clGg.globalCompositeOperation='lighter';clGg.drawImage(clG,0,0);clGg.drawImage(clG,0,0);clGg.filter='none';clGg.globalCompositeOperation='source-over';
+ const gl=clGg.getImageData(0,0,GN,GN).data;
+ for(let i=0,j=0;i<d.length;i+=4,j+=2){if(!d[i+3])continue;const r=d[i],gg2=d[i+1],b=d[i+2];if(isRb(r,gg2,b))continue;
+  const x=(i>>2)%CLN,y=(i>>2)/CLN|0,k=1-m[j],o=((y/st|0)*GN+(x/st|0))*4,w=ring*(.3+.7*(1-k));
+  d[i]=Math.min(255,r*k+gl[o]*w*(.25+r/255));d[i+1]=Math.min(255,gg2*k+gl[o+1]*w*(.25+gg2/255));d[i+2]=Math.min(255,b*k+gl[o+2]*w*(.25+b/255))}
  g.putImageData(im,0,0)}
 (function clLoop(){if(inGal)bakeClov();requestAnimationFrame(clLoop)})();
 function placeOmni(){
