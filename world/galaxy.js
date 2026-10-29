@@ -52,13 +52,22 @@ const shipImg=document.createElement('img');shipImg.alt='';shipImg.draggable=fal
 back.appendChild(shipImg);
 // Omniverse CTA: tap the omniverse -> "roll for yourself..." + glitchy pixel PLAY link
 const cta=document.createElement('div');cta.id='omcta';cta.hidden=true;
-const ctaT=document.createElement('p');ctaT.className='lgtx';ctaT.textContent='roll for yourself\u2026';
+const ctaT=document.createElement('canvas');ctaT.className='lgtx';ctaT.setAttribute('role','img');ctaT.setAttribute('aria-label','Roll for yourself');
+const tx=ctaT.getContext('2d');const TXT='ROLL FOR YOURSELF\u2026';
+function drawTxt(){const f="400 64px 'Silkscreen',monospace";tx.font=f;const w=Math.ceil(tx.measureText(TXT).width)+24;if(ctaT.width!==w){ctaT.width=w;ctaT.height=92}
+ tx.clearRect(0,0,ctaT.width,ctaT.height);tx.font=f;tx.textBaseline='middle';tx.textAlign='center';tx.lineJoin='miter';
+ const cx=ctaT.width/2,cy=ctaT.height/2;tx.fillStyle='#1a0004';for(const[dx,dy]of[[-5,0],[5,0],[0,-5],[0,5],[-4,-4],[4,-4],[-4,4],[4,4],[0,8]])tx.fillText(TXT,cx+dx,cy+dy);
+ tx.fillStyle='#ff1e32';tx.fillText(TXT,cx,cy);tx.fillStyle='#ff8a94';tx.fillRect(0,0,0,0)}
+function glitchTxt(){const W=ctaT.width,H=ctaT.height,n=2+(Math.random()*4|0);for(let k=0;k<n;k++){const h=4*(1+(Math.random()*4|0)),w=8*(4+(Math.random()*20|0)),sx=Math.random()*(W-w)|0,sy=Math.random()*(H-h)|0,dx=Math.max(0,Math.min(W-w,sx+4*((Math.random()*9|0)-4)));
+ const d=tx.getImageData(sx,sy,w,h);tx.putImageData(d,dx,sy);if(Math.random()<.4){tx.globalAlpha=.8;tx.fillStyle=Math.random()<.5?'#ff2a4a':'#5affd8';tx.fillRect(dx,sy,4*(2+(Math.random()*6|0)),4);tx.globalAlpha=1}}}
+document.fonts&&document.fonts.load("64px 'Silkscreen'").then(drawTxt);drawTxt();
 const play=document.createElement('a');play.id='omplay';play.href='https://rainbowroar14.github.io/RNG/';play.target='_blank';play.rel='noopener';play.setAttribute('aria-label','Play: roll for yourself');
 const pc=document.createElement('canvas');play.appendChild(pc);cta.append(ctaT,play);
 pc.width=16;pc.height=16;
 const px=pc.getContext('2d');
 const PP=[['#7a0014','M4 2h2v1h2v1h2v1h2v1h2v4h-2v1h-2v1h-2v1h-2v1h-2z'],['#ff2a4a','M5 4h1v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-1z'],['#ffd0d8','M5 8h1v3h-1zM6 9h2v1h-2z']];
-function drawPlay(){px.clearRect(0,0,16,16);for(const[f,d]of PP){px.fillStyle=f;px.fill(new Path2D(d))}}
+function drawPlay0(){px.clearRect(0,0,16,16);for(const[f,d]of PP){px.fillStyle=f;px.fill(new Path2D(d))}}
+function drawPlay(){drawPlay0();drawTxt()}
 drawPlay();
 let glT=0;
 function glitch(){if(cta.hidden||RM)return;const S=1,n=2+(Math.random()*5|0);
@@ -67,6 +76,7 @@ function glitch(){if(cta.hidden||RM)return;const S=1,n=2+(Math.random()*5|0);
   const dx=Math.max(0,Math.min(pc.width-w,sx+S*((Math.random()*7|0)-3)));
   const d=px.getImageData(sx,sy,w,h);px.putImageData(d,dx,sy);
   if(Math.random()<.4){px.fillStyle=Math.random()<.5?'#ff2a4a':'#5affd8';px.globalAlpha=.85;px.fillRect(dx,sy,S*(1+(Math.random()*3|0)),S);px.globalAlpha=1}}
+ glitchTxt();
  setTimeout(()=>{drawPlay();if(Math.random()<.5)setTimeout(glitch,70)},90+Math.random()*120)}
 function glitchLoop(){clearTimeout(glT);if(cta.hidden)return;glT=setTimeout(()=>{glitch();glitchLoop()},500+Math.random()*1800)}
 function showCta(on){cta.hidden=!on;if(on){cta.classList.remove('fin');void cta.offsetWidth;cta.classList.add('fin');placeOmni()}if(on){drawPlay();glitchLoop()}else clearTimeout(glT)}
@@ -186,8 +196,8 @@ function placeOmni(){
  const x=(0-cam.x)*cam.z+GW/2,y=(0-cam.y)*cam.z+GH/2;
  omni.style.width=Math.round(size)+'px';omni.style.height=Math.round(size)+'px';
  omni.style.transform='translate('+Math.round(x-size/2)+'px,'+Math.round(y-size/2)+'px)';
- // CTA is world-anchored to the Omniverse sprite: same world x, offset below disc center in world units, scales with zoom
- cta.style.transform='translate('+Math.round(x)+'px,'+Math.round(y+size*.06)+'px) scale('+(size/1000).toFixed(4)+') translate(-50%,0)'}
+ // CTA is world-anchored to the Omniverse sprite: same world x, centered on the disc, scales with zoom
+ cta.style.transform='translate('+Math.round(x)+'px,'+Math.round(y)+'px) scale('+(size/1000).toFixed(4)+') translate(-50%,-50%)'}
 function resizeGal(){
  GW=innerWidth;GH=innerHeight;gsky.width=GW;gsky.height=GH;gg.imageSmoothingEnabled=false;
  if(inGal&&!busy)placeOmni()}
