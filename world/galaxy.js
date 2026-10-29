@@ -14,7 +14,7 @@ const BH_IN='world/assets/blackhole-f/bh-in.gif',BH_LOOP='world/assets/blackhole
 // world layout: blackhole at origin, the Omniverse orbits it on a flattened ring like the hub planets
 const CL_GIF='world/assets/clover/clover-planet.gif',CL_STILL='world/assets/clover/clover-planet.png';
 // F is 5x bigger; the clover planet orbits far out, Max Omniverse is its moon
-const PB_ORB=12400,PB_PER=150,PB_W=1100,DS_ORB=14000,DS_PER=120,DS_W=1500,BH_W=9200,CL_W=1300,ORB=10200,SQ=.6,OM_PER=70,OM_W=420,MO=1400,MO_PER=16;
+const PB_ORB=17500,PB_PER=150,PB_W=1100,DS_ORB=14000,DS_PER=120,DS_W=1500,BH_W=9200,CL_W=1300,ORB=10200,SQ=.6,OM_PER=70,OM_W=420,MO=1400,MO_PER=16;
 
 const worm=document.createElement('button');
 worm.type='button';worm.id='worm';
@@ -158,7 +158,7 @@ document.body.appendChild(gal);
 
 const tip=document.getElementById('tip');
 let busy=false,inGal=false,holdTip=false;
-const cam={x:0,y:0,z:1};window.__galView=()=>({cam,GW,GH,inGal,ds:dsPos(),dsZ:dsPos()[1]<0?1:3,pb:pbPos(),pbZ:pbPos()[1]<0?1:3,pbFoc:gfoc==='pb',pbLa:Math.atan2(-pbPos()[1],bhOff-pbPos()[0])});
+const cam={x:0,y:0,z:1};window.__galView=()=>({cam,GW,GH,inGal,ds:dsPos(),dsZ:dsPos()[1]<0?1:3,pb:pbPos(),pbZ:pbPos()[1]<0?1:3,pbFoc:gfoc==='pb',pbLa:Math.atan2(-pbPos()[1],bhOff-pbPos()[0]),clLa:clLA,clF:CLF.i});
 let fin=false,bhOff=0,gfoc=null,GW=1,GH=1,neb=null,stars=[],omniPx=0,omAng=.55,moAng=0,omSf=1,omHov=false,gLast=0,bhT=0,dsAng=3.75,pbAng=.6;
 function clPos(){return[Math.cos(omAng)*ORB,Math.sin(omAng)*ORB*SQ]}
 function pbPos(){return[Math.cos(pbAng)*PB_ORB,Math.sin(pbAng)*PB_ORB*SQ]}
@@ -292,7 +292,7 @@ function isRb(r,g,b){const mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(mx<120||mx-m
 /* V41: clover frames pre-extracted offline into a sprite sheet (80 frames, 128px, 10x8, 70ms each, from clover-planet.gif);
    we step the frame index on a clock ourselves, no browser GIF decode involved */
 const CLF={sh:null,n:80,cols:10,d:70,i:0,t:0};
-{const im=new Image();im.onload=()=>{CLF.sh=im};im.src='world/assets/clover/clover-sheet.png?v=42'}
+{const im=new Image();im.onload=()=>{CLF.sh=im};im.src='world/assets/clover/clover-sheet.png?v=43'}
 window.__clFrameIdx=()=>CLF.i;
 function clFrame(now){if(!CLF.sh)return null;if(!RM){if(!CLF.t)CLF.t=now;const k=Math.floor((now-CLF.t)/CLF.d);if(k>0){CLF.i=(CLF.i+k)%CLF.n;CLF.t+=k*CLF.d;if(now-CLF.t>1000)CLF.t=now}}return CLF.sh}
 function bakeClov(){const cf=clFrame(performance.now());if(!inGal||(!cf&&(!clSrc.complete||!clSrc.naturalWidth)))return;if(clC.width!==CLN){clC.width=clC.height=CLN}const g=clC.getContext('2d',{willReadFrequently:true});
@@ -349,6 +349,9 @@ function drawGal(now){
  // orbit: hover slows, open CTA stops it (like the hub planets)
  const dt=Math.min(.05,gLast?(now-gLast)/1000:0);gLast=now;
  const tg=RM?0:omHov&&!gfoc?.35:1;omSf+=(tg-omSf)*Math.min(1,dt*4);omAng+=dt*Math.PI*2/OM_PER*omSf;moAng+=dt*Math.PI*2/MO_PER*omSf;if(!RM){dsAng+=dt*Math.PI*2/DS_PER*(gfoc==='ds'?.35:1);pbAng+=dt*Math.PI*2/PB_PER*(gfoc==='pb'?.35:1)}
+ // V43: Sticky Board orbit trail (same style, paper yellow), outer orbit
+ if(FFC){const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(PB_ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#ffe066';
+  for(let k=1;k<=n;k++){const f=k/n,an=pbAng-arc*f,sx=(Math.cos(an)*PB_ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*PB_ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
  // Deep Sea orbit trail (same style, ocean blue)
  {const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(DS_ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#4ac8ff';
   for(let k=1;k<=n;k++){const f=k/n,an=dsAng-arc*f,sx=(Math.cos(an)*DS_ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*DS_ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
