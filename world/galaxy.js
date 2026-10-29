@@ -168,7 +168,7 @@ document.body.appendChild(gal);
 
 const tip=document.getElementById('tip');
 let busy=false,inGal=false,holdTip=false;
-const cam={x:0,y:0,z:1};window.__galView=()=>({cam,GW,GH,inGal,ds:dsPos(),dsZ:dsPos()[1]<0?1:3,pb:pbPos(),pbZ:pbPos()[1]<0?1:3,pbFoc:gfoc==='pb',pbLa:Math.atan2(-pbPos()[1],bhOff-pbPos()[0]),vs:window.__FFC?vsPos():null,vsZ:vsPos()[1]<0?1:3,vsLa:Math.atan2(-vsPos()[1],bhOff-vsPos()[0]),clLa:clLA,clF:CLF.i});
+const cam={x:0,y:0,z:1};window.__galView=()=>({cam,GW,GH,inGal,ds:dsPos(),dsZ:dsPos()[1]<0?1:3,pb:pbPos(),pbZ:pbPos()[1]<0?1:3,pbFoc:gfoc==='pb',pbLa:Math.atan2(-pbPos()[1],bhOff-pbPos()[0]),vs:FFC?vsPos():null,vsZ:vsPos()[1]<0?1:3,vsLa:Math.atan2(-vsPos()[1],bhOff-vsPos()[0]),clLa:clLA,clF:CLF.i});
 let fin=false,bhOff=0,gfoc=null,GW=1,GH=1,neb=null,stars=[],omniPx=0,omAng=.55,moAng=0,omSf=1,omHov=false,gLast=0,bhT=0,dsAng=3.75,pbAng=.6,vsAng=2.2;
 function clPos(){return[Math.cos(omAng)*ORB,Math.sin(omAng)*ORB*SQ]}
 function vsPos(){return[Math.cos(vsAng)*VS_ORB,Math.sin(vsAng)*VS_ORB*SQ]}
@@ -349,7 +349,7 @@ function drawGal(now){
  gg.imageSmoothingEnabled=false;gg.fillStyle='#140206';gg.fillRect(0,0,GW,GH);
  const T=512,ox=Math.round(((cam.x*.08)%T+T)%T),oy=Math.round(((cam.y*.08)%T+T)%T);
  if(neb){gg.globalAlpha=.92;for(let y=-oy;y<GH;y+=T)for(let x=-ox;x<GW;x+=T)gg.drawImage(neb,x,y,T,T);gg.globalAlpha=1;
-  {const n=Math.max(40,Math.min(160,Math.round(VS_ORB*cam.z*2.4/(ps*3)))),arc=2.4;for(let k=1;k<=n;k++){const f=k/n,an=vsAng-arc*f,sx=(Math.cos(an)*VS_ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*VS_ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.65;if(al<.02||(k%2&&f>.35))continue;gg.fillStyle=k%5?'#5ee6ff':'#c9a6ff';gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}}
+  if(FFC){const ps=pxScale(),n=Math.max(40,Math.min(160,Math.round(VS_ORB*cam.z*2.4/(ps*3)))),arc=2.4;for(let k=1;k<=n;k++){const f=k/n,an=vsAng-arc*f,sx=(Math.cos(an)*VS_ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*VS_ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.65;if(al<.02||(k%2&&f>.35))continue;gg.fillStyle=k%5?'#5ee6ff':'#c9a6ff';gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}}
  else{const grd=gg.createRadialGradient(GW/2,GH/2,40,GW/2,GH/2,Math.max(GW,GH)*.7);grd.addColorStop(0,'#6a1420');grd.addColorStop(1,'#140206');gg.fillStyle=grd;gg.fillRect(0,0,GW,GH)}
  const t=now/1000;
  for(const s of stars){
