@@ -168,7 +168,7 @@ document.body.appendChild(gal);
 
 const tip=document.getElementById('tip');
 let busy=false,inGal=false,holdTip=false;
-const cam={x:0,y:0,z:1};window.__galFz=k=>inGal&&(gfoc===k);window.__galView=()=>({cam,GW,GH,inGal,ds:dsPos(),dsZ:dsPos()[1]<0?1:3,pb:pbPos(),pbZ:pbPos()[1]<0?1:3,pbFoc:gfoc==='pb',pbLa:Math.atan2(-pbPos()[1],bhOff-pbPos()[0]),vs:FFC?vsPos():null,vsZ:vsPos()[1]<0?1:3,vsLa:Math.atan2(-vsPos()[1],bhOff-vsPos()[0]),clLa:clLA,clF:CLF.i});
+const cam={x:0,y:0,z:1};window.__galFz=k=>inGal&&(gfoc===k);const SP={ds:1,pb:1,vs:1,cl:1,om:1};window.__galSp=k=>RM?0:(SP[k]??1);/* V57: hover/focus only slows a planet (orbit + sprite anim) */window.__galView=()=>({cam,GW,GH,inGal,ds:dsPos(),dsZ:dsPos()[1]<0?1:3,pb:pbPos(),pbZ:pbPos()[1]<0?1:3,pbFoc:gfoc==='pb',pbLa:Math.atan2(-pbPos()[1],bhOff-pbPos()[0]),vs:FFC?vsPos():null,vsZ:vsPos()[1]<0?1:3,vsLa:Math.atan2(-vsPos()[1],bhOff-vsPos()[0]),clLa:clLA,clF:CLF.i});
 let fin=false,bhOff=0,gfoc=null,GW=1,GH=1,neb=null,stars=[],omniPx=0,omAng=.55,moAng=0,moSf=1,omSf=1,omHov=false,gLast=0,bhT=0,dsAng=3.75,pbAng=.6,vsAng=2.2;
 function clPos(){return[Math.cos(omAng)*ORB,Math.sin(omAng)*ORB*SQ]}
 function vsPos(){return[Math.cos(vsAng)*VS_ORB,Math.sin(vsAng)*VS_ORB*SQ]}
@@ -305,7 +305,7 @@ function isRb(r,g,b){const mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(mx<120||mx-m
 const CLF={sh:null,n:80,cols:10,d:70,i:0,t:0};
 {const im=new Image();im.onload=()=>{CLF.sh=im};im.src='world/assets/clover/clover-sheet.png?v=46'}
 window.__clFrameIdx=()=>CLF.i;
-function clFrame(now){if(!CLF.sh)return null;if(!RM&&window.__galFz&&__galFz('cl'))CLF.t=now;else if(!RM){if(!CLF.t)CLF.t=now;const k=Math.floor((now-CLF.t)/CLF.d);if(k>0){CLF.i=(CLF.i+k)%CLF.n;CLF.t+=k*CLF.d;if(now-CLF.t>1000)CLF.t=now}}return CLF.sh}
+function clFrame(now){if(!CLF.sh)return null;if(!RM){if(!CLF.t)CLF.t=now;CLF.a=Math.min(1000,(CLF.a||0)+(now-CLF.t)*__galSp('cl'));CLF.t=now;const k=Math.floor(CLF.a/CLF.d);if(k>0){CLF.i=(CLF.i+k)%CLF.n;CLF.a-=k*CLF.d}}return CLF.sh}
 function bakeClov(){const cf=clFrame(performance.now());if(!inGal||(!cf&&(!clSrc.complete||!clSrc.naturalWidth)))return;if(clC.width!==CLN){clC.width=clC.height=CLN}const g=clC.getContext('2d',{willReadFrequently:true});
  g.imageSmoothingEnabled=false;g.clearRect(0,0,CLN,CLN);(cf?g.drawImage(cf,(CLF.i%CLF.cols)*128,(CLF.i/CLF.cols|0)*128,128,128,0,0,CLN,CLN):g.drawImage(clSrc,0,0,CLN,CLN));const im=g.getImageData(0,0,CLN,CLN),d=im.data,m=clMaskFor(clLA),ring=cta.hidden?1:1.5,st=CLN/GN;
  const em=new ImageData(GN,GN),e=em.data;
@@ -361,7 +361,7 @@ function drawGal(now){
  for(let i=0;i<4;i++){const m=(i+1)*Math.max(8,pxScale()*6);gg.fillStyle='rgba(20,2,6,.22)';gg.fillRect(0,0,GW,m);gg.fillRect(0,GH-m,GW,m);gg.fillRect(0,0,m,GH);gg.fillRect(GW-m,0,m,GH)}
  // orbit: only focus/zoom stops it (V55: hover no longer freezes) (like the hub planets)
  const dt=Math.min(.05,gLast?(now-gLast)/1000:0);gLast=now;
- const tg=RM||gfoc==='cl'||gfoc==='om'?0:1;omSf+=(tg-omSf)*Math.min(1,dt*4);omAng+=dt*Math.PI*2/OM_PER*omSf;moSf+=((RM||gfoc==='om'?0:1)-moSf)*Math.min(1,dt*4);moAng+=dt*Math.PI*2/MO_PER*moSf;/* V56: moon keeps orbiting while clover is focused */if(!RM){dsAng+=dt*Math.PI*2/DS_PER*(__galFz('ds')?0:1);pbAng+=dt*Math.PI*2/PB_PER*(__galFz('pb')?0:1);vsAng+=dt*Math.PI*2/VS_PER*(__galFz('vs')?0:1);{const os=__galFz('om')?OM_STILL:OM_GIF;if(!RM&&omni.dataset.arm&&!omni.src.endsWith(os))omni.src=os}}
+ for(const k in SP){const tg=inGal&&(gfoc===k||window.__galHov===k)?.3:1;SP[k]+=(tg-SP[k])*Math.min(1,dt*4)}const spO=RM?0:Math.min(SP.om,SP.cl),spC=RM?0:SP.cl;omAng+=dt*Math.PI*2/OM_PER*spO;moAng+=dt*Math.PI*2/MO_PER*spC;/* V57: moons keep orbiting; focus/hover only slows */if(!RM){dsAng+=dt*Math.PI*2/DS_PER*SP.ds;pbAng+=dt*Math.PI*2/PB_PER*SP.pb;vsAng+=dt*Math.PI*2/VS_PER*SP.vs}
  // V43: Sticky Board orbit trail (same style, paper yellow), outer orbit
  if(FFC){const ps=pxScale(),n=Math.max(40,Math.min(150,Math.round(PB_ORB*cam.z*2.6/(ps*3)))),arc=2.6;gg.fillStyle='#ffe066';
   for(let k=1;k<=n;k++){const f=k/n,an=pbAng-arc*f,sx=(Math.cos(an)*PB_ORB-cam.x)*cam.z+GW/2,sy=(Math.sin(an)*PB_ORB*SQ-cam.y)*cam.z+GH/2;if(sx<-4||sy<-4||sx>GW+4||sy>GH+4)continue;const al=Math.pow(1-f,1.3)*.6;if(al<.02||(k%2&&f>.35))continue;gg.globalAlpha=al;gg.fillRect(Math.round(sx/ps)*ps,Math.round(sy/ps)*ps,ps,ps)}gg.globalAlpha=1}
@@ -456,7 +456,7 @@ gsky.addEventListener('pointerdown',e=>{
  if(pts.size===2){const[a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),z:cam.z}}});
 gsky.addEventListener('pointermove',e=>{
  if(!pts.has(e.pointerId)){
-  omHov=overOmni(e.clientX,e.clientY)||overMoon(e.clientX,e.clientY);gsky.style.cursor=omHov?'pointer':'grab';
+  omHov=overOmni(e.clientX,e.clientY)||overMoon(e.clientX,e.clientY);{const hk=overOmni(e.clientX,e.clientY)?"cl":overMoon(e.clientX,e.clientY)?"om":null;if(hk)window.__galHov=hk;else if(window.__galHov==="cl"||window.__galHov==="om")window.__galHov=null}gsky.style.cursor=omHov?'pointer':'grab';
   if(overOmni(e.clientX,e.clientY))showTip('Lucky clover',e.clientX,e.clientY);
   else if(overMoon(e.clientX,e.clientY))showTip('Maximum Omniverse',e.clientX,e.clientY);
   else if(holdTip&&tip&&/^(Lucky clover|Maximum Omniverse)/.test(tip.textContent))hideTip();

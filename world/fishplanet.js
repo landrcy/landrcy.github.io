@@ -60,6 +60,6 @@ function frame(ms){
  else{const v=window.__hubView&&window.__hubView(),b=document.body.classList;
   if(!v||v.sys!=='main'||b.contains('arch')||b.contains('galaxy')||b.contains('intro')){c.style.display='none';return requestAnimationFrame(frame)}
   place(v.cam.z,v.cam.x,v.cam.y,v.W,v.H);{const m=Math.hypot(WX,WY)||1;LT=[-WX/m*.88,-WY/m*.88,.47]}}
- if(c.style.display!=='none'&&ms-last>55){const dt=(ms-last)/1000;last=ms;if(stirring){let any=0;const f=Math.pow(.55,dt);for(let i=0;i<ST.length;i++)if(ST[i]){ST[i]=ST[i]*f<.01?0:ST[i]*f;any=1}stirring=any}{const fz=FFC&&window.__galFz&&__galFz('ds');if(!fz&&frame.pm)frame.at=(frame.at||0)+(ms-frame.pm)/1000;frame.pm=ms;paint(FFC?(frame.at||0):ms/1000)}}
+ if(c.style.display!=='none'&&ms-last>55){const dt=(ms-last)/1000;last=ms;if(stirring){let any=0;const f=Math.pow(.55,dt);for(let i=0;i<ST.length;i++)if(ST[i]){ST[i]=ST[i]*f<.01?0:ST[i]*f;any=1}stirring=any}{const fz=FFC&&window.__galFz&&__galFz('ds');if(frame.pm)frame.at=(frame.at||0)+(ms-frame.pm)/1000*(window.__galSp?__galSp('ds'):1);frame.pm=ms;paint(FFC?(frame.at||0):ms/1000)}}
  requestAnimationFrame(frame)}
 paint(0);requestAnimationFrame(frame)})();

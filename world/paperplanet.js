@@ -46,6 +46,6 @@ function frame(ms){const v=window.__galView&&window.__galView(),gal=document.get
  const z=v.cam.z,s=Math.max(2,Math.round(PB_W*K*z)),x=(v.pb[0]-v.cam.x)*z+v.GW/2,y=(v.pb[1]-v.cam.y)*z+v.GH/2;
  c.style.zIndex=v.pbZ;c.style.width=c.style.height=s+'px';c.style.transform='translate('+Math.round(x-s/2)+'px,'+Math.round(y-s/2)+'px)';
  c.style.display=(x<-s||y<-s||x>v.GW+s||y>v.GH+s)?'none':'';
- if(c.style.display!=='none'&&(ms-last>50||!last)){const fz=window.__galFz&&__galFz('pb');if(!fz&&pm)at+=(ms-pm)/1000;pm=ms;last=ms;paint(at)}
+ if(c.style.display!=='none'&&(ms-last>50||!last)){const fz=window.__galFz&&__galFz('pb');if(pm)at+=(ms-pm)/1000*(window.__galSp?__galSp('pb'):1);pm=ms;last=ms;paint(at)}
  requestAnimationFrame(frame)}
 requestAnimationFrame(frame)})();
