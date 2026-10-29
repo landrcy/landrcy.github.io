@@ -1,7 +1,8 @@
 // V50 FFC only: Volt Sphere, a wireframe globe of electric lines and lightning bolts, two grids spinning on crossed axes.
+// V53: six bent polished iron plates orbit the sphere, tethered by constant branching electric beams.
 // Procedural pixel art (low-res buffer, nearest upscale), F blackhole light baked per pixel. Click zooms to it (title showcase).
 (()=>{if(!window.__FFC)return;
-const VS_W=900,K=1.9,N=320,B=80,R=30,RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const VS_W=900,K=1.9,N=512,B=128,R=30,SC=128/80,PS=64,RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const c=document.createElement('canvas');c.width=c.height=N;c.id='vsplanet';c.tabIndex=0;c.setAttribute('role','button');c.setAttribute('aria-label','Volt Sphere planet');
 c.style.cssText='position:absolute;left:0;top:0;z-index:3;image-rendering:pixelated;display:none;touch-action:none;will-change:transform';
 const g=c.getContext('2d');g.imageSmoothingEnabled=false;
@@ -10,6 +11,14 @@ const img=bg.createImageData(B,B),D=img.data;let LA=null,seed=1;
 const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
 const PAL=[[40,30,110],[90,60,200],[60,140,255],[90,230,255],[230,250,255]];
 const BAY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+const PL=[1,2,3,4,5,6].map(i=>{const m=new Image();m.src='world/assets/ironsheet/sheet-'+i+'.png';return m});
+let plates=[];
+function platePos(t){const out=[];for(let i=0;i<6;i++){const a=(RM?0:t*.35)+i*Math.PI/3,r=1.75+.08*Math.sin(i*2.1);
+ p=rot([Math.cos(a)*r,Math.sin(i*1.7+t*.6)*.12,Math.sin(a)*r],0,.38,.22);out.push({p,i,spin:(RM?0:t*.9)*(i%2?1:-1)+i})}return out}
+function jag(a,b,d,amp){if(d===0){line([a,b],.3,1,2);return}const m=[(a[0]+b[0])/2+(rnd()-.5)*amp,(a[1]+b[1])/2+(rnd()-.5)*amp,(a[2]+b[2])/2];jag(a,m,d-1,amp*.55);jag(m,b,d-1,amp*.55);
+ if(d>=2&&rnd()<.3){const e=[m[0]+(rnd()-.5)*amp*1.6,m[1]+(rnd()-.5)*amp*1.6,m[2]];jag(m,e,1,amp*.4)}}
+function beam(P){const l=Math.hypot(...P),u=P.map(v=>v/l);jag(u,P,4,.35);
+ const ns=RM?2:3+Math.floor(rnd()*4);for(let k=0;k<ns;k++){const an=rnd()*Math.PI*2,rr=.18+rnd()*.22,e=[P[0]+Math.cos(an)*rr,P[1]+Math.sin(an)*rr,P[2]];jag(P,e,2,.12)}}
 const buf=new Float32Array(B*B),hue=new Float32Array(B*B);
 function plot(x,y,v,h){x|=0;y|=0;if(x<0||y<0||x>=B||y>=B)return;const i=y*B+x;if(v>buf[i]){buf[i]=v;hue[i]=h}}
 // rotate point by grid frame: spin about local Y by a, then tilt about X by tx, then about Z by tz
@@ -30,6 +39,7 @@ function paint(t){seed=(Math.floor(t*12)%997)+7;buf.fill(0);hue.fill(0);
  grid(t,RM?.3:t*.6,.41,.18,0,0);grid(t,RM?1:-t*.45,1.2,-.6,1,2);
  const nb=RM?1:2+Math.floor(rnd()*3);for(let i=0;i<nb;i++){const a=sp();a[2]=Math.abs(a[2]);const b=sp();b[2]=Math.abs(b[2]);bolt(a,b,3,2)}
  if(!RM&&rnd()<.35){const a=sp(),o=[a[0]*1.45,a[1]*1.45,a[2]];bolt(a,o,2,2)}
+ plates=platePos(t);for(const q of plates)beam(q.p);
  const L=LA==null?[-.5,-.5,.7]:[Math.cos(LA)*.88,Math.sin(LA)*.88,.47];
  for(let y=0;y<B;y++)for(let x=0;x<B;x++){const i=y*B+x,o=i*4,nx=(x+.5-B/2)/R,ny=(y+.5-B/2)/R,r2=nx*nx+ny*ny;let v=buf[i];
   const nz=Math.sqrt(Math.max(0,1-r2)),lit=Math.max(0,Math.min(1,.45+(nx*L[0]+ny*L[1]+nz*L[2])*.75));
@@ -38,7 +48,9 @@ function paint(t){seed=(Math.floor(t*12)%997)+7;buf.fill(0);hue.fill(0);
   else if(r2<1){const q=Math.floor((.15+lit*.35)*4+BAY[(y&3)*4+(x&3)]/16)/4,gl=RM?0:.5+.5*Math.sin(t*5);D[o]=8+q*14;D[o+1]=6+q*16+gl*4;D[o+2]=26+q*50+gl*10;D[o+3]=255}
   else if(r2<1.18&&!RM&&BAY[(y&3)*4+(x&3)]<(Math.sin(t*6)+1.2)*3){D[o]=70;D[o+1]=170;D[o+2]=255;D[o+3]=110}
   else D[o+3]=0}
- bg.putImageData(img,0,0);g.clearRect(0,0,N,N);g.drawImage(bc,0,0,N,N)}
+ bg.putImageData(img,0,0);g.clearRect(0,0,N,N);
+ const sk=N/B,dp=q=>{const m=PL[q.i];if(!m.complete||!m.naturalWidth)return;const sz=PS*(1+q.p[2]*.12);g.save();g.translate(N/2+q.p[0]*R*sk,N/2+q.p[1]*R*sk);g.rotate(Math.sin(q.spin)*.5);g.globalAlpha=q.p[2]<0?.7:1;g.drawImage(m,-sz/2,-sz/2,sz,sz);g.restore()};
+ for(const q of plates)if(q.p[2]<0)dp(q);g.drawImage(bc,0,0,N,N);for(const q of plates)if(q.p[2]>=0)dp(q)}
 const NAME='Volt Sphere';
 const tipOn=(on,e)=>{const t=document.getElementById('tip');if(!t)return;if(on){if(t.textContent!==NAME||!t.classList.contains('on'))window.__blip&&__blip('hover');t.textContent=NAME;t.style.left=(e.clientX+14)+'px';t.style.top=(e.clientY+14)+'px';t.classList.add('on')}else if(t.textContent===NAME)t.classList.remove('on')};
 const onBall=e=>{const r=c.getBoundingClientRect();return Math.hypot((e.clientX-r.left)/r.width*N-N/2,(e.clientY-r.top)/r.height*N-N/2)<R*N/B*1.15};
@@ -54,7 +66,7 @@ let last=0,at=0,pm=0;
 function frame(ms){const v=window.__galView&&window.__galView(),gal=document.getElementById('galaxy');
  if(!v||!gal||!v.inGal||!v.vs){c.style.display='none';return requestAnimationFrame(frame)}
  if(v.vsLa!=null)LA=v.vsLa;if(c.parentNode!==gal)gal.appendChild(c);
- const z=v.cam.z,s=Math.max(2,Math.round(VS_W*K*z)),x=(v.vs[0]-v.cam.x)*z+v.GW/2,y=(v.vs[1]-v.cam.y)*z+v.GH/2;
+ const z=v.cam.z,s=Math.max(2,Math.round(VS_W*K*SC*z)),x=(v.vs[0]-v.cam.x)*z+v.GW/2,y=(v.vs[1]-v.cam.y)*z+v.GH/2;
  c.style.zIndex=v.vsZ;c.style.width=c.style.height=s+'px';c.style.transform='translate('+Math.round(x-s/2)+'px,'+Math.round(y-s/2)+'px)';
  c.style.display=(x<-s||y<-s||x>v.GW+s||y>v.GH+s)?'none':'';
  if(c.style.display!=='none'&&(ms-last>60||!last)){const fz=window.__galFz&&__galFz('vs');if(!fz&&pm)at+=(ms-pm)/1000;pm=ms;last=ms;paint(at)}
