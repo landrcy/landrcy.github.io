@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LLC &amp; FFC Powered Channels · Live</title>
+<title>YouTube · LLC &amp; FFC Live Stats</title><link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}html,body{margin:0;background:#07050f;color:#f3ecdf;font-family:'VT323',monospace;font-size:20px;min-height:100%}
@@ -43,7 +43,7 @@ a.back{font-family:Silkscreen;font-size:12px;color:#b9b0d0;text-decoration:none;
 .st .d24{margin-top:0;font-size:9px}
 .ctog{font-family:Silkscreen;font-size:12px;background:#120c1e;color:#ffcc4d;border:3px solid #2c2244;box-shadow:3px 3px 0 #000;padding:8px 12px;cursor:pointer;margin:26px 0 12px}.ctog:hover{color:#fff}
 #charts[hidden]{display:none}#charts .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-#charts .card canvas{width:100%;height:180px;display:block;image-rendering:pixelated}
+#charts .card canvas{width:100%;height:200px;display:block}
 #charts .ctl{font-family:Silkscreen;font-size:11px;margin-bottom:10px;color:#b9b0d0}#charts .ctl button{font:inherit;background:#07050f;color:#b9b0d0;border:2px solid #2c2244;padding:4px 8px;cursor:pointer}#charts .ctl button.on{color:#fff;border-color:#ffcc4d}
 @media(max-width:820px){#charts .cgrid{grid-template-columns:1fr}}
 .hof{margin-top:26px}.hof>h2{font-family:Silkscreen;font-weight:700;font-size:clamp(16px,2.6vw,22px);margin:0 0 12px;color:#ffcc4d}.hof.shame>h2{color:#ff6b6b}
@@ -95,13 +95,13 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
 <p class="note" id="sfoot"></p>
 <button class="ctog" id="ctog" aria-expanded="false">▶ SHOW CHARTS</button>
 <section id="charts" hidden>
- <div class="ctl">BRAND: <button data-b="both" class="on">BOTH</button> <button data-b="llc">LLC</button> <button data-b="ffc">FFC</button> &nbsp;<span id="cinfo"></span></div>
+ <div class="ctl">BRAND: <button data-b="both" class="on">BOTH</button> <button data-b="llc">LLC</button> <button data-b="ffc">FFC</button> &nbsp;<br>RANGE: <button data-r="3600000">1H</button> <button data-r="21600000">6H</button> <button data-r="86400000" class="on">24H</button> <button data-r="604800000">7D</button> <button data-r="1e15">ALL</button> &nbsp;SHOW: <button data-m="gain" class="on">GAINED</button> <button data-m="rate">RATE /HR</button> &nbsp;<span id="cinfo"></span></div>
  <div class="cgrid">
-  <div class="card"><h3>SUBSCRIBERS OVER TIME</h3><canvas id="c-subs" width="320" height="120"></canvas></div>
-  <div class="card"><h3>VIEWS OVER TIME</h3><canvas id="c-views" width="320" height="120"></canvas></div>
+  <div class="card"><h3>SUBSCRIBERS GAINED</h3><canvas id="c-subs" width="320" height="120"></canvas></div>
+  <div class="card"><h3>VIEWS GAINED</h3><canvas id="c-views" width="320" height="120"></canvas></div>
   <div class="card" style="grid-column:1/-1"><h3>CURRENT SUBS BY CHANNEL</h3><canvas id="c-bar" width="640" height="120"></canvas></div>
  </div>
- <div class="note">History comes from samples this browser has stored (localStorage). Lines fill in as the page stays open / is revisited.</div>
+ <div class="note">History comes from samples this browser has stored (localStorage). Charts show change within the selected range (not raw totals), resampled smoothly; channels without data yet are held flat at their first value so no fake jumps. Up to ~1500 samples/channel kept (dense for last 2h, thinned older).</div>
 </section>
 <footer id="foot">Loading live counts…</footer>
 </main>
@@ -157,12 +157,12 @@ function renderGroup(g){
 function render(){Object.values(GROUPS).forEach(g=>{renderGroup(g);renderD24(g)});drawCharts()}
 
 // ---- trailing samples (localStorage) ----
-const HK='pc-hist:',CAP=200,MINGAP=5*60e3;
+const HK='pc-hist:',CAP=1500,MINGAP=60e3;
 const hist=id=>{try{return JSON.parse(localStorage.getItem(HK+id))||[]}catch(e){return[]}};
 function addSample(c){if(c.subs==null&&c.views==null)return;const a=hist(c.id),t=Date.now(),l=a[a.length-1];
  if(l&&t-l.t<MINGAP){l.t=t;l.subs=c.subs;l.views=c.views;if(a.length>1&&a.length<3){}}else a.push({t,subs:c.subs,views:c.views});
  // keep at most CAP, thinning old points but always keeping a point near 24h
- while(a.length>CAP){let k=1;for(let j=2;j<a.length-1;j++)if(a[j+1].t-a[j-1].t<a[k+1].t-a[k-1].t)k=j;a.splice(k,1)}
+ while(a.length>CAP){let k=1;for(let j=2;j<a.length-1&&a[j].t<t-72e5;j++)if(a[j+1].t-a[j-1].t<a[k+1].t-a[k-1].t)k=j;a.splice(k,1)}
  try{localStorage.setItem(HK+c.id,JSON.stringify(a))}catch(e){}}
 function at24(a,k){const tgt=Date.now()-864e5;const v=a.filter(p=>p[k]!=null);if(!v.length||v[0].t>Date.now()-23*36e5)return null;
  for(let j=0;j<v.length-1;j++)if(v[j].t<=tgt&&v[j+1].t>=tgt){const f=(tgt-v[j].t)/(v[j+1].t-v[j].t||1);return v[j][k]+(v[j+1][k]-v[j][k])*f}
@@ -178,24 +178,42 @@ function renderD24(g){let s=0,v=0,ns=0,nv=0,age=Infinity;g.channels.forEach(c=>{
  const el=document.getElementById('d24-'+g.key);const live=g.channels.filter(c=>c.subs!=null).length;
  el.innerHTML=(!ns&&!nv)?trk(age===Infinity?0:age):`${ns?sg(s):'?'} subs · ${nv?sg(v):'?'} views`+(ns<live?` <span class="tr">(${ns}/${live} ch. have 24h)</span>`:'')}
 // ---- charts (hand-drawn canvas) ----
-let cb='both',copen=false;const COL={llc:['#ff4d6a','#ffcc4d'],ffc:['#38e1d0','#7c6cff']};
-function series(gk,k){const ch=GROUPS[gk].channels,hs=ch.map(c=>hist(c.id).filter(p=>p[k]!=null));const ts=[...new Set(hs.flat().map(p=>p.t))].sort((a,b)=>a-b);
- return ts.map(t=>{let sum=0,ok=0;hs.forEach(h=>{const p=h.filter(q=>q.t<=t).pop();if(p){sum+=p[k];ok++}});return{t,v:sum,ok}}).filter(p=>p.ok)}
-function line(id,k,ci){const cv=document.getElementById(id),x=cv.getContext('2d'),W=cv.width,H=cv.height;x.fillStyle='#07050f';x.fillRect(0,0,W,H);
- x.fillStyle='#2c2244';for(let i=1;i<4;i++)x.fillRect(0,H*i/4|0,W,1);
- const gs=cb==='both'?['llc','ffc']:[cb];let any=false;x.font='8px monospace';
- gs.forEach((gk,gi)=>{const s=series(gk,k);if(s.length<2)return;any=true;const t0=s[0].t,t1=s[s.length-1].t||t0+1,lo=Math.min(...s.map(p=>p.v)),hi=Math.max(...s.map(p=>p.v));
-  const X=t=>4+(W-8)*(t-t0)/((t1-t0)||1),Y=v=>H-6-(H-14)*(hi===lo?.5:(v-lo)/(hi-lo));x.fillStyle=COL[gk][ci];
-  for(let j=1;j<s.length;j++){let ax=X(s[j-1].t)|0,ay=Y(s[j-1].v)|0;const bx=X(s[j].t)|0,by=Y(s[j].v)|0;x.fillRect(ax,ay,bx-ax+1,2);x.fillRect(bx,Math.min(ay,by),2,Math.abs(by-ay)+1)}
-  x.fillText(gk.toUpperCase()+' '+cmp(s[s.length-1].v),4,10+gi*10)});
- if(!any){x.fillStyle='#6e6588';x.fillText('collecting samples… need 2+ points',8,H/2)}}
-function bars(){const cv=document.getElementById('c-bar'),x=cv.getContext('2d'),W=cv.width,H=cv.height;x.fillStyle='#07050f';x.fillRect(0,0,W,H);
- const cs=ALL.filter(c=>(cb==='both'||c.group===cb)&&c.subs!=null).sort((a,b)=>b.subs-a.subs);if(!cs.length)return;const mx=cs[0].subs||1,bh=Math.floor((H-4)/cs.length);x.font='8px monospace';
- cs.forEach((c,i)=>{const w=Math.max(2,((W-200)*c.subs/mx)|0),y=2+i*bh;x.fillStyle='#b9b0d0';x.fillText(c.name.slice(0,16),2,y+bh/2+3);x.fillStyle=COL[c.group][0];x.fillRect(90,y+1,w,bh-3);x.fillStyle='#f3ecdf';x.fillText(c.subs.toLocaleString('en-US'),94+w,y+bh/2+3)})}
+let cb='both',copen=false,crng=864e5,cmode='gain';const COL={llc:['#ff4d6a','#ffcc4d'],ffc:['#38e1d0','#7c6cff']};
+// per-channel value at time t: linear interpolation; before first sample = first value (no fake spike from 0)
+function vAt(h,t,k){if(!h.length)return null;if(t<=h[0].t)return h[0][k];const L=h[h.length-1];if(t>=L.t)return L[k];
+ let lo=0,hi=h.length-1;while(hi-lo>1){const m=(lo+hi)>>1;if(h[m].t<=t)lo=m;else hi=m}const A=h[lo],B=h[hi];return A[k]+(B[k]-A[k])*(t-A.t)/((B.t-A.t)||1)}
+// uniform resample of group total over window; only channels that have history
+function series(gk,k,N){const hs=GROUPS[gk].channels.map(c=>hist(c.id).filter(p=>p[k]!=null)).filter(h=>h.length);if(!hs.length)return null;
+ const now=Date.now(),first=Math.min(...hs.map(h=>h[0].t)),t0=Math.max(now-crng,first),t1=now;if(t1-t0<60e3)return null;
+ const pts=[];for(let i=0;i<=N;i++){const t=t0+(t1-t0)*i/N;pts.push({t,v:hs.reduce((a,h)=>a+vAt(h,t,k),0)})}return{pts,t0,t1}}
+const nice=r=>{const e=10**Math.floor(Math.log10(r||1)),f=r/e;return(f<=1?1:f<=2?2:f<=5?5:10)*e};
+function tl(t,span){const d=new Date(t);return span>2*864e5?d.toLocaleDateString('en-US',{month:'short',day:'numeric'}):d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}
+function line(id,k,ci){const cv=document.getElementById(id),dpr=devicePixelRatio||1,W=cv.clientWidth||320,H=cv.clientHeight||180;cv.width=W*dpr;cv.height=H*dpr;
+ const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.fillStyle='#07050f';x.fillRect(0,0,W,H);x.font='10px monospace';
+ const gs=cb==='both'?['llc','ffc']:[cb],N=Math.min(240,Math.max(40,W/3|0)),L=52,R=8,T=26,B=20;
+ const S=gs.map(gk=>{const s=series(gk,k,N);if(!s)return null;let ys;
+  if(cmode==='gain')ys=s.pts.map(p=>p.v-s.pts[0].v);
+  else{const w=Math.max(2,N/24|0);ys=s.pts.map((p,i)=>{const j=Math.max(0,i-w),dt=(p.t-s.pts[j].t)/36e5;return i?(p.v-s.pts[j].v)/(dt||1):0});ys[0]=ys[1]??0}
+  return{gk,s,ys,tot:s.pts[N].v-s.pts[0].v}}).filter(Boolean);
+ if(!S.length){x.fillStyle='#6e6588';x.fillText('collecting samples… keep page open a few minutes',8,H/2);return}
+ const t0=Math.min(...S.map(o=>o.s.t0)),t1=Math.max(...S.map(o=>o.s.t1));let lo=Math.min(0,...S.flatMap(o=>o.ys)),hi=Math.max(1,...S.flatMap(o=>o.ys));
+ const st=nice((hi-lo)/4);lo=Math.floor(lo/st)*st;hi=Math.ceil(hi/st)*st;if(hi===lo)hi=lo+st;
+ const X=t=>L+(W-L-R)*(t-t0)/((t1-t0)||1),Y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+ x.textAlign='right';for(let v=lo;v<=hi+st/2;v+=st){const y=Y(v)|0;x.fillStyle=v===0?'#4a3d70':'#1e1730';x.fillRect(L,y,W-L-R,1);x.fillStyle='#8a80a8';x.fillText((v>0&&cmode==='gain'?'+':'')+cmp(Math.round(v*10)/10),L-4,y+3)}
+ x.textAlign='center';for(let i=0;i<=4;i++){const t=t0+(t1-t0)*i/4;x.fillStyle='#8a80a8';x.fillText(i===4?'now':tl(t,t1-t0),Math.min(W-R-14,Math.max(L+14,X(t))),H-6)}
+ S.forEach((o,gi)=>{x.strokeStyle=COL[o.gk][ci];x.lineWidth=2;x.lineJoin='round';x.beginPath();o.s.pts.forEach((p,i)=>{const px=X(p.t),py=Y(o.ys[i]);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();
+  const hrs=(o.s.t1-o.s.t0)/36e5,cur=o.s.pts[N].v;x.textAlign='left';x.fillStyle=COL[o.gk][ci];
+  x.fillText(`${o.gk.toUpperCase()} ${o.tot<0?'−':'+'}${cmp(Math.abs(Math.round(o.tot)))} in ${hrs<1?Math.round(hrs*60)+'m':hrs.toFixed(1)+'h'} · ${cmp(Math.round(o.tot/(hrs||1)))}/h · total ${cmp(cur)}`,L,11+gi*12)})}
+function bars(){const cv=document.getElementById('c-bar'),dpr=devicePixelRatio||1,W=cv.clientWidth||640;const cs=ALL.filter(c=>(cb==='both'||c.group===cb)&&c.subs!=null).sort((a,b)=>b.subs-a.subs);
+ const bh=18,H=Math.max(40,cs.length*bh+4);cv.style.height=H+'px';cv.width=W*dpr;cv.height=H*dpr;const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.fillStyle='#07050f';x.fillRect(0,0,W,H);if(!cs.length)return;
+ const mx=cs[0].subs||1;x.font='10px monospace';cs.forEach((c,i)=>{const w=Math.max(2,((W-230)*c.subs/mx)|0),y=2+i*bh;x.fillStyle='#b9b0d0';x.fillText(c.name.slice(0,16),2,y+12);x.fillStyle=COL[c.group][0];x.fillRect(120,y+2,w,bh-5);x.fillStyle='#f3ecdf';x.fillText(c.subs.toLocaleString('en-US'),126+w,y+12)})}
 function drawCharts(){if(!copen)return;line('c-subs','subs',0);line('c-views','views',1);bars();
- const n=ALL.reduce((a,c)=>a+hist(c.id).length,0);document.getElementById('cinfo').textContent=`${n} stored samples`}
+ const all=ALL.flatMap(c=>hist(c.id)),n=all.length,old=n?Math.min(...all.map(p=>p.t)):0;document.getElementById('cinfo').textContent=n?`${n} samples · history since ${new Date(old).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}`:''}
 document.getElementById('ctog').onclick=e=>{copen=!copen;document.getElementById('charts').hidden=!copen;e.target.textContent=(copen?'▼ HIDE':'▶ SHOW')+' CHARTS';e.target.setAttribute('aria-expanded',copen);drawCharts()};
-document.querySelectorAll('#charts .ctl button').forEach(b=>b.onclick=()=>{cb=b.dataset.b;document.querySelectorAll('#charts .ctl button').forEach(q=>q.classList.toggle('on',q===b));drawCharts()});
+document.querySelectorAll('#charts .ctl button').forEach(b=>b.onclick=()=>{const grp=b.dataset.b?'b':b.dataset.r?'r':'m';
+ if(grp==='b')cb=b.dataset.b;else if(grp==='r')crng=+b.dataset.r;else cmode=b.dataset.m;
+ document.querySelectorAll('#charts .ctl button').forEach(q=>{const qg=q.dataset.b?'b':q.dataset.r?'r':'m';if(qg===grp)q.classList.toggle('on',q===b)});drawCharts()});
+addEventListener('resize',()=>drawCharts());setInterval(drawCharts,30e3);
 let last=0,delay=4000,i=0,busy=false;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function fetchOne(c,opts){opts=opts||{};if(busy&&!opts.force)return;busy=true;
