@@ -7,14 +7,16 @@ try:
     prev = {v['id']: v.get('first') for g in ('llc','ffc') for v in json.load(open('youtube/shorts.json'))[g]}
 except Exception:
     prev = {}
-out = {'updated': int(time.time()*1000), 'llc': [], 'ffc': []}
+out = {'updated': int(time.time()*1000), 'llc': [], 'ffc': [], 'latest': {}}
 for g, ids in CH.items():
     for cid in ids:
         try:
             d = json.loads(subprocess.run(['yt-dlp','--flat-playlist','-J',f'https://www.youtube.com/channel/{cid}/shorts'],capture_output=True,text=True,timeout=180).stdout)
         except Exception as e:
             print('fail', cid, e); continue
-        for e in d.get('entries') or []:
+        ents = d.get('entries') or []
+        if ents: out['latest'][cid] = {'id': ents[0]['id'], 'title': ents[0].get('title') or ''}  # /shorts tab is newest-first
+        for e in ents:
             if e.get('view_count') is None: continue
             out[g].append({'id': e['id'], 'title': e.get('title') or '', 'views': e['view_count'], 'ch': d.get('channel') or cid, 'cid': cid, 'first': prev.get(e['id']) or out['updated']})
 json.dump(out, open('youtube/shorts.json','w'), ensure_ascii=False)

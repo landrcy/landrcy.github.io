@@ -57,7 +57,7 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
 @media(max-width:820px){.cols{grid-template-columns:1fr}.tot{grid-template-columns:1fr}}
 @media(max-width:520px){.row{height:58px;gap:8px;padding:0 10px}.nm a{font-size:19px}.st{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.odo .d span,.row{transition:none}.live i{animation:none}}
-#clash{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.4;transition:background 1.5s}#clashlbl{position:fixed;left:50%;bottom:6px;transform:translateX(-50%);font-family:Silkscreen;font-size:10px;color:#f3ecdf;background:#07050fcc;padding:3px 8px;border:2px solid #2c2244;z-index:5;pointer-events:none}</style></head><body><canvas id="sky"></canvas><div id="clash"></div><div id="clashlbl"></div>
+#clash{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.4;transition:background 1.5s}#clashlbl{position:fixed;left:50%;bottom:6px;transform:translateX(-50%);font-family:Silkscreen;font-size:10px;color:#f3ecdf;background:#07050fcc;padding:3px 8px;border:2px solid #2c2244;z-index:5;pointer-events:none}.nm{flex-wrap:wrap;align-content:center}.nm .ls{display:block;flex-basis:100%;font-family:VT323,monospace;font-size:15px;color:#ffcc4d;text-decoration:none;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.nm .ls:hover{text-decoration:underline}</style></head><body><canvas id="sky"></canvas><div id="clash"></div><div id="clashlbl"></div>
 <main>
 <a class="back" href="/">◀ BACK TO THE HUB</a>
 <div class="top">
@@ -248,7 +248,11 @@ setInterval(()=>{document.getElementById('foot').textContent=last?`Live counts f
 const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function slist(id,arr,shame){const el=document.getElementById(id);if(!arr.length){el.innerHTML='<li><span class="na">no shorts yet</span></li>';return}
  el.innerHTML=arr.map((v,i)=>`<li class="${i===0?'first':''}"><div class="rk">#${i+1}</div>${i===0?(shame?'<span class="skull">☠</span>':CROWN):''}<div class="t"><a href="https://www.youtube.com/shorts/${v.id}" target="_blank" rel="noopener">${esc(v.title.replace(/\s*#shorts?\b/gi,''))}</a><small>${esc(v.ch)}</small></div><div class="st"><b>${v.views.toLocaleString('en-US')}</b> views</div></li>`).join('')}
-function shortsRender(d){const now=Date.now();
+function latestRender(d){const seen={};(d.llc||[]).concat(d.ffc||[]).forEach(v=>{if(!seen[v.cid])seen[v.cid]=v});
+ ALL.forEach(c=>{const v=(d.latest||{})[c.id]||seen[c.id],nm=GROUPS[c.group].rows[c.id].querySelector('.nm');let a=nm.querySelector('.ls');
+  if(!a){a=document.createElement('a');a.className='ls';a.target='_blank';a.rel='noopener';nm.appendChild(a)}
+  a.href=v?'https://www.youtube.com/shorts/'+v.id:c.url.replace(/\/$/,'')+'/shorts';a.textContent=v?'▶ latest: '+v.title.replace(/\s*#\S+/g,'').trim().slice(0,34):'▶ shorts';a.title=v?v.title:'channel shorts'})}
+function shortsRender(d){const now=Date.now();latestRender(d);
  for(const gk of['llc','ffc']){const a=d[gk]||[];
   const fame=[...a].sort((x,y)=>y.views-x.views).slice(0,5);
   const old=a.filter(v=>(v.first||0)<now-48*36e5),pool=old.length>=5?old:a;
