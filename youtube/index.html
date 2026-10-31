@@ -141,10 +141,12 @@ for(const g of Object.values(GROUPS)){
  g.channels.forEach(c=>{const r=document.createElement('div');r.className='row';r.innerHTML=`<div class="rk"></div><div class="nm"><a href="${c.url}" target="_blank" rel="noopener">${c.name}</a></div><div class="st"></div>`;board.appendChild(r);g.rows[c.id]=r});
 }
 // joke: LLC display-only climb for 10 min after load, then real numbers (history/charts untouched)
-const J0=Date.now(),JDUR=10*60e3;
-function J(c,k){const v=c[k];if(v==null||c.group!=='llc')return v;const e=(Date.now()-J0)/1e3;if(e*1e3>=JDUR)return v;
- return v+Math.floor(k==='subs'?e*.6+(e/60)**2*4:e*23+(e/60)**2*180)}
-const JT=setInterval(()=>{render();if(Date.now()-J0>=JDUR){clearInterval(JT);render()}},1000);
+const J0=Date.now(),JDUR=10*60e3,JB={};
+function J(c,k){const v=c[k];if(v==null||c.group!=='llc'||Date.now()-J0>=JDUR)return v;return v+((JB[c.id]||{})[k]||0)}
+function jtick(){const e=(Date.now()-J0)/JDUR;ALL.forEach(c=>{if(c.group!=='llc')return;const b=JB[c.id]||(JB[c.id]={subs:0,views:0});
+ if(Math.random()<.35+e*.4)b.subs+=Math.random()<.85?1:2+Math.floor(Math.random()*(3+e*8));
+ if(Math.random()<.7)b.views+=Math.floor(Math.random()**3*(40+e*400))+(Math.random()<.05?Math.floor(Math.random()*600):0)})}
+(function jl(){if(Date.now()-J0>=JDUR){render();return}jtick();render();setTimeout(jl,250+Math.random()*1500)})();
 function renderGroup(g){
  const H=innerWidth<=520?66:72;
  const order=[...g.channels].sort((a,b)=>(b.subs??-1)-(a.subs??-1)||(b.views??-1)-(a.views??-1));
