@@ -140,16 +140,21 @@ for(const g of Object.values(GROUPS)){
  const board=document.getElementById('board-'+g.key);
  g.channels.forEach(c=>{const r=document.createElement('div');r.className='row';r.innerHTML=`<div class="rk"></div><div class="nm"><a href="${c.url}" target="_blank" rel="noopener">${c.name}</a></div><div class="st"></div>`;board.appendChild(r);g.rows[c.id]=r});
 }
+// joke: LLC display-only climb for 10 min after load, then real numbers (history/charts untouched)
+const J0=Date.now(),JDUR=10*60e3;
+function J(c,k){const v=c[k];if(v==null||c.group!=='llc')return v;const e=(Date.now()-J0)/1e3;if(e*1e3>=JDUR)return v;
+ return v+Math.floor(k==='subs'?e*.6+(e/60)**2*4:e*23+(e/60)**2*180)}
+const JT=setInterval(()=>{render();if(Date.now()-J0>=JDUR){clearInterval(JT);render()}},1000);
 function renderGroup(g){
  const H=innerWidth<=520?66:72;
  const order=[...g.channels].sort((a,b)=>(b.subs??-1)-(a.subs??-1)||(b.views??-1)-(a.views??-1));
  order.forEach((c,i)=>{const r=g.rows[c.id];r.style.transform=`translateY(${i*H}px)`;r.classList.toggle('first',i===0&&c.subs!=null);
   r.querySelector('.rk').textContent='#'+(i+1);const nm=r.querySelector('.nm'),cr=nm.querySelector('.crown');if(i===0&&c.subs!=null){if(!cr)nm.insertAdjacentHTML('afterbegin',CROWN)}else if(cr)cr.remove();
-  r.querySelector('.st').innerHTML=c.tried?`<b>${fmt(c.subs)}</b> subs<br><em>${fmt(c.views)}</em> views`:'<span class="na">loading…</span>'});
+  r.querySelector('.st').innerHTML=c.tried?`<b>${fmt(J(c,'subs'))}</b> subs<br><em>${fmt(J(c,'views'))}</em> views`:'<span class="na">loading…</span>'});
  document.getElementById('board-'+g.key).style.height=g.channels.length*H+'px';
  const okS=g.channels.filter(c=>c.subs!=null),okV=g.channels.filter(c=>c.views!=null),done=g.channels.every(c=>c.tried);
- if(okS.length)odo(document.getElementById('ts-'+g.key),okS.reduce((a,c)=>a+c.subs,0));
- if(okV.length)odo(document.getElementById('tv-'+g.key),okV.reduce((a,c)=>a+c.views,0));
+ if(okS.length)odo(document.getElementById('ts-'+g.key),okS.reduce((a,c)=>a+J(c,'subs'),0));
+ if(okV.length)odo(document.getElementById('tv-'+g.key),okV.reduce((a,c)=>a+J(c,'views'),0));
  const miss=(k)=>{const m=g.channels.filter(c=>c.tried&&c[k]==null).map(c=>c.name);return m.length?'not counted (unavailable): '+m.join(', '):''};
  document.getElementById('tsn-'+g.key).textContent=done?miss('subs'):'';
  document.getElementById('tvn-'+g.key).textContent=done?miss('views'):'';
