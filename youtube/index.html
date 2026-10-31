@@ -141,13 +141,9 @@ for(const g of Object.values(GROUPS)){
  g.channels.forEach(c=>{const r=document.createElement('div');r.className='row';r.innerHTML=`<div class="rk"></div><div class="nm"><a href="${c.url}" target="_blank" rel="noopener">${c.name}</a></div><div class="st"></div>`;board.appendChild(r);g.rows[c.id]=r});
 }
 // joke: LLC display-only climb for 10 min after load, then real numbers (history/charts untouched)
-const J0=Date.now(),JDUR=10*60e3,JS={};ALL.forEach((c,i)=>{if(c.group==='llc')JS[c.id]={s:.6+Math.random()*.9,i}});
-const jh=(n,i)=>{const x=Math.sin(n*12.9898+i*78.233)*43758.5453;return x-Math.floor(x)};
-// boost at time t: instant jump + exponential growth with irregular stair-step ticks; 0 outside joke window or once joke over
-function JF(c,k,t){const q=JS[c.id];if(!q||Date.now()-J0>=JDUR||t<J0)return 0;const e=(Math.min(t,J0+JDUR)-J0)/1e3,n=Math.floor(e/.8),u=n*.8+.6*jh(n,q.i);
- const base=k==='subs'?Math.max(300,(c.subs||0)*12):Math.max(20000,(c.views||0)*3);return Math.floor(q.s*base*(1+.4*jh(1,q.i))*Math.exp(u/95))}
+function JF(){return 0}
 function J(c,k){const v=c[k];return v==null?v:v+JF(c,k,Date.now())}
-function jl(){render();if(Date.now()-J0<JDUR)setTimeout(jl,300+Math.random()*900)}setTimeout(jl,300);
+
 function renderGroup(g){
  const H=innerWidth<=520?66:72;
  const order=[...g.channels].sort((a,b)=>(J(b,'subs')??-1)-(J(a,'subs')??-1)||(J(b,'views')??-1)-(J(a,'views')??-1));
