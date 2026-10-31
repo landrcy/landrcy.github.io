@@ -146,7 +146,7 @@ function J(c,k){const v=c[k];if(v==null||c.group!=='llc'||Date.now()-J0>=JDUR)re
 function jtick(){const e=(Date.now()-J0)/JDUR;ALL.forEach(c=>{if(c.group!=='llc')return;const b=JB[c.id]||(JB[c.id]={subs:0,views:0});
  if(Math.random()<.35+e*.4)b.subs+=Math.random()<.85?1:2+Math.floor(Math.random()*(3+e*8));
  if(Math.random()<.7)b.views+=Math.floor(Math.random()**3*(40+e*400))+(Math.random()<.05?Math.floor(Math.random()*600):0)})}
-(function jl(){if(Date.now()-J0>=JDUR){render();return}jtick();render();setTimeout(jl,250+Math.random()*1500)})();
+function jl(){if(Date.now()-J0>=JDUR){render();return}jtick();render();setTimeout(jl,250+Math.random()*1500)}setTimeout(jl,1500);
 function renderGroup(g){
  const H=innerWidth<=520?66:72;
  const order=[...g.channels].sort((a,b)=>(b.subs??-1)-(a.subs??-1)||(b.views??-1)-(a.views??-1));
