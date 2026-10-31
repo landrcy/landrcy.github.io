@@ -141,15 +141,16 @@ for(const g of Object.values(GROUPS)){
  g.channels.forEach(c=>{const r=document.createElement('div');r.className='row';r.innerHTML=`<div class="rk"></div><div class="nm"><a href="${c.url}" target="_blank" rel="noopener">${c.name}</a></div><div class="st"></div>`;board.appendChild(r);g.rows[c.id]=r});
 }
 // joke: LLC display-only climb for 10 min after load, then real numbers (history/charts untouched)
-const J0=Date.now(),JDUR=10*60e3,JB={};ALL.forEach(c=>{if(c.group==='llc')JB[c.id]={subs:400+Math.floor(Math.random()*1100),views:25000+Math.floor(Math.random()*90000)}});
-function J(c,k){const v=c[k];if(v==null||c.group!=='llc'||Date.now()-J0>=JDUR)return v;return v+((JB[c.id]||{})[k]||0)}
-function jtick(){const e=(Date.now()-J0)/JDUR;ALL.forEach(c=>{if(c.group!=='llc')return;const b=JB[c.id]||(JB[c.id]={subs:0,views:0});
- if(Math.random()<.35+e*.4)b.subs+=Math.random()<.7?1+Math.floor(Math.random()*4):5+Math.floor(Math.random()*(20+e*80));
- if(Math.random()<.7)b.views+=Math.floor(Math.random()**3*(400+e*4000))+(Math.random()<.06?Math.floor(Math.random()*8000):0)})}
-function jl(){if(Date.now()-J0>=JDUR){render();return}jtick();render();setTimeout(jl,250+Math.random()*1500)}setTimeout(jl,300);
+const J0=Date.now(),JDUR=10*60e3,JS={};ALL.forEach((c,i)=>{if(c.group==='llc')JS[c.id]={s:.6+Math.random()*.9,i}});
+const jh=(n,i)=>{const x=Math.sin(n*12.9898+i*78.233)*43758.5453;return x-Math.floor(x)};
+// boost at time t: instant jump + exponential growth with irregular stair-step ticks; 0 outside joke window or once joke over
+function JF(c,k,t){const q=JS[c.id];if(!q||Date.now()-J0>=JDUR||t<J0)return 0;const e=(Math.min(t,J0+JDUR)-J0)/1e3,n=Math.floor(e/.8),u=n*.8+.6*jh(n,q.i);
+ const base=k==='subs'?Math.max(300,(c.subs||0)*12):Math.max(20000,(c.views||0)*3);return Math.floor(q.s*base*(1+.4*jh(1,q.i))*Math.exp(u/95))}
+function J(c,k){const v=c[k];return v==null?v:v+JF(c,k,Date.now())}
+function jl(){render();if(Date.now()-J0<JDUR)setTimeout(jl,300+Math.random()*900)}setTimeout(jl,300);
 function renderGroup(g){
  const H=innerWidth<=520?66:72;
- const order=[...g.channels].sort((a,b)=>(b.subs??-1)-(a.subs??-1)||(b.views??-1)-(a.views??-1));
+ const order=[...g.channels].sort((a,b)=>(J(b,'subs')??-1)-(J(a,'subs')??-1)||(J(b,'views')??-1)-(J(a,'views')??-1));
  order.forEach((c,i)=>{const r=g.rows[c.id];r.style.transform=`translateY(${i*H}px)`;r.classList.toggle('first',i===0&&c.subs!=null);
   r.querySelector('.rk').textContent='#'+(i+1);const nm=r.querySelector('.nm'),cr=nm.querySelector('.crown');if(i===0&&c.subs!=null){if(!cr)nm.insertAdjacentHTML('afterbegin',CROWN)}else if(cr)cr.remove();
   r.querySelector('.st').innerHTML=c.tried?`<b>${fmt(J(c,'subs'))}</b> subs<br><em>${fmt(J(c,'views'))}</em> views`:'<span class="na">loading…</span>'});
@@ -161,7 +162,7 @@ function renderGroup(g){
  document.getElementById('tsn-'+g.key).textContent=done?miss('subs'):'';
  document.getElementById('tvn-'+g.key).textContent=done?miss('views'):'';
 }
-function clash(){const T=(g,k)=>GROUPS[g].channels.reduce((a,c)=>a+(c[k]||0),0);const sh=k=>{const a=T('llc',k),b=T('ffc',k);return a+b?a/(a+b):null};
+function clash(){const T=(g,k)=>GROUPS[g].channels.reduce((a,c)=>a+(J(c,k)||0),0);const sh=k=>{const a=T('llc',k),b=T('ffc',k);return a+b?a/(a+b):null};
  const ss=sh('subs'),vs=sh('views');const v=[ss,vs].filter(x=>x!=null);if(!v.length)return;const r=v.reduce((a,b)=>a+b,0)/v.length,P=(r*100).toFixed(1);
  document.getElementById('clash').style.background=`linear-gradient(100deg,#1a4dff 0%,#1a4dff ${Math.max(0,r*100-12)}%,#7a1aff ${P}%,#ff1a2e ${Math.min(100,r*100+12)}%,#ff1a2e 100%)`;
  const pc=x=>x==null?'?':Math.round(x*100)+'%';document.getElementById('clashlbl').textContent=`LLC ${pc(ss)} subs / ${pc(vs)} views  ◀▶  FFC ${pc(ss==null?null:1-ss)} / ${pc(vs==null?null:1-vs)}`}
@@ -178,7 +179,7 @@ function addSample(c){if(c.subs==null&&c.views==null)return;const a=hist(c.id),t
 function at24(a,k){const tgt=Date.now()-864e5;const v=a.filter(p=>p[k]!=null);if(!v.length||v[0].t>Date.now()-23*36e5)return null;
  for(let j=0;j<v.length-1;j++)if(v[j].t<=tgt&&v[j+1].t>=tgt){const f=(tgt-v[j].t)/(v[j+1].t-v[j].t||1);return v[j][k]+(v[j+1][k]-v[j][k])*f}
  const o=v[0];return o.t>=Date.now()-25*36e5?o[k]:(v.filter(p=>p.t<=tgt).pop()||o)[k]}
-function d24(c){const a=hist(c.id);const r={};for(const k of['subs','views']){const b=at24(a,k);r[k]=(b==null||c[k]==null)?null:Math.round(c[k]-b)}
+function d24(c){const a=hist(c.id);const r={};for(const k of['subs','views']){const b=at24(a,k);r[k]=(b==null||J(c,k)==null)?null:Math.round(J(c,k)-b)}
  r.age=a.length?Date.now()-a[0].t:0;return r}
 const cmp=n=>Math.abs(n)>=1e6?(n/1e6).toFixed(1)+'M':Math.abs(n)>=1e3?(n/1e3).toFixed(1)+'K':String(n);
 const sg=n=>`<span class="${n<0?'dn':'up'}">${n<0?'−':'+'}${cmp(Math.abs(n))}</span>`;
@@ -194,9 +195,9 @@ let cb='both',copen=false,crng=864e5,cmode='gain';const COL={llc:['#ff4d6a','#ff
 function vAt(h,t,k){if(!h.length)return null;if(t<=h[0].t)return h[0][k];const L=h[h.length-1];if(t>=L.t)return L[k];
  let lo=0,hi=h.length-1;while(hi-lo>1){const m=(lo+hi)>>1;if(h[m].t<=t)lo=m;else hi=m}const A=h[lo],B=h[hi];return A[k]+(B[k]-A[k])*(t-A.t)/((B.t-A.t)||1)}
 // uniform resample of group total over window; only channels that have history
-function series(gk,k,N){const hs=GROUPS[gk].channels.map(c=>hist(c.id).filter(p=>p[k]!=null)).filter(h=>h.length);if(!hs.length)return null;
+function series(gk,k,N){const hc=GROUPS[gk].channels.map(c=>[c,hist(c.id).filter(p=>p[k]!=null)]).filter(x=>x[1].length),hs=hc.map(x=>x[1]);if(!hs.length)return null;
  const now=Date.now(),first=Math.min(...hs.map(h=>h[0].t)),t0=Math.max(now-crng,first),t1=now;if(t1-t0<60e3)return null;
- const pts=[];for(let i=0;i<=N;i++){const t=t0+(t1-t0)*i/N;pts.push({t,v:hs.reduce((a,h)=>a+vAt(h,t,k),0)})}return{pts,t0,t1}}
+ const pts=[];for(let i=0;i<=N;i++){const t=t0+(t1-t0)*i/N;pts.push({t,v:hc.reduce((a,[c,h])=>a+vAt(h,t,k)+JF(c,k,t),0)})}return{pts,t0,t1}}
 const nice=r=>{const e=10**Math.floor(Math.log10(r||1)),f=r/e;return(f<=1?1:f<=2?2:f<=5?5:10)*e};
 function tl(t,span){const d=new Date(t);return span>2*864e5?d.toLocaleDateString('en-US',{month:'short',day:'numeric'}):d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}
 function line(id,k,ci){const cv=document.getElementById(id),dpr=devicePixelRatio||1,W=cv.clientWidth||320,H=cv.clientHeight||180;cv.width=W*dpr;cv.height=H*dpr;
@@ -215,9 +216,9 @@ function line(id,k,ci){const cv=document.getElementById(id),dpr=devicePixelRatio
  S.forEach((o,gi)=>{x.strokeStyle=COL[o.gk][ci];x.lineWidth=2;x.lineJoin='round';x.beginPath();o.s.pts.forEach((p,i)=>{const px=X(p.t),py=Y(o.ys[i]);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();
   const hrs=(o.s.t1-o.s.t0)/36e5,cur=o.s.pts[N].v;x.textAlign='left';x.fillStyle=COL[o.gk][ci];
   x.fillText(`${o.gk.toUpperCase()} ${o.tot<0?'−':'+'}${cmp(Math.abs(Math.round(o.tot)))} in ${hrs<1?Math.round(hrs*60)+'m':hrs.toFixed(1)+'h'} · ${cmp(Math.round(o.tot/(hrs||1)))}/h · total ${cmp(cur)}`,L,11+gi*12)})}
-function bars(){const cv=document.getElementById('c-bar'),dpr=devicePixelRatio||1,W=cv.clientWidth||640;const cs=ALL.filter(c=>(cb==='both'||c.group===cb)&&c.subs!=null).sort((a,b)=>b.subs-a.subs);
+function bars(){const cv=document.getElementById('c-bar'),dpr=devicePixelRatio||1,W=cv.clientWidth||640;const cs=ALL.filter(c=>(cb==='both'||c.group===cb)&&c.subs!=null).sort((a,b)=>J(b,'subs')-J(a,'subs'));
  const bh=18,H=Math.max(40,cs.length*bh+4);cv.style.height=H+'px';cv.width=W*dpr;cv.height=H*dpr;const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.fillStyle='#07050f';x.fillRect(0,0,W,H);if(!cs.length)return;
- const mx=cs[0].subs||1;x.font='10px monospace';cs.forEach((c,i)=>{const w=Math.max(2,((W-230)*c.subs/mx)|0),y=2+i*bh;x.fillStyle='#b9b0d0';x.fillText(c.name.slice(0,16),2,y+12);x.fillStyle=COL[c.group][0];x.fillRect(120,y+2,w,bh-5);x.fillStyle='#f3ecdf';x.fillText(c.subs.toLocaleString('en-US'),126+w,y+12)})}
+ const mx=J(cs[0],'subs')||1;x.font='10px monospace';cs.forEach((c,i)=>{const w=Math.max(2,((W-230)*J(c,'subs')/mx)|0),y=2+i*bh;x.fillStyle='#b9b0d0';x.fillText(c.name.slice(0,16),2,y+12);x.fillStyle=COL[c.group][0];x.fillRect(120,y+2,w,bh-5);x.fillStyle='#f3ecdf';x.fillText(J(c,'subs').toLocaleString('en-US'),126+w,y+12)})}
 function drawCharts(){if(!copen)return;line('c-subs','subs',0);line('c-views','views',1);bars();
  const all=ALL.flatMap(c=>hist(c.id)),n=all.length,old=n?Math.min(...all.map(p=>p.t)):0;document.getElementById('cinfo').textContent=n?`${n} samples · history since ${new Date(old).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}`:''}
 document.getElementById('ctog').onclick=e=>{copen=!copen;document.getElementById('charts').hidden=!copen;e.target.textContent=(copen?'▼ HIDE':'▶ SHOW')+' CHARTS';e.target.setAttribute('aria-expanded',copen);drawCharts()};
