@@ -57,7 +57,27 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
 @media(max-width:820px){.cols{grid-template-columns:1fr}.tot{grid-template-columns:1fr}}
 @media(max-width:520px){.row{height:58px;gap:8px;padding:0 10px}.nm a{font-size:19px}.st{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.odo .d span,.row{transition:none}.live i{animation:none}}
-#clash{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.4;transition:background 1.5s}#clashlbl{position:fixed;left:50%;bottom:6px;transform:translateX(-50%);font-family:Silkscreen;font-size:10px;color:#f3ecdf;background:#07050fcc;padding:3px 8px;border:2px solid #2c2244;z-index:5;pointer-events:none}.nm{flex-wrap:wrap;align-content:center}.nm .ls{display:block;flex-basis:100%;font-family:VT323,monospace;font-size:15px;color:#ffcc4d;text-decoration:none;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.nm .ls:hover{text-decoration:underline}</style></head><body><canvas id="sky"></canvas><div id="clash"></div><div id="clashlbl"></div>
+#clash{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.4;transition:background 1.5s}#clashlbl{position:fixed;left:50%;bottom:6px;transform:translateX(-50%);font-family:Silkscreen;font-size:10px;color:#f3ecdf;background:#07050fcc;padding:3px 8px;border:2px solid #2c2244;z-index:5;pointer-events:none}.nm{flex-wrap:wrap;align-content:center}.nm .ls{display:block;flex-basis:100%;font-family:VT323,monospace;font-size:15px;color:#ffcc4d;text-decoration:none;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.nm .ls:hover{text-decoration:underline}#wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.wt{position:relative;aspect-ratio:9/16;background:#07050f;border:3px solid #2c2244;box-shadow:4px 4px 0 #000;overflow:hidden;cursor:pointer}
+.wt.llc{border-color:#3a5cff}.wt.ffc{border-color:#ff3a4d}
+.wt img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated;filter:contrast(1.15) saturate(1.2)}
+.wt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.wt .cap{position:absolute;left:0;right:0;bottom:0;padding:6px;background:linear-gradient(transparent,#07050fee);font-family:Silkscreen;font-size:9px;color:#ffcc4d;pointer-events:none}
+.wt .cap b{display:block;color:#f3ecdf;font-family:VT323;font-size:15px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wt .pl{position:absolute;top:6px;right:6px;font-family:Silkscreen;font-size:9px;background:#07050fcc;padding:2px 5px;color:#fff}
+.wt a.open{position:absolute;top:6px;left:6px;font-family:Silkscreen;font-size:9px;background:#07050fcc;padding:2px 5px;color:#38e1d0;z-index:2;text-decoration:none}
+#heat{overflow-x:auto}#heat table{border-collapse:separate;border-spacing:4px;font-family:Silkscreen;font-size:10px}
+#heat th{color:#8a80a8;font-weight:400;padding:0 4px;text-align:left;white-space:nowrap}
+#heat td.c{width:54px;height:34px;text-align:center;color:#f3ecdf;border:2px solid #1e1730;font-family:VT323;font-size:16px}
+#heat tr.htot th{color:#ffcc4d}
+#top2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:820px){#top2{grid-template-columns:1fr}}
+.t2{display:flex;gap:14px;align-items:center;background:#120c1e;border:3px solid #2c2244;box-shadow:4px 4px 0 #000;padding:10px;color:#f3ecdf;text-decoration:none}
+.t2.llc{border-color:#3a5cff}.t2.ffc{border-color:#ff3a4d}.t2:hover{background:#1a1230}
+.t2 img{width:96px;height:128px;object-fit:cover;image-rendering:pixelated;border:2px solid #000;flex:none}
+.t2 .rk2{font-family:Silkscreen;font-size:18px;color:#ffcc4d}.t2 .rk2 .crown{width:24px;vertical-align:middle}
+.t2 b{display:block;font-size:22px;font-weight:400;margin:4px 0}.t2 small{display:block;font-family:Silkscreen;font-size:10px;color:#b9b0d0}.t2 em{display:block;font-style:normal;color:#ffcc4d;margin-top:4px}
+.hof button,.wall button,.heat button{font-family:Silkscreen;font-size:10px;background:#07050f;color:#b9b0d0;border:2px solid #2c2244;padding:3px 7px;cursor:pointer}.heat button.on{color:#fff;border-color:#ffcc4d}
+</style></head><body><canvas id="sky"></canvas><div id="clash"></div><div id="clashlbl"></div>
 <main>
 <a class="back" href="/">◀ BACK TO THE HUB</a>
 <div class="top">
@@ -84,15 +104,11 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
   <div class="board" id="board-ffc"></div>
  </section>
 </div>
- <section class="hof fame"><h2>★ SHORTS HALL OF FAME</h2><p class="note" style="margin:-6px 0 12px">Most-viewed Shorts across each brand's channels</p><div class="cols">
-  <div class="brand llc"><p class="lb">LLC CHANNELS · TOP 5</p><ol class="sl" id="fame-llc"><li><span class="na">loading…</span></li></ol></div>
-  <div class="brand ffc"><p class="lb">FFC · QUACKATRON + LOOCIXE · TOP 5</p><ol class="sl" id="fame-ffc"><li><span class="na">loading…</span></li></ol></div>
- </div></section>
- <section class="hof shame"><h2>☠ HALL OF SHAME</h2><p class="note" style="margin:-6px 0 12px">Fewest-viewed Shorts (only ones older than 48h, so fresh uploads get a chance)</p><div class="cols">
-  <div class="brand llc"><p class="lb">LLC CHANNELS · TOP 5</p><ol class="sl" id="shame-llc"><li><span class="na">loading…</span></li></ol></div>
-  <div class="brand ffc"><p class="lb">FFC · QUACKATRON + LOOCIXE · TOP 5</p><ol class="sl" id="shame-ffc"><li><span class="na">loading…</span></li></ol></div>
- </div></section>
+ <section class="hof fame"><h2>★ TOP 2 SHORTS</h2><p class="note" style="margin:-6px 0 12px">The two most-viewed Shorts across all LLC + FFC channels</p><div id="top2"></div></section>
 <p class="note" id="sfoot"></p>
+<section class="hof wall"><h2>▶ LIVE SHORTS WALL</h2><p class="note" style="margin:-6px 0 12px">Each channel's latest Short · hover/tap a tile to play muted · <button id="wallall">▶ PLAY ALL</button></p><div id="wall"></div></section>
+<section class="hof heat"><h2>▦ 7-DAY HEAT MAP</h2><p class="note" style="margin:-6px 0 12px">Daily gains from this browser's stored samples · <button data-hm="subs" class="on">SUBS</button> <button data-hm="views">VIEWS</button> · ? = no samples that day</p><div id="heat"></div></section>
+
 <button class="ctog" id="ctog" aria-expanded="false">▶ SHOW CHARTS</button>
 <section id="charts" hidden>
  <div class="ctl">BRAND: <button data-b="both" class="on">BOTH</button> <button data-b="llc">LLC</button> <button data-b="ffc">FFC</button> &nbsp;<br>RANGE: <button data-r="3600000">1H</button> <button data-r="21600000">6H</button> <button data-r="86400000" class="on">24H</button> <button data-r="604800000">7D</button> <button data-r="1e15">ALL</button> &nbsp;SHOW: <button data-m="gain" class="on">GAINED</button> <button data-m="rate">RATE /HR</button> &nbsp;<span id="cinfo"></span></div>
@@ -256,13 +272,37 @@ function latestRender(d){const seen={};(d.llc||[]).concat(d.ffc||[]).forEach(v=>
  ALL.forEach(c=>{const v=(d.latest||{})[c.id]||seen[c.id],nm=GROUPS[c.group].rows[c.id].querySelector('.nm');let a=nm.querySelector('.ls');
   if(!a){a=document.createElement('a');a.className='ls';a.target='_blank';a.rel='noopener';nm.appendChild(a)}
   a.href=v?'https://www.youtube.com/shorts/'+v.id:c.url.replace(/\/$/,'')+'/shorts';a.textContent=v?'▶ latest: '+v.title.replace(/\s*#\S+/g,'').trim().slice(0,34):'▶ shorts';a.title=v?v.title:'channel shorts'})}
-function shortsRender(d){const now=Date.now();latestRender(d);
- for(const gk of['llc','ffc']){const a=d[gk]||[];
-  const fame=[...a].sort((x,y)=>y.views-x.views).slice(0,5);
-  const old=a.filter(v=>(v.first||0)<now-48*36e5),pool=old.length>=5?old:a;
-  const shame=[...pool].sort((x,y)=>x.views-y.views).slice(0,5);
-  slist('fame-'+gk,fame,false);slist('shame-'+gk,shame,true)}
+function shortsRender(d){const now=Date.now();latestRender(d);wallRender(d);
+ const all=[...(d.llc||[]).map(v=>({...v,g:'llc'})),...(d.ffc||[]).map(v=>({...v,g:'ffc'}))].sort((x,y)=>y.views-x.views).slice(0,2);
+ document.getElementById('top2').innerHTML=all.map((v,i)=>`<a class="t2 ${v.g}" href="https://www.youtube.com/shorts/${v.id}" target="_blank" rel="noopener"><img alt="" src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg"><div><div class="rk2">#${i+1} ${i?'':CROWN}</div><b>${esc(v.title.replace(/\s*#\S+/g,'').trim())}</b><small>${esc(v.ch)} · ${v.g.toUpperCase()}</small><em>${v.views.toLocaleString('en-US')} views</em></div></a>`).join('')||'<span class="na">no shorts yet</span>';
  document.getElementById('sfoot').textContent=`Shorts stats updated ${Math.max(0,Math.round((now-d.updated)/60000))} min ago · rescraped every ~10 min · page re-checks every 60s`}
+
+// ---- live shorts wall ----
+let wallKey='';
+function wallRender(d){const seen={};(d.llc||[]).concat(d.ffc||[]).forEach(v=>{if(!seen[v.cid])seen[v.cid]=v});
+ const items=ALL.map(c=>({c,v:(d.latest||{})[c.id]||seen[c.id]})).filter(o=>o.v);const key=items.map(o=>o.v.id).join();if(key===wallKey)return;wallKey=key;
+ const el=document.getElementById('wall');el.innerHTML='';
+ items.forEach(({c,v})=>{const t=document.createElement('div');t.className='wt '+c.group;t.dataset.id=v.id;
+  t.innerHTML=`<img loading="lazy" alt="" src="https://i.ytimg.com/vi/${v.id}/oar2.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${v.id}/hqdefault.jpg'"><a class="open" href="https://www.youtube.com/shorts/${v.id}" target="_blank" rel="noopener">OPEN ↗</a><span class="pl">${c.group.toUpperCase()} ▶</span><div class="cap">${esc(c.name)}<b>${esc(v.title.replace(/\s*#\S+/g,'').trim())}</b></div>`;
+  const play=()=>{if(t.querySelector('iframe'))return;const f=document.createElement('iframe');f.allow='autoplay; encrypted-media; picture-in-picture';f.loading='lazy';
+   f.src=`https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=1&loop=1&playlist=${v.id}&controls=0&playsinline=1&modestbranding=1&rel=0`;t.appendChild(f);t.querySelector('.pl').textContent='LIVE ●'};
+  t.addEventListener('mouseenter',play);t.addEventListener('click',e=>{if(!e.target.closest('a'))play()});el.appendChild(t)})}
+document.getElementById('wallall').onclick=()=>document.querySelectorAll('.wt').forEach(t=>t.dispatchEvent(new Event('mouseenter')));
+// ---- 7-day heat map ----
+let hmk='subs';
+function dayGain(h,k,a,b){const v=h.filter(p=>p[k]!=null);if(v.length<2||v[v.length-1].t<a||v[0].t>b)return null;const s=vAt(v,Math.max(a,v[0].t),k),e=vAt(v,Math.min(b,v[v.length-1].t),k);return e-s}
+function heat(){const el=document.getElementById('heat');if(!el)return;const now=new Date(),days=[];for(let i=6;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()-i);days.push(d)}
+ const rows=[];const cell=(g,val,mx)=>{if(val==null)return`<td class="c" style="color:#4a3d70">?</td>`;const f=mx?Math.min(1,Math.abs(val)/mx):0,rgb=val<0?'150,150,150':g==='llc'?'58,92,255':'255,58,77';
+  return`<td class="c" style="background:rgba(${rgb},${(.08+f*.82).toFixed(2)});box-shadow:0 0 ${Math.round(f*14)}px rgba(${rgb},${f.toFixed(2)});border-color:rgba(${rgb},.6)">${val<0?'−':val>0?'+':''}${cmp(Math.abs(Math.round(val)))}</td>`};
+ const data=ALL.map(c=>{const h=hist(c.id);return{c,g:days.map(d=>dayGain(h,hmk,+d,+d+864e5))}});
+ const tot=gk=>days.map((d,i)=>{const xs=data.filter(o=>o.c.group===gk).map(o=>o.g[i]).filter(x=>x!=null);return xs.length?xs.reduce((a,b)=>a+b,0):null});
+ const T={llc:tot('llc'),ffc:tot('ffc')};const mxc=Math.max(1,...data.flatMap(o=>o.g.filter(x=>x!=null).map(Math.abs))),mxt=Math.max(1,...T.llc.concat(T.ffc).filter(x=>x!=null).map(Math.abs));
+ let hd='<tr><th></th>'+days.map((d,i)=>`<th>${i===6?'TODAY':d.toLocaleDateString('en-US',{weekday:'short'}).toUpperCase()+' '+d.getDate()}</th>`).join('')+'</tr>';
+ for(const gk of['llc','ffc']){hd+=`<tr class="htot"><th>${gk.toUpperCase()} TOTAL</th>${T[gk].map(v=>cell(gk,v,mxt)).join('')}</tr>`;
+  data.filter(o=>o.c.group===gk).forEach(o=>hd+=`<tr><th>${esc(o.c.name)}</th>${o.g.map(v=>cell(gk,v,mxc)).join('')}</tr>`)}
+ el.innerHTML='<table>'+hd+'</table>'}
+document.querySelectorAll('[data-hm]').forEach(b=>b.onclick=()=>{hmk=b.dataset.hm;document.querySelectorAll('[data-hm]').forEach(q=>q.classList.toggle('on',q===b));heat()});
+setTimeout(heat,2000);setInterval(heat,60e3);
 async function shorts(){try{const r=await fetch('shorts.json?t='+Date.now(),{cache:'no-store'});const d=await r.json();shortsRender(d);try{localStorage.setItem('pc-shorts',JSON.stringify(d))}catch(e){}}catch(e){}}
 try{const c=JSON.parse(localStorage.getItem('pc-shorts'));if(c)shortsRender(c)}catch(e){}
 shorts();setInterval(()=>{if(!document.hidden)shorts()},60000);
