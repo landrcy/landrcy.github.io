@@ -26,6 +26,13 @@ function sphere(S,R,cx,cy,rot,fn,atm,shp){const{img}=S,W=img.width,d=img.data;co
   const o=(y*W+x)*4;if(col){const c=typeof col==='string'?hx(col):col;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}else d[o+3]=0}
  S.g.putImageData(img,0,0)}
 const P={};
+/* ---------- LSU: minimalist rhythm planet, pink hit-circle with approach ring ---------- */
+P.lsu=(S,t)=>{const W=S.img.width,R=W*.3,cx=W/2,cy=W/2,d=S.img.data;d.fill(0);const beat=(t*140/60)%1,ar=R*(1+(1-beat)*1.1);
+ for(let y=0;y<W;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=y+.5-cy,r=Math.hypot(dx,dy),o=(y*W+x)*4;let c=null;
+  if(Math.abs(r-ar)<Math.max(1,R*.05))c=hx('#ff3d7f');
+  if(r<R){const nz=Math.sqrt(1-(r/R)**2),l=Math.max(0,(dx*LX+dy*LY)/R+nz*LZ);c=r>R*.86?hx(dq(['#c8c8d0','#ffffff'],.4+l,x,y)):hx(dq(['#5a0a2a','#a01448','#e0286a','#ff5a96'],l*1.1,x,y));}
+  if(c){d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}}
+ S.g.putImageData(S.img,0,0)};
 /* ---------- ESCAPE CA: night campus planet, purple dusk + red emergency glow ---------- */
 P.escapeca=(S,t)=>{const W=S.img.width,R=W*.4;
  sphere(S,R,W/2,W/2,t*.3,(lon,lat,lit,x,y)=>{const sh=lit;const gu=lon*7,gv=lat*7,cu=Math.floor(gu),cv=Math.floor(gv),fu=gu-cu,fv=gv-cv,h=H(cu,cv);
