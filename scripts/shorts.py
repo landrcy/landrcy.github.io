@@ -34,5 +34,26 @@ for cid in [c for ids in CH.values() for c in ids]:
         except Exception as e:
             print('joined fail', cid, e)
     if j: out['joined'][cid] = j
+# best comments: top comments on each channel's 4 most-viewed shorts; refreshed every 3h
+try:
+    oldc = json.load(open('youtube/shorts.json')).get('comments')
+except Exception:
+    oldc = None
+if oldc and out['updated'] - oldc.get('t', 0) < 3*3600*1000:
+    out['comments'] = oldc
+else:
+    cm = []
+    for g in ('llc', 'ffc'):
+        for cid in CH[g]:
+            for v in sorted([v for v in out[g] if v['cid'] == cid], key=lambda v: -v['views'])[:4]:
+                try:
+                    d = json.loads(subprocess.run(['yt-dlp','--skip-download','-J','--write-comments','--extractor-args','youtube:max_comments=15,all,0,0;comment_sort=top',f'https://www.youtube.com/shorts/{v["id"]}'],capture_output=True,text=True,timeout=120).stdout)
+                except Exception as e:
+                    print('comments fail', v['id'], e); continue
+                for c in (d or {}).get("comments") or []:
+                    if c.get('author_is_uploader') or not (c.get('text') or '').strip(): continue
+                    cm.append({'text': c['text'][:220], 'author': c.get('author') or '', 'likes': c.get('like_count') or 0, 'vid': v['id'], 'ch': v['ch'], 'g': g})
+    cm.sort(key=lambda c: -c['likes'])
+    out['comments'] = {'t': out['updated'], 'list': cm[:24]} if cm else (oldc or {'t': 0, 'list': []})
 json.dump(out, open('youtube/shorts.json','w'), ensure_ascii=False)
 print({g: len(out[g]) for g in CH})
