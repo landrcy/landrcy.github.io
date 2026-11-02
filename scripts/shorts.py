@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Fetch every public Short for the LLC/FFC channels -> youtube/shorts.json"""
-import json, subprocess, time
+import json, subprocess, time, re, urllib.request, datetime
 CH = {'llc': ['UCT3ciRCc8ouYTix5_Heyrhg','UCCo7JOIyE3W--C9ANfWdObA','UCNBQ7mBPy16upVp0EhbdTgA','UCRegZeMyJ1B5B9n64rfgKAw','UCfDhWTThokF3gKW03iEGijg'],
       'ffc': ['UCIcfr7SXegLIyvpNiDzFLEw','UCGl9SSbOrCg2jgBLrGO4aIw']}
 try:
@@ -19,5 +19,20 @@ for g, ids in CH.items():
         for e in ents:
             if e.get('view_count') is None: continue
             out[g].append({'id': e['id'], 'title': e.get('title') or '', 'views': e['view_count'], 'ch': d.get('channel') or cid, 'cid': cid, 'first': prev.get(e['id']) or out['updated']})
+try:
+    oldj = json.load(open('youtube/shorts.json')).get('joined', {})
+except Exception:
+    oldj = {}
+out['joined'] = {}
+for cid in [c for ids in CH.values() for c in ids]:
+    j = oldj.get(cid)
+    if not j:
+        try:
+            h = urllib.request.urlopen(urllib.request.Request(f'https://www.youtube.com/channel/{cid}/about', headers={'User-Agent': 'Mozilla/5.0', 'Accept-Language': 'en-US'}), timeout=30).read().decode('utf8', 'ignore')
+            m = re.search(r'"joinedDateText":\{"content":"Joined ([A-Za-z]{3} \d{1,2}, \d{4})"', h)
+            if m: j = datetime.datetime.strptime(m.group(1), '%b %d, %Y').strftime('%Y-%m-%d')
+        except Exception as e:
+            print('joined fail', cid, e)
+    if j: out['joined'][cid] = j
 json.dump(out, open('youtube/shorts.json','w'), ensure_ascii=False)
 print({g: len(out[g]) for g in CH})

@@ -77,16 +77,12 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
 .t2 .rk2{font-family:Silkscreen;font-size:18px;color:#ffcc4d}.t2 .rk2 .crown{width:24px;vertical-align:middle}
 .t2 b{display:block;font-size:22px;font-weight:400;margin:4px 0}.t2 small{display:block;font-family:Silkscreen;font-size:10px;color:#b9b0d0}.t2 em{display:block;font-style:normal;color:#ffcc4d;margin-top:4px}
 .hof button,.wall button,.heat button{font-family:Silkscreen;font-size:10px;background:#07050f;color:#b9b0d0;border:2px solid #2c2244;padding:3px 7px;cursor:pointer}.heat button.on{color:#fff;border-color:#ffcc4d}
-</style></head><body><canvas id="sky"></canvas><div id="clash"></div><div id="clashlbl"></div>
+.nm .age{display:block;flex-basis:100%;font-family:Silkscreen;font-size:9px;color:#8a80a8;margin-top:1px}.indays{font-family:Silkscreen;font-size:12px;color:#ffcc4d;margin-top:4px;letter-spacing:1px}</style></head><body><canvas id="sky"></canvas><div id="clash"></div><div id="clashlbl"></div>
 <main>
-<a class="back" href="/">◀ BACK TO THE HUB</a>
-<div class="top">
- <h1>Powered Channels</h1>
- <p class="sub"><span class="live"><i></i>LIVE</span> &nbsp;LLC + FFC combined live counts</p>
-</div>
+
 <div class="cols">
  <section class="brand llc" data-group="llc">
-  <h2><svg viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#ff0033" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#b8001f" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#fff" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg>LLC Powered Channels</h2>
+  <h2><svg viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#ff0033" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#b8001f" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#fff" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg>L Powered Channels</h2>
   <div class="tot">
    <div class="card s"><h3>TOTAL SUBSCRIBERS</h3><div class="odo" id="ts-llc">–</div><div class="note" id="tsn-llc"></div></div>
    <div class="card v"><h3>TOTAL VIEWS</h3><div class="odo" id="tv-llc">–</div><div class="note" id="tvn-llc"></div></div>
@@ -95,7 +91,7 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
   <div class="board" id="board-llc"></div>
  </section>
  <section class="brand ffc" data-group="ffc">
-  <h2><svg viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#38e1d0" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#0e6a62" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#07201e" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg>FFC Powered Channels</h2>
+  <h2><svg viewBox="0 0 24 17" shape-rendering="crispEdges"><path fill="#38e1d0" d="M2 0h20v1h1v1h1v13h-1v1h-1v1h-20v-1h-1v-1h-1v-13h1v-1h1z"/><path fill="#0e6a62" d="M1 14h22v1h-1v1h-20v-1h-1z"/><path fill="#07201e" d="M9 4h2v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-2z"/></svg>F Powered Channels</h2>
   <div class="tot">
    <div class="card s"><h3>TOTAL SUBSCRIBERS</h3><div class="odo" id="ts-ffc">–</div><div class="note" id="tsn-ffc"></div></div>
    <div class="card v"><h3>TOTAL VIEWS</h3><div class="odo" id="tv-ffc">–</div><div class="note" id="tvn-ffc"></div></div>
@@ -104,14 +100,14 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
   <div class="board" id="board-ffc"></div>
  </section>
 </div>
- <section class="hof fame"><h2>★ TOP 2 SHORTS</h2><p class="note" style="margin:-6px 0 12px">The two most-viewed Shorts across all LLC + FFC channels</p><div id="top2"></div></section>
+ <section class="hof fame"><h2>★ TOP 2 SHORTS</h2><p class="note" style="margin:-6px 0 12px">The two most-viewed Shorts across all L + F channels</p><div id="top2"></div></section>
 <p class="note" id="sfoot"></p>
 <section class="hof wall"><h2>▶ LIVE SHORTS WALL</h2><p class="note" style="margin:-6px 0 12px">Each channel's latest Short · hover/tap a tile to play muted · <button id="wallall">▶ PLAY ALL</button></p><div id="wall"></div></section>
 <section class="hof heat"><h2>▦ 7-DAY HEAT MAP</h2><p class="note" style="margin:-6px 0 12px">Daily gains from this browser's stored samples · <button data-hm="subs" class="on">SUBS</button> <button data-hm="views">VIEWS</button> · ? = no samples that day</p><div id="heat"></div></section>
 
 <button class="ctog" id="ctog" aria-expanded="false">▶ SHOW CHARTS</button>
 <section id="charts" hidden>
- <div class="ctl">BRAND: <button data-b="both" class="on">BOTH</button> <button data-b="llc">LLC</button> <button data-b="ffc">FFC</button> &nbsp;<br>RANGE: <button data-r="3600000">1H</button> <button data-r="21600000">6H</button> <button data-r="86400000" class="on">24H</button> <button data-r="604800000">7D</button> <button data-r="1e15">ALL</button> &nbsp;SHOW: <button data-m="gain" class="on">GAINED</button> <button data-m="rate">RATE /HR</button> &nbsp;<span id="cinfo"></span></div>
+ <div class="ctl">BRAND: <button data-b="both" class="on">BOTH</button> <button data-b="llc">L</button> <button data-b="ffc">F</button> &nbsp;<br>RANGE: <button data-r="3600000">1H</button> <button data-r="21600000">6H</button> <button data-r="86400000" class="on">24H</button> <button data-r="604800000">7D</button> <button data-r="1e15">ALL</button> &nbsp;SHOW: <button data-m="gain" class="on">GAINED</button> <button data-m="rate">RATE /HR</button> &nbsp;<span id="cinfo"></span></div>
  <div class="cgrid">
   <div class="card"><h3>SUBSCRIBERS GAINED</h3><canvas id="c-subs" width="320" height="120"></canvas></div>
   <div class="card"><h3>VIEWS GAINED</h3><canvas id="c-views" width="320" height="120"></canvas></div>
@@ -156,7 +152,7 @@ for(const g of Object.values(GROUPS)){
  const board=document.getElementById('board-'+g.key);
  g.channels.forEach(c=>{const r=document.createElement('div');r.className='row';r.innerHTML=`<div class="rk"></div><div class="nm"><a href="${c.url}" target="_blank" rel="noopener">${c.name}</a></div><div class="st"></div>`;board.appendChild(r);g.rows[c.id]=r});
 }
-// joke: LLC display-only climb for 10 min after load, then real numbers (history/charts untouched)
+// joke: L display-only climb for 10 min after load, then real numbers (history/charts untouched)
 function JF(){return 0}
 function J(c,k){const v=c[k];return v==null?v:v+JF(c,k,Date.now())}
 
@@ -177,7 +173,7 @@ function renderGroup(g){
 function clash(){const T=(g,k)=>GROUPS[g].channels.reduce((a,c)=>a+(J(c,k)||0),0);const sh=k=>{const a=T('llc',k),b=T('ffc',k);return a+b?a/(a+b):null};
  const ss=sh('subs'),vs=sh('views');const v=[ss,vs].filter(x=>x!=null);if(!v.length)return;const r=v.reduce((a,b)=>a+b,0)/v.length,P=(r*100).toFixed(1);
  document.getElementById('clash').style.background=`linear-gradient(100deg,#1a4dff 0%,#1a4dff ${Math.max(0,r*100-12)}%,#7a1aff ${P}%,#ff1a2e ${Math.min(100,r*100+12)}%,#ff1a2e 100%)`;
- const pc=x=>x==null?'?':Math.round(x*100)+'%';document.getElementById('clashlbl').textContent=`LLC ${pc(ss)} subs / ${pc(vs)} views  ◀▶  FFC ${pc(ss==null?null:1-ss)} / ${pc(vs==null?null:1-vs)}`}
+ const pc=x=>x==null?'?':Math.round(x*100)+'%';document.getElementById('clashlbl').textContent=`L ${pc(ss)} subs / ${pc(vs)} views  ◀▶  F ${pc(ss==null?null:1-ss)} / ${pc(vs==null?null:1-vs)}`}
 function render(){Object.values(GROUPS).forEach(g=>{renderGroup(g);renderD24(g)});drawCharts();clash()}
 
 // ---- trailing samples (localStorage) ----
@@ -227,7 +223,7 @@ function line(id,k,ci){const cv=document.getElementById(id),dpr=devicePixelRatio
  x.textAlign='center';for(let i=0;i<=4;i++){const t=t0+(t1-t0)*i/4;x.fillStyle='#8a80a8';x.fillText(i===4?'now':tl(t,t1-t0),Math.min(W-R-14,Math.max(L+14,X(t))),H-6)}
  S.forEach((o,gi)=>{x.strokeStyle=COL[o.gk][ci];x.lineWidth=2;x.lineJoin='round';x.beginPath();o.s.pts.forEach((p,i)=>{const px=X(p.t),py=Y(o.ys[i]);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();
   const hrs=(o.s.t1-o.s.t0)/36e5,cur=o.s.pts[N].v;x.textAlign='left';x.fillStyle=COL[o.gk][ci];
-  x.fillText(`${o.gk.toUpperCase()} ${o.tot<0?'−':'+'}${cmp(Math.abs(Math.round(o.tot)))} in ${hrs<1?Math.round(hrs*60)+'m':hrs.toFixed(1)+'h'} · ${cmp(Math.round(o.tot/(hrs||1)))}/h · total ${cmp(cur)}`,L,11+gi*12)})}
+  x.fillText(`${o.gk[0].toUpperCase()} ${o.tot<0?'−':'+'}${cmp(Math.abs(Math.round(o.tot)))} in ${hrs<1?Math.round(hrs*60)+'m':hrs.toFixed(1)+'h'} · ${cmp(Math.round(o.tot/(hrs||1)))}/h · total ${cmp(cur)}`,L,11+gi*12)})}
 function bars(){const cv=document.getElementById('c-bar'),dpr=devicePixelRatio||1,W=cv.clientWidth||640;const cs=ALL.filter(c=>(cb==='both'||c.group===cb)&&c.subs!=null).sort((a,b)=>J(b,'subs')-J(a,'subs'));
  const bh=18,H=Math.max(40,cs.length*bh+4);cv.style.height=H+'px';cv.width=W*dpr;cv.height=H*dpr;const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.fillStyle='#07050f';x.fillRect(0,0,W,H);if(!cs.length)return;
  const mx=J(cs[0],'subs')||1;x.font='10px monospace';cs.forEach((c,i)=>{const w=Math.max(2,((W-230)*J(c,'subs')/mx)|0),y=2+i*bh;x.fillStyle='#b9b0d0';x.fillText(c.name.slice(0,16),2,y+12);x.fillStyle=COL[c.group][0];x.fillRect(120,y+2,w,bh-5);x.fillStyle='#f3ecdf';x.fillText(J(c,'subs').toLocaleString('en-US'),126+w,y+12)})}
@@ -272,9 +268,9 @@ function latestRender(d){const seen={};(d.llc||[]).concat(d.ffc||[]).forEach(v=>
  ALL.forEach(c=>{const v=(d.latest||{})[c.id]||seen[c.id],nm=GROUPS[c.group].rows[c.id].querySelector('.nm');let a=nm.querySelector('.ls');
   if(!a){a=document.createElement('a');a.className='ls';a.target='_blank';a.rel='noopener';nm.appendChild(a)}
   a.href=v?'https://www.youtube.com/shorts/'+v.id:c.url.replace(/\/$/,'')+'/shorts';a.textContent=v?'▶ latest: '+v.title.replace(/\s*#\S+/g,'').trim().slice(0,34):'▶ shorts';a.title=v?v.title:'channel shorts'})}
-function shortsRender(d){const now=Date.now();latestRender(d);wallRender(d);
+function shortsRender(d){const now=Date.now();latestRender(d);wallRender(d);JOINED=d.joined||JOINED;ageRender();
  const all=[...(d.llc||[]).map(v=>({...v,g:'llc'})),...(d.ffc||[]).map(v=>({...v,g:'ffc'}))].sort((x,y)=>y.views-x.views).slice(0,2);
- document.getElementById('top2').innerHTML=all.map((v,i)=>`<a class="t2 ${v.g}" href="https://www.youtube.com/shorts/${v.id}" target="_blank" rel="noopener"><img alt="" src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg"><div><div class="rk2">#${i+1} ${i?'':CROWN}</div><b>${esc(v.title.replace(/\s*#\S+/g,'').trim())}</b><small>${esc(v.ch)} · ${v.g.toUpperCase()}</small><em>${v.views.toLocaleString('en-US')} views</em></div></a>`).join('')||'<span class="na">no shorts yet</span>';
+ document.getElementById('top2').innerHTML=all.map((v,i)=>`<a class="t2 ${v.g}" href="https://www.youtube.com/shorts/${v.id}" target="_blank" rel="noopener"><img alt="" src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg"><div><div class="rk2">#${i+1} ${i?'':CROWN}</div><b>${esc(v.title.replace(/\s*#\S+/g,'').trim())}</b><small>${esc(v.ch)} · ${v.g[0].toUpperCase()}</small><em>${v.views.toLocaleString('en-US')} views</em></div></a>`).join('')||'<span class="na">no shorts yet</span>';
  document.getElementById('sfoot').textContent=`Shorts stats updated ${Math.max(0,Math.round((now-d.updated)/60000))} min ago · rescraped every ~10 min · page re-checks every 60s`}
 
 // ---- live shorts wall ----
@@ -283,7 +279,7 @@ function wallRender(d){const seen={};(d.llc||[]).concat(d.ffc||[]).forEach(v=>{i
  const items=ALL.map(c=>({c,v:(d.latest||{})[c.id]||seen[c.id]})).filter(o=>o.v);const key=items.map(o=>o.v.id).join();if(key===wallKey)return;wallKey=key;
  const el=document.getElementById('wall');el.innerHTML='';
  items.forEach(({c,v})=>{const t=document.createElement('div');t.className='wt '+c.group;t.dataset.id=v.id;
-  t.innerHTML=`<img loading="lazy" alt="" src="https://i.ytimg.com/vi/${v.id}/oar2.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${v.id}/hqdefault.jpg'"><a class="open" href="https://www.youtube.com/shorts/${v.id}" target="_blank" rel="noopener">OPEN ↗</a><span class="pl">${c.group.toUpperCase()} ▶</span><div class="cap">${esc(c.name)}<b>${esc(v.title.replace(/\s*#\S+/g,'').trim())}</b></div>`;
+  t.innerHTML=`<img loading="lazy" alt="" src="https://i.ytimg.com/vi/${v.id}/oar2.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${v.id}/hqdefault.jpg'"><a class="open" href="https://www.youtube.com/shorts/${v.id}" target="_blank" rel="noopener">OPEN ↗</a><span class="pl">${c.group[0].toUpperCase()} ▶</span><div class="cap">${esc(c.name)}<b>${esc(v.title.replace(/\s*#\S+/g,'').trim())}</b></div>`;
   const play=()=>{if(t.querySelector('iframe'))return;const f=document.createElement('iframe');f.allow='autoplay; encrypted-media; picture-in-picture';f.loading='lazy';
    f.src=`https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=1&loop=1&playlist=${v.id}&controls=0&playsinline=1&modestbranding=1&rel=0`;t.appendChild(f);t.querySelector('.pl').textContent='LIVE ●'};
   t.addEventListener('mouseenter',play);t.addEventListener('click',e=>{if(!e.target.closest('a'))play()});el.appendChild(t)})}
@@ -298,11 +294,21 @@ function heat(){const el=document.getElementById('heat');if(!el)return;const now
  const tot=gk=>days.map((d,i)=>{const xs=data.filter(o=>o.c.group===gk).map(o=>o.g[i]).filter(x=>x!=null);return xs.length?xs.reduce((a,b)=>a+b,0):null});
  const T={llc:tot('llc'),ffc:tot('ffc')};const mxc=Math.max(1,...data.flatMap(o=>o.g.filter(x=>x!=null).map(Math.abs))),mxt=Math.max(1,...T.llc.concat(T.ffc).filter(x=>x!=null).map(Math.abs));
  let hd='<tr><th></th>'+days.map((d,i)=>`<th>${i===6?'TODAY':d.toLocaleDateString('en-US',{weekday:'short'}).toUpperCase()+' '+d.getDate()}</th>`).join('')+'</tr>';
- for(const gk of['llc','ffc']){hd+=`<tr class="htot"><th>${gk.toUpperCase()} TOTAL</th>${T[gk].map(v=>cell(gk,v,mxt)).join('')}</tr>`;
+ for(const gk of['llc','ffc']){hd+=`<tr class="htot"><th>${gk[0].toUpperCase()} TOTAL</th>${T[gk].map(v=>cell(gk,v,mxt)).join('')}</tr>`;
   data.filter(o=>o.c.group===gk).forEach(o=>hd+=`<tr><th>${esc(o.c.name)}</th>${o.g.map(v=>cell(gk,v,mxc)).join('')}</tr>`)}
  el.innerHTML='<table>'+hd+'</table>'}
 document.querySelectorAll('[data-hm]').forEach(b=>b.onclick=()=>{hmk=b.dataset.hm;document.querySelectorAll('[data-hm]').forEach(q=>q.classList.toggle('on',q===b));heat()});
 setTimeout(heat,2000);setInterval(heat,60e3);
+
+// ---- channel age + "in N days" ----
+let JOINED={};const dage=j=>Math.floor((Date.now()-new Date(j+'T00:00:00'))/864e5);
+const agefmt=n=>n>=365?`${Math.floor(n/365)}y ${Math.floor(n%365/30)}m`:n>=30?`${Math.floor(n/30)}m ${n%30}d`:n+'d';
+function ageRender(){ALL.forEach(c=>{const j=JOINED[c.id],nm=GROUPS[c.group].rows[c.id].querySelector('.nm');let e=nm.querySelector('.age');
+  if(!e){e=document.createElement('span');e.className='age';nm.insertBefore(e,nm.querySelector('.ls'))}
+  e.textContent=j?`age ${agefmt(dage(j))} · since ${new Date(j+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`:''});
+ for(const gk of['llc','ffc']){const js=GROUPS[gk].channels.map(c=>JOINED[c.id]).filter(Boolean);const n=js.length?Math.max(...js.map(dage)):null;
+  for(const id of['ts-','tv-']){const o=document.getElementById(id+gk);let e=o.parentNode.querySelector('.indays');if(!e){e=document.createElement('div');e.className='indays';o.after(e)}
+   e.textContent=n==null?'':`in ${n.toLocaleString('en-US')} days`}}}
 async function shorts(){try{const r=await fetch('shorts.json?t='+Date.now(),{cache:'no-store'});const d=await r.json();shortsRender(d);try{localStorage.setItem('pc-shorts',JSON.stringify(d))}catch(e){}}catch(e){}}
 try{const c=JSON.parse(localStorage.getItem('pc-shorts'));if(c)shortsRender(c)}catch(e){}
 shorts();setInterval(()=>{if(!document.hidden)shorts()},60000);
