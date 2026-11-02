@@ -340,7 +340,7 @@ function spark(c){const r=GROUPS[c.group].rows[c.id];let cv=r.querySelector('can
  const now=Date.now(),t0=Math.max(now-864e5,h[0].t),N=30,ys=[];for(let i=0;i<=N;i++)ys.push(vAt(h,t0+(now-t0)*i/N,'views')-vAt(h,t0,'views'));
  const mx=Math.max(1,...ys);x.strokeStyle=col;x.lineWidth=1.5;x.beginPath();ys.forEach((y,i)=>{const px=1+(W-2)*i/N,py=H-3-(H-8)*y/mx;i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();
  x.lineTo(W-1,H);x.lineTo(1,H);x.fillStyle=col+'33';x.fill();x.fillStyle='#f3ecdf';x.font='8px monospace';x.fillText('+'+cmp(Math.round(ys[N])),2,8)}
-let spT=0;function extras(){race();if(Date.now()-spT<5000)return;spT=Date.now();ALL.forEach(spark)}
+let spT=0;function extras(){race()}
 
 function cboard(d){const el=document.getElementById('cboard');if(!el)return;const L=(d.comments||{}).list||[];
  el.innerHTML=L.length?L.map(c=>`<a class="nt ${c.g}" href="https://www.youtube.com/shorts/${c.vid}" target="_blank" rel="noopener">“${esc(c.text)}”<small>${esc(c.author)} · ♥ ${cmp(c.likes)} · ${esc(c.ch)} (${c.g[0].toUpperCase()})</small></a>`).join(''):'<span class="na" style="color:#f3ecdf">no comments yet</span>'}
