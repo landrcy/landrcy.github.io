@@ -26,6 +26,13 @@ function sphere(S,R,cx,cy,rot,fn,atm,shp){const{img}=S,W=img.width,d=img.data;co
   const o=(y*W+x)*4;if(col){const c=typeof col==='string'?hx(col):col;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}else d[o+3]=0}
  S.g.putImageData(img,0,0)}
 const P={};
+/* ---------- ESCAPE CA: night campus planet, purple dusk + red emergency glow ---------- */
+P.escapeca=(S,t)=>{const W=S.img.width,R=W*.4;
+ sphere(S,R,W/2,W/2,t*.3,(lon,lat,lit,x,y)=>{const sh=lit;const gu=lon*7,gv=lat*7,cu=Math.floor(gu),cv=Math.floor(gv),fu=gu-cu,fv=gv-cv,h=H(cu,cv);
+  const road=fu<.12||fv<.12;if(road)return dq(['#0a0612','#1a1026','#2a1a3a'],sh*.8,x,y);
+  if(h>.42&&fu>.2&&fu<.88&&fv>.2&&fv<.85){const wx=Math.floor(fu*10),wy=Math.floor(fv*12);if(wx%2&&wy%2){const on=H(cu*31+wx,cv*17+wy+Math.floor(t*.5+h*9)%3);if(on>.72)return on>.95?'#ff2a2a':dq(['#7a4a10','#e0a030','#ffe08a'],.4+sh*.6,x,y)}return dq(['#08040e','#160c22','#2a1838','#3a2450'],sh,x,y)}
+  if(h<.05)return dq(['#3a0408','#8a0a14','#ff2a2a'],.5+.5*Math.sin(t*3+cu),x,y);
+  const tr=vn(lon*9,lat*9);return dq(tr>.6?['#06100a','#0e2014','#1a3420']:['#120a1e','#24143a','#3a2058','#5a2e80'],sh*.9,x,y)},{w:Math.max(2,R*.12),r:['#2a0418','#7a1040','#c02a6a','#ff4a6a']})};
 /* ---------- SUN (SDO-style, pixelised) with calligraphic script L ---------- */
 const SUNR=['#1c0201','#460603','#7a0e04','#b01e08','#d8360e','#ee5a18','#fa8a2c','#ffc070','#ffe8c0'];
 const GLOW=['#1a0201','#4a0803','#8a1606','#c42a0a'];
