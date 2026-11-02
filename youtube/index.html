@@ -100,7 +100,7 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
   <div class="board" id="board-ffc"></div>
  </section>
 </div>
- <section class="hof fame"><h2>★ TOP 2 SHORTS</h2><p class="note" style="margin:-6px 0 12px">The two most-viewed Shorts across all L + F channels</p><div id="top2"></div></section>
+ <section class="hof fame"><h2>★ BEST SHORT PER CHANNEL</h2><p class="note" style="margin:-6px 0 12px">Each channel's most-viewed Short</p><div id="top2"></div></section>
 <p class="note" id="sfoot"></p>
 <section class="hof wall"><h2>▶ LIVE SHORTS WALL</h2><p class="note" style="margin:-6px 0 12px">Each channel's latest Short · hover/tap a tile to play muted · <button id="wallall">▶ PLAY ALL</button></p><div id="wall"></div></section>
 <section class="hof heat"><h2>▦ 7-DAY HEAT MAP</h2><p class="note" style="margin:-6px 0 12px">Daily gains from this browser's stored samples · <button data-hm="subs" class="on">SUBS</button> <button data-hm="views">VIEWS</button> · ? = no samples that day</p><div id="heat"></div></section>
@@ -269,8 +269,8 @@ function latestRender(d){const seen={};(d.llc||[]).concat(d.ffc||[]).forEach(v=>
   if(!a){a=document.createElement('a');a.className='ls';a.target='_blank';a.rel='noopener';nm.appendChild(a)}
   a.href=v?'https://www.youtube.com/shorts/'+v.id:c.url.replace(/\/$/,'')+'/shorts';a.textContent=v?'▶ latest: '+v.title.replace(/\s*#\S+/g,'').trim().slice(0,34):'▶ shorts';a.title=v?v.title:'channel shorts'})}
 function shortsRender(d){const now=Date.now();latestRender(d);wallRender(d);JOINED=d.joined||JOINED;ageRender();
- const all=[...(d.llc||[]).map(v=>({...v,g:'llc'})),...(d.ffc||[]).map(v=>({...v,g:'ffc'}))].sort((x,y)=>y.views-x.views).slice(0,2);
- document.getElementById('top2').innerHTML=all.map((v,i)=>`<a class="t2 ${v.g}" href="https://www.youtube.com/shorts/${v.id}" target="_blank" rel="noopener"><img alt="" src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg"><div><div class="rk2">#${i+1} ${i?'':CROWN}</div><b>${esc(v.title.replace(/\s*#\S+/g,'').trim())}</b><small>${esc(v.ch)} · ${v.g[0].toUpperCase()}</small><em>${v.views.toLocaleString('en-US')} views</em></div></a>`).join('')||'<span class="na">no shorts yet</span>';
+ const all=[...(d.llc||[]).map(v=>({...v,g:'llc'})),...(d.ffc||[]).map(v=>({...v,g:'ffc'}))].sort((x,y)=>y.views-x.views).filter((v,i,a)=>a.findIndex(w=>w.cid===v.cid)===i);
+ document.getElementById('top2').innerHTML=all.map((v,i)=>`<a class="t2 ${v.g}" href="https://www.youtube.com/shorts/${v.id}" target="_blank" rel="noopener"><img alt="" src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg"><div><div class="rk2">BEST · ${esc(v.ch)} ${i?'':CROWN}</div><b>${esc(v.title.replace(/\s*#\S+/g,'').trim())}</b><small>${esc(v.ch)} · ${v.g[0].toUpperCase()}</small><em>${v.views.toLocaleString('en-US')} views</em></div></a>`).join('')||'<span class="na">no shorts yet</span>';
  document.getElementById('sfoot').textContent=`Shorts stats updated ${Math.max(0,Math.round((now-d.updated)/60000))} min ago · rescraped every ~10 min · page re-checks every 60s`}
 
 // ---- live shorts wall ----
