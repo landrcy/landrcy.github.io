@@ -77,7 +77,16 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
 .t2 .rk2{font-family:Silkscreen;font-size:18px;color:#ffcc4d}.t2 .rk2 .crown{width:24px;vertical-align:middle}
 .t2 b{display:block;font-size:22px;font-weight:400;margin:4px 0}.t2 small{display:block;font-family:Silkscreen;font-size:10px;color:#b9b0d0}.t2 em{display:block;font-style:normal;color:#ffcc4d;margin-top:4px}
 .hof button,.wall button,.heat button{font-family:Silkscreen;font-size:10px;background:#07050f;color:#b9b0d0;border:2px solid #2c2244;padding:3px 7px;cursor:pointer}.heat button.on{color:#fff;border-color:#ffcc4d}
-.nm .age{display:block;flex-basis:100%;font-family:Silkscreen;font-size:9px;color:#8a80a8;margin-top:1px}.indays{font-family:Silkscreen;font-size:12px;color:#ffcc4d;margin-top:4px;letter-spacing:1px}</style></head><body><canvas id="sky"></canvas><div id="clash"></div><div id="clashlbl"></div>
+.nm .age{display:block;flex-basis:100%;font-family:Silkscreen;font-size:9px;color:#8a80a8;margin-top:1px}.indays{font-family:Silkscreen;font-size:12px;color:#ffcc4d;margin-top:4px;letter-spacing:1px}.race{margin-top:28px}.trk{background:#120c1e;border:3px solid #2c2244;box-shadow:4px 4px 0 #000;padding:10px 14px;margin-bottom:14px}
+.trk h3{font-family:Silkscreen;font-size:12px;margin:0 0 8px;color:#ffcc4d}
+.ln{position:relative;height:30px;margin:6px 0 6px 28px;background:repeating-linear-gradient(90deg,#1e1730 0 18px,#160f24 18px 36px);border-top:2px dashed #2c2244;border-bottom:2px dashed #2c2244}
+.ln::after{content:'';position:absolute;right:0;top:0;bottom:0;width:10px;background:repeating-conic-gradient(#fff 0 25%,#000 0 50%) 0 0/10px 10px}
+.ln .lb2{position:absolute;left:-28px;top:4px;font-family:Silkscreen;font-size:14px}
+.ln .bar{position:absolute;left:0;top:0;bottom:0;transition:width 1s}.ln.l .bar{background:#3a5cff55}.ln.f .bar{background:#ff3a4d55}
+.ln .rn{position:absolute;top:2px;transform:translateX(-50%);font-size:20px;transition:left 1s;filter:drop-shadow(0 0 6px currentColor)}.ln.l .rn{color:#3a8cff}.ln.f .rn{color:#ff3a4d}
+.ln .tx{position:absolute;left:8px;top:6px;font-family:Silkscreen;font-size:10px;color:#f3ecdf;text-shadow:1px 1px 0 #000;white-space:nowrap}
+.row canvas.spk{width:90px;height:30px;flex:none;image-rendering:pixelated}@media(max-width:520px){.row canvas.spk{width:50px}}
+</style></head><body><canvas id="sky"></canvas><div id="clash"></div><div id="clashlbl"></div>
 <main>
 
 <div class="cols">
@@ -100,7 +109,8 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
   <div class="board" id="board-ffc"></div>
  </section>
 </div>
- <section class="hof fame"><h2>★ BEST SHORT PER CHANNEL</h2><p class="note" style="margin:-6px 0 12px">Each channel's most-viewed Short</p><div id="top2"></div></section>
+ <section class="hof race"><h2>⚑ THE RACE</h2><p class="note" style="margin:-6px 0 12px">L vs F to 1,000 subs and 1,000,000 views · ETA from recent pace (stored samples)</p><div id="race"></div></section>
+<section class="hof fame"><h2>★ BEST SHORT PER CHANNEL</h2><p class="note" style="margin:-6px 0 12px">Each channel's most-viewed Short</p><div id="top2"></div></section>
 <p class="note" id="sfoot"></p>
 <section class="hof wall"><h2>▶ LIVE SHORTS WALL</h2><p class="note" style="margin:-6px 0 12px">Each channel's latest Short · hover/tap a tile to play muted · <button id="wallall">▶ PLAY ALL</button></p><div id="wall"></div></section>
 <section class="hof heat"><h2>▦ 7-DAY HEAT MAP</h2><p class="note" style="margin:-6px 0 12px">Daily gains from this browser's stored samples · <button data-hm="subs" class="on">SUBS</button> <button data-hm="views">VIEWS</button> · ? = no samples that day</p><div id="heat"></div></section>
@@ -174,7 +184,7 @@ function clash(){const T=(g,k)=>GROUPS[g].channels.reduce((a,c)=>a+(J(c,k)||0),0
  const ss=sh('subs'),vs=sh('views');const v=[ss,vs].filter(x=>x!=null);if(!v.length)return;const r=v.reduce((a,b)=>a+b,0)/v.length,P=(r*100).toFixed(1);
  document.getElementById('clash').style.background=`linear-gradient(100deg,#1a4dff 0%,#1a4dff ${Math.max(0,r*100-12)}%,#7a1aff ${P}%,#ff1a2e ${Math.min(100,r*100+12)}%,#ff1a2e 100%)`;
  const pc=x=>x==null?'?':Math.round(x*100)+'%';document.getElementById('clashlbl').textContent=`L ${pc(ss)} subs / ${pc(vs)} views  ◀▶  F ${pc(ss==null?null:1-ss)} / ${pc(vs==null?null:1-vs)}`}
-function render(){Object.values(GROUPS).forEach(g=>{renderGroup(g);renderD24(g)});drawCharts();clash()}
+function render(){Object.values(GROUPS).forEach(g=>{renderGroup(g);renderD24(g)});drawCharts();clash();if(typeof extras==='function')try{extras()}catch(e){}}
 
 // ---- trailing samples (localStorage) ----
 const HK='pc-hist:',CAP=1500,MINGAP=60e3;
@@ -309,6 +319,22 @@ function ageRender(){ALL.forEach(c=>{const j=JOINED[c.id],nm=GROUPS[c.group].row
  for(const gk of['llc','ffc']){const js=GROUPS[gk].channels.map(c=>JOINED[c.id]).filter(Boolean);const n=js.length?Math.max(...js.map(dage)):null;
   for(const id of['ts-','tv-']){const o=document.getElementById(id+gk);let e=o.parentNode.querySelector('.indays');if(!e){e=document.createElement('div');e.className='indays';o.after(e)}
    e.textContent=n==null?'':`in ${n.toLocaleString('en-US')} days`}}}
+
+// ---- race + sparklines ----
+function pace(gk,k){const hs=GROUPS[gk].channels.map(c=>hist(c.id).filter(p=>p[k]!=null)).filter(h=>h.length>1);if(!hs.length)return null;
+ const now=Date.now(),t0=Math.max(now-864e5,Math.min(...hs.map(h=>h[0].t)));if(now-t0<10*60e3)return null;
+ return hs.reduce((a,h)=>a+vAt(h,now,k)-vAt(h,t0,k),0)/((now-t0)/864e5)}
+function race(){const el=document.getElementById('race');if(!el)return;const T=(gk,k)=>GROUPS[gk].channels.reduce((a,c)=>a+(c[k]||0),0);
+ el.innerHTML=[['subs',1000,'1,000 SUBS'],['views',1e6,'1,000,000 VIEWS']].map(([k,goal,lab])=>`<div class="trk"><h3>RACE TO ${lab}</h3>${['llc','ffc'].map(gk=>{const v=T(gk,k),f=Math.min(1,v/goal),pc=pace(gk,k);
+  const eta=v>=goal?'FINISHED!':pc>0?`ETA ~${Math.ceil((goal-v)/pc).toLocaleString('en-US')} days at ${cmp(Math.round(pc))}/day`:'ETA: need more samples';
+  return`<div class="ln ${gk[0]}"><span class="lb2" style="color:${gk==='llc'?'#3a8cff':'#ff3a4d'}">${gk[0].toUpperCase()}</span><div class="bar" style="width:${(f*100).toFixed(2)}%"></div><span class="rn" style="left:${Math.max(2,f*100).toFixed(2)}%">▶</span><span class="tx">${v.toLocaleString('en-US')} / ${cmp(goal)} · ${(f*100).toFixed(1)}% · ${eta}</span></div>`}).join('')}</div>`).join('')}
+function spark(c){const r=GROUPS[c.group].rows[c.id];let cv=r.querySelector('canvas.spk');if(!cv){cv=document.createElement('canvas');cv.className='spk';cv.title='views gained, last 24h';r.insertBefore(cv,r.querySelector('.st'))}
+ const W=90,H=30,dpr=devicePixelRatio||1;cv.width=W*dpr;cv.height=H*dpr;const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
+ const h=hist(c.id).filter(p=>p.views!=null);const col=c.group==='llc'?'#3a8cff':'#ff3a4d';if(h.length<2){x.fillStyle='#4a3d70';x.font='9px monospace';x.fillText('…',40,18);return}
+ const now=Date.now(),t0=Math.max(now-864e5,h[0].t),N=30,ys=[];for(let i=0;i<=N;i++)ys.push(vAt(h,t0+(now-t0)*i/N,'views')-vAt(h,t0,'views'));
+ const mx=Math.max(1,...ys);x.strokeStyle=col;x.lineWidth=1.5;x.beginPath();ys.forEach((y,i)=>{const px=1+(W-2)*i/N,py=H-3-(H-8)*y/mx;i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();
+ x.lineTo(W-1,H);x.lineTo(1,H);x.fillStyle=col+'33';x.fill();x.fillStyle='#f3ecdf';x.font='8px monospace';x.fillText('+'+cmp(Math.round(ys[N])),2,8)}
+let spT=0;function extras(){race();if(Date.now()-spT<5000)return;spT=Date.now();ALL.forEach(spark)}
 async function shorts(){try{const r=await fetch('shorts.json?t='+Date.now(),{cache:'no-store'});const d=await r.json();shortsRender(d);try{localStorage.setItem('pc-shorts',JSON.stringify(d))}catch(e){}}catch(e){}}
 try{const c=JSON.parse(localStorage.getItem('pc-shorts'));if(c)shortsRender(c)}catch(e){}
 shorts();setInterval(()=>{if(!document.hidden)shorts()},60000);
