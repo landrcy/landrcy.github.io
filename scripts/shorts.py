@@ -8,6 +8,7 @@ try:
 except Exception:
     prev = {}
 out = {'updated': int(time.time()*1000), 'llc': [], 'ffc': [], 'latest': {}}
+SUBS = {}
 for g, ids in CH.items():
     for cid in ids:
         try:
@@ -15,6 +16,7 @@ for g, ids in CH.items():
         except Exception as e:
             print('fail', cid, e); continue
         ents = d.get('entries') or []
+        if d.get('channel_follower_count') is not None: SUBS[cid] = d['channel_follower_count']
         if ents: out['latest'][cid] = {'id': ents[0]['id'], 'title': ents[0].get('title') or ''}  # /shorts tab is newest-first
         for e in ents:
             if e.get('view_count') is None: continue
@@ -34,6 +36,35 @@ for cid in [c for ids in CH.values() for c in ids]:
         except Exception as e:
             print('joined fail', cid, e)
     if j: out['joined'][cid] = j
+# upload dates (immutable, cached) -> "started" = first Short of the current regular-posting streak
+try:
+    oldf = json.load(open('youtube/shorts.json'))
+except Exception:
+    oldf = {}
+pub = oldf.get('pub', {})
+for g in CH:
+    for v in out[g]:
+        if v['id'] in pub: continue
+        try:
+            r = subprocess.run(['yt-dlp','--skip-download','--print','%(upload_date)s',f'https://www.youtube.com/shorts/{v["id"]}'],capture_output=True,text=True,timeout=60).stdout.strip()
+            if re.fullmatch(r'\d{8}', r): pub[v['id']] = f'{r[:4]}-{r[4:6]}-{r[6:]}'
+        except Exception as e:
+            print('date fail', v['id'], e)
+out['pub'] = pub
+GAP = 21  # a pause longer than this many days resets the streak
+out['started'] = {}
+for g in CH:
+    for cid in CH[g]:
+        ds = sorted(datetime.date.fromisoformat(pub[v['id']]) for v in out[g] if v['cid'] == cid and v['id'] in pub)
+        if not ds: continue
+        st = ds[0]
+        for a, b in zip(ds, ds[1:]):
+            if (b - a).days > GAP: st = b
+        out['started'][cid] = st.isoformat()
+# server-side views history (sum of all Shorts view counts per channel) for an accurate LAST 24H
+vh = [p for p in oldf.get('vh', []) if out['updated'] - p['t'] < 8*86400*1000]
+vh.append({'t': out['updated'], 's': SUBS, 'v': {cid: sum(v['views'] for v in out[g] if v['cid'] == cid) for g in CH for cid in CH[g] if any(v['cid'] == cid for v in out[g])}})
+out['vh'] = vh
 # best comments: top comments on each channel's 4 most-viewed shorts; refreshed every 3h
 try:
     oldc = json.load(open('youtube/shorts.json')).get('comments')

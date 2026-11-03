@@ -1,6 +1,8 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LIVE STATS</title><link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
-<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&display=block" rel="stylesheet">
+<style>html.fl body{visibility:hidden}</style><script>document.documentElement.classList.add("fl");(function(){var d=function(){document.documentElement.classList.remove("fl")};setTimeout(d,2500);if(document.fonts)Promise.all([document.fonts.load("12px Silkscreen"),document.fonts.load("16px VT323")]).then(d,d);else d()})()</script>
 <style>
 *{box-sizing:border-box}html{background:#07050f}html,body{margin:0;color:#f3ecdf;font-family:'VT323',monospace;font-size:20px;min-height:100%}
 #sky{position:fixed;inset:0;width:100%;height:100%;z-index:-1;image-rendering:pixelated}
@@ -194,8 +196,13 @@ function render(){Object.values(GROUPS).forEach(g=>{renderGroup(g);renderD24(g)}
 
 // ---- trailing samples (localStorage) ----
 const HK='pc-hist:',CAP=1500,MINGAP=60e3;
-const hist=id=>{try{return JSON.parse(localStorage.getItem(HK+id))||[]}catch(e){return[]}};
-function addSample(c){if(c.subs==null&&c.views==null)return;const a=hist(c.id),t=Date.now(),l=a[a.length-1],p=a[a.length-2];
+let VH=[],V90=null;const lhist=id=>{try{return JSON.parse(localStorage.getItem(HK+id))||[]}catch(e){return[]}};
+// server snapshots: subs + sum of Shorts views (fresher than channel viewCount); views offset so the latest point matches the live total
+function hist(id){const p=VH.filter(x=>(x.v&&x.v[id]!=null)||(x.s&&x.s[id]!=null));if(p.length<2)return lhist(id);
+ const c=ALL.find(c=>c.id===id),L=[...p].reverse().find(x=>x.v&&x.v[id]!=null),off=(c&&c.views!=null&&L)?c.views-L.v[id]:0;
+ const a=p.map(x=>({t:x.t,subs:x.s&&x.s[id]!=null?x.s[id]:null,views:x.v&&x.v[id]!=null?x.v[id]+off:null}));
+ const old=lhist(id).filter(x=>x.t<a[0].t-60e3);a.unshift(...old);if(c&&(c.subs!=null||c.views!=null)&&Date.now()-a[a.length-1].t>60e3)a.push({t:Date.now(),subs:c.subs??a[a.length-1].subs,views:c.views??a[a.length-1].views});return a}
+function addSample(c){if(c.subs==null&&c.views==null)return;const a=lhist(c.id),t=Date.now(),l=a[a.length-1],p=a[a.length-2];
  // coalesce only if the previous anchor is <MINGAP old (old code slid the last point forward forever when polls were <60s apart, so history never aged)
  if(l&&p&&t-p.t<MINGAP){l.t=t;l.subs=c.subs;l.views=c.views}else a.push({t,subs:c.subs,views:c.views});
  // drop >8d, then thin old points (never the ones bracketing 24h ago)
@@ -289,7 +296,7 @@ function latestRender(d){const seen={};(d.llc||[]).concat(d.ffc||[]).forEach(v=>
  ALL.forEach(c=>{const v=(d.latest||{})[c.id]||seen[c.id],nm=GROUPS[c.group].rows[c.id].querySelector('.nm');let a=nm.querySelector('.ls');
   if(!a){a=document.createElement('a');a.className='ls';a.target='_blank';a.rel='noopener';nm.appendChild(a)}
   a.href=v?'https://www.youtube.com/shorts/'+v.id:c.url.replace(/\/$/,'')+'/shorts';a.textContent=v?'▶ latest: '+v.title.replace(/\s*#\S+/g,'').trim().slice(0,34):'▶ shorts';a.title=v?v.title:'channel shorts'})}
-function shortsRender(d){const now=Date.now();latestRender(d);wallRender(d);cboard(d);JOINED=d.joined||JOINED;ageRender();
+function shortsRender(d){const now=Date.now();latestRender(d);wallRender(d);cboard(d);JOINED=d.started||d.joined||JOINED;VH=d.vh||VH;V90={};const c90=Date.now()-90*864e5;for(const gk of['llc','ffc'])V90[gk]=(d[gk]||[]).filter(v=>{const p=(d.pub||{})[v.id];return p?new Date(p+'T00:00:00')>=c90:true}).reduce((a,v)=>a+v.views,0);try{render()}catch(e){}ageRender();
  const card=(v,i)=>`<a class="t2 ${v.g}" href="https://www.youtube.com/shorts/${v.id}" target="_blank" rel="noopener"><img alt="" src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg"><div><div class="rk2">BEST · ${esc(v.ch)} ${i?'':CROWN}</div><b>${esc(v.title.replace(/\s*#\S+/g,'').trim())}</b><small>${esc(v.ch)} · ${v.g[0].toUpperCase()}</small><em>${v.views.toLocaleString('en-US')} views</em></div></a>`;
  document.getElementById('top2').innerHTML=['llc','ffc'].map(gk=>{const b=(d[gk]||[]).map(v=>({...v,g:gk})).sort((x,y)=>y.views-x.views).filter((v,i,a)=>a.findIndex(w=>w.cid===v.cid)===i);
   return`<div class="t2col"><p class="lb" style="color:${gk==='llc'?'#3a8cff':'#ff3a4d'}">${gk[0].toUpperCase()} · BEST PER CHANNEL</p>${b.map(card).join('')||'<span class="na">no shorts yet</span>'}</div>`}).join('');
@@ -327,7 +334,7 @@ let JOINED={};const dage=j=>Math.floor((Date.now()-new Date(j+'T00:00:00'))/864e
 const agefmt=n=>n>=365?`${Math.floor(n/365)}y ${Math.floor(n%365/30)}m`:n>=30?`${Math.floor(n/30)}m ${n%30}d`:n+'d';
 function ageRender(){ALL.forEach(c=>{const j=JOINED[c.id],nm=GROUPS[c.group].rows[c.id].querySelector('.nm');let e=nm.querySelector('.age');
   if(!e){e=document.createElement('span');e.className='age';nm.insertBefore(e,nm.querySelector('.ls'))}
-  e.textContent=j?`age ${agefmt(dage(j))} · since ${new Date(j+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`:''});
+  e.textContent=j?`posting ${agefmt(dage(j))} · 1st short ${new Date(j+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`:''});
  for(const gk of['llc','ffc']){const js=GROUPS[gk].channels.map(c=>JOINED[c.id]).filter(Boolean);const n=js.length?Math.max(...js.map(dage)):null;
   for(const id of['ts-','tv-']){const o=document.getElementById(id+gk);let e=o.parentNode.querySelector('.indays');if(!e){e=document.createElement('div');e.className='indays';o.after(e)}
    e.textContent=n==null?'':`in ${n.toLocaleString('en-US')} days`}}}
@@ -336,9 +343,9 @@ function ageRender(){ALL.forEach(c=>{const j=JOINED[c.id],nm=GROUPS[c.group].row
 function pace(gk,k){const hs=GROUPS[gk].channels.map(c=>hist(c.id).filter(p=>p[k]!=null)).filter(h=>h.length>1);if(!hs.length)return null;
  const now=Date.now(),t0=Math.max(now-864e5,Math.min(...hs.map(h=>h[0].t)));if(now-t0<10*60e3)return null;
  return hs.reduce((a,h)=>a+vAt(h,now,k)-vAt(h,t0,k),0)/((now-t0)/864e5)}
-function race(){const el=document.getElementById('race');if(!el)return;const T=(gk,k)=>GROUPS[gk].channels.reduce((a,c)=>a+(c[k]||0),0);
- el.innerHTML=[['subs',1000,'1,000 SUBS'],['views',1e6,'1,000,000 VIEWS']].map(([k,goal,lab])=>`<div class="trk"><h3>RACE TO ${lab}</h3>${['llc','ffc'].map(gk=>{const v=T(gk,k),f=Math.min(1,v/goal),pc=pace(gk,k);
-  const eta=v>=goal?'FINISHED!':pc>0?`ETA ~${Math.ceil((goal-v)/pc).toLocaleString('en-US')} days at ${cmp(Math.round(pc))}/day`:'ETA: need more samples';
+function race(){const el=document.getElementById('race');if(!el)return;const T=(gk,k)=>k==='v90'?((V90||{})[gk]||0):GROUPS[gk].channels.reduce((a,c)=>a+(c[k]||0),0);
+ el.innerHTML=[['subs',1000,'1,000 SUBS'],['v90',1e7,'10M SHORTS VIEWS (90D · YPP)']].map(([k,goal,lab])=>`<div class="trk"><h3>RACE TO ${lab}</h3>${['llc','ffc'].map(gk=>{const v=T(gk,k),f=Math.min(1,v/goal),st=GROUPS[gk].channels.map(c=>JOINED[c.id]).filter(Boolean).map(dage),dd=st.length?Math.min(k==='v90'?90:1e9,Math.max(1,...st)):0,pc=dd?v/dd:pace(gk,k);
+  const eta=v>=goal?'FINISHED!':pc>0?`ETA ~${Math.ceil((goal-v)/pc).toLocaleString('en-US')} days at ${cmp(Math.round(pc))}/day avg since 1st short`:'ETA: need more samples';
   return`<div class="ln ${gk[0]}"><span class="lb2" style="color:${gk==='llc'?'#3a8cff':'#ff3a4d'}">${gk[0].toUpperCase()}</span><div class="bar" style="width:${(f*100).toFixed(2)}%"></div><span class="rn" style="left:${Math.max(2,f*100).toFixed(2)}%">▶</span><span class="tx">${v.toLocaleString('en-US')} / ${cmp(goal)} · ${(f*100).toFixed(1)}% · ${eta}</span></div>`}).join('')}</div>`).join('')}
 function spark(c){const r=GROUPS[c.group].rows[c.id];let cv=r.querySelector('canvas.spk');if(!cv){cv=document.createElement('canvas');cv.className='spk';cv.title='views gained, last 24h';r.insertBefore(cv,r.querySelector('.st'))}
  const W=90,H=30,dpr=devicePixelRatio||1;cv.width=W*dpr;cv.height=H*dpr;const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
