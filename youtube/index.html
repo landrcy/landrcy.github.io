@@ -196,7 +196,7 @@ function render(){Object.values(GROUPS).forEach(g=>{renderGroup(g);renderD24(g)}
 
 // ---- trailing samples (localStorage) ----
 const HK='pc-hist:',CAP=1500,MINGAP=60e3;
-let VH=[],V90=null;const lhist=id=>{try{return JSON.parse(localStorage.getItem(HK+id))||[]}catch(e){return[]}};
+let VH=[],V90=null,D24=null;const lhist=id=>{try{return JSON.parse(localStorage.getItem(HK+id))||[]}catch(e){return[]}};
 // server snapshots: subs + sum of Shorts views (fresher than channel viewCount); views offset so the latest point matches the live total
 function hist(id){const p=VH.filter(x=>(x.v&&x.v[id]!=null)||(x.s&&x.s[id]!=null));if(p.length<2)return lhist(id);
  const c=ALL.find(c=>c.id===id),L=[...p].reverse().find(x=>x.v&&x.v[id]!=null),off=(c&&c.views!=null&&L)?c.views-L.v[id]:0;
@@ -215,7 +215,7 @@ function at24(a,k){const now=Date.now(),tgt=now-864e5;const v=a.filter(p=>p[k]!=
  if(lo&&hi&&hi.t-lo.t<=2*36e5){const f=(tgt-lo.t)/(hi.t-lo.t||1);return{v:lo[k]+(hi[k]-lo[k])*f,span:864e5}}
  // gap around 24h ago: use the nearest real sample and its true age
  const c=[lo,hi].filter(Boolean).sort((x,y)=>Math.abs(x.t-tgt)-Math.abs(y.t-tgt))[0];const span=now-c.t;if(span<20*36e5)return null;return{v:c[k],span,est:true}}
-function d24(c){const a=hist(c.id);const r={};for(const k of['subs','views']){const b=at24(a,k),cur=J(c,k);r[k]=(b==null||cur==null)?null:Math.round((cur-b.v)*864e5/b.span);if(b&&b.est)r.est=true}
+function d24(c){const S=D24&&D24[c.id];if(S&&S.v!=null){const a=hist(c.id);return{subs:S.s??null,views:S.v,est:!!S.est,age:a.length?Date.now()-a[0].t:864e5}}const a=hist(c.id);const r={};for(const k of['subs','views']){const b=at24(a,k),cur=J(c,k);r[k]=(b==null||cur==null)?null:Math.round((cur-b.v)*864e5/b.span);if(b&&b.est)r.est=true}
  r.age=a.length?Date.now()-a[0].t:0;return r}
 const cmp=n=>Math.abs(n)>=1e6?(n/1e6).toFixed(1)+'M':Math.abs(n)>=1e3?(n/1e3).toFixed(1)+'K':String(n);
 const sg=n=>`<span class="${n<0?'dn':'up'}">${n<0?'−':'+'}${cmp(Math.abs(n))}</span>`;
@@ -296,7 +296,7 @@ function latestRender(d){const seen={};(d.llc||[]).concat(d.ffc||[]).forEach(v=>
  ALL.forEach(c=>{const v=(d.latest||{})[c.id]||seen[c.id],nm=GROUPS[c.group].rows[c.id].querySelector('.nm');let a=nm.querySelector('.ls');
   if(!a){a=document.createElement('a');a.className='ls';a.target='_blank';a.rel='noopener';nm.appendChild(a)}
   a.href=v?'https://www.youtube.com/shorts/'+v.id:c.url.replace(/\/$/,'')+'/shorts';a.textContent=v?'▶ latest: '+v.title.replace(/\s*#\S+/g,'').trim().slice(0,34):'▶ shorts';a.title=v?v.title:'channel shorts'})}
-function shortsRender(d){const now=Date.now();latestRender(d);wallRender(d);cboard(d);JOINED=d.started||d.joined||JOINED;VH=d.vh||VH;V90={};const c90=Date.now()-90*864e5;for(const gk of['llc','ffc'])V90[gk]=(d[gk]||[]).filter(v=>{const p=(d.pub||{})[v.id];return p?new Date(p+'T00:00:00')>=c90:true}).reduce((a,v)=>a+v.views,0);try{render()}catch(e){}ageRender();
+function shortsRender(d){const now=Date.now();latestRender(d);wallRender(d);cboard(d);JOINED=d.started||d.joined||JOINED;VH=d.vh||VH;D24=d.d24||D24;V90={};const c90=Date.now()-90*864e5;for(const gk of['llc','ffc'])V90[gk]=(d[gk]||[]).filter(v=>{const p=(d.pub||{})[v.id];return p?new Date(p+'T00:00:00')>=c90:true}).reduce((a,v)=>a+v.views,0);try{render()}catch(e){}ageRender();
  const card=(v,i)=>`<a class="t2 ${v.g}" href="https://www.youtube.com/shorts/${v.id}" target="_blank" rel="noopener"><img alt="" src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg"><div><div class="rk2">BEST · ${esc(v.ch)} ${i?'':CROWN}</div><b>${esc(v.title.replace(/\s*#\S+/g,'').trim())}</b><small>${esc(v.ch)} · ${v.g[0].toUpperCase()}</small><em>${v.views.toLocaleString('en-US')} views</em></div></a>`;
  document.getElementById('top2').innerHTML=['llc','ffc'].map(gk=>{const b=(d[gk]||[]).map(v=>({...v,g:gk})).sort((x,y)=>y.views-x.views).filter((v,i,a)=>a.findIndex(w=>w.cid===v.cid)===i);
   return`<div class="t2col"><p class="lb" style="color:${gk==='llc'?'#3a8cff':'#ff3a4d'}">${gk[0].toUpperCase()} · BEST PER CHANNEL</p>${b.map(card).join('')||'<span class="na">no shorts yet</span>'}</div>`}).join('');
