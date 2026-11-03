@@ -190,8 +190,7 @@ function renderGroup(g){
 }
 function clash(){const T=(g,k)=>GROUPS[g].channels.reduce((a,c)=>a+(J(c,k)||0),0);const sh=k=>{const a=T('llc',k),b=T('ffc',k);return a+b?a/(a+b):null};
  const ss=sh('subs'),vs=sh('views');const v=[ss,vs].filter(x=>x!=null);if(!v.length)return;const r=v.reduce((a,b)=>a+b,0)/v.length,P=(r*100).toFixed(1);
- document.getElementById('clash').style.background=`linear-gradient(100deg,#1a4dff 0%,#1a4dff ${Math.max(0,r*100-12)}%,#7a1aff ${P}%,#ff1a2e ${Math.min(100,r*100+12)}%,#ff1a2e 100%)`;
- const pc=x=>x==null?'?':Math.round(x*100)+'%';document.getElementById('clashlbl').textContent=`L ${pc(ss)} subs / ${pc(vs)} views  ◀▶  F ${pc(ss==null?null:1-ss)} / ${pc(vs==null?null:1-vs)}`}
+ document.getElementById('clash').style.background=`linear-gradient(100deg,#1a4dff 0%,#1a4dff ${Math.max(0,r*100-12)}%,#7a1aff ${P}%,#ff1a2e ${Math.min(100,r*100+12)}%,#ff1a2e 100%)`;}
 function render(){Object.values(GROUPS).forEach(g=>{renderGroup(g);renderD24(g)});drawCharts();clash();if(typeof extras==='function')try{extras()}catch(e){}}
 
 // ---- trailing samples (localStorage) ----
