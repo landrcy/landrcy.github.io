@@ -16,9 +16,14 @@ jobs:
           git config user.name shorts-bot; git config user.email shorts-bot@users.noreply.github.com
           end=$(( $(date +%s) + 19800 ))
           while [ $(date +%s) -lt $end ]; do
-            git pull --rebase -q || true
+            # always start from a clean origin/main so a manual commit to shorts.json can't wedge the loop in a failed rebase
+            git rebase --abort 2>/dev/null || true
+            git fetch -q origin main && git reset -q --hard origin/main
             python3 scripts/shorts.py || true
             git add youtube/shorts.json
-            git diff --cached --quiet || (git commit -qm "shorts stats" && (git push -q || (git pull --rebase -q && git push -q)))
+            if ! git diff --cached --quiet; then
+              git commit -qm "shorts stats"
+              git push -q || { cp youtube/shorts.json /tmp/s.json; git fetch -q origin main; git reset -q --hard origin/main; cp /tmp/s.json youtube/shorts.json; git add youtube/shorts.json; git commit -qm "shorts stats"; git push -q || true; }
+            fi
             sleep 540
           done

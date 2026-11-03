@@ -9,12 +9,19 @@ except Exception:
     prev = {}
 out = {'updated': int(time.time()*1000), 'llc': [], 'ffc': [], 'latest': {}}
 SUBS = {}
+NOSHORTS = set()
 for g, ids in CH.items():
     for cid in ids:
         try:
-            d = json.loads(subprocess.run(['yt-dlp','--flat-playlist','-J',f'https://www.youtube.com/channel/{cid}/shorts'],capture_output=True,text=True,timeout=180).stdout)
+            r = subprocess.run(['yt-dlp','--flat-playlist','-J',f'https://www.youtube.com/channel/{cid}/shorts'],capture_output=True,text=True,timeout=180)
+            d = json.loads(r.stdout or 'null')
         except Exception as e:
             print('fail', cid, e); continue
+        if not d:
+            # channel currently has zero public Shorts (YouTube: "does not have a shorts tab") -> real 0, don't crash the whole scrape
+            if 'does not have a shorts tab' in (r.stderr or ''): NOSHORTS.add(cid)
+            else: print('fail', cid, (r.stderr or '')[-200:])
+            continue
         ents = d.get('entries') or []
         if d.get('channel_follower_count') is not None: SUBS[cid] = d['channel_follower_count']
         if ents: out['latest'][cid] = {'id': ents[0]['id'], 'title': ents[0].get('title') or ''}  # /shorts tab is newest-first
@@ -63,7 +70,7 @@ for g in CH:
         out['started'][cid] = st.isoformat()
 # server-side views history (sum of all Shorts view counts per channel) for an accurate LAST 24H
 vh = [p for p in oldf.get('vh', []) if out['updated'] - p['t'] < 8*86400*1000]
-vh.append({'t': out['updated'], 's': SUBS, 'v': {cid: sum(v['views'] for v in out[g] if v['cid'] == cid) for g in CH for cid in CH[g] if any(v['cid'] == cid for v in out[g])}})
+vh.append({'t': out['updated'], 's': SUBS, 'v': {**{cid: sum(v['views'] for v in out[g] if v['cid'] == cid) for g in CH for cid in CH[g] if any(v['cid'] == cid for v in out[g])}, **{cid: 0 for cid in NOSHORTS}}})
 out['vh'] = vh
 # per-day (America/New_York) end-of-day Shorts view sums from REAL snapshots only (for streaks); kept 120 days
 try:
