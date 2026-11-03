@@ -67,7 +67,7 @@ vh.append({'t': out['updated'], 's': SUBS, 'v': {cid: sum(v['views'] for v in ou
 out['vh'] = vh
 # server-computed LAST 24H per channel (Shorts view-sum delta incl. brand-new uploads; subs delta).
 # Interpolates across the two snapshots bracketing now-24h; if history is shorter/gappy, scales the
-# nearest real span (>=6h) to 24h and flags est.
+# nearest real span (>=6h): reports the RAW delta over that span (no extrapolation) and flags est.
 def base24(k, cid):
     now = out['updated']; tgt = now - 86400*1000
     pts = [p for p in vh if cid in p.get(k, {})]
@@ -84,7 +84,7 @@ for cid, cur in vh[-1]['v'].items():
     for k, cv in (('v', cur), ('s', SUBS.get(cid))):
         b = base24(k, cid)
         if b is None or cv is None: continue
-        r[k] = round((cv - b[0]) * 86400*1000 / b[1]); r['span'] = b[1]
+        r[k] = round(cv - b[0]) if b[2] else round((cv - b[0]) * 86400*1000 / b[1]); r['span'] = b[1]  # est: raw delta over real span, never extrapolated
         if b[2]: r['est'] = True
     out['d24'][cid] = r
 # best comments: top comments on each channel's 4 most-viewed shorts; refreshed every 3h

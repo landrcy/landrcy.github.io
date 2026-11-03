@@ -215,12 +215,12 @@ function at24(a,k){const now=Date.now(),tgt=now-864e5;const v=a.filter(p=>p[k]!=
  if(lo&&hi&&hi.t-lo.t<=2*36e5){const f=(tgt-lo.t)/(hi.t-lo.t||1);return{v:lo[k]+(hi[k]-lo[k])*f,span:864e5}}
  // gap around 24h ago: use the nearest real sample and its true age
  const c=[lo,hi].filter(Boolean).sort((x,y)=>Math.abs(x.t-tgt)-Math.abs(y.t-tgt))[0];const span=now-c.t;if(span<20*36e5)return null;return{v:c[k],span,est:true}}
-function d24(c){const S=D24&&D24[c.id];if(S&&S.v!=null){const a=hist(c.id);return{subs:S.s??null,views:S.v,est:!!S.est,age:a.length?Date.now()-a[0].t:864e5}}const a=hist(c.id);const r={};for(const k of['subs','views']){const b=at24(a,k),cur=J(c,k);r[k]=(b==null||cur==null)?null:Math.round((cur-b.v)*864e5/b.span);if(b&&b.est)r.est=true}
+function d24(c){const S=D24&&D24[c.id];if(S&&S.v!=null){const a=hist(c.id);return{subs:S.s??null,views:S.v,est:!!S.est,span:S.span,age:a.length?Date.now()-a[0].t:864e5}}const a=hist(c.id);const r={};for(const k of['subs','views']){const b=at24(a,k),cur=J(c,k);r[k]=(b==null||cur==null)?null:Math.round((cur-b.v)*864e5/b.span);if(b&&b.est)r.est=true}
  r.age=a.length?Date.now()-a[0].t:0;return r}
 const cmp=n=>Math.abs(n)>=1e6?(n/1e6).toFixed(1)+'M':Math.abs(n)>=1e3?(n/1e3).toFixed(1)+'K':String(n);
 const sg=n=>`<span class="${n<0?'dn':'up'}">${n<0?'−':'+'}${cmp(Math.abs(n))}</span>`;
 function trk(age){const h=Math.max(0,20-age/36e5);return `<span class="tr">tracking… need ~${Math.ceil(h)}h more</span>`}
-function d24html(r){return r.subs==null&&r.views==null?trk(r.age):`${r.est?'~':''}${r.subs==null?'?':sg(r.subs)} subs · ${r.views==null?'?':sg(r.views)} views`}
+function d24html(r){return r.subs==null&&r.views==null?trk(r.age):`${r.subs==null?'?':sg(r.subs)} subs · ${r.views==null?'?':sg(r.views)} views${r.est&&r.span?` <span class="tr">(last ${Math.round(r.span/36e5)}h)</span>`:''}`}
 function renderD24(g){let s=0,v=0,ns=0,nv=0,age=Infinity,est=false;g.channels.forEach(c=>{const r=d24(c);if(r.est)est=true;age=Math.min(age,r.age);if(r.subs!=null){s+=r.subs;ns++}if(r.views!=null){v+=r.views;nv++}
   const st=g.rows[c.id].querySelector('.st');if(c.tried)st.insertAdjacentHTML('beforeend',`<div class="d24">${d24html(r)}</div>`)});
  const el=document.getElementById('d24-'+g.key);const live=g.channels.filter(c=>c.subs!=null).length;
