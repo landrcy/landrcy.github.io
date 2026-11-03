@@ -102,8 +102,8 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
 .bdg span{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;line-height:14px;flex:none;border:1px solid #2c2244;background:#07050f;white-space:nowrap}
 .bdg .em{font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif;font-size:12px;line-height:1}.bdg .stk{color:#ffcc4d;border-color:#ff8a1f}.bdg .stk.z{color:#6e6588;border-color:#2c2244}.bdg .cmb{color:#fff;background:#ff3a00;border-color:#ffcc4d;animation:bl 0.8s steps(2) infinite}.bdg .zz{color:#a89cff}.bdg .kg{color:#07050f;background:#ffcc4d;border-color:#ffcc4d}.bdg .ic{color:#7fd6ff;border-color:#7fd6ff}
 .gh{color:#6e6588;font-size:9px}
-#riv{margin:0 0 18px;font-family:Silkscreen;font-size:11px}#riv .bar2{position:relative;height:18px;border:3px solid #2c2244;box-shadow:4px 4px 0 #000;background:#ff3a4d;overflow:hidden}#riv .bar2 i{position:absolute;left:0;top:0;bottom:0;background:#3a5cff;transition:width 1.2s steps(12)}#riv .bar2 b{position:absolute;top:-3px;width:4px;height:24px;background:#fff;transition:left 1.2s steps(12)}#riv .lbl{display:flex;justify-content:space-between;margin-bottom:4px}#riv .lbl .l{color:#3a8cff}#riv .lbl .f{color:#ff3a4d}
-#riv.shk{animation:shk .5s steps(4) 3}@keyframes shk{25%{transform:translate(-4px,1px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,2px)}}
+
+@keyframes shk{25%{transform:translate(-4px,1px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,2px)}}
 #boss{font-family:Silkscreen;font-size:10px;background:#07050f;color:#b9b0d0;border:2px solid #2c2244;padding:3px 7px;cursor:pointer;margin-left:8px}#boss.on{color:#ff8a1f;border-color:#ff8a1f}
 .nt.hot{animation:hot 1s steps(2) infinite}@keyframes hot{50%{box-shadow:0 0 0 3px #ff0033,4px 4px 0 #000}}
 #cft{position:fixed;inset:0;pointer-events:none;z-index:50;image-rendering:pixelated;width:100%;height:100%}
@@ -409,11 +409,7 @@ let ft=0;function flames(t){if(t-ft>90){ft=t;document.querySelectorAll('canvas.f
  x.clearRect(3,6,W-6,H-6);x.globalAlpha=1})}requestAnimationFrame(flames)}
 if(!matchMedia('(prefers-reduced-motion: reduce)').matches)requestAnimationFrame(flames);
 // rivalry
-function rivalry(d){const L=d.vh&&d.vh.length?d.vh[d.vh.length-1].v:{};const T=gk=>GROUPS[gk].channels.reduce((a,c)=>a+(L[c.id]||0),0),l=T('llc'),f=T('ffc');if(!l&&!f)return;
- let el=document.getElementById('riv');if(!el){el=document.createElement('div');el.id='riv';document.querySelector('.cols').before(el)}
- const p=l/(l+f)*100,lead=l>f?'L':'F';el.innerHTML=`<div class="lbl"><span class="l">L ${l.toLocaleString('en-US')}</span><span>TUG OF WAR · ALL SHORTS VIEWS <button id="boss" class="${BOSS?'on':''}" title="play a short phonk hit when a channel catches fire">${BOSS?'♪ BOSS ON':'♪ BOSS OFF'}</button></span><span class="f">${f.toLocaleString('en-US')} F</span></div><div class="bar2"><i style="width:${p.toFixed(2)}%"></i><b style="left:calc(${p.toFixed(2)}% - 2px)"></b></div>`;
- document.getElementById('boss').onclick=()=>{BOSS=!BOSS;LS('boss',BOSS);rivalry(d);if(BOSS)boss()};
- const pv=LS('lead');if(pv&&pv!==lead){el.classList.remove('shk');void el.offsetWidth;el.classList.add('shk')}LS('lead',lead)}
+function rivalry(d){if(document.getElementById('boss'))return;const bt=document.createElement('button');bt.id='boss';bt.title='play a short phonk hit when a channel catches fire';const up=()=>{bt.className=BOSS?'on':'';bt.textContent=BOSS?'♪ BOSS ON':'♪ BOSS OFF'};up();bt.onclick=()=>{BOSS=!BOSS;LS('boss',BOSS);up();if(BOSS)boss()};document.getElementById('ctog').after(bt)}
 // milestones: only from real snapshot crossings
 function milestones(d){const vh=d.vh||[];if(vh.length<2)return;const seen=LS('ms')||{},M=[1e3,1e4,1e5,1e6];const L=vh[vh.length-1],cut=Date.now()-6*36e5;
  for(const c of ALL){const cur=L.v[c.id];if(cur==null)continue;for(const m of M){const k=c.id+':'+m;if(seen[k]||cur<m)continue;const was=vh.find(p=>p.t>=cut&&p.v[c.id]!=null&&p.v[c.id]<m);seen[k]=1;if(was){pop(`${c.name} crossed ${cmp(m)} Shorts views!`);break}}}LS('ms',seen)}
