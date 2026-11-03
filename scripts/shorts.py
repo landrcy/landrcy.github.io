@@ -65,6 +65,17 @@ for g in CH:
 vh = [p for p in oldf.get('vh', []) if out['updated'] - p['t'] < 8*86400*1000]
 vh.append({'t': out['updated'], 's': SUBS, 'v': {cid: sum(v['views'] for v in out[g] if v['cid'] == cid) for g in CH for cid in CH[g] if any(v['cid'] == cid for v in out[g])}})
 out['vh'] = vh
+# per-day (America/New_York) end-of-day Shorts view sums from REAL snapshots only (for streaks); kept 120 days
+try:
+    from zoneinfo import ZoneInfo
+    _tz = ZoneInfo('America/New_York')
+except Exception:
+    _tz = None
+daily = dict(oldf.get('daily', {}))
+for p in vh:
+    k = datetime.datetime.fromtimestamp(p['t']/1000, _tz).strftime('%Y-%m-%d')
+    daily[k] = {**daily.get(k, {}), **p['v']}
+out['daily'] = {k: daily[k] for k in sorted(daily)[-120:]}
 # server-computed LAST 24H per channel (Shorts view-sum delta incl. brand-new uploads; subs delta).
 # Uses ONLY real scraped snapshots: newest snapshot at/before now-24h (else the oldest available);
 # reports the RAW delta over that real span. No interpolation, scaling, or extrapolation. span <24h => est.
