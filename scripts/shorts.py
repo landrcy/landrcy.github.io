@@ -66,25 +66,23 @@ vh = [p for p in oldf.get('vh', []) if out['updated'] - p['t'] < 8*86400*1000]
 vh.append({'t': out['updated'], 's': SUBS, 'v': {cid: sum(v['views'] for v in out[g] if v['cid'] == cid) for g in CH for cid in CH[g] if any(v['cid'] == cid for v in out[g])}})
 out['vh'] = vh
 # server-computed LAST 24H per channel (Shorts view-sum delta incl. brand-new uploads; subs delta).
-# Interpolates across the two snapshots bracketing now-24h; if history is shorter/gappy, scales the
-# nearest real span (>=6h): reports the RAW delta over that span (no extrapolation) and flags est.
+# Uses ONLY real scraped snapshots: newest snapshot at/before now-24h (else the oldest available);
+# reports the RAW delta over that real span. No interpolation, scaling, or extrapolation. span <24h => est.
 def base24(k, cid):
     now = out['updated']; tgt = now - 86400*1000
     pts = [p for p in vh if cid in p.get(k, {})]
-    lo = next((p for p in reversed(pts) if p['t'] <= tgt), None); hi = next((p for p in pts if p['t'] > tgt), None)
-    if lo and hi and hi['t'] - lo['t'] <= 3*3600*1000:
-        f = (tgt - lo['t']) / ((hi['t'] - lo['t']) or 1)
-        return lo[k][cid] + (hi[k][cid] - lo[k][cid]) * f, 86400*1000, False
-    c = min([x for x in (lo, hi) if x], key=lambda x: abs(x['t'] - tgt), default=None)
-    if not c or now - c['t'] < 6*3600*1000: return None
-    return c[k][cid], now - c['t'], True
+    if len(pts) < 2: return None
+    lo = next((p for p in reversed(pts) if p['t'] <= tgt), None) or pts[0]
+    span = now - lo['t']
+    if span <= 0: return None
+    return lo[k][cid], span, span < 86400*1000 - 30*60*1000
 out['d24'] = {}
 for cid, cur in vh[-1]['v'].items():
     r = {}
     for k, cv in (('v', cur), ('s', SUBS.get(cid))):
         b = base24(k, cid)
         if b is None or cv is None: continue
-        r[k] = round(cv - b[0]) if b[2] else round((cv - b[0]) * 86400*1000 / b[1]); r['span'] = b[1]  # est: raw delta over real span, never extrapolated
+        r[k] = round(cv - b[0]); r['span'] = b[1]  # raw delta over real span, never scaled
         if b[2]: r['est'] = True
     out['d24'][cid] = r
 # best comments: top comments on each channel's 4 most-viewed shorts; refreshed every 3h
