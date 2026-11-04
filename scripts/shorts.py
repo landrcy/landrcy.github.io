@@ -85,7 +85,7 @@ for p in vh:
 out['daily'] = {k: daily[k] for k in sorted(daily)[-120:]}
 # server-computed LAST 24H per channel (Shorts view-sum delta incl. brand-new uploads; subs delta).
 # Uses ONLY real scraped snapshots: newest snapshot at/before now-24h (else the oldest available);
-# reports the RAW delta over that real span. No interpolation, scaling, or extrapolation. span <24h => est.
+# reports the RAW delta over that real span. No interpolation, scaling, or extrapolation. span not ~24h => est (page shows 'last Nh').
 def base24(k, cid):
     now = out['updated']; tgt = now - 86400*1000
     pts = [p for p in vh if cid in p.get(k, {})]
@@ -93,7 +93,7 @@ def base24(k, cid):
     lo = next((p for p in reversed(pts) if p['t'] <= tgt), None) or pts[0]
     span = now - lo['t']
     if span <= 0: return None
-    return lo[k][cid], span, span < 86400*1000 - 30*60*1000
+    return lo[k][cid], span, abs(span - 86400*1000) > 30*60*1000  # label real span if it isn't ~24h (shorter OR longer, e.g. after a scrape gap)
 out['d24'] = {}
 for cid, cur in vh[-1]['v'].items():
     r = {}
