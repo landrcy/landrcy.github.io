@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Fetch every public Short for the LLC/FFC channels -> youtube/shorts.json"""
-import json, subprocess, time, re, urllib.request, datetime
+import base64, json, subprocess, time, re, urllib.request, datetime
 CH = {'llc': ['UCT3ciRCc8ouYTix5_Heyrhg','UCCo7JOIyE3W--C9ANfWdObA','UCNBQ7mBPy16upVp0EhbdTgA','UCRegZeMyJ1B5B9n64rfgKAw','UCfDhWTThokF3gKW03iEGijg'],
       'ffc': ['UCIcfr7SXegLIyvpNiDzFLEw','UCGl9SSbOrCg2jgBLrGO4aIw']}
 try:
@@ -103,26 +103,107 @@ for cid, cur in vh[-1]['v'].items():
         r[k] = round(cv - b[0]); r['span'] = b[1]  # raw delta over real span, never scaled
         if b[2]: r['est'] = True
     out['d24'][cid] = r
+def comment_likes(toolbar):
+    """likeCountNotliked is the displayed count ('7', '1.2K'); empty means zero."""
+    raw = str((toolbar or {}).get('likeCountNotliked') or '').strip().replace(',', '')
+    mult = 1
+    if raw and raw[-1] in 'KkMm':
+        mult = 1000 if raw[-1] in 'Kk' else 1000000
+        raw = raw[:-1]
+    if raw:
+        try:
+            return int(float(raw) * mult)
+        except ValueError:
+            pass
+    m = re.search(r'([\d,.]+)\s*([KkMm])?', str((toolbar or {}).get('likeCountA11y') or ''))
+    if not m:
+        return 0
+    suf = m.group(2) or ''
+    mult = 1000 if suf in ('K', 'k') else 1000000 if suf in ('M', 'm') else 1
+    try:
+        return int(float(m.group(1).replace(',', '')) * mult)
+    except ValueError:
+        return 0
+
+def parse_comment_page(data):
+    """Top-level comments from a watch-next continuation response. Skips the uploader and replies."""
+    muts = (((data or {}).get('frameworkUpdates') or {}).get('entityBatchUpdate') or {}).get('mutations') or []
+    rows = []
+    for m in muts:
+        p = ((m.get('payload') or {}).get('commentEntityPayload') or {})
+        if not p:
+            continue
+        props, author = p.get('properties') or {}, p.get('author') or {}
+        if props.get('replyLevel') or author.get('isCreator'):
+            continue
+        text = re.sub(r'\n{3,}', '\n\n', ((props.get('content') or {}).get('content') or '')).strip()
+        if not text:
+            continue
+        rows.append({'text': text[:220], 'author': author.get('displayName') or '', 'likes': comment_likes(p.get('toolbar'))})
+    return rows
+
+def video_comments(vid):
+    """Top comments for one Short. The public watch-next continuation, not yt-dlp's player extract
+    (that path is bot-walled from GitHub Actions and was collapsing the board to a single note)."""
+    if not re.fullmatch(r'[A-Za-z0-9_-]{11}', vid or ''):
+        return []
+    token = f'\x12\r\x12\x0b{vid}\x18\x062\'"\x11"\x0b{vid}0\x00x\x020\x00B\x10comments-section'
+    body = json.dumps({
+        'context': {'client': {'clientName': 'WEB', 'clientVersion': '2.20251101.01.00', 'hl': 'en', 'gl': 'US'}},
+        'continuation': base64.b64encode(token.encode()).decode(),
+    }).encode()
+    last = None
+    for attempt in range(3):
+        req = urllib.request.Request(
+            'https://www.youtube.com/youtubei/v1/next?prettyPrint=false', data=body,
+            headers={'Content-Type': 'application/json',
+                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                     'Origin': 'https://www.youtube.com', 'Referer': f'https://www.youtube.com/watch?v={vid}'})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return parse_comment_page(json.loads(r.read().decode('utf-8', 'replace')))
+        except Exception as e:
+            last = e
+            if getattr(e, 'code', None) in (429, 500, 503) and attempt < 2:
+                time.sleep(1.2 * (attempt + 1))
+                continue
+            raise
+    raise last
+
+def pick_comments(new, oldc, fails, now):
+    """Don't cache a near-empty scrape over a real board when some videos failed."""
+    oldn = len((oldc or {}).get('list') or [])
+    if new and not (fails and len(new) < 4 and oldn >= 8):
+        return {'t': now, 'list': new}
+    return oldc or {'t': 0, 'list': []}
+
 # best comments: top comments on each channel's 4 most-viewed shorts; refreshed every 3h
 try:
     oldc = json.load(open('youtube/shorts.json')).get('comments')
 except Exception:
     oldc = None
-if oldc and out['updated'] - oldc.get('t', 0) < 3*3600*1000:
+# a 1-note board is the failed scrape, not a fresh result — don't sit on it for 3h
+old_list = (oldc or {}).get('list') or []
+if oldc and len(old_list) >= 4 and out['updated'] - oldc.get('t', 0) < 3*3600*1000:
     out['comments'] = oldc
 else:
-    cm = []
+    cm, fails, tried = [], 0, 0
     for g in ('llc', 'ffc'):
         for cid in CH[g]:
             for v in sorted([v for v in out[g] if v['cid'] == cid], key=lambda v: -v['views'])[:4]:
+                tried += 1
                 try:
-                    d = json.loads(subprocess.run(['yt-dlp','--skip-download','-J','--write-comments','--extractor-args','youtube:max_comments=15,all,0,0;comment_sort=top',f'https://www.youtube.com/shorts/{v["id"]}'],capture_output=True,text=True,timeout=120).stdout)
+                    rows = video_comments(v['id'])
                 except Exception as e:
-                    print('comments fail', v['id'], e); continue
-                for c in (d or {}).get("comments") or []:
-                    if c.get('author_is_uploader') or not (c.get('text') or '').strip(): continue
-                    cm.append({'text': c['text'][:220], 'author': c.get('author') or '', 'likes': c.get('like_count') or 0, 'vid': v['id'], 'ch': v['ch'], 'g': g})
+                    fails += 1
+                    print('comments fail', v['id'], e, flush=True)
+                    continue
+                for c in rows[:15]:
+                    cm.append({**c, 'vid': v['id'], 'ch': v['ch'], 'g': g})
+                time.sleep(0.15)
     cm.sort(key=lambda c: -c['likes'])
-    out['comments'] = {'t': out['updated'], 'list': cm[:24]} if cm else (oldc or {'t': 0, 'list': []})
+    picked = pick_comments(cm[:24], oldc, fails, out['updated'])
+    out['comments'] = picked
+    print('comments', len(picked.get('list') or []), 'fails', fails, '/', tried, 'kept' if picked is oldc or (oldc and picked.get('t') == oldc.get('t')) else 'refreshed', flush=True)
 json.dump(out, open('youtube/shorts.json','w'), ensure_ascii=False)
 print({g: len(out[g]) for g in CH})

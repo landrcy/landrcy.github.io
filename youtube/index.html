@@ -57,7 +57,7 @@ a.back{font-family:Silkscreen;font-size:12px;color:#b9b0d0;text-decoration:none;
 .skull{font-size:18px;margin-right:6px;color:#ff6b6b}
 footer{margin-top:28px;font-size:16px;color:#8d84a6}
 @media(max-width:820px){.cols{grid-template-columns:1fr}.tot{grid-template-columns:1fr}}
-@media(max-width:520px){.row{height:58px;gap:8px;padding:0 10px}.nm a{font-size:19px}.st{font-size:11px}}
+@media(max-width:520px){.row{height:58px;gap:8px;padding:0 10px}.nm a{font-size:19px}.st{font-size:11px}#cboard{gap:12px}.nt{font-size:18px}}
 @media(prefers-reduced-motion:reduce){.odo .d span,.row{transition:none}.live i{animation:none}}
 #clash{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.4;transition:background 1.5s}.nm{flex-wrap:wrap;align-content:center}.nm .ls{display:block;flex-basis:100%;font-family:VT323,monospace;font-size:15px;color:#ffcc4d;text-decoration:none;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.nm .ls:hover{text-decoration:underline}#wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
 .wt{position:relative;aspect-ratio:9/16;background:#07050f;border:3px solid #2c2244;box-shadow:4px 4px 0 #000;overflow:hidden;cursor:pointer}
@@ -88,8 +88,8 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
 .ln .rn{position:absolute;top:2px;transform:translateX(-50%);font-size:20px;transition:left 1s;filter:drop-shadow(0 0 6px currentColor)}.ln.l .rn{color:#3a8cff}.ln.f .rn{color:#ff3a4d}
 .ln .tx{position:absolute;left:8px;top:6px;font-family:Silkscreen;font-size:10px;color:#f3ecdf;text-shadow:1px 1px 0 #000;white-space:nowrap}
 .row canvas.spk{width:90px;height:30px;flex:none;image-rendering:pixelated}@media(max-width:520px){.row canvas.spk{width:50px}}
-#cboard{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;padding:10px;background:#3a2414;border:6px solid #1e1208;box-shadow:inset 0 0 0 3px #5a3820,4px 4px 0 #000}
-.nt{position:relative;display:block;padding:18px 12px 10px;color:#1a1208;text-decoration:none;box-shadow:3px 4px 0 #0008;font-size:19px;line-height:1.05;min-height:110px}
+#cboard{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr));gap:18px;padding:10px;background:#3a2414;border:6px solid #1e1208;box-shadow:inset 0 0 0 3px #5a3820,4px 4px 0 #000}
+.nt{position:relative;display:block;padding:18px 12px 10px;color:#1a1208;text-decoration:none;box-shadow:3px 4px 0 #0008;font-size:19px;line-height:1.15;min-height:110px;overflow-wrap:anywhere}
 .nt:nth-child(4n+1){background:#ffe066;transform:rotate(-2deg)}.nt:nth-child(4n+2){background:#ff9fb2;transform:rotate(1.5deg)}.nt:nth-child(4n+3){background:#9ff0e0;transform:rotate(-1deg)}.nt:nth-child(4n){background:#c9b6ff;transform:rotate(2deg)}
 .nt:hover{transform:rotate(0) scale(1.04);z-index:2}.nt::before{content:'';position:absolute;top:4px;left:50%;width:10px;height:10px;margin-left:-5px;background:#ff3a4d;border:2px solid #000}
 .nt.llc::before{background:#3a5cff}.nt small{display:block;margin-top:8px;font-family:Silkscreen;font-size:9px;color:#3a2a18}
@@ -117,7 +117,7 @@ footer{margin-top:28px;font-size:16px;color:#8d84a6}
  </section>
 </div>
  <section class="hof fame"><h2>★ BEST SHORT PER CHANNEL</h2><p class="note" style="margin:-6px 0 12px">Each channel's most-viewed Short</p><div id="top2"></div></section>
-<section class="hof cmw"><h2>✎ COMMENT BOARD</h2><p class="note" style="margin:-6px 0 12px">Best (most-liked) comments on L + F Shorts · refreshed every ~3h</p><div id="cboard"></div></section>
+<section class="hof cmw"><h2>✎ COMMENT BOARD</h2><p class="note" id="cnote" style="margin:-6px 0 12px">Best (most-liked) comments on L + F Shorts · refreshed every ~3h</p><div id="cboard"></div></section>
 <section class="hof wall"><h2>▶ LIVE SHORTS WALL</h2><p class="note" style="margin:-6px 0 12px">Each channel's latest Short · hover/tap a tile to play muted · <button id="wallall">▶ PLAY ALL</button></p><div id="wall"></div></section>
 <section class="hof race"><h2>⚑ THE RACE</h2><p class="note" style="margin:-6px 0 12px">L vs F to 1,000 subs and 1,000,000 views · ETA from recent pace (stored samples)</p><div id="race"></div></section>
 <section class="hof heat"><h2>▦ 7-DAY HEAT MAP</h2><p class="note" style="margin:-6px 0 12px">Daily gains from this browser's stored samples · <button data-hm="subs" class="on">SUBS</button> <button data-hm="views">VIEWS</button> · ? = no samples that day</p><div id="heat"></div></section>
@@ -350,9 +350,18 @@ function spark(c){const r=GROUPS[c.group].rows[c.id];let cv=r.querySelector('can
  x.lineTo(W-1,H);x.lineTo(1,H);x.fillStyle=col+'33';x.fill();x.fillStyle='#f3ecdf';x.font='8px monospace';x.fillText('+'+cmp(Math.round(ys[N])),2,8)}
 let spT=0;function extras(){race()}
 
-function cboard(d){const el=document.getElementById('cboard');if(!el)return;const L=(d.comments||{}).list||[];
- el.innerHTML=L.length?L.map(c=>`<a class="nt ${c.g}" href="https://www.youtube.com/shorts/${c.vid}" target="_blank" rel="noopener">“${esc(c.text)}”<small>${esc(c.author)} · ♥ ${cmp(c.likes)} · ${esc(c.ch)} (${c.g[0].toUpperCase()})</small></a>`).join(''):'<span class="na" style="color:#f3ecdf">no comments yet</span>'}
-async function shorts(){try{const r=await fetch('shorts.json?t='+Date.now(),{cache:'no-store'});const d=await r.json();shortsRender(d);try{localStorage.setItem('pc-shorts',JSON.stringify(d))}catch(e){}}catch(e){}}
+function cboard(d){const el=document.getElementById('cboard');if(!el)return;const L=Array.isArray((d.comments||{}).list)?d.comments.list:[];
+ const notes=[];
+ for(const c of L){if(!c||typeof c.text!=='string'||!c.text.trim()||typeof c.vid!=='string'||!/^[A-Za-z0-9_-]{11}$/.test(c.vid))continue;
+  const g=c.g==='ffc'?'ffc':'llc', likes=Number.isFinite(+c.likes)?Math.max(0,Math.round(+c.likes)):0;
+  const body=esc(c.text).replace(/\n{3,}/g,'\n\n').replace(/\n/g,'<br>');
+  notes.push(`<a class="nt ${g}" href="https://www.youtube.com/shorts/${c.vid}" target="_blank" rel="noopener">“${body}”<small>${esc(c.author||'')} · ♥ ${cmp(likes)} · ${esc(c.ch||'')} (${g[0].toUpperCase()})</small></a>`)}
+ el.innerHTML=notes.length?notes.join(''):'<span class="na" style="color:#f3ecdf">no comments yet</span>';
+ const note=document.getElementById('cnote'), t=+((d.comments||{}).t)||0;
+ if(note){let age='';if(t){const m=Math.max(0,Math.round((Date.now()-t)/60000));age=` · last update ${m<90?m+' min':Math.round(m/60)+'h'} ago`}
+  note.textContent='Best (most-liked) comments on L + F Shorts · refreshed every ~3h'+age}}
+function cboardFail(){const el=document.getElementById('cboard');if(el&&!el.querySelector('.nt'))el.innerHTML='<span class="na" style="color:#f3ecdf">couldn’t load comments — retrying</span>'}
+async function shorts(){try{const r=await fetch('shorts.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();shortsRender(d);try{localStorage.setItem('pc-shorts',JSON.stringify(d))}catch(e){}}catch(e){cboardFail()}}
 try{const c=JSON.parse(localStorage.getItem('pc-shorts'));if(c)shortsRender(c)}catch(e){}
 shorts();setInterval(()=>{if(!document.hidden)shorts()},60000);
 addEventListener('resize',render);render();boot();
