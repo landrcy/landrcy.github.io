@@ -1,6 +1,22 @@
 #!/usr/bin/env python3
 """Fetch every public Short for the LLC/FFC channels -> youtube/shorts.json"""
 import base64, json, subprocess, time, re, urllib.request, datetime
+
+def channel_identity(cid, playlist):
+    """Display name and @ URL for this channel id. None means the playlist is a different channel."""
+    if not isinstance(playlist, dict):
+        return None
+    if playlist.get('channel_id') and playlist.get('channel_id') != cid:
+        return None
+    url = playlist.get('uploader_url') or ''
+    name = playlist.get('channel') or ''
+    handle = url.rsplit('/', 1)[-1] if isinstance(url, str) else ''
+    if isinstance(url, str) and url.startswith('https://www.youtube.com/@') and name and re.fullmatch(r'@[A-Za-z0-9._-]{3,30}', handle):
+        return {'name': name, 'url': url}
+    return {}
+# Channel ids are the identity. UCRegZeMyJ1B5B9n64rfgKAw was RedditStoryADay and is now
+# JudeLow Daily (@judelowdaily). UCfDhWTThokF3gKW03iEGijg was SAT in a Minute and is now
+# Donut Vault (@donutvaultshorts). Names and @ links come from the playlist response.
 CH = {'llc': ['UCT3ciRCc8ouYTix5_Heyrhg','UCCo7JOIyE3W--C9ANfWdObA','UCNBQ7mBPy16upVp0EhbdTgA','UCRegZeMyJ1B5B9n64rfgKAw','UCfDhWTThokF3gKW03iEGijg'],
       'ffc': ['UCIcfr7SXegLIyvpNiDzFLEw','UCGl9SSbOrCg2jgBLrGO4aIw']}
 try:
@@ -9,6 +25,7 @@ except Exception:
     prev = {}
 out = {'updated': int(time.time()*1000), 'llc': [], 'ffc': [], 'latest': {}}
 SUBS = {}
+HANDLES = {}
 NOSHORTS = set()
 for g, ids in CH.items():
     for cid in ids:
@@ -22,12 +39,18 @@ for g, ids in CH.items():
             if 'does not have a shorts tab' in (r.stderr or ''): NOSHORTS.add(cid)
             else: print('fail', cid, (r.stderr or '')[-200:])
             continue
+        ident = channel_identity(cid, d)
+        if ident is None:
+            print('channel id mismatch', cid, d.get('channel_id'), d.get('channel'), flush=True)
+            continue
         ents = d.get('entries') or []
         if d.get('channel_follower_count') is not None: SUBS[cid] = d['channel_follower_count']
+        if ident: HANDLES[cid] = ident
         if ents: out['latest'][cid] = {'id': ents[0]['id'], 'title': ents[0].get('title') or ''}  # /shorts tab is newest-first
         for e in ents:
             if e.get('view_count') is None: continue
             out[g].append({'id': e['id'], 'title': e.get('title') or '', 'views': e['view_count'], 'ch': d.get('channel') or cid, 'cid': cid, 'first': prev.get(e['id']) or out['updated']})
+out['handles'] = HANDLES
 try:
     oldj = json.load(open('youtube/shorts.json')).get('joined', {})
 except Exception:
