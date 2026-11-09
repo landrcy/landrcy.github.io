@@ -48,8 +48,18 @@ for g, ids in CH.items():
         if ident: HANDLES[cid] = ident
         if ents: out['latest'][cid] = {'id': ents[0]['id'], 'title': ents[0].get('title') or ''}  # /shorts tab is newest-first
         for e in ents:
-            if e.get('view_count') is None: continue
-            out[g].append({'id': e['id'], 'title': e.get('title') or '', 'views': e['view_count'], 'ch': d.get('channel') or cid, 'cid': cid, 'first': prev.get(e['id']) or out['updated']})
+            if not e or not e.get('id'): continue
+            vc = e.get('view_count')
+            if vc is None:
+                # listing omits view_count for some public Shorts (often a true 0); fetch the video before skipping
+                try:
+                    r2 = subprocess.run(['yt-dlp','--skip-download','--print','%(view_count)s',f'https://www.youtube.com/shorts/{e["id"]}'],capture_output=True,text=True,timeout=60)
+                    raw = (r2.stdout or '').strip()
+                    vc = int(raw) if raw.isdigit() else None
+                except Exception as ex:
+                    print('view fail', e.get('id'), ex); vc = None
+            if vc is None: continue
+            out[g].append({'id': e['id'], 'title': e.get('title') or '', 'views': vc, 'ch': d.get('channel') or cid, 'cid': cid, 'first': prev.get(e['id']) or out['updated']})
 out['handles'] = HANDLES
 try:
     oldj = json.load(open('youtube/shorts.json')).get('joined', {})
@@ -120,11 +130,23 @@ def base24(k, cid):
 out['d24'] = {}
 for cid, cur in vh[-1]['v'].items():
     r = {}
-    for k, cv in (('v', cur), ('s', SUBS.get(cid))):
-        b = base24(k, cid)
-        if b is None or cv is None: continue
-        r[k] = round(cv - b[0]); r['span'] = b[1]  # raw delta over real span, never scaled
-        if b[2]: r['est'] = True
+    bv = base24('v', cid)
+    if bv is not None:
+        r['v'] = round(cur - bv[0])
+        r['span'] = bv[1]  # views span is what LAST 24H should label
+        if bv[2]: r['est'] = True
+    sv = SUBS.get(cid)
+    bs = base24('s', cid)
+    if bs is not None and sv is not None:
+        # only attach a subs delta when its baseline is ~24h; a gappy subs
+        # history must not overwrite the views span/est (that made the page
+        # say "last 139h" while the view delta was a real 24h change)
+        if not bs[2]:
+            r['s'] = round(sv - bs[0])
+        elif 'span' not in r:
+            r['s'] = round(sv - bs[0])
+            r['span'] = bs[1]
+            if bs[2]: r['est'] = True
     out['d24'][cid] = r
 def comment_likes(toolbar):
     """likeCountNotliked is the displayed count ('7', '1.2K'); empty means zero."""
