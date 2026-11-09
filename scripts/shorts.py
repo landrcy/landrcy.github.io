@@ -20,9 +20,12 @@ def channel_identity(cid, playlist):
 CH = {'llc': ['UCT3ciRCc8ouYTix5_Heyrhg','UCCo7JOIyE3W--C9ANfWdObA','UCNBQ7mBPy16upVp0EhbdTgA','UCRegZeMyJ1B5B9n64rfgKAw','UCfDhWTThokF3gKW03iEGijg'],
       'ffc': ['UCIcfr7SXegLIyvpNiDzFLEw','UCGl9SSbOrCg2jgBLrGO4aIw']}
 try:
-    prev = {v['id']: v.get('first') for g in ('llc','ffc') for v in json.load(open('youtube/shorts.json'))[g]}
+    _old_videos = [v for g in ('llc','ffc') for v in json.load(open('youtube/shorts.json'))[g]]
+    prev = {v['id']: v.get('first') for v in _old_videos}
+    prev_views = {v['id']: v['views'] for v in _old_videos if v.get('views') is not None}
 except Exception:
     prev = {}
+    prev_views = {}
 out = {'updated': int(time.time()*1000), 'llc': [], 'ffc': [], 'latest': {}}
 SUBS = {}
 HANDLES = {}
@@ -58,7 +61,10 @@ for g, ids in CH.items():
                     vc = int(raw) if raw.isdigit() else None
                 except Exception as ex:
                     print('view fail', e.get('id'), ex); vc = None
-            if vc is None: continue
+            if vc is None:
+                # listing often hides a real 0; if the video-page fetch failed, keep last known count else 0
+                vc = prev_views.get(e['id'], 0)
+                print('view default', e.get('id'), vc, flush=True)
             out[g].append({'id': e['id'], 'title': e.get('title') or '', 'views': vc, 'ch': d.get('channel') or cid, 'cid': cid, 'first': prev.get(e['id']) or out['updated']})
 out['handles'] = HANDLES
 try:
