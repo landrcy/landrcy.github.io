@@ -704,6 +704,20 @@ P.rmoon=(S,t,kind)=>{const k=K[kind];if(!k)return;if(k.paint)return k.paint(S,t)
  for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){const u=(x+.5)*pw-1,v=(y+.5)*pw-1-oy,c=k.px(u,v,x,y,PP,pw),o=(y*W+x)*4;if(c){const q=typeof c==='string'?hx(c):c;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255}else d[o+3]=0}
  S.g.putImageData(S.img,0,0)};
 }
+/* ---------- AI QUIZ: a planet split down a jagged seam; left half hard-banded chunky pixel art (the human side), right half fine dithered gradient (the AI side), a split-square moon, brief glitch tears ---------- */
+const AQC=['#06223d','#0c5a8a','#2fb4e8','#8af4ff','#e8ffff'],AQM=['#2a0a3e','#6a1a8a','#c030b0','#ff5ad2','#ffd8f6'],AQF=()=>.5;
+P.aiq=(S,t)=>{const W=S.img.width,R=W*.34,rot=t*.18,tick=Math.floor(t*5),gl=tick%12===0;
+ sphere(S,R,W/2,W/2,rot,(lon,lat,lit,x,y,nz,dx,dy)=>{
+  const row=Math.floor(y/2),seam=Math.sin(lat*5+t*1.2)*.07+(gl?(H(row,tick)-.5)*.5:(H(row,3)-.5)*.07),side=dx-seam;
+  if(Math.abs(side)<Math.max(.02,.8/R))return'#ffffff';
+  if(side<0){const gu=lon*3.4,gv=lat*3.4,iu=Math.floor(gu),iv=Math.floor(gv),h=fbm(iu*.5+3,iv*.5+7);
+   if(R>20&&(gu-iu<.07||gv-iv<.07))return AQC[0];
+   return dq(AQC,h*.7+lit*.55-.12,x,y,AQF)}
+  const h=fbm(lon*3.3+5+Math.sin(lat*4)*.6,lat*3.3+2);return dq(AQM,h*.7+lit*.55-.12,x,y)},{w:Math.max(1,R*.12),r:['#2a1a6a','#7a4aff','#57f0ff']});
+ const d=S.img.data,ma=-t*.9,m=Math.max(3,Math.round(W*.05)),mx=W/2+Math.cos(ma)*R*1.5,my=W/2+Math.sin(ma)*R*.78,back=Math.sin(ma)<0;
+ for(let yy=0;yy<m;yy++)for(let xx=0;xx<m;xx++){const px=Math.round(mx-m/2)+xx,py=Math.round(my-m/2)+yy;if(px<0||py<0||px>=W||py>=W)continue;if(back&&Math.hypot(px+.5-W/2,py+.5-W/2)<R)continue;
+  const edge=xx===0||yy===0||xx===m-1||yy===m-1,c=edge?(xx<m/2?[138,244,255]:[255,216,246]):(xx<m/2?[47,180,232]:[192,48,176]),o=(py*W+px)*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}
+ S.g.putImageData(S.img,0,0)};
 P.setFlat=v=>{FLAT=v?1:0};P.setLight=v=>{CURL=v};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
 })();
