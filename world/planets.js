@@ -132,6 +132,20 @@ const MSH={mc:a=>Math.pow(Math.pow(Math.abs(Math.cos(a)),7)+Math.pow(Math.abs(Ma
 P.moon=(S,t,kind)=>{const W=S.img.width,R=W*(kind==='mc'?.34:.4),[ramp,deco]=MOON[kind];
  sphere(S,R,W/2,W/2,t*.55,(lon,lat,lit,x,y)=>{const d=deco(lon,lat,x,y,t);if(d&&lit>.12)return d;
   const cr=vn(lon*5,lat*5);return dq(ramp,lit*.95+(cr-.5)*.25,x,y)},null,MSH[kind])};
+/* ---------- TERRA: a handmade pixel earth, waiting in the shared sky ---------- */
+const TERR=['#041428','#0a2a58','#1a6eaa','#48c0d8'],TERN=['#143818','#245a24','#3a7a32','#5a9a3c'],TERS=['#8a6a32','#c4a05a','#e8d48a'];
+P.terra=(S,t)=>{const W=S.img.width,R=W*.4;
+ sphere(S,R,W/2,W/2,t*.18,(lon,lat,lit,x,y)=>{
+  const n=fbm(lon*2.1+3,lat*2.3)+.2*fbm(lon*5.5,lat*5.5+2);
+  const ice=Math.abs(lat)>.74+(vn(lon*3,lat*8)-.5)*.08;
+  if(ice)return dq(['#b8c8d4','#e4eef4','#ffffff'],lit*1.05,x,y);
+  if(n>.46){
+    const shore=n<.52;
+    if(shore)return dq(TERS,lit*.95,x,y);
+    return dq(TERN,lit+.12*(n-.46),x,y);
+  }
+  return dq(TERR,lit*.95+n*.08,x,y);
+ },{w:Math.max(2,R*.1),r:['#0a3058','#2a70a8','#7ec8e8','#d0f0ff']})};
 /* ---------- SEA OF THOUGHT: a whole water planet sealed inside a glass bottle ---------- */
 const SEA=['#04112a','#0a2a5a','#11508a','#1f82b8','#4cb8dc','#a6e6f4'],SAND=['#5a4a22','#9c8442','#d8c070','#f4e6a8'],GLS=['#0a2a22','#1a5444','#2e8a6c','#6ad0a8','#c8ffe8','#ffffff'];
 P.sea=(S,t)=>{const W=S.img.width,R=W*.4,cx=W/2,cy=W/2,rot=t*.24;

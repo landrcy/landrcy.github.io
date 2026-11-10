@@ -68,6 +68,7 @@ body.arch #back{z-index:40}
 #info.lg .lgtx.tf{font:italic 400 15cqw/1 'Times New Roman',Times,serif;text-transform:none;color:#f7f2e7;text-shadow:0 2px 0 #111,0 0 6px #000}
 #info.lg .lgtx.tg{font:700 11cqw/1.05 'Pixelify Sans',monospace;color:#ffe2b0;text-shadow:0 3px 0 #3a1f0a,0 0 6px #000}
 #info.lg .lgtx.eca{font:400 13cqw/.95 'Anton',Impact,sans-serif;letter-spacing:.06em;color:#f2e6ee;text-shadow:0 0 10px #ff1a3a,0 3px 0 #3a0418,0 0 22px #7a2ac0}
+#info.lg .lgtx.terra{font:400 15cqw/1 'Silkscreen',monospace;color:#f4ead4;letter-spacing:.08em;text-shadow:0 2px 0 #2a1a10,0 0 8px #c4a05a}
 #info.lg .lgtx.lsu{font:800 16cqw/1 ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.04em;color:#fff;text-shadow:0 0 18px #ff3d7f}
 #info.lg .lgtx.mo{font-size:13cqw;word-break:break-word}
 #info.lg .lgplay{display:block;width:32cqmin;aspect-ratio:1;pointer-events:auto;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--ac) 55%,transparent));transition:transform .15s}
