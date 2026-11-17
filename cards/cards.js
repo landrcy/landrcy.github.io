@@ -24,7 +24,7 @@ const floor=$('floor'),table=$('table'),deck=$('deck'),box=$('box'),deckhit=$('d
 const medal=box.querySelector('.medal'),rays=box.querySelector('.rays'),pets=[...box.querySelectorAll('.pet')],glint=box.querySelector('.glint');
 $('sites').innerHTML=SITES.map(p=>`<a href="${p[2]}">${p[1]}</a>`).join('');
 // preload every face so swapping the top card's face is instant
-const FACE=SITES.map(p=>{const i=new Image();i.src='img/'+p[0]+'.png?v=3';return i});
+const FACE=SITES.map(p=>{const i=new Image();i.src='img/'+p[0]+'.png?v=4';return i});
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 function A(el,kf,o){const a=el.animate(kf,Object.assign({fill:'forwards'},o));return a.finished.then(()=>{try{a.commitStyles()}catch(e){}a.cancel()},()=>{})}
 let s=1.8,p=1,B=2,vw=0,vh=0,tx0=0,ty0=0;
