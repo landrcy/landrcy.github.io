@@ -24,20 +24,20 @@ const floor=$('floor'),table=$('table'),deck=$('deck'),box=$('box'),deckhit=$('d
 const medal=box.querySelector('.medal'),rays=box.querySelector('.rays'),pets=[...box.querySelectorAll('.pet')],glint=box.querySelector('.glint');
 $('sites').innerHTML=SITES.map(p=>`<a href="${p[2]}">${p[1]}</a>`).join('');
 // preload every face so swapping the top card's face is instant
-const FACE=SITES.map(p=>{const i=new Image();i.src='img/'+p[0]+'.png?v=2';return i});
+const FACE=SITES.map(p=>{const i=new Image();i.src='img/'+p[0]+'.png?v=3';return i});
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 function A(el,kf,o){const a=el.animate(kf,Object.assign({fill:'forwards'},o));return a.finished.then(()=>{try{a.commitStyles()}catch(e){}a.cancel()},()=>{})}
-let s=2,B=3,vw=0,vh=0,tx0=0,ty0=0;
+let s=1.8,p=1,B=2,vw=0,vh=0,tx0=0,ty0=0;
 // ---- cards (identical backs; only the top card's face matters, assigned after each shuffle) ----
 const stack=[];
-for(let i=0;i<N;i++){const c=document.createElement('div');c.className='card';c.innerHTML='<img class="px bk" src="img/back.png" alt=""><img class="px fc" alt="">';deck.appendChild(c);stack.push(c)}
-const ST=k=>`translate(0px,${-Math.floor(k/2)*s}px)`;
+for(let i=0;i<N;i++){const c=document.createElement('div');c.className='card';c.innerHTML='<img class="px bk" src="img/back.png?v=3" alt=""><img class="px fc" alt="">';deck.appendChild(c);stack.push(c)}
+const ST=k=>`translate(0px,${-Math.round(Math.floor(k/2)*s)}px)`;
 function restack(){stack.forEach((c,k)=>{c.style.zIndex=k;c.style.transform=ST(k)})}
 function layout(){vw=innerWidth;vh=innerHeight;
- s=(vh>=1060&&vw>=900)?3:2;
- B=Math.max(2,Math.min(5,Math.floor((vw-24)/100),Math.floor((vh-150)/140)));
- document.body.style.setProperty('--s',s);
- const tw=116*s,th=160*s,gap=70;
+ p=(vh>=1100&&vw>=900)?2:1;s=1.8*p;
+ B=Math.max(1,Math.min(3,Math.floor((vw-24)/180),Math.floor((vh-150)/252)));
+ document.body.style.setProperty('--s',s);document.body.style.setProperty('--p',p);
+ const tw=208*p,th=288*p,gap=70;
  tx0=Math.round((vw-tw)/2);ty0=Math.max(56,Math.round((vh-th-gap)/2));
  table.style.left=tx0+'px';table.style.top=ty0+'px';table.style.transform='none';
  shuf.style.top=(ty0+th+20)+'px';
@@ -47,19 +47,19 @@ function layout(){vw=innerWidth;vh=innerHeight;
 let busy=false,state='box',cur=null,last=-1;
 // ---- sparkles ----
 function spark(x,y,n,r,dur=520){if(RM.matches)return;for(let i=0;i<n;i++){const im=document.createElement('img');im.src='img/spark.png';im.className='px';fx.appendChild(im);
- const a=Math.PI*2*i/n+Math.random()*.6,d=r*(.6+Math.random()*.5),z=7*s/2;
+ const a=Math.PI*2*i/n+Math.random()*.6,d=r*(.6+Math.random()*.5),z=7*p;
  im.style.left=Math.round(x-z)+'px';im.style.top=Math.round(y-z)+'px';
  im.animate([{transform:'translate(0,0) scale(.4)',opacity:1},{transform:`translate(${Math.round(Math.cos(a)*d)}px,${Math.round(Math.sin(a)*d)}px) scale(1)`,opacity:1,offset:.55},{transform:`translate(${Math.round(Math.cos(a)*d*1.25)}px,${Math.round(Math.sin(a)*d*1.25)}px) scale(.6)`,opacity:0}],{duration:dur+Math.random()*160,easing:'cubic-bezier(.2,.7,.3,1)'}).finished.then(()=>im.remove())}}
 // ---- glint sweep across the closed box (low-res canvas, so the shine is pixel art too) ----
-const gx=glint.getContext('2d'),boxImg=new Image();boxImg.src='img/box.png';
+const gx=glint.getContext('2d'),boxImg=new Image();boxImg.src='img/box.png?v=3';
 let glintOn=true;
 function sweep(){if(!glintOn||RM.matches)return;const t0=performance.now(),D=900;
- (function f(t){const p=Math.min(1,(t-t0)/D),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2,x=Math.round(-70+e*260);gx.clearRect(0,0,116,160);
+ (function f(t){const p=Math.min(1,(t-t0)/D),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2,x=Math.round(-126+e*468);gx.clearRect(0,0,208,288);
   if(glintOn&&p<1){gx.globalCompositeOperation='source-over';
-   const band=(o,w,al)=>{gx.fillStyle=`rgba(255,250,225,${al})`;gx.beginPath();gx.moveTo(x+o,0);gx.lineTo(x+o+w,0);gx.lineTo(x+o+w-60,160);gx.lineTo(x+o-60,160);gx.closePath();gx.fill()};
-   band(0,14,.28);band(4,6,.5);band(18,3,.3);
+   const band=(o,w,al)=>{gx.fillStyle=`rgba(255,250,225,${al})`;gx.beginPath();gx.moveTo(x+o,0);gx.lineTo(x+o+w,0);gx.lineTo(x+o+w-108,288);gx.lineTo(x+o-108,288);gx.closePath();gx.fill()};
+   band(0,25,.28);band(7,11,.5);band(32,5,.3);
    gx.globalCompositeOperation='destination-in';gx.drawImage(boxImg,0,0);gx.globalCompositeOperation='source-over';requestAnimationFrame(f)}
-  else gx.clearRect(0,0,116,160)})(t0);
+  else gx.clearRect(0,0,208,288)})(t0);
  setTimeout(sweep,3400)}
 setTimeout(sweep,700);
 // ---- open the box: dial twist + clicks, medallion lifts, panels bloom, gold light, cards fan out then gather ----
@@ -81,7 +81,7 @@ async function openBox(){if(busy||state!=='box')return;busy=true;box.disabled=tr
  // final heavy click
  spark(mx,my,10,40*s,640);
  await A(table,[{transform:'translate(0,0)'},{transform:`translate(0,${2*s}px)`,offset:.3},{transform:`translate(0,${-s}px)`,offset:.65},{transform:'translate(0,0)'}],{duration:220,easing:'ease-out'});
- glintOn=false;gx.clearRect(0,0,116,160);
+ glintOn=false;gx.clearRect(0,0,208,288);
  // medallion presses in, then lifts away; gold light spills from the opening
  A(medal,[{transform:'rotate(360deg) translateY(0px) scale(1)',opacity:1},{transform:'rotate(360deg) translateY(0px) scale(.9)',opacity:1,offset:.2,easing:'cubic-bezier(.3,0,.2,1)'},{transform:`rotate(360deg) translateY(${-18*s}px) scale(1.25)`,opacity:0}],{duration:560});
  A(rays,[{opacity:0,transform:'scale(.2) rotate(0deg)'},{opacity:1,transform:'scale(1.06) rotate(14deg)',offset:.6},{opacity:.85,transform:'scale(1) rotate(22deg)'}],{duration:1100,delay:120,easing:'cubic-bezier(.2,.8,.3,1)'});
@@ -111,7 +111,7 @@ function finishOpen(){box.hidden=true;floor.hidden=true;deck.style.zIndex=2;deck
 function pickNext(){let n;do n=Math.floor(Math.random()*N);while(n===last&&N>1);return n}
 async function riffle(){
  if(RM.matches){await A(deck,[{opacity:1},{opacity:.35}],{duration:160,easing:'ease'});await A(deck,[{opacity:.35},{opacity:1}],{duration:160,easing:'ease'});return}
- const dx=Math.min(54*s,Math.floor((vw-100*s)/2)-10),L=stack.slice(0,7),R=stack.slice(7);
+ const dx=Math.min(Math.round(54*s),Math.floor((vw-180*p)/2)-10),L=stack.slice(0,7),R=stack.slice(7);
  const halfT=(side,j)=>`translate(${side*dx}px,${-8*s-Math.floor(j/2)*s}px) rotate(${side*6}deg)`;
  await Promise.all([...L.map((c,j)=>A(c,[{transform:ST(j)+' rotate(0deg)'},{transform:halfT(-1,j)}],{duration:230,delay:j*6,easing:'cubic-bezier(.3,0,.15,1)'})),
   ...R.map((c,j)=>A(c,[{transform:ST(7+j)+' rotate(0deg)'},{transform:halfT(1,j)}],{duration:230,delay:j*6,easing:'cubic-bezier(.3,0,.15,1)'}))]);
@@ -128,7 +128,7 @@ async function riffle(){
  stack.length=0;stack.push(...out);restack();
  await A(deck,[{transform:'scale(1,1)'},{transform:'scale(.98,1.015)',offset:.4},{transform:'scale(1,1)'}],{duration:170,easing:'ease-out'})}
 // ---- flip the top card, then pop it up big ----
-function bigTarget(){const w=100*B,h=140*B,acth=64;return{w,h,x:Math.round((vw-w)/2),y:Math.max(58,Math.round((vh-h-acth)/2))}}
+function bigTarget(){const w=180*B,h=252*B,acth=64;return{w,h,x:Math.round((vw-w)/2),y:Math.max(58,Math.round((vh-h-acth)/2))}}
 function placeBig(c,anim){const t=bigTarget();c.style.setProperty('--cs',B);c.style.left=t.x+'px';c.style.top=t.y+'px';c.style.transform='none';acts.style.top=(t.y+t.h+22)+'px'}
 async function draw(){if(busy||state!=='deck')return;busy=true;deckhit.disabled=true;shuf.disabled=true;
  A(shuf,[{opacity:1},{opacity:.35}],{duration:160});
@@ -144,7 +144,7 @@ async function draw(){if(busy||state!=='deck')return;busy=true;deckhit.disabled=
  }else{await A(c,[{opacity:1},{opacity:0}],{duration:150});c.classList.add('up');await A(c,[{opacity:0},{opacity:1}],{duration:150})}
  // move into the overlay layer at the same spot, then grow to the big size
  const r=rect(c);big.appendChild(c);c.style.zIndex=1;c.style.left=r.left+'px';c.style.top=r.top+'px';c.style.transform='none';
- const t=bigTarget(),k=B/s,dx=(t.x+t.w/2)-(r.left+r.width/2),dy=(t.y+t.h/2)-(r.top+r.height/2);
+ const t=bigTarget(),k=B/p,dx=(t.x+t.w/2)-(r.left+r.width/2),dy=(t.y+t.h/2)-(r.top+r.height/2);
  shade.hidden=false;state='big';
  if(!RM.matches){A(shade,[{opacity:0},{opacity:1}],{duration:360,easing:'ease'});
   await A(c,[{transform:'translate(0px,0px) scale(1)',easing:'cubic-bezier(.3,0,.2,1)'},{transform:`translate(${dx}px,${dy}px) scale(${k*1.045})`,offset:.72,easing:'cubic-bezier(.4,0,.3,1)'},{transform:`translate(${dx}px,${dy}px) scale(${k*.99})`,offset:.88,easing:'ease-in-out'},{transform:`translate(${dx}px,${dy}px) scale(${k})`}],{duration:560});
@@ -155,7 +155,7 @@ async function draw(){if(busy||state!=='deck')return;busy=true;deckhit.disabled=
  busy=false;go.focus({preventScroll:true})}
 async function drawAgain(){if(busy||state!=='big')return;busy=true;const c=cur;
  await A(acts,[{opacity:1},{opacity:0}],{duration:140,easing:'ease'});acts.hidden=true;
- const d=rect(deck),tw=100*s,th=140*s,tl=d.left,tt=d.top-Math.floor((N-1)/2)*s,t=bigTarget(),k=s/B,dx=(tl+tw/2)-(t.x+t.w/2),dy=(tt+th/2)-(t.y+t.h/2);
+ const d=rect(deck),tw=180*p,th=252*p,tl=d.left,tt=d.top-Math.round(Math.floor((N-1)/2)*s),t=bigTarget(),k=p/B,dx=(tl+tw/2)-(t.x+t.w/2),dy=(tt+th/2)-(t.y+t.h/2);
  A(shade,[{opacity:1},{opacity:0}],{duration:300,easing:'ease'}).then(()=>shade.hidden=true);
  if(!RM.matches)await A(c,[{transform:'translate(0px,0px) scale(1)'},{transform:`translate(${dx}px,${dy}px) scale(${k})`}],{duration:380,easing:'cubic-bezier(.5,0,.25,1)'});
  else await A(c,[{opacity:1},{opacity:0}],{duration:160});
