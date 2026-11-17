@@ -1,0 +1,16 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="../favicons/sun-L-32.png" type="image/png" sizes="32x32"><link rel="icon" href="../favicons/sun-L.ico" sizes="any"><link rel="apple-touch-icon" href="../favicons/sun-L-180.png">
+<title>Laverse Gumball Machine</title><meta name="description" content="Laverse as a gumball machine: drop in a quarter and get one of Landry's sites.">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="gumball.css?v=1"></head><body>
+<a id="back" href="/" aria-label="Back to the shelf"><svg viewBox="0 0 9 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M3 1h1v1H3zM2 2h1v1H2zM1 3h1v1H1zM0 4h8v1H0zM1 5h1v1H1zM2 6h1v1H2zM3 7h1v1H3z"/></svg></a>
+<canvas id="gm" role="img" aria-label="A gumball machine full of planet gumballs, one for each of Landry's sites"></canvas>
+<button id="spin" type="button"><span class="q" aria-hidden="true">L</span><span class="t">Insert quarter</span></button>
+<div id="pop" role="dialog" aria-modal="true" aria-labelledby="pname" hidden>
+ <div class="burst" aria-hidden="true"></div>
+ <canvas id="pimg" role="img"></canvas>
+ <div class="ptxt"><h1 id="pname"></h1><div class="pbtns"><a id="pgo" class="b go" href="#">Go to site</a><button id="again" class="b again" type="button">Spin again</button></div></div>
+</div>
+<nav class="sr" aria-label="Sites" id="sites"></nav>
+<script src="gumball.js?v=1"></script>
+</body></html>
