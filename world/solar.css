@@ -82,7 +82,6 @@ body.arch #back{z-index:40}
 #info.lg .lgch[hidden]{display:none}
 #info.lg .lgc{font:400 5.5cqw 'Silkscreen',monospace;color:#fff;background:#ff0033;border:0;box-shadow:0 2px 0 #8a0014;padding:1.5cqh 3cqw;cursor:pointer}
 #info.lg .lgc:hover{background:#ff4060}
-#info.lg .lgtx.fb{font-size:15cqw;line-height:.95;color:#ffcf3a;text-shadow:0 .6cqw 0 #ff6464,0 1.2cqw 0 #3a1a06,0 0 6px #000}
 #sndbtn{right:calc(7.5rem + env(safe-area-inset-right,0px));width:2.4rem;height:2.4rem;padding:.35rem;display:flex;align-items:center;justify-content:center}
 #sndbtn svg{width:24px;height:24px;image-rendering:pixelated}
 #sndbtn[aria-pressed=true]{color:#5affb0}
