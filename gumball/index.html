@@ -1,13 +1,12 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="icon" href="../favicons/sun-L-32.png" type="image/png" sizes="32x32"><link rel="icon" href="../favicons/sun-L.ico" sizes="any"><link rel="apple-touch-icon" href="../favicons/sun-L-180.png">
 <title>Laverse Gumball Machine</title><meta name="description" content="Laverse as a gumball machine: drop in a quarter and get one of Landry's sites.">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="gumball.css?v=1"></head><body>
 <a id="back" href="/" aria-label="Back to the shelf"><svg viewBox="0 0 9 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M3 1h1v1H3zM2 2h1v1H2zM1 3h1v1H1zM0 4h8v1H0zM1 5h1v1H1zM2 6h1v1H2zM3 7h1v1H3z"/></svg></a>
 <canvas id="gm" role="img" aria-label="A gumball machine full of planet gumballs, one for each of Landry's sites"></canvas>
-<button id="spin" type="button"><span class="q" aria-hidden="true">L</span><span class="t">Insert quarter</span></button>
+<button id="spin" type="button"><svg class="q" viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true"><path fill="#5f646e" d="M4 0h4v1h2v1h1v2h1v4h-1v2h-1v1H8v1H4v-1H2v-1H1V8H0V4h1V2h1V1h2z"/><path fill="#dde0e6" d="M4 1h4v1h2v2h1v4h-1v2H8v1H4v-1H2V8H1V4h1V2h2z"/><path fill="#ffffff" d="M4 2h2v1H4zM3 3h1v2H3z"/><path fill="#5f646e" d="M5 3h1v5h3v1H5z"/></svg><span class="t">Insert quarter</span></button>
 <div id="pop" role="dialog" aria-modal="true" aria-labelledby="pname" hidden>
- <div class="burst" aria-hidden="true"></div>
  <canvas id="pimg" role="img"></canvas>
  <div class="ptxt"><h1 id="pname"></h1><div class="pbtns"><a id="pgo" class="b go" href="#">Go to site</a><button id="again" class="b again" type="button">Spin again</button></div></div>
 </div>
