@@ -11,7 +11,7 @@ button{font:inherit;background:none;border:0;cursor:pointer;color:inherit}
 #box{position:absolute;inset:0;transform-style:preserve-3d;perspective:calc(1260px*var(--p));z-index:3}
 #box:focus-visible{outline:2px dashed #b07a1c;outline-offset:6px}
 #box>*{position:absolute;left:0;top:0}
-#mech{width:calc(208px*var(--p));height:calc(528px*var(--p));pointer-events:none}
+#mech{left:calc(-104px*var(--p));top:calc(-20px*var(--p));width:calc(416px*var(--p));height:calc(328px*var(--p));pointer-events:none}
 #lift{position:absolute;left:0;top:calc(252px*var(--p));width:calc(180px*var(--p));height:calc(8px*var(--p));z-index:0}
 #box .rays{width:calc(360px*var(--p));height:calc(360px*var(--p));left:calc(-76px*var(--p));top:calc(-41px*var(--p));opacity:0;transform:scale(.2)}
 #floor{position:absolute;left:0;top:0;width:100%;height:100%;z-index:1}#box .rays{z-index:5;pointer-events:none}

@@ -2,10 +2,10 @@
    Causal chain: the L dial (61 teeth) turns in three detents -> it drives gear A (14) and gear C (14).
    A carries pinion pa (6) which moves two racks in opposite directions: the top bolts slide out of the frame.
    C carries pinion pc (6) -> idlers F (10) -> G (7). G_r drives a vertical rack (the bottom bolt); a spring pawl
-   ticks over G_l. When the last bolt clears, the plate settles on its hinges and falls open; the deck lift rises.
+   ticks over G_l. When the last bolt clears, the box unlatches and splits down the middle seam: each half swings open on its outer edge.
    The gear train follows the dial through a stiff spring (a little backlash and settle). No overlays, no glows. */
 (()=>{'use strict';
-const BW=208,BH=288,CH=528,X0=33,Y0=33,X1=175,Y1=255,TAU=Math.PI*2;
+const BW=208,BH=288,CW=416,CH=328,OX=104,OY=20,X0=33,Y0=33,X1=175,Y1=255,TAU=Math.PI*2;
 const C=(r,g,b)=>(255<<24)|(b<<16)|(g<<8)|r;
 const DK=C(36,20,4),G4=C(110,66,14),G3=C(160,110,30),G2=C(214,166,66),G1=C(240,204,110),HL=C(255,240,184),HOLE=C(40,22,8),
  ST0=C(70,72,84),ST1=C(140,144,156),ST2=C(214,218,226);
@@ -16,16 +16,17 @@ const STEP=25; // degrees per detent
 const BOLT={rr:10,r4:40,rl:34}; // rack travel (px) before each bolt clears the frame
 function train(th){const a=mesh(D,th,A),el=mesh(A,a,EL),er=mesh(A,a,ER),c=mesh(D,th,CC),fl=mesh(CC,c,FL),fr=mesh(CC,c,FR),gl=mesh(FL,fl,GL),gr=mesh(FR,fr,GR);return{a,el,er,c,fl,fr,gl,gr}}
 function load(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src})}
-const Mech={};let cv,ctx,pc,pctx,buf,b32,base32,imgs={},ready;
+const Mech={};let wc,wctx,cv,ctx,pc,pctx,buf,b32,base32,imgs={},ready;
 Mech.init=async function(canvas,v){cv=canvas;ctx=cv.getContext('2d');
- const [plate,back,frame,medal]=await Promise.all(['plate','plateback','frame','medal'].map(n=>load('img/'+n+'.png?v='+v)));
- imgs={plate,back,frame,medal};
+ const [plate,back,frame,medal,door]=await Promise.all(['plate','plateback','frame','medal','doorin'].map(n=>load('img/'+n+'.png?v='+v)));
+ imgs={plate,back,frame,medal,door};
+ wc=document.createElement('canvas');wc.width=BW;wc.height=BH;wctx=wc.getContext('2d');
  pc=document.createElement('canvas');pc.width=BW;pc.height=BH;pctx=pc.getContext('2d');
  const t=document.createElement('canvas');t.width=BW;t.height=BH;const tx=t.getContext('2d');tx.drawImage(plate,0,0);
  base32=new Uint32Array(tx.getImageData(0,0,BW,BH).data.buffer.slice(0));
  buf=pctx.createImageData(BW,BH);b32=new Uint32Array(buf.data.buffer);
  ready=true;state.dial=0;state.train=0;phases();render()};
-const state={dial:0,train:0,drop:0,phi:0,shake:0};let T0,ph={};
+const state={dial:0,train:0,shake:0,gap:0,psi:0};let T0,ph={};
 // rack phases so each rack's teeth sit in its pinion's gaps at rest
 function phases(){T0=train(0);const f=(th,n)=>th+.46*TAU/n;
  ph.rl=EL.x+PE.R*(f(T0.el,PE.N)+Math.PI/2);ph.rr=ER.x-PE.R*(f(T0.er,PE.N)-Math.PI/2);ph.r4=GR.y+GR.R*f(T0.gr,GR.N)}
@@ -105,49 +106,52 @@ function drawPlate(){b32.set(base32);
  pctx.putImageData(buf,0,0);
  // the L medallion turns with the dial (nearest-neighbour rotation keeps it pixel art)
  pctx.save();pctx.imageSmoothingEnabled=false;pctx.translate(DX,DY);pctx.rotate(state.dial);pctx.drawImage(imgs.medal,-59.5,-59.5);pctx.restore()}
-function render(){if(!ready)return;ctx.clearRect(0,0,BW,CH);ctx.imageSmoothingEnabled=false;
- const sy=state.shake|0;
- drawPlate();
- ctx.drawImage(imgs.frame,0,sy);
- const phi=state.phi,drop=state.drop|0;
- if(phi<=0){ctx.drawImage(pc,X0,Y0,X1-X0,Y1-Y0,X0,Y0+sy+drop,X1-X0,Y1-Y0);return}
- // the plate falls forward on its bottom hinge: rows compress toward the hinge, the top edge comes toward you
- const c=Math.cos(phi),s=Math.sin(phi),H=Y1-Y0,hy=Y1+drop+sy;
- if(c>=0){for(let j=0;j<H;j++){const dist=H-j,k=1+.16*s*dist/H,w=Math.round((X1-X0)*k),x=Math.round(DX-w/2),y=Math.round(hy-dist*c);
-   ctx.drawImage(pc,X0,Y0+j,X1-X0,1,x,y,w,1)}
-  if(phi>.08){const k=1+.16*s,w=Math.round((X1-X0)*k),x=Math.round(DX-w/2),y=Math.round(hy-H*c),th=Math.max(1,Math.round(4*s));ctx.fillStyle='#24140'+'4';ctx.fillRect(x,y-th-1,w,th+1);ctx.fillStyle='#d6a642';ctx.fillRect(x+1,y-th,w-2,th);ctx.fillStyle='#f0cc6e';ctx.fillRect(x+1,y-th,w-2,1)}}
- else{const cc=-c;for(let j=0;j<H;j++){const dist=H-j,k=1+.16*s*dist/H,w=Math.round((X1-X0)*k),x=Math.round(DX-w/2),y=Math.round(hy+dist*cc);
-   ctx.drawImage(imgs.back,X0,Y0+j,X1-X0,1,x,y,w,1)}
-  const k=1+.16*s,w=Math.round((X1-X0)*k),x=Math.round(DX-w/2),y=Math.round(hy+H*cc),th=Math.max(1,Math.round(4*s));ctx.fillStyle='#241404';ctx.fillRect(x,y,w,th+1);ctx.fillStyle='#a06e1e';ctx.fillRect(x+1,y,w-2,th)}
-}
+function render(){if(!ready)return;ctx.clearRect(0,0,CW,CH);ctx.imageSmoothingEnabled=false;
+ const sy=state.shake|0;drawPlate();
+ // the closed box: frame + plate
+ wctx.clearRect(0,0,BW,BH);wctx.imageSmoothingEnabled=false;wctx.drawImage(imgs.frame,0,0);wctx.drawImage(pc,X0,Y0,X1-X0,Y1-Y0,X0,Y0,X1-X0,Y1-Y0);
+ const psi=state.psi,gap=Math.round(state.gap);
+ if(psi<=0&&gap===0){ctx.drawImage(wc,OX,OY+sy);return}
+ // split: each half swings on its outer edge. Columns compress toward the hinge; the seam side comes toward you.
+ const c=Math.cos(psi),s=Math.sin(psi),HW=BW/2;
+ const half=(right)=>{const hinge=right?OX+BW+gap:OX-gap;
+  for(let d=0;d<HW;d++){const k=1+.13*s*d/HW,h=Math.round(BH*k),y=Math.round(OY+BH/2-h/2)+sy;
+   if(c>=0){const x=right?hinge-1-Math.round(d*c):hinge+Math.round(d*c),sx=right?BW-1-d:d;ctx.drawImage(wc,sx,0,1,BH,x,y,1,h)}
+   else{const x=right?hinge+Math.round(d*-c):hinge-1-Math.round(d*-c),sx=right?HW-1-d:d;ctx.drawImage(imgs.door,right?sx:HW-1-sx,0,1,BH,x,y,1,h)}}
+  // door thickness along the seam edge (gold, 3 hard bands)
+  if(s>.06){const k=1+.13*s,h=Math.round(BH*k),y=Math.round(OY+BH/2-h/2)+sy,w=Math.max(1,Math.round(6*s)),ex=right?hinge-Math.round(HW*c):hinge+Math.round(HW*c);
+   const x0=right?ex-w-1:ex,cols=['#241404','#a06e1e','#d6a642','#f0cc6e'];
+   for(let i=0;i<=w;i++){ctx.fillStyle=i===0||i===w?cols[0]:cols[1+Math.min(2,(i*3/w)|0)];ctx.fillRect(right?x0+i:x0+i,y,1,h)}}};
+ half(false);half(true)}
 // ---- the opening, driven by one rAF clock; returns a promise when the deck can rise ----
 const eio=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,eo=t=>1-Math.pow(1-t,3),ei=t=>t*t;
 const R=Math.PI/180;
+const K=1.5; // overall pace
 function dialAt(t){ // anticipation, then three detents with overshoot and settle
- if(t<180)return -4*R*eo(t/180);let a=-4*R;
- for(let i=0;i<3;i++){const s0=180+i*470,to=(STEP*(i+1))*R;
-  if(t<s0+290)return a+(to+1.6*R-a)*eio(Math.max(0,(t-s0)/290));
-  if(t<s0+380)return to+1.6*R*(1-eo((t-s0-290)/90));
-  if(t<s0+470)return to;a=to}
+ const A0=180*K,S=470*K,RT=290*K,ST=90*K;
+ if(t<A0)return -4*R*eo(t/A0);let a=-4*R;
+ for(let i=0;i<3;i++){const s0=A0+i*S,to=(STEP*(i+1))*R;
+  if(t<s0+RT)return a+(to+1.6*R-a)*eio(Math.max(0,(t-s0)/RT));
+  if(t<s0+RT+ST)return to+1.6*R*(1-eo((t-s0-RT)/ST));
+  if(t<s0+S)return to;a=to}
  return 3*STEP*R}
-Mech.open=function(hooks){return new Promise(res=>{
- let t0=performance.now(),v=0,last=t0,clicked=[false,false,false],dropT=0,fallT=0;
+const DIAL_END=180*K+3*470*K;
+Mech.open=function(){return new Promise(res=>{
+ let t0=performance.now(),v=0,last=t0,clicked=[false,false,false];
  const step=now=>{const t=now-t0;let dt=Math.min(32,now-last)/1000;last=now;
   const target=dialAt(t);
-  // gear train follows the dial through a stiff spring: tiny lag, overshoot, settle (backlash)
+  // the gear train follows the dial through a stiff spring: tiny lag, overshoot, settle (backlash)
   for(let k=0;k<4;k++){const h=dt/4,acc=1800*(target-state.train)-34*v;v+=acc*h;state.train+=v*h}
   state.dial=target;
-  // detent feedback: 1px knock when each detent seats
-  for(let i=0;i<3;i++){const s0=180+i*470+290;if(!clicked[i]&&t>=s0){clicked[i]=true;state.shake=1;setTimeout(()=>state.shake=0,50)}}
-  const end=180+3*470;
-  if(t>=end+60&&!dropT){dropT=now}
-  if(dropT){state.drop=now-dropT>40?1:0}
-  if(dropT&&now-dropT>170&&!fallT){fallT=now;hooks&&hooks.fall&&hooks.fall()}
-  if(fallT){const u=(now-fallT);
-   // gravity fall to the stop, then a damped bounce on the hinge
-   if(u<480)state.phi=100*R*ei(u/480);
-   else{const b=u-480;state.phi=(100-11*Math.exp(-b/120)*Math.abs(Math.sin(b/62)))*R}
-   if(u>900){render();res();return}}
+  for(let i=0;i<3;i++){const s0=180*K+i*470*K+290*K;if(!clicked[i]&&t>=s0){clicked[i]=true;state.shake=1;setTimeout(()=>state.shake=0,60)}}
+  // last bolt is clear: the halves unlatch (a 1px jolt apart), rest a beat, then swing open on the outer edges
+  const u=t-DIAL_END-160;
+  if(u>0){
+   state.gap=u<110?eo(u/110)*1.2:1.2;
+   const w=u-380,T=1250;
+   if(w>0){if(w<T)state.psi=118*R*(w<T*.5?.5*Math.pow(w/(T*.5),2.2):1-.5*Math.pow(1-(w-T*.5)/(T*.5),2.2));
+    else{const b=w-T;state.psi=(118-9*Math.exp(-b/170)*Math.sin(Math.min(Math.PI,b/95)))*R}
+    if(w>T+560){render();res();return}}}
   render();requestAnimationFrame(step)};
  requestAnimationFrame(step)})};
 Mech.render=render;

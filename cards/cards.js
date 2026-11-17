@@ -44,23 +44,18 @@ function layout(){vw=innerWidth;vh=innerHeight;
  if(state==='big'&&cur)placeBig(cur,false);
 }
 let busy=false,state='box',cur=null,last=-1;
-Mech.init(document.getElementById('mech'),5);
-const lift=document.createElement('img');lift.id='lift';lift.className='px';lift.src='img/lift.png?v=5';lift.alt='';deck.appendChild(lift);
-// ---- open the box: the clockwork lock (mech.js), then the deck lift ----
+Mech.init(document.getElementById('mech'),6);
+// ---- open the box: the clockwork lock and the split (mech.js) ----
 function rect(el){return el.getBoundingClientRect()}
 async function openBox(){if(busy||state!=='box')return;busy=true;box.disabled=true;
  if(RM.matches){A(floor,[{opacity:1},{opacity:0}],{duration:320,easing:'ease'});await A(box,[{opacity:1},{opacity:0}],{duration:320,easing:'ease'});finishOpen();return}
  await Mech.open();
- // the deck lift rises out of the open box (slow start, weighty stop)
- const L=Math.round(96*p);
- await A(deck,[{transform:'translateY(0px)',easing:'cubic-bezier(.55,0,.35,1)'},{transform:`translateY(${-L-Math.round(3*p)}px)`,offset:.86,easing:'cubic-bezier(.3,0,.4,1)'},{transform:`translateY(${-L}px)`}],{duration:900});
- await wait(140);
- // the box sinks away and the deck settles where it stood
- A(box,[{opacity:1,transform:'translateY(0px)'},{opacity:0,transform:`translateY(${Math.round(16*p)}px)`}],{duration:420,easing:'cubic-bezier(.5,0,.75,0)'});
- A(floor,[{opacity:1},{opacity:0}],{duration:420,easing:'ease'});A(lift,[{opacity:1},{opacity:0}],{duration:300,easing:'ease'});
- await A(deck,[{transform:`translateY(${-L}px)`,easing:'cubic-bezier(.45,0,.3,1)'},{transform:`translateY(${Math.round(2*p)}px)`,offset:.82,easing:'ease-out'},{transform:'translateY(0px)'}],{duration:560,delay:120});
+ await wait(220);
+ // the open box steps back and leaves the deck where it sat
+ A(box,[{opacity:1},{opacity:0}],{duration:480,easing:'ease-in'});
+ await A(floor,[{opacity:1},{opacity:0}],{duration:520,delay:60,easing:'ease-in'});
  finishOpen()}
-function finishOpen(){box.hidden=true;floor.hidden=true;lift.hidden=true;deck.style.transform='';deck.style.zIndex=2;deck.style.setProperty('--sh',1);restack();state='deck';deckhit.hidden=false;shuf.hidden=false;
+function finishOpen(){box.hidden=true;floor.hidden=true;deck.style.transform='';deck.style.zIndex=2;deck.style.setProperty('--sh',1);restack();state='deck';deckhit.hidden=false;shuf.hidden=false;
  A(shuf,[{opacity:0,transform:'translate(-50%,8px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:260,easing:'cubic-bezier(.2,.8,.3,1)'}).then(()=>{shuf.style.transform=''});
  busy=false;shuf.focus({preventScroll:true})}
 // ---- riffle shuffle ----
