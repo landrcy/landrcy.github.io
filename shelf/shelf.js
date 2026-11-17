@@ -224,12 +224,12 @@ function zoomIn(o){if(busy||zoomed)return;busy=true;zoomed=o;o._arrived=false;ob
   if(rm){fadeTo(1,140,'#fff').then(()=>{setCam(to.k,to.tx,to.ty);draw();return fadeTo(0,160)}).then(arrive)}
   else tweenCam(ctr(o),to,1050,t=>backIO(t,.85),arrive)};
  if(o.id==='cards'&&!cardsOK)cardsCheck().then(proceed);else proceed()}
-function goBack(fromPop){if(!zoomed||(busy&&!zoomed._arrived))return;busy=true;const o=zoomed,rm=RM.matches;back.classList.remove('on');
+function goBack(fromPop){if(!zoomed||zoomed._leaving||(busy&&!zoomed._arrived))return;busy=true;const o=zoomed,rm=RM.matches;o._leaving=true;back.classList.remove('on');
  spin.on=false;spin.drag=null;spin.hover=false;pad.hidden=true;pad.classList.remove('sun');if(ORR.glow){ORR.glow=0;spin.dirty=true}
  if(!fromPop&&history.state&&history.state.shelf)history.back();
  const pl=plate.hidden?Promise.resolve():plate.animate([{opacity:1},{opacity:0}],{duration:160,fill:'forwards'}).finished.then(()=>{plate.hidden=true;plate.getAnimations().forEach(a=>a.cancel())});
- const ap=app?app.animate([{opacity:1},{opacity:0}],{duration:rm?140:260,easing:'ease-in',fill:'forwards'}).finished.then(()=>{app.remove();app=null}):Promise.resolve();
- Promise.all([pl,ap]).then(()=>{const fin=()=>{zoomed=null;busy=false;back.hidden=true;document.body.classList.remove('zoomed');o.btn.focus({preventScroll:true});kick()};
+ const ap=app?app.animate([{opacity:1},{opacity:0}],{duration:rm?140:260,easing:'ease-in',fill:'forwards'}).finished.then(()=>{if(app){app.remove();app=null}}):Promise.resolve();
+ Promise.all([pl,ap]).then(()=>{const fin=()=>{o._leaving=false;zoomed=null;busy=false;back.hidden=true;document.body.classList.remove('zoomed');o.btn.focus({preventScroll:true});kick()};
   if(rm){fadeTo(1,120,'#fff').then(()=>{setCam(1,0,0);draw();return fadeTo(0,160)}).then(fin)}else tweenCam(ctr(o),{k:1,tx:0,ty:0},850,t=>backIO(t,.7),fin)})}
 back.addEventListener('click',()=>goBack());
 addEventListener('keydown',e=>{if(e.key==='Escape')goBack()});
