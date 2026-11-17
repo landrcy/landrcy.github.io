@@ -88,20 +88,23 @@ function placeRows(rows,hg,vg,x0,y0){const SH=24;let y=y0;const out=[];
  rows.forEach((r,i)=>{const rh=Math.max(...r.map(k=>O[k].s.h)),rw=r.reduce((a,k)=>a+O[k].s.w,0)+hg[i]*(r.length-1),top=y+rh;let X=x0-Math.round(rw/2);
   out.push({x0:x0-Math.round(rw/2),x1:x0+Math.round(rw/2),y:top});r.forEach(k=>{const o=O[k];o.x=X;o.y=top-o.s.h+3;X+=o.s.w+hg[i]});y=top+SH+vg});return out}
 function layout(){W=innerWidth;H=innerHeight;dpr=devicePixelRatio||1;const tall=W/H<.9;
- const rows=[['gumball','cards'],['laverse','tv']],hg=tall?[40,40]:[120,120];let vg=tall?80:70,pad=tall?24:60;objs=rows.flat().map(k=>{O[k].id=k;return O[k]});
- U=1/dpr;let sh;const M=8;
- for(let it=0;it<200;it++){sh=placeRows(rows,hg,vg,0,0);let bad=false;
-  for(const a of objs){const w=zoomWin(a);for(const b of objs){if(a===b)continue;
-   if(b.x+b.s.w+M>w[0]&&b.x-M<w[2]&&b.y-6+M<w[3]&&b.y+b.s.h-M>w[1]){bad=true;const ra=rows.findIndex(r=>r.includes(a.id)),rb=rows.findIndex(r=>r.includes(b.id));if(ra===rb)hg[ra]+=6;else vg+=6}}}
-  if(!bad)break}
- // balance the two rows to the same width: widen the narrower row's gap
- const rwid=i=>rows[i].reduce((a,k)=>a+O[k].s.w,0)+hg[i];const d=rwid(0)-rwid(1);if(d>0)hg[1]+=d;else hg[0]-=d;sh=placeRows(rows,hg,vg,0,0);
- const bx0=Math.min(...sh.map(q=>q.x0))-pad,bx1=Math.max(...sh.map(q=>q.x1))+pad,by0=Math.min(...objs.map(o=>o.y))-8,by1=Math.max(...sh.map(q=>q.y))+24;
- const PXd=Math.max(1,Math.floor(Math.min(W*.94/(bx1-bx0),H*.9/(by1-by0))*dpr+1e-6));U=PXd/dpr;lw=Math.ceil(W/U);lh=Math.ceil(H/U);
+ // Compact two-shelf wall. The other objects fade out as the camera flies in, so spacing no longer has to
+ // clear each zoom window; it only has to read well. Idle camera fills ~70% of the viewport.
+ const rows=[['gumball','cards'],['laverse','tv']],hg=tall?[30,30]:[72,72],vg=tall?58:44;let pad=tall?14:26;objs=rows.flat().map(k=>{O[k].id=k;return O[k]});
+ const rwid=i=>rows[i].reduce((a,k)=>a+O[k].s.w,0)+hg[i];const d=rwid(0)-rwid(1);if(d>0)hg[1]+=d;else hg[0]-=d;
+ let sh=placeRows(rows,hg,vg,0,0);const ext=()=>[Math.min(...sh.map(q=>q.x0))-pad,Math.max(...sh.map(q=>q.x1))+pad,Math.min(...objs.map(o=>o.y))-8,Math.max(...sh.map(q=>q.y))+24];
+ let[bx0,bx1,by0,by1]=ext(),bw=bx1-bx0,bh=by1-by0;
+ // whole device pixels per art pixel when that lands near ~72%, else a fractional (still nearest-neighbour) scale; never below 1 device px
+ const u=Math.min(W*.72/bw,H*.72/bh),lo=Math.floor(u*dpr+1e-6),hi=lo+1,fits=p=>p/dpr*bw<=W*.8&&p/dpr*bh<=H*.82;
+ U=fits(hi)?hi/dpr:lo>=1&&lo>=u*dpr*.9?lo/dpr:u;if(U*dpr<1)U=1/dpr;
+ // on wide screens spread the shelves so they span ~2/3 of the width
+ // (objects stay grouped toward the middle; the gold boards run out past them)
+ const extra=Math.floor(W*.66/U-bw);if(extra>0){const g2=Math.floor(extra*.45);hg[0]+=g2;hg[1]+=g2;pad+=Math.floor((extra-g2)/2);sh=placeRows(rows,hg,vg,0,0);[bx0,bx1,by0,by1]=ext();bw=bx1-bx0;bh=by1-by0}
+ lw=Math.ceil(W/U);lh=Math.ceil(H/U);
  cv.width=lw;cv.height=lh;cv.style.width=lw*U+'px';cv.style.height=lh*U+'px';
  const ox=Math.round(lw/2-(bx0+bx1)/2),oy=Math.round(lh/2-(by0+by1)/2);objs.forEach(o=>{o.x+=ox;o.y+=oy});
  shelves=sh.map(q=>({x0:q.x0+ox-pad,x1:q.x1+ox+pad,y:q.y+oy}));
- layout.info={hg:[...hg],vg,U,overlap:objs.map(a=>{const w=zoomWin(a);return objs.filter(b=>b!==a&&b.x+b.s.w>w[0]&&b.x<w[2]&&b.y<w[3]&&b.y+b.s.h>w[1]).map(b=>b.id)})};
+ layout.info={hg:[...hg],vg,U,fill:[bw*U/W,bh*U/H],overlap:objs.map(a=>{const w=zoomWin(a);return objs.filter(b=>b!==a&&b.x+b.s.w>w[0]&&b.x<w[2]&&b.y<w[3]&&b.y+b.s.h>w[1]).map(b=>b.id)})};
  placeHits();draw()}
 function drawShelf(sh){const{x0,x1,y}=sh,w=x1-x0;
  [x0+14,x1-26].forEach(bx=>{for(let k=0;k<12;k++){const ww=12-k;px(g,bx,y+10+k,GD[0],ww,1);if(ww>2)px(g,bx+1,y+10+k,k<2?GD[4]:GD[3],ww-2,1);if(ww>3)px(g,bx+1,y+10+k,GD[5]);if(ww>5)px(g,bx+ww-2,y+10+k,GD[2])}});
@@ -111,10 +114,10 @@ function drawShelf(sh){const{x0,x1,y}=sh,w=x1-x0;
 let glintT=0;
 function draw(){g.setTransform(1,0,0,1,0,0);g.fillStyle='#fff';g.fillRect(0,0,lw,lh);if(!ready)return;
  shelves.forEach(drawShelf);
- for(const o of objs){const L=Math.round(o.lift||0),sw=Math.max(4,o.s.w-10-L*3),sx=o.x+Math.round((o.s.w-sw)/2)-(o.id==='cards'?4:0);
+ for(const o of objs){const al=o.al==null?1:o.al;if(al<=0)continue;g.globalAlpha=al;const L=Math.round(o.lift||0),sw=Math.max(4,o.s.w-10-L*3),sx=o.x+Math.round((o.s.w-sw)/2)-(o.id==='cards'?4:0);
   px(g,sx,o.y+o.s.h-3,L?GD[4]:GD[3],sw,1);px(g,sx+2,o.y+o.s.h-2,L>1?GD[5]:GD[4],sw-4,1);
   g.drawImage(o.s.c,o.x,o.y-L);
-  if(o.id==='cards'&&glintT>0){const F=o.s.F,pos=lerp(-30,F+60,glintT);for(const[a,b]of o.s.glint){const d=a+b*.5-pos;if(d>-2.5&&d<2.5)px(g,o.x+a,o.y-L+b,Math.abs(d)<1.1?GD[6]:GD[5])}}}}
+  if(o.id==='cards'&&glintT>0){const F=o.s.F,pos=lerp(-30,F+60,glintT);for(const[a,b]of o.s.glint){const d=a+b*.5-pos;if(d>-2.5&&d<2.5)px(g,o.x+a,o.y-L+b,Math.abs(d)<1.1?GD[6]:GD[5])}}}g.globalAlpha=1}
 function placeHits(){for(const o of objs){const b=o.btn;b.style.left=o.x*U+'px';b.style.top=(o.y-6)*U+'px';b.style.width=o.s.w*U+'px';b.style.height=(o.s.h+6)*U+'px'}}
 
 // ---------------- animation loop: hover springs, glint, orrery spin ----------------
@@ -148,6 +151,8 @@ function backIn(t,c){return(c+1)*t*t*t-c*t*t}
 function tweenCam(A,to,dur,ease,done){const k0=camK,q0=[A[0]*k0+camX,A[1]*k0+camY],q1=[A[0]*to.k+to.tx,A[1]*to.k+to.ty],t0=performance.now();
  tick.push(now=>{const t=clamp((now-t0)/dur),p=ease(t),k=k0*Math.pow(to.k/k0,p),qx=lerp(q0[0],q1[0],p),qy=lerp(q0[1],q1[1],p);
   if(t>=1){setCam(to.k,to.tx,to.ty);done&&done();return false}setCam(k,qx-A[0]*k,qy-A[1]*k)});kick()}
+function fadeOthers(o,v,dur,delay=0){const os=objs.filter(q=>q!==o),a0=os.map(q=>q.al==null?1:q.al),t0=performance.now()+delay;
+ if(dur<=0){os.forEach(q=>q.al=v);draw();return}tick.push(now=>{const t=clamp((now-t0)/dur);os.forEach((q,i)=>q.al=lerp(a0[i],v,t*t*(3-2*t)));return t<1});kick()}
 const ctr=o=>[(o.x+o.s.w/2)*U,(o.y+o.s.h/2)*U];
 function fadeTo(v,ms,col,delay){if(col)fade.style.background=col;return fade.animate([{opacity:getComputedStyle(fade).opacity},{opacity:v}],{duration:ms,delay:delay||0,easing:'ease-in-out',fill:'forwards'}).finished}
 
@@ -195,8 +200,8 @@ function zoomIn(o){if(busy||zoomed)return;busy=true;zoomed=o;o._arrived=false;ob
   const arrive=()=>{o._arrived=true;back.hidden=false;requestAnimationFrame(()=>back.classList.add('on'));
    if(o.id==='laverse'){spin.on=true;pad.hidden=false;busy=false;if(!rm)spin.v=-.5;kick();return}
    if(app){const f=app;showApp(f).then(()=>{if(app===f)busy=false})}else{if(o.id==='cards')showPlate(o);busy=false}};
-  if(rm){fadeTo(1,140,'#fff').then(()=>{setCam(to.k,to.tx,to.ty);draw();return fadeTo(0,160)}).then(arrive)}
-  else tweenCam(ctr(o),to,1050,t=>backIO(t,.85),arrive)};
+  if(rm){fadeTo(1,140,'#fff').then(()=>{fadeOthers(o,0,0);setCam(to.k,to.tx,to.ty);draw();return fadeTo(0,160)}).then(arrive)}
+  else{fadeOthers(o,0,420,60);tweenCam(ctr(o),to,1050,t=>backIO(t,.85),arrive)}};
  if(o.id==='cards'&&!cardsOK)cardsCheck().then(proceed);else proceed()}
 function goBack(fromPop){if(!zoomed||zoomed._leaving||(busy&&!zoomed._arrived))return;busy=true;const o=zoomed,rm=RM.matches;o._leaving=true;back.classList.remove('on');
  spin.on=false;spin.drag=null;spin.hover=false;pad.hidden=true;pad.classList.remove('sun');if(ORR.glow){ORR.glow=0;spin.dirty=true}
@@ -204,11 +209,11 @@ function goBack(fromPop){if(!zoomed||zoomed._leaving||(busy&&!zoomed._arrived))r
  const pl=plate.hidden?Promise.resolve():plate.animate([{opacity:1},{opacity:0}],{duration:160,fill:'forwards'}).finished.then(()=>{plate.hidden=true;plate.getAnimations().forEach(a=>a.cancel())});
  const ap=app?app.animate([{opacity:1},{opacity:0}],{duration:rm?140:260,easing:'ease-in',fill:'forwards'}).finished.then(()=>{if(app){app.remove();app=null}}):Promise.resolve();
  Promise.all([pl,ap]).then(()=>{const fin=()=>{o._leaving=false;zoomed=null;busy=false;back.hidden=true;document.body.classList.remove('zoomed');o.btn.focus({preventScroll:true});kick()};
-  if(rm){fadeTo(1,120,'#fff').then(()=>{setCam(1,0,0);draw();return fadeTo(0,160)}).then(fin)}else tweenCam(ctr(o),{k:1,tx:0,ty:0},850,t=>backIO(t,.7),fin)})}
+  if(rm){fadeTo(1,120,'#fff').then(()=>{fadeOthers(o,1,0);setCam(1,0,0);draw();return fadeTo(0,160)}).then(fin)}else{fadeOthers(o,1,420,330);tweenCam(ctr(o),{k:1,tx:0,ty:0},850,t=>backIO(t,.7),fin)}})}
 back.addEventListener('click',()=>goBack());
 addEventListener('keydown',e=>{if(e.key==='Escape')goBack()});
 addEventListener('popstate',()=>{if(zoomed)goBack(true)});
-addEventListener('pageshow',e=>{if(e.persisted){fade.getAnimations().forEach(a=>a.cancel());tick.length=0;if(zoomed){zoomed=null;busy=false;spin.on=false;pad.hidden=true;setCam(1,0,0);back.hidden=true;back.classList.remove('on');document.body.classList.remove('zoomed')}busy=false;kick()}});
+addEventListener('pageshow',e=>{if(e.persisted){objs.forEach(q=>q.al=1);fade.getAnimations().forEach(a=>a.cancel());tick.length=0;if(zoomed){zoomed=null;busy=false;spin.on=false;pad.hidden=true;setCam(1,0,0);back.hidden=true;back.classList.remove('on');document.body.classList.remove('zoomed')}busy=false;kick()}});
 addEventListener('resize',()=>{if(!ready)return;layout();if(zoomed){const t=target(zoomed);setCam(t.k,t.tx,t.ty);if(!plate.hidden)showPlate(zoomed)}});
 
 // ---------------- boot ----------------

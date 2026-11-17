@@ -20,17 +20,21 @@ const cv=$('tv'),g=cv.getContext('2d'),scr=$('scr'),dialEl=$('dial'),cap=$('cap'
 $('sites').innerHTML=SITES.map(s=>`<a href="${s[2]}">${s[1]}</a>`).join('');
 const T=TVART.make(),[SX,SY,SW,SH]=T.screen,[DX,DY]=T.dial;
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
-// ---- channel pictures (66x50 art px each, converted from the /cards/ art) ----
-const pics=SITES.map(s=>{const im=new Image();const o={ok:false,d:null};im.onload=()=>{const c=document.createElement('canvas');c.width=SW;c.height=SH;const x=c.getContext('2d');x.drawImage(im,0,0);o.d=x.getImageData(0,0,SW,SH).data;o.ok=true;if(st.ch===SITES.indexOf(s))dirty=true;kick()};im.src='img/'+s[0]+'.png?v=1';return o});
+// ---- channel loops: each site's own 5s pixel animation (channels.js), drawn into a 66x50 buffer ----
+const LOOP=5000,FPS=30,buf=document.createElement('canvas');buf.width=SW;buf.height=SH;const bx=buf.getContext('2d',{willReadFrequently:true});
+const A={ash:null};{const im=new Image();im.onload=()=>{A.ash=im;lastKey='';dirty=true;kick()};im.src='img/ashaad_sprite.png?v=1'}
+let pic=null,lastKey='';
+function picAt(now){const f=RM.matches?0:Math.floor(now/(1000/FPS))%(LOOP/1000*FPS),key=st.ch+':'+f;if(key===lastKey&&pic)return pic;
+ lastKey=key;bx.clearRect(0,0,SW,SH);try{TVCH[SITES[st.ch][0]](bx,f/(LOOP/1000*FPS),A)}catch(e){}pic=bx.getImageData(0,0,SW,SH).data;return pic}
 // ---- 3x5 OSD digits ----
 const FONT={C:'111100100100111',H:'101101111101101','0':'111101101101111','1':'010110010010111','2':'111001111100111','3':'111001111001111','4':'101101111001001','5':'111100111001111','6':'111100111101111','7':'111001010010010','8':'111101111101111','9':'111101111001111'};
 function osdMask(txt){const m=new Set();let x0=0;for(const ch of txt){if(ch===' '){x0+=2;continue}const f=FONT[ch];for(let i=0;i<15;i++)if(f[i]==='1')m.add((x0+i%3)+','+Math.floor(i/3));x0+=4}return{m,w:x0-1}}
 // ---- state ----
-const st={ch:0,pow:0,on:false,staticUntil:0,dialVis:0,dialV:0,dialT:0,frame:0};
+const st={osdUntil:0,ch:0,pow:0,on:false,staticUntil:0,dialVis:0,dialV:0,dialT:0,frame:0};
 let dirty=true,raf=0;
 const H32=(a,b,c)=>{let h=(a*374761393+b*668265263+c*1442695041)|0;h=Math.imul(h^h>>>13,1274126177);return((h^h>>>16)>>>0)/4294967296};
 const GREY=[[18,20,26],[46,52,64],[94,106,126],[138,151,171],[174,185,201],[207,216,228],[243,246,250]];
-function screenFn(now){const p=pics[st.ch],stat=now<st.staticUntil,pow=st.pow,osd=osdMask('CH '+String(st.ch+1).padStart(2,'0')),ox=SW-6-osd.w,oy=4,fr=Math.floor(now/33);
+function screenFn(now){const stat=now<st.staticUntil,d=stat?null:picAt(now),showOsd=now<st.osdUntil,pow=st.pow,osd=osdMask('CH '+String(st.ch+1).padStart(2,'0')),ox=SW-6-osd.w,oy=4,fr=Math.floor(now/33);
  const roll=(now/9)%SH;
  return(u,v,def)=>{
   // CRT power-on: a bright line opens into the picture
@@ -38,10 +42,10 @@ function screenFn(now){const p=pics[st.ch],stat=now<st.staticUntil,pow=st.pow,os
    const h=Math.max(1,(1-Math.pow(1-(pow-.38)/.62,3))*SH/2);if(Math.abs(v+.5-cy)>h)return[14,16,22];vv=cy+(v+.5-cy)*(SH/2)/h-.5}
   const nu=u/SW-.5,nv=vv/SH-.5;let c;
   if(stat){const n=H32(u,v,fr),band=Math.abs(((v-roll+SH)%SH)-SH*.5)<3;c=GREY[Math.min(6,Math.floor(n*(band?5:7))+(band?2:0))]}
-  else if(p.ok){const su=clamp(Math.round((nu*(1-.07*nv*nv*4)+.5)*SW-.5),0,SW-1),sv=clamp(Math.round((nv*(1-.07*nu*nu*4)+.5)*SH-.5),0,SH-1),i=(sv*SW+su)*4;c=[p.d[i],p.d[i+1],p.d[i+2]]}
+  else if(d){const i=(clamp(Math.round(vv),0,SH-1)*SW+u)*4;c=[d[i],d[i+1],d[i+2]]}
   else c=def;
-  if(!stat&&osd.m.has((u-ox)+','+(v-oy)))c=[140,255,160];else if(!stat&&osd.m.has((u-ox-1)+','+(v-oy-1)))c=[10,40,18];
-  const r2=nu*nu*1.1+nv*nv,f=(r2>.15?1-(r2-.15)*1.6:1)*(v&1?.88:1)*(pow<1?1+(1-pow)*.3:1);
+  if(showOsd&&!stat&&osd.m.has((u-ox)+','+(v-oy)))c=[140,255,160];else if(showOsd&&!stat&&osd.m.has((u-ox-1)+','+(v-oy-1)))c=[10,40,18];
+  const r2=nu*nu+nv*nv,f=stat?(r2>.15?1-(r2-.15)*1.6:1)*(v&1?.88:1):(r2>.3?1-(r2-.3)*.5:1);
   return[Math.min(255,c[0]*f)|0,Math.min(255,c[1]*f)|0,Math.min(255,c[2]*f)|0]}}
 // ---- layout ----
 let L=TVART.layout(innerWidth,innerHeight);
@@ -56,9 +60,9 @@ function label(){const s=SITES[st.ch];capN.textContent='CH '+String(st.ch+1).pad
  scr.href=s[2];scr.setAttribute('aria-label','Open '+s[1]);if(/^https?:/.test(s[2])){scr.target='_blank';scr.rel='noopener'}else{scr.target='_top';scr.removeAttribute('rel')}
  dialEl.setAttribute('aria-valuenow',st.ch+1);dialEl.setAttribute('aria-valuetext',s[1])}
 let capAnim=null;
-function setCh(i){i=((i%N)+N)%N;if(i===st.ch)return;st.ch=i;const now=performance.now();st.staticUntil=now+(RM.matches?90:260);
+function setCh(i){i=((i%N)+N)%N;if(i===st.ch)return;st.ch=i;const now=performance.now();st.staticUntil=now+(RM.matches?60:200);st.osdUntil=now+1800;setTimeout(kick,1850);
  if(capAnim)capAnim.cancel();cap.style.opacity=1;
- if(!RM.matches)capAnim=cap.animate([{opacity:.25,transform:'translateY(4px)'},{opacity:1,transform:'none'}],{duration:260,delay:200,easing:'cubic-bezier(.3,.7,.3,1)',fill:'backwards'});
+ if(!RM.matches)capAnim=cap.animate([{opacity:.25,transform:'translateY(4px)'},{opacity:1,transform:'none'}],{duration:180,delay:170,easing:'cubic-bezier(.3,.7,.3,1)',fill:'backwards'});
  label();dirty=true;kick()}
 function step(dir){if(!st.on)return;st.dialT+=dir;setCh(Math.round(st.dialT));kick()}
 // ---- dial input: drag/rotate with detents, tap, wheel, keys ----
@@ -80,11 +84,12 @@ function frame(now){raf=0;let more=false;
  // dial spring toward its detent target (a little overshoot = the click)
  const tgt=st.dialT,k=RM.matches?1:0;if(k){st.dialVis=tgt;st.dialV=0}else{st.dialV+=((tgt-st.dialVis)*700-st.dialV*34)/60;st.dialVis+=st.dialV/60}
  if(Math.abs(tgt-st.dialVis)>.002||Math.abs(st.dialV)>.002){more=true;dirty=true}else st.dialVis=tgt;
- if(st.powT0!=null&&st.pow<1){st.pow=clamp((now-st.powT0)/(RM.matches?1:520));if(RM.matches)st.pow=1;more=true;dirty=true;if(st.pow>=1){st.on=true;label();cap.animate([{opacity:0},{opacity:1}],{duration:RM.matches?120:320,fill:'forwards'})}}
+ if(st.powT0!=null&&st.pow<1){st.pow=clamp((now-st.powT0)/(RM.matches?1:520));if(RM.matches)st.pow=1;more=true;dirty=true;if(st.pow>=1){st.on=true;st.osdUntil=now+1800;setTimeout(kick,1850);label();cap.animate([{opacity:0},{opacity:1}],{duration:RM.matches?120:320,fill:'forwards'})}}
  if(now<st.staticUntil){more=true;dirty=true}else if(st.wasStatic){dirty=true}st.wasStatic=now<st.staticUntil;
+ if(st.on&&!document.hidden){if(!RM.matches)more=true;const k2=st.ch+':'+(RM.matches?0:Math.floor(now/(1000/FPS)))+':'+(now<st.osdUntil);if(k2!==st.k2){st.k2=k2;dirty=true}}
  if(dirty){T.setDial(st.dialVis);T.setScreen(st.powT0!=null?screenFn(now):null);T.render();g.clearRect(0,0,112,100);g.drawImage(T.c,0,0);dirty=false}
  if(more||drag)raf=requestAnimationFrame(frame)}
-const kick=()=>{if(!raf)raf=requestAnimationFrame(frame)};
+const kick=()=>{if(!raf)raf=requestAnimationFrame(frame)};addEventListener('visibilitychange',kick);
 st.chRaw=0;label();kick();
 // power on shortly after arrival (a bit later inside the shelf, so its crossfade finishes first)
 const inFrame=window.self!==window.top;
