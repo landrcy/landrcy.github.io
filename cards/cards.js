@@ -50,12 +50,13 @@ function rect(el){return el.getBoundingClientRect()}
 async function openBox(){if(busy||state!=='box')return;busy=true;box.disabled=true;
  if(RM.matches){A(floor,[{opacity:1},{opacity:0}],{duration:320,easing:'ease'});await A(box,[{opacity:1},{opacity:0}],{duration:320,easing:'ease'});finishOpen();return}
  await Mech.open();
- await wait(220);
- // the open box steps back and leaves the deck where it sat
- A(box,[{opacity:1},{opacity:0}],{duration:480,easing:'ease-in'});
- await A(floor,[{opacity:1},{opacity:0}],{duration:520,delay:60,easing:'ease-in'});
+ const mech=document.getElementById('mech'),t1=performance.now(),chunks=Crumble.prep({mech,floor,deck,p});
+ await wait(Math.max(0,140-(performance.now()-t1)));
+ // the open box takes the strain for a moment (1px knock), then breaks apart around the deck (crumble.js)
+ await A(box,[{transform:'translate(0,0)'},{transform:`translate(${-p}px,0)`},{transform:`translate(${p}px,0)`},{transform:'translate(0,0)'}],{duration:90,easing:'steps(3,end)'});
+ await Crumble.run(chunks,{floor,deck,p,onFirst(){box.style.visibility='hidden';floor.style.visibility='hidden'}});
  finishOpen()}
-function finishOpen(){box.hidden=true;floor.hidden=true;deck.style.transform='';deck.style.zIndex=2;deck.style.setProperty('--sh',1);restack();state='deck';deckhit.hidden=false;shuf.hidden=false;
+function finishOpen(){box.hidden=true;floor.hidden=true;box.style.visibility='';floor.style.visibility='';deck.style.transform='';deck.style.zIndex=2;deck.style.setProperty('--sh',1);restack();state='deck';deckhit.hidden=false;shuf.hidden=false;
  A(shuf,[{opacity:0,transform:'translate(-50%,8px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:260,easing:'cubic-bezier(.2,.8,.3,1)'}).then(()=>{shuf.style.transform=''});
  busy=false;shuf.focus({preventScroll:true})}
 // ---- riffle shuffle ----
