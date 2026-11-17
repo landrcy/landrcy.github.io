@@ -109,15 +109,26 @@ function drawOrr(s){const x=s.x,im=s.im,{cx,py}=ORR,N=ORB.length;x.clearRect(0,0
 // ---------------- scene / layout ----------------
 let W=0,H=0,U=2,dpr=1,lw=0,lh=0,objs=[],shelves=[],ready=false;
 const O={gumball:{label:'Gumball machine'},cards:{label:'Deck of cards'},laverse:{label:'The Laverse'},tv:{label:'TV'}};
-function layout(){W=innerWidth;H=innerHeight;dpr=devicePixelRatio||1;const two=W/H<.9,gap=two?12:24,pad=two?6:16;
- const rows=two?[['gumball','tv'],['cards','laverse']]:[['gumball','cards','laverse','tv']];
- const rw=rows.map(r=>r.reduce((a,k)=>a+O[k].s.w,0)+gap*(r.length-1)),rh=rows.map(r=>Math.max(...r.map(k=>O[k].s.h)));
- const needW=Math.max(...rw)+pad*2+4,needH=rh.reduce((a,b)=>a+b+24,0)+(rows.length-1)*28;
- const PXd=Math.max(1,Math.floor(Math.min(W*(two?.96:.88)/needW,H*(two?.8:.64)/needH)*dpr+1e-6));U=PXd/dpr;lw=Math.ceil(W/U);lh=Math.ceil(H/U);
+// Two gold shelves, two objects on each. Gaps grow until, zoomed on any object, no other object is in view.
+function zoomWin(o){const t=target(o),q=U*t.k;return[-t.tx/q,-t.ty/q,(W-t.tx)/q,(H-t.ty)/q]}
+function placeRows(rows,hg,vg,x0,y0){const SH=24;let y=y0;const out=[];
+ rows.forEach((r,i)=>{const rh=Math.max(...r.map(k=>O[k].s.h)),rw=r.reduce((a,k)=>a+O[k].s.w,0)+hg[i]*(r.length-1),top=y+rh;let X=x0-Math.round(rw/2);
+  out.push({x0:x0-Math.round(rw/2),x1:x0+Math.round(rw/2),y:top});r.forEach(k=>{const o=O[k];o.x=X;o.y=top-o.s.h+3;X+=o.s.w+hg[i]});y=top+SH+vg});return out}
+function layout(){W=innerWidth;H=innerHeight;dpr=devicePixelRatio||1;const tall=W/H<.9;
+ const rows=[['gumball','cards'],['laverse','tv']],hg=tall?[40,40]:[120,120];let vg=tall?80:70,pad=tall?24:60;objs=rows.flat().map(k=>{O[k].id=k;return O[k]});
+ U=1/dpr;let sh;const M=8;
+ for(let it=0;it<200;it++){sh=placeRows(rows,hg,vg,0,0);let bad=false;
+  for(const a of objs){const w=zoomWin(a);for(const b of objs){if(a===b)continue;
+   if(b.x+b.s.w+M>w[0]&&b.x-M<w[2]&&b.y-6+M<w[3]&&b.y+b.s.h-M>w[1]){bad=true;const ra=rows.findIndex(r=>r.includes(a.id)),rb=rows.findIndex(r=>r.includes(b.id));if(ra===rb)hg[ra]+=6;else vg+=6}}}
+  if(!bad)break}
+ // balance the two rows to the same width: widen the narrower row's gap
+ const rwid=i=>rows[i].reduce((a,k)=>a+O[k].s.w,0)+hg[i];const d=rwid(0)-rwid(1);if(d>0)hg[1]+=d;else hg[0]-=d;sh=placeRows(rows,hg,vg,0,0);
+ const bx0=Math.min(...sh.map(q=>q.x0))-pad,bx1=Math.max(...sh.map(q=>q.x1))+pad,by0=Math.min(...objs.map(o=>o.y))-8,by1=Math.max(...sh.map(q=>q.y))+24;
+ const PXd=Math.max(1,Math.floor(Math.min(W*.94/(bx1-bx0),H*.9/(by1-by0))*dpr+1e-6));U=PXd/dpr;lw=Math.ceil(W/U);lh=Math.ceil(H/U);
  cv.width=lw;cv.height=lh;cv.style.width=lw*U+'px';cv.style.height=lh*U+'px';
- let y=Math.round((lh-needH)/2+(two?0:lh*.03));objs=[];shelves=[];
- rows.forEach((r,i)=>{const top=y+rh[i];let X=Math.round((lw-rw[i])/2);shelves.push({x0:Math.round((lw-rw[i])/2)-pad,x1:Math.round((lw+rw[i])/2)+pad,y:top});
-  r.forEach(k=>{const o=O[k];o.id=k;o.x=X;o.y=top-o.s.h+3;objs.push(o);X+=o.s.w+gap});y=top+24+28});
+ const ox=Math.round(lw/2-(bx0+bx1)/2),oy=Math.round(lh/2-(by0+by1)/2);objs.forEach(o=>{o.x+=ox;o.y+=oy});
+ shelves=sh.map(q=>({x0:q.x0+ox-pad,x1:q.x1+ox+pad,y:q.y+oy}));
+ layout.info={hg:[...hg],vg,U,overlap:objs.map(a=>{const w=zoomWin(a);return objs.filter(b=>b!==a&&b.x+b.s.w>w[0]&&b.x<w[2]&&b.y<w[3]&&b.y+b.s.h>w[1]).map(b=>b.id)})};
  placeHits();draw()}
 function drawShelf(sh){const{x0,x1,y}=sh,w=x1-x0;
  [x0+14,x1-26].forEach(bx=>{for(let k=0;k<12;k++){const ww=12-k;px(g,bx,y+10+k,GD[0],ww,1);if(ww>2)px(g,bx+1,y+10+k,k<2?GD[4]:GD[3],ww-2,1);if(ww>3)px(g,bx+1,y+10+k,GD[5]);if(ww>5)px(g,bx+ww-2,y+10+k,GD[2])}});
@@ -238,5 +249,5 @@ Promise.all([load('img/gumball.png'),load('img/cards.png'),...ORB.map(o=>load('i
   b.addEventListener('click',()=>zoomIn(o))}
  ready=true;layout();kick();
  const h=location.hash.slice(1);if(O[h]&&O[h].s){history.replaceState(null,'',location.pathname);setTimeout(()=>zoomIn(O[h]),200)}});
-window.__shelf={O,ORR,spin,get zoomed(){return zoomed&&zoomed.id},get busy(){return busy},get cam(){return[camK,camX,camY]},get U(){return U},target,sunScreen};
+window.__shelf={O,ORR,spin,get zoomed(){return zoomed&&zoomed.id},get busy(){return busy},get cam(){return[camK,camX,camY]},get U(){return U},target,sunScreen,get info(){return layout.info}};
 })();
