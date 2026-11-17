@@ -2,7 +2,7 @@
    upscaled by a whole number of device pixels (U css px per art px) with image-rendering:pixelated. The "camera" is a CSS transform on that canvas. */
 (()=>{'use strict';
 const LAVERSE_URL='/';           // the solar hub (the root will later become the shelf; change this then)
-const GUMBALL_URL='/gumball/', CARDS_URL='/cards/';
+const GUMBALL_URL='/gumball/', CARDS_URL='/cards/', TV_URL='/tv/';
 const RM=matchMedia('(prefers-reduced-motion: reduce)');
 const cam=document.getElementById('cam'),cv=document.getElementById('sc'),g=cv.getContext('2d'),hits=document.getElementById('hits'),
  back=document.getElementById('back'),fade=document.getElementById('fade'),plate=document.getElementById('plate');
@@ -30,35 +30,8 @@ function cardBox(img){const s=mk(img.width,img.height);s.x.drawImage(img,0,0);co
  for(let y=0;y<s.h;y++)for(let X=0;X<s.w;X++){const i=(y*s.w+X)*4;if(d[i]>190&&d[i+1]>130&&d[i+2]<150&&d[i]-d[i+2]>90)gl.push([X,y])}
  return{...s,glint:gl,F:s.w}}
 
-// RETRO TV: gold casing, gold dial, gold antenna
-function tv(){const W=112,H=100,s=mk(W,H),x=s.x;
- const ball=(X,Y)=>disc(x,X,Y,3,(a,b,dx,dy,d)=>px(x,a,b,d>2.6?GD[0]:dx+dy<-1?GD[6]:dx+dy<1?GD[5]:GD[3]));
- const rod=(x0,y0,x1,y1)=>{line(x,x0,y0,x1,y1,GD[2]);line(x,x0,y0-1,x1,y1-1,GD[5]);line(x,x0+1,y0,x1+1,y1,GD[1])};
- rod(52,20,24,5);rod(60,20,88,4);ball(24,5);ball(88,4);
- for(let X=44;X<=68;X++){const h=Math.round(7*Math.sqrt(Math.max(0,1-((X-56)/12.5)**2)));for(let k=0;k<=h;k++)px(x,X,25-k,k===h?GD[0]:X<52?(k>h-2?GD[6]:GD[5]):X<62?GD[4]:GD[3])}
- const cx0=2,cy0=25,cw=108,ch=66,R=8;
- const inR=(X,Y,x0,y0,w,h,r)=>{const ex=Math.min(X-x0,x0+w-1-X),ey=Math.min(Y-y0,y0+h-1-Y);if(ex<0||ey<0)return-1;if(ex<r&&ey<r){const d=r-Math.hypot(r-ex-.5,r-ey-.5);return d<0?-1:d}return Math.min(ex,ey)};
- for(let y=cy0;y<cy0+ch;y++)for(let X=cx0;X<cx0+cw;X++){const e=inR(X,y,cx0,cy0,cw,ch,R);if(e<0)continue;
-  let c=y<cy0+4?GD[5]:X<cx0+5?GD[5]:y>cy0+ch*.58?GD[3]:GD[4];if(y>cy0+ch-6)c=GD[2];if(e<1)c=GD[0];else if(e<2&&(y<cy0+6||X<cx0+6))c=GD[6];else if(e<2)c=GD[1];px(x,X,y,c)}
- // screen
- const sx=11,sy=33,sw=66,sh=50;
- for(let y=sy-4;y<sy+sh+4;y++)for(let X=sx-4;X<sx+sw+4;X++){const e=inR(X,y,sx-4,sy-4,sw+8,sh+8,10);if(e<0)continue;let c;
-  if(e<1)c=GD[1];else if(e<2)c=(y<sy+sh/2&&X<sx+sw*.8)?GD[0]:GD[6];else if(e<4)c=(y<sy+sh/2)?GD[2]:GD[5];
-  else{const u=(X-sx)/sw-.5,v=(y-sy)/sh-.5,d=u*u*1.1+v*v;c=d>.24?'#262c38':d>.15?GL[7]:d>.07?'#46506a':'#525d78';if(y&1)c=c==='#525d78'?'#4c5772':c==='#46506a'?'#414b64':c===GL[7]?'#363e4e':c}
-  px(x,X,y,c)}
- for(let a=0;a<=20;a++){const t=Math.PI*(1.08+a/20*.36);px(x,Math.round(sx+sw/2+Math.cos(t)*sw*.4),Math.round(sy+sh/2+Math.sin(t)*sh*.38),a<14?GL[4]:GL[5])}
- for(let a=0;a<=6;a++){const t=Math.PI*(1.12+a/6*.12);px(x,Math.round(sx+sw/2+Math.cos(t)*sw*.32),Math.round(sy+sh/2+Math.sin(t)*sh*.28),GL[5])}
- // dial with ticks, knob, grille
- const dx=95,dy=47;
- for(let k=0;k<16;k++){const a=k/16*Math.PI*2;px(x,Math.round(dx+Math.cos(a)*12),Math.round(dy+Math.sin(a)*12),k%4===0?GD[0]:GD[2])}
- disc(x,dx,dy,9,(X,Y,a,b,d)=>px(x,X,Y,d>8.5?GD[0]:d>7.6?(a+b<0?GD[6]:GD[2]):a+b<-6?GD[6]:a+b<-1?GD[5]:a+b<5?GD[4]:GD[3]));
- line(x,dx,dy,dx+4,dy-6,GD[0]);line(x,dx+1,dy,dx+5,dy-6,GD[1]);disc(x,dx,dy,1,(X,Y)=>px(x,X,Y,GD[0]));
- disc(x,dx,66,5,(X,Y,a,b,d)=>px(x,X,Y,d>4.6?GD[0]:a+b<-2?GD[6]:a+b<2?GD[4]:GD[2]));
- for(let k=0;k<4;k++){px(x,86,74+k*3,GD[1],18,1);px(x,86,75+k*3,GD[5],18,1)}
- // legs
- const leg=X=>{for(let y=0;y<9;y++){const w=8-Math.floor(y/3);for(let i=0;i<w;i++){const c=i===0||i===w-1||y===8?GD[0]:i===1?GD[5]:GD[3];px(x,X+i+Math.floor(y/3)*.5|0,91+y,c)}}};
- leg(14);leg(90);
- s.screen=[sx,sy,sw,sh];return s}
+// RETRO TV: the exact model /tv/ uses (shared ../tv/tvart.js), so the zoom hands off with no swap.
+function tv(){return TVART.make()}
 
 // LAVERSE ORRERY (redrawn live so it can spin). Hand-built: stepped engraved gold base, central spindle, six thin arms on
 // collars at different heights, each with an elbow knuckle and a rod up to its planet. Light comes from the top-left.
@@ -164,7 +137,8 @@ const kick=()=>{if(!raf)raf=requestAnimationFrame(loop)};
 // ---------------- camera ----------------
 let camK=1,camX=0,camY=0,zoomed=null,busy=false,app=null;
 function setCam(k,tx,ty){camK=k;camX=tx;camY=ty;cam.style.transform=`translate3d(${tx}px,${ty}px,0) scale(${k})`}
-function target(o){if(o.id==='cards'){const L=cbLayout(W,H),k=L.w/(o.s.w*U);return{k,tx:L.x-o.x*U*k,ty:L.y-o.y*U*k}}
+function target(o){if(o.id==='tv'){const L=TVART.layout(W,H),k=L.P/U;return{k,tx:L.x-o.x*U*k,ty:L.y-o.y*U*k}}
+ if(o.id==='cards'){const L=cbLayout(W,H),k=L.w/(o.s.w*U);return{k,tx:L.x-o.x*U*k,ty:L.y-o.y*U*k}}
  if(o.id==='gumball'){const L=gumLayout(W,H),r=L.S/GB.S0,k=2*r/U;
   return{k,tx:((GB.cx0*2-GB.OX0)*r+L.OX)-o.x*U*k,ty:((GB.cy0*2-GB.OY0)*r+L.OY)-o.y*U*k}}
  const fw=o.id==='tv'?.8:o.id==='laverse'?.86:.72,fh=o.id==='laverse'?.8:.72,k=Math.min(W*fw/(o.s.w*U),H*fh/(o.s.h*U)),cx=(o.x+o.s.w/2)*U,cy=(o.y+o.s.h/2)*U;
@@ -178,7 +152,7 @@ const ctr=o=>[(o.x+o.s.w/2)*U,(o.y+o.s.h/2)*U];
 function fadeTo(v,ms,col,delay){if(col)fade.style.background=col;return fade.animate([{opacity:getComputedStyle(fade).opacity},{opacity:v}],{duration:ms,delay:delay||0,easing:'ease-in-out',fill:'forwards'}).finished}
 
 // ---------------- apps (iframes) ----------------
-function openApp(url){const f=document.createElement('iframe');f.className='app';f.title=url==GUMBALL_URL?'Gumball machine':'Deck of cards';f.src=url;
+function openApp(url){const f=document.createElement('iframe');f.className='app';f.title=url==GUMBALL_URL?'Gumball machine':url==TV_URL?'TV':'Deck of cards';f.src=url;
  f.loaded=new Promise(res=>f.addEventListener('load',()=>{try{const d=f.contentDocument,st=d.createElement('style');st.textContent='#back{display:none!important}';d.head.appendChild(st);
   if(!d.querySelector('base')){const b=d.createElement('base');b.target='_top';d.head.prepend(b)}
   f.contentWindow.addEventListener('keydown',e=>{if(e.key==='Escape'&&!d.querySelector('[role=dialog]:not([hidden])'))goBack()})}catch(e){}res()},{once:true}));
@@ -216,11 +190,11 @@ function flyToSun(){if(busy||!spin.on)return;busy=true;spin.on=false;spin.drag=n
 // ---------------- zoom in / out ----------------
 function zoomIn(o){if(busy||zoomed)return;busy=true;zoomed=o;o._arrived=false;objs.forEach(q=>{q.hover=false;q.press=false});document.body.classList.add('zoomed');
  history.pushState({shelf:o.id},'','#'+o.id);
- const rm=RM.matches,to=target(o);let useApp=o.id==='gumball'?GUMBALL_URL:null;
+ const rm=RM.matches,to=target(o);let useApp=o.id==='gumball'?GUMBALL_URL:o.id==='tv'?TV_URL:null;
  const proceed=()=>{if(o.id==='cards'&&cardsOK)useApp=CARDS_URL;if(useApp)app=openApp(useApp);
   const arrive=()=>{o._arrived=true;back.hidden=false;requestAnimationFrame(()=>back.classList.add('on'));
    if(o.id==='laverse'){spin.on=true;pad.hidden=false;busy=false;if(!rm)spin.v=-.5;kick();return}
-   if(app){const f=app;showApp(f).then(()=>{if(app===f)busy=false})}else{if(o.id==='tv'||o.id==='cards')showPlate(o);busy=false}};
+   if(app){const f=app;showApp(f).then(()=>{if(app===f)busy=false})}else{if(o.id==='cards')showPlate(o);busy=false}};
   if(rm){fadeTo(1,140,'#fff').then(()=>{setCam(to.k,to.tx,to.ty);draw();return fadeTo(0,160)}).then(arrive)}
   else tweenCam(ctr(o),to,1050,t=>backIO(t,.85),arrive)};
  if(o.id==='cards'&&!cardsOK)cardsCheck().then(proceed);else proceed()}
