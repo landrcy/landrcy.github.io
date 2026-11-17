@@ -214,17 +214,17 @@ function flyToSun(){if(busy||!spin.on)return;busy=true;spin.on=false;spin.drag=n
  history.replaceState(null,'',location.pathname);tweenCam(A,to,1250,t=>backIn(t,.9),null);fadeTo(1,520,HUB_BG,700).then(()=>{location.href=LAVERSE_URL})}
 
 // ---------------- zoom in / out ----------------
-function zoomIn(o){if(busy||zoomed)return;busy=true;zoomed=o;objs.forEach(q=>{q.hover=false;q.press=false});document.body.classList.add('zoomed');
+function zoomIn(o){if(busy||zoomed)return;busy=true;zoomed=o;o._arrived=false;objs.forEach(q=>{q.hover=false;q.press=false});document.body.classList.add('zoomed');
  history.pushState({shelf:o.id},'','#'+o.id);
  const rm=RM.matches,to=target(o);let useApp=o.id==='gumball'?GUMBALL_URL:null;
  const proceed=()=>{if(o.id==='cards'&&cardsOK)useApp=CARDS_URL;if(useApp)app=openApp(useApp);
-  const arrive=()=>{back.hidden=false;requestAnimationFrame(()=>back.classList.add('on'));
+  const arrive=()=>{o._arrived=true;back.hidden=false;requestAnimationFrame(()=>back.classList.add('on'));
    if(o.id==='laverse'){spin.on=true;pad.hidden=false;busy=false;if(!rm)spin.v=-.5;kick();return}
-   if(app)showApp(app).then(()=>{busy=false});else{if(o.id==='tv'||o.id==='cards')showPlate(o);busy=false}};
+   if(app){const f=app;showApp(f).then(()=>{if(app===f)busy=false})}else{if(o.id==='tv'||o.id==='cards')showPlate(o);busy=false}};
   if(rm){fadeTo(1,140,'#fff').then(()=>{setCam(to.k,to.tx,to.ty);draw();return fadeTo(0,160)}).then(arrive)}
   else tweenCam(ctr(o),to,1050,t=>backIO(t,.85),arrive)};
  if(o.id==='cards'&&!cardsOK)cardsCheck().then(proceed);else proceed()}
-function goBack(fromPop){if(!zoomed||busy)return;busy=true;const o=zoomed,rm=RM.matches;back.classList.remove('on');
+function goBack(fromPop){if(!zoomed||(busy&&!zoomed._arrived))return;busy=true;const o=zoomed,rm=RM.matches;back.classList.remove('on');
  spin.on=false;spin.drag=null;spin.hover=false;pad.hidden=true;pad.classList.remove('sun');if(ORR.glow){ORR.glow=0;spin.dirty=true}
  if(!fromPop&&history.state&&history.state.shelf)history.back();
  const pl=plate.hidden?Promise.resolve():plate.animate([{opacity:1},{opacity:0}],{duration:160,fill:'forwards'}).finished.then(()=>{plate.hidden=true;plate.getAnimations().forEach(a=>a.cancel())});
