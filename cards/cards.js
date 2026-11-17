@@ -21,7 +21,6 @@ const SITES=[
  ['wam','W.A.M.','https://landrcy.github.io/wam/']];
 const N=SITES.length,$=id=>document.getElementById(id);
 const floor=$('floor'),table=$('table'),deck=$('deck'),box=$('box'),deckhit=$('deckhit'),shuf=$('shuffle'),shade=$('shade'),big=$('big'),acts=$('acts'),go=$('go'),again=$('again'),fx=$('fx'),live=$('live');
-const medal=box.querySelector('.medal'),rays=box.querySelector('.rays'),pets=[...box.querySelectorAll('.pet')],glint=box.querySelector('.glint');
 $('sites').innerHTML=SITES.map(p=>`<a href="${p[2]}">${p[1]}</a>`).join('');
 // preload every face so swapping the top card's face is instant
 const FACE=SITES.map(p=>{const i=new Image();i.src='img/'+p[0]+'.png?v=4';return i});
@@ -45,66 +44,23 @@ function layout(){vw=innerWidth;vh=innerHeight;
  if(state==='big'&&cur)placeBig(cur,false);
 }
 let busy=false,state='box',cur=null,last=-1;
-// ---- sparkles ----
-function spark(x,y,n,r,dur=520){if(RM.matches)return;for(let i=0;i<n;i++){const im=document.createElement('img');im.src='img/spark.png';im.className='px';fx.appendChild(im);
- const a=Math.PI*2*i/n+Math.random()*.6,d=r*(.6+Math.random()*.5),z=7*p;
- im.style.left=Math.round(x-z)+'px';im.style.top=Math.round(y-z)+'px';
- im.animate([{transform:'translate(0,0) scale(.4)',opacity:1},{transform:`translate(${Math.round(Math.cos(a)*d)}px,${Math.round(Math.sin(a)*d)}px) scale(1)`,opacity:1,offset:.55},{transform:`translate(${Math.round(Math.cos(a)*d*1.25)}px,${Math.round(Math.sin(a)*d*1.25)}px) scale(.6)`,opacity:0}],{duration:dur+Math.random()*160,easing:'cubic-bezier(.2,.7,.3,1)'}).finished.then(()=>im.remove())}}
-// ---- glint sweep across the closed box (low-res canvas, so the shine is pixel art too) ----
-const gx=glint.getContext('2d'),boxImg=new Image();boxImg.src='img/box.png?v=3';
-let glintOn=true;
-function sweep(){if(!glintOn||RM.matches)return;const t0=performance.now(),D=900;
- (function f(t){const p=Math.min(1,(t-t0)/D),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2,x=Math.round(-126+e*468);gx.clearRect(0,0,208,288);
-  if(glintOn&&p<1){gx.globalCompositeOperation='source-over';
-   const band=(o,w,al)=>{gx.fillStyle=`rgba(255,250,225,${al})`;gx.beginPath();gx.moveTo(x+o,0);gx.lineTo(x+o+w,0);gx.lineTo(x+o+w-108,288);gx.lineTo(x+o-108,288);gx.closePath();gx.fill()};
-   band(0,25,.28);band(7,11,.5);band(32,5,.3);
-   gx.globalCompositeOperation='destination-in';gx.drawImage(boxImg,0,0);gx.globalCompositeOperation='source-over';requestAnimationFrame(f)}
-  else gx.clearRect(0,0,208,288)})(t0);
- setTimeout(sweep,3400)}
-setTimeout(sweep,700);
-// ---- open the box: dial twist + clicks, medallion lifts, panels bloom, gold light, cards fan out then gather ----
+Mech.init(document.getElementById('mech'),5);
+const lift=document.createElement('img');lift.id='lift';lift.className='px';lift.src='img/lift.png?v=5';lift.alt='';deck.appendChild(lift);
+// ---- open the box: the clockwork lock (mech.js), then the deck lift ----
 function rect(el){return el.getBoundingClientRect()}
 async function openBox(){if(busy||state!=='box')return;busy=true;box.disabled=true;
  if(RM.matches){A(floor,[{opacity:1},{opacity:0}],{duration:320,easing:'ease'});await A(box,[{opacity:1},{opacity:0}],{duration:320,easing:'ease'});finishOpen();return}
- const r=rect(medal),mx=r.left+r.width/2,my=r.top+r.height/2;
- // anticipation: the box gives a little, the dial winds back
- await Promise.all([A(box,[{transform:'scale(1,1)'},{transform:'scale(.975,.97)'}],{duration:150,easing:'cubic-bezier(.3,0,.4,1)'}),
-  A(medal,[{transform:'rotate(0deg)'},{transform:'rotate(-18deg)'}],{duration:190,easing:'cubic-bezier(.3,0,.4,1)'})]);
- A(box,[{transform:'scale(.975,.97)'},{transform:'scale(1.01,1.012)',offset:.6},{transform:'scale(1,1)'}],{duration:260,easing:'ease-out'});
- // the L turns like a lock dial, clicking at each quarter (overshoot + settle each time)
- const steps=[90,180,270,360];let a0=-18;
- for(let i=0;i<4;i++){const a1=steps[i],ov=i===3?12:5;
-  await A(medal,[{transform:`rotate(${a0}deg)`,easing:'cubic-bezier(.5,0,.25,1)'},{transform:`rotate(${a1+ov}deg)`,offset:.72,easing:'cubic-bezier(.3,0,.3,1)'},{transform:`rotate(${a1}deg)`}],{duration:i===3?300:190});
-  a0=a1;const k=Math.PI*2*(i/4)-Math.PI/2;spark(mx+Math.cos(k)*r.width*.42,my+Math.sin(k)*r.width*.42,3,10*s,360);
-  A(table,[{transform:'translate(0,0)'},{transform:`translate(0,${s}px)`,offset:.35},{transform:'translate(0,0)'}],{duration:110,easing:'ease-out'});
-  if(i<3)await wait(40)}
- // final heavy click
- spark(mx,my,10,40*s,640);
- await A(table,[{transform:'translate(0,0)'},{transform:`translate(0,${2*s}px)`,offset:.3},{transform:`translate(0,${-s}px)`,offset:.65},{transform:'translate(0,0)'}],{duration:220,easing:'ease-out'});
- glintOn=false;gx.clearRect(0,0,208,288);
- // medallion presses in, then lifts away; gold light spills from the opening
- A(medal,[{transform:'rotate(360deg) translateY(0px) scale(1)',opacity:1},{transform:'rotate(360deg) translateY(0px) scale(.9)',opacity:1,offset:.2,easing:'cubic-bezier(.3,0,.2,1)'},{transform:`rotate(360deg) translateY(${-18*s}px) scale(1.25)`,opacity:0}],{duration:560});
- A(rays,[{opacity:0,transform:'scale(.2) rotate(0deg)'},{opacity:1,transform:'scale(1.06) rotate(14deg)',offset:.6},{opacity:.85,transform:'scale(1) rotate(22deg)'}],{duration:1100,delay:120,easing:'cubic-bezier(.2,.8,.3,1)'});
- await wait(200);
- // the four panels bloom outward along the seams (each hinged on its outer edge)
- const rot={top:'rotateX',bottom:'rotateX',left:'rotateY',right:'rotateY'},sg={top:1,bottom:-1,left:-1,right:1};
- pets.forEach((p,i)=>{const k=p.classList[1],R=rot[k],g=sg[k];
-  A(p,[{transform:`${R}(0deg)`,easing:'cubic-bezier(.45,0,.2,1)'},{transform:`${R}(${-6*g}deg)`,offset:.12,easing:'cubic-bezier(.5,0,.15,1)'},{transform:`${R}(${190*g}deg)`,offset:.8,easing:'cubic-bezier(.3,0,.3,1)'},{transform:`${R}(${180*g}deg)`}],{duration:920,delay:i*70})});
- await wait(820);
- // cards rise out in a fan
- deck.style.zIndex=4;
- const FA=vw<600?44:56,FS=vw<600?.68:1,FAN=k=>`translate(0px,${-28*s}px) rotate(${-FA+2*FA*k/(N-1)}deg) scale(${FS})`;
- const fan=stack.map((c,k)=>{c.style.transformOrigin='50% 140%';const ang=-FA+2*FA*k/(N-1);
-  return A(c,[{transform:ST(k)+' rotate(0deg) scale(1)'},{transform:`translate(0px,${-30*s}px) rotate(${ang*1.06}deg) scale(${FS})`,offset:.75},{transform:FAN(k)}],{duration:620,delay:k*32,easing:'cubic-bezier(.25,.8,.35,1)'})});
- A(box,[{opacity:1},{opacity:0}],{duration:620,delay:380,easing:'ease'});A(floor,[{opacity:1},{opacity:0}],{duration:620,delay:520,easing:'ease'});
- await Promise.all(fan);await wait(230);
- // gather into a neat deck
- const back=stack.map((c,k)=>A(c,[{transform:FAN(k)},{transform:ST(k)+' rotate(0deg) scale(1)'}],{duration:480,delay:(N-1-k)*22,easing:'cubic-bezier(.55,0,.25,1)'}));
- await Promise.all(back);
- await A(deck,[{transform:'scale(1,1)'},{transform:'scale(1.02,.975)',offset:.35},{transform:'scale(.995,1.005)',offset:.7},{transform:'scale(1,1)'}],{duration:220,easing:'ease-out'});
- stack.forEach(c=>c.style.transformOrigin='');
+ await Mech.open();
+ // the deck lift rises out of the open box (slow start, weighty stop)
+ const L=Math.round(96*p);
+ await A(deck,[{transform:'translateY(0px)',easing:'cubic-bezier(.55,0,.35,1)'},{transform:`translateY(${-L-Math.round(3*p)}px)`,offset:.86,easing:'cubic-bezier(.3,0,.4,1)'},{transform:`translateY(${-L}px)`}],{duration:900});
+ await wait(140);
+ // the box sinks away and the deck settles where it stood
+ A(box,[{opacity:1,transform:'translateY(0px)'},{opacity:0,transform:`translateY(${Math.round(16*p)}px)`}],{duration:420,easing:'cubic-bezier(.5,0,.75,0)'});
+ A(floor,[{opacity:1},{opacity:0}],{duration:420,easing:'ease'});A(lift,[{opacity:1},{opacity:0}],{duration:300,easing:'ease'});
+ await A(deck,[{transform:`translateY(${-L}px)`,easing:'cubic-bezier(.45,0,.3,1)'},{transform:`translateY(${Math.round(2*p)}px)`,offset:.82,easing:'ease-out'},{transform:'translateY(0px)'}],{duration:560,delay:120});
  finishOpen()}
-function finishOpen(){box.hidden=true;floor.hidden=true;deck.style.zIndex=2;deck.style.setProperty('--sh',1);restack();state='deck';deckhit.hidden=false;shuf.hidden=false;
+function finishOpen(){box.hidden=true;floor.hidden=true;lift.hidden=true;deck.style.transform='';deck.style.zIndex=2;deck.style.setProperty('--sh',1);restack();state='deck';deckhit.hidden=false;shuf.hidden=false;
  A(shuf,[{opacity:0,transform:'translate(-50%,8px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:260,easing:'cubic-bezier(.2,.8,.3,1)'}).then(()=>{shuf.style.transform=''});
  busy=false;shuf.focus({preventScroll:true})}
 // ---- riffle shuffle ----
@@ -148,7 +104,7 @@ async function draw(){if(busy||state!=='deck')return;busy=true;deckhit.disabled=
  shade.hidden=false;state='big';
  if(!RM.matches){A(shade,[{opacity:0},{opacity:1}],{duration:360,easing:'ease'});
   await A(c,[{transform:'translate(0px,0px) scale(1)',easing:'cubic-bezier(.3,0,.2,1)'},{transform:`translate(${dx}px,${dy}px) scale(${k*1.045})`,offset:.72,easing:'cubic-bezier(.4,0,.3,1)'},{transform:`translate(${dx}px,${dy}px) scale(${k*.99})`,offset:.88,easing:'ease-in-out'},{transform:`translate(${dx}px,${dy}px) scale(${k})`}],{duration:560});
-  placeBig(c);spark(t.x+t.w/2,t.y+t.h/2,12,t.w*.62,700);
+  placeBig(c);
  }else{await A(c,[{opacity:1},{opacity:0}],{duration:120});placeBig(c);A(shade,[{opacity:0},{opacity:1}],{duration:200});await A(c,[{opacity:0},{opacity:1}],{duration:200})}
  acts.hidden=false;live.textContent=SITES[n][1];
  await A(acts,[{opacity:0,transform:RM.matches?'none':'translateY(10px)'},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.8,.3,1)'});
