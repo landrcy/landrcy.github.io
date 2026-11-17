@@ -251,7 +251,10 @@ function drawOutside(now){return;// white void removed: whole hub map is continu
   o.globalCompositeOperation='destination-out';o.drawImage(RCUT.c,0,0,wt*T,ht*T);o.globalCompositeOperation='source-over';o.drawImage(RGLO.c,0,0,wt*T,ht*T)}
  g.drawImage(OC,0,0)}
 // pixel reveal front (screen px): grows from the sun outwards; everything beyond it is dithered/chunky-hidden
-function revealR(t){const m=Math.min(W,H);if(t<3.9)return m*(.5+.12*seg(t,0,3.9));const z0=m*.82/(250*.72),w0=m*.62/z0;return(w0+(3800-w0)*Math.pow(seg(t,3.9,8.2),1.25))*cam.z}
+// after 3.9s the front grows in screen space on a sine ease from .62*min(W,H) toward 1.2x the clear radius (still moving when it leaves the screen)
+function revealR(t){const m=Math.min(W,H);if(t<3.9)return m*(.5+.12*seg(t,0,3.9));const r0=m*.62,e=(1-Math.cos(Math.PI*seg(t,3.9,9.4)))/2;return r0+(revealEnd()*1.2-r0)*e}
+// radius at which the whole dithered band is past the farthest screen corner (mask fully transparent)
+function revealEnd(){const[cx,cy]=W2S(0,0);return Math.max(Math.hypot(cx,cy),Math.hypot(W-cx,cy),Math.hypot(cx,H-cy),Math.hypot(W-cx,H-cy))+Math.min(W,H)*RVB+8}
 const RVB=.22;let rvC=null,rvG=null,rvI=null;
 function revealOf(sx,sy,R){const[cx,cy]=W2S(0,0);return clamp((R-Math.hypot(sx-cx,sy-cy))/Math.max(20,Math.min(Math.min(W,H)*RVB,R*.5)))}
 function revealMask(R){const cs=4,mw=Math.ceil(W/cs),mh=Math.ceil(H/cs);if(!rvC||rvC.width!==mw||rvC.height!==mh){rvC=document.createElement('canvas');rvC.width=mw;rvC.height=mh;rvG=rvC.getContext('2d');rvI=rvG.createImageData(mw,mh)}
@@ -321,7 +324,7 @@ function lens(){if(sys!=='main')return;const b=MAIN.find(q=>q.id==='void'),[vx0,
   lc.putImageData(out,0,0);lensR=[x0,y0,D]}
  g.drawImage(lensC,x0,y0,D,D)}
 function frame(now){if(window.__galaxyHold){last=now;requestAnimationFrame(frame);return}if(sys==='archive'&&!warp&&document.body.classList.contains('arch')){last=now;requestAnimationFrame(frame);return}const dt=Math.min(.05,(now-last)/1000);last=now;const IS=introState(now);FA+=((focus?1:0)-FA)*Math.min(1,dt*4);if(mv.on&&!tw){const k=Math.pow(.9,dt*60);mv.x*=k;mv.y*=k;cam.x+=mv.x*dt*60;cam.y+=mv.y*dt*60;if(Math.hypot(mv.x,mv.y)*cam.z<.1)mv.on=0}if(!tw&&!intro&&!focus&&sys==='main'){const bx=W<H?5500:6500,by=W<H?6750:5750;cam.x=clamp2(cam.x,fitX()-bx,fitX()+bx);cam.y=clamp2(cam.y,fitY()-by,fitY()+by)}
- if(intro){if(IS.t<3.9){cam.x=0;cam.y=0;cam.z=Math.min(W,H)*.82/(250*.72)}else if(!intro.zoomed){intro.zoomed=1;to(fitX(),fitY(),fitZ(),2200)}if(IS.t>7.4&&!intro.ui){intro.ui=1;uiReveal()}if(IS.t>8.8)intro=null}
+ if(intro){if(IS.t<3.9){cam.x=0;cam.y=0;cam.z=Math.min(W,H)*.82/(250*.72)}else if(!intro.zoomed){intro.zoomed=1;to(fitX(),fitY(),fitZ(),2200)}if(IS.t>7.4&&!intro.ui){intro.ui=1;uiReveal()}if(IS.t>3.9&&(IS.R>=revealEnd()||IS.t>12)){if(!intro.ui)uiReveal();intro=null}}
  if(tw){const k=ease(clamp((now-tw.t0)/tw.ms));const zl=Math.exp(Math.log(tw.a.z)+(Math.log(tw.b.z)-Math.log(tw.a.z))*k);cam.x=tw.a.x+(tw.b.x-tw.a.x)*k;cam.y=tw.a.y+(tw.b.y-tw.a.y)*k;cam.z=zl;if(k>=1){const d=tw.done;tw=null;d&&d()}}
  // orbit motion: hover/focus slows to a stop
  const list=sys==='main'?[...bodies,...MOONS]:bodies;
