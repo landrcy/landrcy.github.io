@@ -23,43 +23,12 @@ const GB={cx0:31,cy0:28,S0:(544-52-92)/720,OX0:150,OY0:140};
 function gumLayout(W,H){const top=Math.max(52,H*.06),bot=Math.max(92,H*.12),avail=H-top-bot,S=Math.min(avail/720,W*.9/330,1.5),P=Math.max(2,Math.round(720*S/300));
  return{S,OX:Math.round(W/2/P)*P,OY:Math.round((top+(avail-720*S)/2+158*S)/P)*P}}
 
-// CARD BOX: an upright golden tuck box: gold filigree border, corner fans, jewel inlays, a cursive L on a burgundy cartouche
-function cardBox(){const F=58,D=8,W=F+D+1,H=92,s=mk(W,H),x=s.x,gold=[];const P=(X,Y,c,gl)=>{px(x,X,Y,c);if(gl)gold.push([X,Y])};
- // side face (oblique)
- for(let X=F+1;X<=F+D;X++){const t=X-F;px(x,X,t,GD[0]);for(let y=t+1;y<H-1;y++)px(x,X,y,X===F+D?GD[0]:y<t+3?GD[3]:y>H-6?GD[0+1]:(X-F)%3===0&&y>24&&y<H-10?GD[1]:GD[2]);px(x,X,H-1,GD[0])}
- // front face
- for(let y=1;y<H-1;y++)for(let X=1;X<F;X++){const u=X/F;let c=u<.1?GD[5]:u<.58?GD[4]:GD[3];if(y>H-7)c=u<.1?GD[4]:GD[2];if(y<17)c=u<.1?GD[4]:u<.58?GD[3]:GD[2];P(X,y,c,true)}
- for(let X=1;X<F;X++)P(X,1,GD[6],true);
- for(let X=0;X<=F;X++){px(x,X,0,GD[0]);px(x,X,H-1,GD[0])}for(let y=0;y<H;y++){px(x,0,y,GD[0]);px(x,F,y,GD[0])}
- // tuck flap curve + thumb notch
- for(let X=2;X<F-1;X++){const yc=16-Math.round(4*Math.sin(Math.PI*(X-2)/(F-4)));P(X,yc,GD[1]);P(X,yc+1,GD[6],true);P(X,yc+2,GD[5],true)}
- for(let X=-6;X<=6;X++){const d=Math.round(3*Math.sqrt(1-(X/6.5)**2));for(let y=1;y<=d;y++)px(x,F/2+X,y,y===d?GD[0]:GD[1])}
- // inner border with filigree band
- const bx0=6,by0=20,bx1=F-6,by1=H-7;const rect=(i,c,c2)=>{for(let X=bx0+i;X<=bx1-i;X++){P(X,by0+i,c);P(X,by1-i,c2||c)}for(let y=by0+i;y<=by1-i;y++){P(bx0+i,y,c);P(bx1-i,y,c2||c)}};
- rect(0,GD[1]);rect(1,GD[5],GD[2]);rect(5,GD[1]);rect(6,GD[2],GD[5]);
- const band=(X,Y,k)=>{const p=k%6;if(p===0){P(X,Y,GD[6],true)}else if(p===3){P(X,Y-1,GD[1]);P(X,Y+1,GD[1]);P(X-1,Y,GD[1]);P(X+1,Y,GD[1]);P(X,Y,GD[6],true)}};
- for(let X=bx0+4;X<=bx1-4;X++){band(X,by0+3,X-bx0);band(X,by1-3,X-bx0)}for(let y=by0+6;y<=by1-6;y++){band(bx0+3,y,y-by0);band(bx1-3,y,y-by0)}
- // corner fans
- const fan=(X0,Y0,sx,sy)=>{for(let a=0;a<=12;a++){const t=a/12*Math.PI/2;for(const[r,c]of[[5,GD[1]],[8,GD[1]]])P(Math.round(X0+sx*Math.cos(t)*r),Math.round(Y0+sy*Math.sin(t)*r),c);P(Math.round(X0+sx*Math.cos(t)*6.5),Math.round(Y0+sy*Math.sin(t)*6.5),a%3?GD[5]:GD[6],true)}};
- fan(bx0+7,by0+7,1,1);fan(bx1-7,by0+7,-1,1);fan(bx0+7,by1-7,1,-1);fan(bx1-7,by1-7,-1,-1);
- // cartouche
- const ccx=F/2,ccy=Math.round((by0+by1)/2),rx=14.5,ry=20.5;
- for(let y=-22;y<=22;y++)for(let X=-16;X<=16;X++){const d=Math.hypot((X+.5)/rx,(y+.5)/ry);if(d>1)continue;const ang=Math.atan2(y,X);let c,gl=false;
-  if(d>.95)c=GD[0];else if(d>.87){c=Math.floor((ang+Math.PI)/(Math.PI*2)*36)%2?GD[6]:GD[3];gl=true}else if(d>.83)c=GD[1];
-  else{c='#5a0e1a';if(d>.72&&((X+y)&1))c='#7a1424';if(d<.55&&X+y<-6)c='#6a1220';if(d>.78)c='#3a0812'}P(ccx+X,ccy+y,c,gl)}
- // cursive L (cubic beziers), 2px stroke with highlight and drop shadow
- const LP=[[[2,-5],[-5,-9],[1,-19],[7,-14]],[[7,-14],[11,-10],[3,-9],[1,-4]],[[1,-4],[-1,2],[-3,8],[-6,11]],[[-6,11],[-10,15],[-3,16],[0,12]],[[0,12],[3,9],[6,14],[10,11]]];
- const bz=(p,t)=>{const u=1-t;return[0,1].map(i=>u*u*u*p[0][i]+3*u*u*t*p[1][i]+3*u*t*t*p[2][i]+t*t*t*p[3][i])};
- const pts=[];LP.forEach(seg=>{for(let i=0;i<=60;i++){const[a,b]=bz(seg,i/60);pts.push([Math.round(ccx+a),Math.round(ccy+b)])}});
- pts.forEach(([a,b])=>{px(x,a+1,b+1,'#2a0610',2,2)});pts.forEach(([a,b])=>{P(a,b,GD[4],true);P(a+1,b,GD[4],true);P(a,b+1,GD[3]);P(a+1,b+1,GD[3])});pts.forEach(([a,b])=>P(a,b,GD[6],true));
- // jewels
- const gem=(X,Y,c)=>{for(let dy=-3;dy<=3;dy++)for(let dx=-3;dx<=3;dx++){const m=Math.abs(dx)+Math.abs(dy);if(m>3)continue;let col;if(m===3)col=GD[1];else if(m===2)col=dx+dy<0?c[0]:c[2];else col=c[1];if(dx===-1&&dy===-1)col=c[3];if(dx===0&&dy===-2)col=c[3];px(x,X+dx,Y+dy,col)}};
- const RUBY=['#ff3a4a','#d81c24','#7a0610','#ffd0d4'],SAPH=['#3fa0ff','#1a64d0','#0e2a6a','#dff4ff'],EMER=['#3ad870','#1a9a40','#0a4a1e','#d8ffe4'];
- gem(ccx,ccy-ry-3,RUBY);gem(ccx,ccy+ry+3,RUBY);gem(ccx,8,RUBY);
- gem(bx0+11,by0+11,SAPH);gem(bx1-11,by0+11,SAPH);gem(bx0+11,by1-11,SAPH);gem(bx1-11,by1-11,SAPH);
- gem(bx0+4+3,ccy,EMER);gem(bx1-4-3,ccy,EMER);
- const gl=gold.filter(([a,b])=>{const d=x.getImageData(a,b,1,1).data;return d[0]>180&&d[1]>110&&d[2]<160});
- return{...s,glint:gl,F}}
+// CARD BOX: the exact golden box from /cards/ (208x288 art), snapshotted and reduced 3x to the shelf's pixel size.
+// CB = how /cards/ lays its box out, used to line the zoom up with the real page.
+function cbLayout(W,H){const p=(H>=1100&&W>=900)?2:1,tw=208*p,th=288*p;return{p,x:Math.round((W-tw)/2),y:Math.max(56,Math.round((H-th-70)/2)),w:tw,h:th}}
+function cardBox(img){const s=mk(img.width,img.height);s.x.drawImage(img,0,0);const d=s.x.getImageData(0,0,s.w,s.h).data,gl=[];
+ for(let y=0;y<s.h;y++)for(let X=0;X<s.w;X++){const i=(y*s.w+X)*4;if(d[i]>190&&d[i+1]>130&&d[i+2]<150&&d[i]-d[i+2]>90)gl.push([X,y])}
+ return{...s,glint:gl,F:s.w}}
 
 // RETRO TV: gold casing, gold dial, gold antenna
 function tv(){const W=112,H=100,s=mk(W,H),x=s.x;
@@ -91,30 +60,56 @@ function tv(){const W=112,H=100,s=mk(W,H),x=s.x;
  leg(14);leg(90);
  s.screen=[sx,sy,sw,sh];return s}
 
-// LAVERSE ORRERY (redrawn live so it can spin): gold base, gold post, gold arms + rods, the hub sun on top, Cooper City outermost.
-const ORB=[['ashaad',14,-1.2,48],['sea',24,2.8,28],['pmuseum',32,-.35,54],['typefall',42,2.3,14],['void',50,-2.75,62],['gow',60,.25,34]];
-const ORR={W:152,H:156,cx:76,hy:122,by:146,sunY:2,rot:0,tilt:.26,glow:0};
-function orrery(im){const s=mk(ORR.W,ORR.H);s.im=im;s.draw=()=>drawOrr(s);s.draw();s.sun=[ORR.cx,ORR.sunY+20,20];return s}
-function drawOrr(s){const x=s.x,im=s.im,{cx,hy,by}=ORR;x.clearRect(0,0,s.w,s.h);
- const items=ORB.map(([id,r,a,h])=>{const A=a+ORR.rot,X=cx+Math.cos(A)*r,Y=hy+Math.sin(A)*r*ORR.tilt;return{id,X,Y,h,z:Math.sin(A)}});
- const drawArm=o=>{const X=Math.round(o.X),Y=Math.round(o.Y);line(x,cx,hy,X,Y,GD[2]);line(x,cx,hy-1,X,Y-1,GD[5]);line(x,cx,hy+1,X,Y+1,GD[1]);
-  const top=Y-o.h;px(x,X-1,top,GD[6],1,Y-top);px(x,X,top,GD[4],1,Y-top);px(x,X+1,top,GD[2],1,Y-top);
-  px(x,X-2,Y-1,GD[0],5,4);px(x,X-1,Y-1,GD[6],2,1);px(x,X-1,Y,GD[4],3,1);px(x,X-1,Y+1,GD[2],3,1);
-  const p=im[o.id];if(p)x.drawImage(p,X-Math.floor(p.width/2),top-p.height+3)};
- const base=(rw,rh,y,c)=>{for(let yy=-rh;yy<=rh;yy++)for(let X=-rw;X<=rw;X++){const d=(X/rw)**2+(yy/rh)**2;if(d>1)continue;let k=d>.86?c[0]:yy>rh*.35?c[1]:X<-rw*.35?c[4]:X<rw*.4?c[3]:c[2];if(yy===-rh+1&&d<=.86)k=c[5];px(x,cx+X,y+yy,k)}};
- base(36,8,by,[GD[0],GD[2],GD[3],GD[4],GD[5],GD[6]]);base(22,5,by-7,[GD[0],GD[2],GD[3],GD[4],GD[5],GD[6]]);
- items.filter(o=>o.z<0).sort((a,b)=>a.Y-b.Y).forEach(drawArm);
- for(let y=36;y<by-9;y++){px(x,cx-3,y,GD[0]);px(x,cx-2,y,GD[6]);px(x,cx-1,y,GD[5]);px(x,cx,y,GD[4]);px(x,cx+1,y,GD[3]);px(x,cx+2,y,GD[2]);px(x,cx+3,y,GD[0])}
- for(const[y0,w]of[[hy-3,7],[40,5]]){px(x,cx-w,y0,GD[0],w*2+1,6);px(x,cx-w+1,y0+1,GD[6],w*2-1,1);px(x,cx-w+1,y0+2,GD[5],w,2);px(x,cx+1,y0+2,GD[3],w-1,2);px(x,cx-w+1,y0+4,GD[2],w*2-1,1)}
- // sun glow (hover): banded rings behind the sun
- if(ORR.glow>0.01){const sy=ORR.sunY+20;for(let yy=-28;yy<=28;yy++)for(let X=-28;X<=28;X++){const d=Math.hypot(X+.5,yy+.5);if(d<19||d>27)continue;const bnd=Math.floor((d-19)/2.7);x.globalAlpha=ORR.glow*[.75,.45,.22][bnd];px(x,cx+X,sy+yy,bnd?GD[5]:GD[6])}x.globalAlpha=1}
- if(im.sun)x.drawImage(im.sun,cx-20,ORR.sunY);
- items.filter(o=>o.z>=0).sort((a,b)=>a.Y-b.Y).forEach(drawArm)}
+// LAVERSE ORRERY (redrawn live so it can spin). Hand-built: stepped engraved gold base, central spindle, six thin arms on
+// collars at different heights, each with an elbow knuckle and a rod up to its planet. Light comes from the top-left.
+// Planets are the hub's own painters at 20px, in hub orbit order; Cooper City on the outermost arm.
+const ORB=[['sea',20],['aiquiz',30],['yt',40],['escapeca',50],['terra',60],['gow',70]];
+const ORR={W:168,H:150,cx:84,sunY:26,sunR:17,py:62,rot:-.45,tilt:.24,glow:0};
+const SUNC=['#5a0a02','#8a1606','#b8280a','#dc4410','#f26a1c','#fb9636','#ffc46e','#ffe8b8'];
+function sunSprite(){const R=ORR.sunR,D=R*2+1,s=mk(D,D),x=s.x;
+ for(let y=-R;y<=R;y++)for(let X=-R;X<=R;X++){const d=Math.hypot(X,y);if(d>R+.35)continue;const nz=Math.sqrt(Math.max(0,1-(d/(R+.5))**2)),l=(-X*.55-y*.6)/(R+.5)+nz*.75;
+  let c=d>R-.65?SUNC[1]:SUNC[clamp(Math.floor(2+l*4.2),2,7)];px(x,X+R,y+R,c)}
+ // engraved cursive L: dark cut with a lit lower lip
+ const LP=[[[1.5,-3],[-3.5,-6],[1,-12.5],[5,-9.5]],[[5,-9.5],[7.5,-7],[2,-6],[.5,-2.5]],[[.5,-2.5],[-.5,2],[-2,5.5],[-4.5,7.5]],[[-4.5,7.5],[-7.5,10],[-2,11],[0,8]],[[0,8],[2,6],[4.5,9.5],[7.5,7]]];
+ const bz=(p,t)=>{const u=1-t;return[0,1].map(i=>u*u*u*p[0][i]+3*u*u*t*p[1][i]+3*u*t*t*p[2][i]+t*t*t*p[3][i])};const pts=new Map();
+ const LS=1.18;LP.forEach(sg=>{for(let i=0;i<=120;i++){const[a,b]=bz(sg,i/120);const X=Math.round(R+a*LS),Y=Math.round(R+b*LS+1);pts.set(X+','+Y,[X,Y])}});
+ pts.forEach(([a,b])=>{if(!pts.has(a+','+(b+1)))px(x,a,b+1,SUNC[7])});pts.forEach(([a,b])=>px(x,a,b,SUNC[0]));return s}
+function orrery(im){const s=mk(ORR.W,ORR.H);s.im=im;im.sunS=sunSprite();s.draw=()=>drawOrr(s);s.draw();s.sun=[ORR.cx,ORR.sunY,ORR.sunR];return s}
+function drawOrr(s){const x=s.x,im=s.im,{cx,py}=ORR,N=ORB.length;x.clearRect(0,0,s.w,s.h);
+ // base: three stepped tiers (top face + front band), engraved
+ const tier=(rx,ry,yt,hb,eng)=>{for(let X=-rx;X<=rx;X++){const e=ry*Math.sqrt(Math.max(0,1-(X/(rx+.5))**2)),yf=Math.round(yt+e),yb=Math.round(yt-e),u=X/rx;
+   const band=u<-.65?GD[4]:u<-.2?GD[3]:u<.35?GD[3]:u<.75?GD[2]:GD[1];
+   for(let y=yf+1;y<=yf+hb;y++){let c=band;if(y===yf+hb)c=GD[0];else if(y===yf+1)c=u<-.3?GD[6]:u<.4?GD[5]:GD[4];
+    else if(eng&&y===yf+Math.ceil(hb/2)){const m=(X+rx)%6;if(m===0)c=u<.1?GD[2]:GD[0];else if(m===1)c=u<.1?GD[6]:GD[4]}px(x,cx+X,y,c)}
+   for(let y=yb;y<=yf;y++){const v=(y-yt)/(ry+.01);let c=(u*.8+v)<-.95?GD[5]:(u*.8+v)<-.05?GD[4]:GD[3];if(y===yb)c=GD[2];if(y===yf)c=GD[5];if(Math.abs(X)>=rx-1&&y!==yf)c=GD[1];px(x,cx+X,y,c)}}
+  if(eng)for(let a=0;a<72;a++){if(a%2)continue;const t=a/72*Math.PI*2;px(x,Math.round(cx+Math.cos(t)*(rx-5)),Math.round(yt+Math.sin(t)*(ry-1.8)),GD[2])}};
+ tier(40,7,135,6,true);tier(28,5,128,4,true);tier(17,3,122,3,false);
+ // baluster neck
+ [[121,6],[120,5],[119,4],[118,4],[117,3],[116,3],[115,4],[114,3]].forEach(([y,w])=>{for(let X=-w;X<=w;X++){const u=X/w;px(x,cx+X,y,Math.abs(X)===w?GD[0]:u<-.4?GD[6]:u<.15?GD[4]:u<.6?GD[3]:GD[2])}});
+ // arms
+ const items=ORB.map(([id,r],i)=>{const A=ORR.rot+(i%2)*Math.PI+i*.2,yc=84+i*5,ex=cx+Math.cos(A)*r,ey=yc+Math.sin(A)*r*ORR.tilt,pY=py+Math.sin(A)*r*ORR.tilt;return{id,r,yc,ex,ey,pY,z:Math.sin(A)}});
+ const arm=o=>{const X=Math.round(o.ex),Y=Math.round(o.ey),top=Math.round(o.pY)+9;
+  line(x,cx,o.yc,X,Y,GD[5]);line(x,cx,o.yc+1,X,Y+1,GD[1]);
+  for(let y=top;y<Y-1;y++){px(x,X-1,y,GD[0]);px(x,X,y,GD[6]);px(x,X+1,y,GD[3]);px(x,X+2,y,GD[0])}
+  // elbow knuckle
+  px(x,X-2,Y-2,GD[0],6,5);px(x,X-1,Y-1,GD[6],2,1);px(x,X+1,Y-1,GD[4],2,1);px(x,X-1,Y,GD[5],1,2);px(x,X,Y,GD[4],2,2);px(x,X+2,Y,GD[2],1,2);px(x,X-1,Y+2,GD[1],4,1);
+  // cup under the planet
+  px(x,X-3,top-1,GD[0],8,3);px(x,X-2,top-1,GD[6],3,1);px(x,X+1,top-1,GD[4],3,1);px(x,X-2,top,GD[2],6,1);
+  const p=im[o.id];if(p)x.drawImage(p,X+1-Math.ceil(p.width/2),Math.round(o.pY)-Math.floor(p.height/2))};
+ const spindle=()=>{for(let y=ORR.sunY+ORR.sunR;y<114;y++){px(x,cx-2,y,GD[0]);px(x,cx-1,y,GD[6]);px(x,cx,y,GD[4]);px(x,cx+1,y,GD[2]);px(x,cx+2,y,GD[0])}
+  items.forEach(o=>{px(x,cx-3,o.yc-1,GD[0],7,3);px(x,cx-2,o.yc,GD[6],2,1);px(x,cx,o.yc,GD[4],2,1);px(x,cx+2,o.yc,GD[2])});
+  // sun cup
+  const cy=ORR.sunY+ORR.sunR;px(x,cx-6,cy-2,GD[0],13,4);px(x,cx-5,cy-1,GD[6],5,1);px(x,cx,cy-1,GD[4],6,1);px(x,cx-5,cy,GD[3],11,1)};
+ items.filter(o=>o.z<0).sort((a,b)=>a.ey-b.ey).forEach(arm);
+ spindle();
+ if(ORR.glow>0.01){const R=ORR.sunR;for(let yy=-R-6;yy<=R+6;yy++)for(let X=-R-6;X<=R+6;X++){const d=Math.hypot(X,yy);if(d<=R+.6||d>R+5.5)continue;const bnd=d<R+2.5?0:1;x.globalAlpha=ORR.glow*(bnd?.28:.6);px(x,cx+X,ORR.sunY+yy,bnd?GD[5]:GD[6])}x.globalAlpha=1}
+ x.drawImage(im.sunS.c,cx-ORR.sunR,ORR.sunY-ORR.sunR);
+ items.filter(o=>o.z>=0).sort((a,b)=>a.ey-b.ey).forEach(arm)}
 
 // ---------------- scene / layout ----------------
 let W=0,H=0,U=2,dpr=1,lw=0,lh=0,objs=[],shelves=[],ready=false;
 const O={gumball:{label:'Gumball machine'},cards:{label:'Deck of cards'},laverse:{label:'The Laverse'},tv:{label:'TV'}};
-function layout(){W=innerWidth;H=innerHeight;dpr=devicePixelRatio||1;const two=W/H<.9,gap=two?12:30,pad=two?6:20;
+function layout(){W=innerWidth;H=innerHeight;dpr=devicePixelRatio||1;const two=W/H<.9,gap=two?12:24,pad=two?6:16;
  const rows=two?[['gumball','tv'],['cards','laverse']]:[['gumball','cards','laverse','tv']];
  const rw=rows.map(r=>r.reduce((a,k)=>a+O[k].s.w,0)+gap*(r.length-1)),rh=rows.map(r=>Math.max(...r.map(k=>O[k].s.h)));
  const needW=Math.max(...rw)+pad*2+4,needH=rh.reduce((a,b)=>a+b+24,0)+(rows.length-1)*28;
@@ -158,7 +153,8 @@ const kick=()=>{if(!raf)raf=requestAnimationFrame(loop)};
 // ---------------- camera ----------------
 let camK=1,camX=0,camY=0,zoomed=null,busy=false,app=null;
 function setCam(k,tx,ty){camK=k;camX=tx;camY=ty;cam.style.transform=`translate3d(${tx}px,${ty}px,0) scale(${k})`}
-function target(o){if(o.id==='gumball'){const L=gumLayout(W,H),r=L.S/GB.S0,k=2*r/U;
+function target(o){if(o.id==='cards'){const L=cbLayout(W,H),k=L.w/(o.s.w*U);return{k,tx:L.x-o.x*U*k,ty:L.y-o.y*U*k}}
+ if(o.id==='gumball'){const L=gumLayout(W,H),r=L.S/GB.S0,k=2*r/U;
   return{k,tx:((GB.cx0*2-GB.OX0)*r+L.OX)-o.x*U*k,ty:((GB.cy0*2-GB.OY0)*r+L.OY)-o.y*U*k}}
  const fw=o.id==='tv'?.8:o.id==='laverse'?.86:.72,fh=o.id==='laverse'?.8:.72,k=Math.min(W*fw/(o.s.w*U),H*fh/(o.s.h*U)),cx=(o.x+o.s.w/2)*U,cy=(o.y+o.s.h/2)*U;
  return{k,tx:W/2-cx*k,ty:H/2-cy*k}}
@@ -191,7 +187,7 @@ function onSun(e){const[x,y,r]=sunScreen();return Math.hypot(e.clientX-x,e.clien
 pad.addEventListener('pointerdown',e=>{if(!spin.on||busy)return;pad.setPointerCapture(e.pointerId);spin.drag={id:e.pointerId,x0:e.clientX,y0:e.clientY,x:e.clientX,y:e.clientY,t:performance.now(),moved:0,hist:[]};spin.v=0;kick()});
 pad.addEventListener('pointermove',e=>{if(!spin.on)return;const d=spin.drag;
  if(!d||d.id!==e.pointerId){const h=onSun(e);if(h!==spin.hover){spin.hover=h;pad.classList.toggle('sun',h);kick()}return}
- const dx=e.clientX-d.x,dy=e.clientY-d.y,now=performance.now(),R=45*U*camK;d.moved+=Math.abs(dx)+Math.abs(dy);d.x=e.clientX;d.y=e.clientY;
+ const dx=e.clientX-d.x,dy=e.clientY-d.y,now=performance.now(),R=60*U*camK;d.moved+=Math.abs(dx)+Math.abs(dy);d.x=e.clientX;d.y=e.clientY;
  const da=-dx/R;ORR.rot+=da;spin.tiltT=clamp(spin.tiltT+dy/(R*5),.14,.44);ORR.tilt=lerp(ORR.tilt,spin.tiltT,.5);spin.dirty=true;
  d.hist.push([now,da]);while(d.hist.length&&now-d.hist[0][0]>90)d.hist.shift();d.t=now;if(d.moved>6&&spin.hover){spin.hover=false;pad.classList.remove('sun')}kick()});
 const endDrag=e=>{const d=spin.drag;if(!d||d.id!==e.pointerId)return;spin.drag=null;const now=performance.now();
@@ -212,7 +208,7 @@ function zoomIn(o){if(busy||zoomed)return;busy=true;zoomed=o;objs.forEach(q=>{q.
  const rm=RM.matches,to=target(o);let useApp=o.id==='gumball'?GUMBALL_URL:null;
  const proceed=()=>{if(o.id==='cards'&&cardsOK)useApp=CARDS_URL;if(useApp)app=openApp(useApp);
   const arrive=()=>{back.hidden=false;requestAnimationFrame(()=>back.classList.add('on'));
-   if(o.id==='laverse'){spin.on=true;pad.hidden=false;busy=false;if(!rm)spin.v=-1.6;kick();return}
+   if(o.id==='laverse'){spin.on=true;pad.hidden=false;busy=false;if(!rm)spin.v=-.5;kick();return}
    if(app)showApp(app).then(()=>{busy=false});else{if(o.id==='tv'||o.id==='cards')showPlate(o);busy=false}};
   if(rm){fadeTo(1,140,'#fff').then(()=>{setCam(to.k,to.tx,to.ty);draw();return fadeTo(0,160)}).then(arrive)}
   else tweenCam(ctr(o),to,1050,t=>backIO(t,.85),arrive)};
@@ -231,9 +227,10 @@ addEventListener('pageshow',e=>{if(e.persisted){fade.getAnimations().forEach(a=>
 addEventListener('resize',()=>{if(!ready)return;layout();if(zoomed){const t=target(zoomed);setCam(t.k,t.tx,t.ty);if(!plate.hidden)showPlate(zoomed)}});
 
 // ---------------- boot ----------------
-Promise.all([load('img/gumball.png'),load('img/sun.png'),...ORB.map(o=>load('img/'+o[0]+'.png'))]).then(([gum,sun,...pl])=>{
- const im={sun};ORB.forEach((o,i)=>im[o[0]]=pl[i]);
- const gs=mk(gum.width,gum.height);gs.x.drawImage(gum,0,0);O.gumball.s=gs;O.cards.s=cardBox();O.laverse.s=orrery(im);O.tv.s=tv();
+Promise.all([load('img/gumball.png'),load('img/cards.png'),...ORB.map(o=>load('img/'+o[0]+'.png'))]).then(([gum,cbox,...pl])=>{
+ const im={};ORB.forEach((o,i)=>{const p=pl[i];if(!p)return;const c=mk(p.width,p.height);c.x.drawImage(p,0,0);const d=c.x.getImageData(0,0,c.w,c.h),r=Math.min(c.w,c.h)*.42+.3;
+  for(let y=0;y<c.h;y++)for(let X=0;X<c.w;X++)if(Math.hypot(X+.5-c.w/2,y+.5-c.h/2)>r)d.data[(y*c.w+X)*4+3]=0;c.x.putImageData(d,0,0);im[o[0]]=c.c});
+ const gs=mk(gum.width,gum.height);gs.x.drawImage(gum,0,0);O.gumball.s=gs;O.cards.s=cardBox(cbox);O.laverse.s=orrery(im);O.tv.s=tv();
  for(const k in O){const o=O[k];o.id=k;const b=document.createElement('button');b.type='button';b.className='hit';b.setAttribute('aria-label',o.label);o.btn=b;hits.appendChild(b);
   b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'&&!zoomed){o.hover=true;kick()}});b.addEventListener('pointerleave',()=>{o.hover=false;o.press=false;kick()});
   b.addEventListener('pointerdown',()=>{if(!zoomed){o.press=true;kick()}});b.addEventListener('pointerup',()=>{o.press=false;kick()});
