@@ -718,6 +718,52 @@ P.aiq=(S,t)=>{const W=S.img.width,R=W*.34,rot=t*.18,tick=Math.floor(t*5),gl=tick
  for(let yy=0;yy<m;yy++)for(let xx=0;xx<m;xx++){const px=Math.round(mx-m/2)+xx,py=Math.round(my-m/2)+yy;if(px<0||py<0||px>=W||py>=W)continue;if(back&&Math.hypot(px+.5-W/2,py+.5-W/2)<R)continue;
   const edge=xx===0||yy===0||xx===m-1||yy===m-1,c=edge?(xx<m/2?[138,244,255]:[255,216,246]):(xx<m/2?[47,180,232]:[192,48,176]),o=(py*W+px)*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}
  S.g.putImageData(S.img,0,0)};
+/* ---------- MINE: a dark rock planet with its upper-right quarter cut away into hard-banded strata, glowing ore veins deepening to a voidglass core,
+   a mine shaft with a riding cage and side drifts, a tiny headframe with a blinking beacon on the surface, and a hauled crystal-chunk moon ---------- */
+const MNR=['#120e10','#211a1a','#33281f','#4a3a2c','#66513c'],
+ MNS=[['#2e1f14','#45301d','#5e4329'],['#62432a','#8a623c','#ad8352'],['#5c5a50','#82806f','#a6a28c'],['#23272f','#343a44','#4a525e'],['#4b3c3c','#6c5856','#8f7a74'],['#1b1c20','#292b31','#3a3d45'],['#22100c','#361912','#4a2418'],['#120a1e','#1e1230','#2c1c46']],
+ MNB=[.08,.18,.3,.42,.56,.7,.84,1.01],
+ MNO=[[['#22222a','#3e3e4a','#8a8a9c']],[['#22222a','#3e3e4a','#8a8a9c'],['#8a4a20','#c4733a','#f2b884']],[['#8a4a20','#c4733a','#f2b884'],['#6c3326','#a05a44','#d6a08c']],[['#a06e0e','#e2b128','#fff1a6'],['#76839a','#b8c4d4','#f6f9ff']],[['#a06e0e','#e2b128','#fff1a6'],['#1b38a2','#3b78e6','#bfe6ff']],[['#1b38a2','#3b78e6','#bfe6ff'],['#b03000','#ff7a10','#ffe68a',1]],[['#b03000','#ff7a10','#ffe68a',1],['#3c0a5c','#8f2fd6','#eab0ff',1]],[['#3c0a5c','#8f2fd6','#eab0ff',1],['#007f78','#2fe2c8','#e4fff9',1]]],
+ MNST=['#14181e','#343c48','#5a6676','#a8b4c4'];
+P.mine=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,R=W*.34,cx=W/2,cy=Hh/2+W*.04,big=W>=64,u=Math.max(1,Math.round(W/110)),sh=Math.floor(t*6);
+ const cut=(x,y)=>x+.5-cx>=0&&y+.5-cy<=0;
+ sphere(S,R,cx,cy,t*.12,(lon,lat,lit,x,y)=>{if(cut(x,y))return null;
+  const h=fbm(lon*2.6+11,lat*2.6+3),cr=vn(lon*7+2,lat*7+9);let v=h*.55+lit*.6-.18;if(cr>.78)v-=.22;
+  if(big&&H(Math.floor(lon*40)&1023,Math.floor(lat*40)&1023)>.994){const g=H(Math.floor(lon*40)&1023,7)>.5;return((sh+x)%9)<2?(g?'#fff1a6':'#e4fff9'):(g?'#e2b128':'#2fe2c8')}
+  return dq(MNR,v,x,y,LINE)});
+ const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const q=typeof c==='string'?hx(c):c,o=(y*W+x)*4;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
+ // the cut-away quarter: concentric strata, ore pockets, magma cracks, glowing deep core
+ for(let y=Math.max(0,Math.floor(cy-R-1));y<=Math.min(Hh-1,Math.ceil(cy));y++)for(let x=Math.floor(cx);x<=Math.min(W-1,Math.ceil(cx+R+1));x++){
+  if(!cut(x,y))continue;const dx=x+.5-cx,dy=y+.5-cy,r=Math.hypot(dx,dy)/R;if(r>1)continue;const f=1-r;let b=0;while(f>MNB[b])b++;
+  const a=Math.atan2(-dy,dx),rim=r>1-1.2/R,edge=dx<u||-dy<u||rim;
+  if(edge){put(x,y,rim?MNS[b][2]:'#0a0608');continue}
+  const lf=f-(b?MNB[b-1]:0),bw=MNB[b]-(b?MNB[b-1]:0),wav=Math.sin(a*9+b*2)*.012;let v=.68-(lf+wav)/bw*.62+(H(x>>1,y)-.5)*.12;
+  let c=dq(MNS[b],v,x,y,LINE);
+  if(b===6&&Math.abs(Math.sin(a*7+r*31))<.12)c=((sh+(x>>1))%5)?'#ff6a10':'#ffd060';
+  if(b===7){const k=f>.95?2:f>.9?1:0;c=k===2?'#e4fff9':k===1?((sh>>1)%2?'#2fe2c8':'#eab0ff'):dq(MNS[7],v+.1,x,y)}
+  if(big&&b>0&&b<7){const cs=Math.max(2,Math.round(W/70)),gx=Math.floor(dx/cs),gy=Math.floor(-dy/cs),hh=H(gx*7+b,gy*13+b*31);
+   if(hh>(b<3?.86:.82)){const O=MNO[b][hh>.93?1%MNO[b].length:0],ix=(dx/cs-gx),iy=(-dy/cs-gy);if(ix>.15&&iy>.15){c=ix<.45&&iy>.55?O[2]:O[1];if(O[3]&&((sh+gx*3+gy)%8)<2)c=O[2]}else if(O[3])c=O[0]}}
+  put(x,y,c)}
+ // mine shaft down the cut face with drifts, a riding cage and (when big) a tiny robot
+ const sx=Math.round(cx+u*2),top=Math.round(cy-R),bot=Math.round(cy-R*.36),sw=Math.max(2,u*2);
+ if(W>=40){for(let y=top;y<=bot;y++){for(let k=0;k<sw;k++)put(sx+k,y,'#07060a');put(sx-1,y,MNST[1]);put(sx+sw,y,MNST[2])}
+  const dr=[.16,.3,.46,.6].filter(q=>top+q*R*1.05<bot);
+  for(const q of dr){const y=Math.round(top+q*R*1.05),len=Math.round(R*(.22+H(q*100,3)*.25));for(let x=sx+sw;x<sx+sw+len;x++){for(let k=0;k<u+1;k++)put(x,y+k,'#07060a');put(x,y+u+1,MNS[3][2])}
+   if(big&&H(q*100,5)>.4)put(sx+sw+len-1,y-1,'#ffe9a8')}
+  const cyy=Math.round(top+2+(.5-.5*Math.cos(t*.8))*(bot-top-4*u));for(let a=-1;a<=sw;a++){put(sx+a,cyy-2*u,MNST[3]);put(sx+a,cyy+u,MNST[3])}for(let k=-2*u;k<=u;k++){put(sx-1,cyy+k,MNST[2]);put(sx+sw,cyy+k,MNST[2])}
+  if(big&&dr.length){const q=dr[1]||dr[0],y=Math.round(top+q*R*1.05),len=Math.round(R*(.22+H(q*100,3)*.25)),rx=Math.round(sx+sw+1+(.5-.5*Math.cos(t*.6))*(len-4));
+   for(let k=0;k<3;k++)put(rx+k,y,k===2?'#ffd23a':'#b8651e');put(rx,y-1,'#d9a520');put(rx+1,y-1,'#7a3e14');put(rx+3,y,'#c8ccd4')}}
+ // headframe over the shaft: hard-banded steel A-frame, sheave wheel, blinking red beacon
+ if(W>=40){const hx0=sx+sw/2,hb=top,hh=Math.round(R*.3),sp=Math.round(R*.13);
+  const ln=(x0,y0,x1,y1,c)=>{const n=Math.ceil(Math.max(Math.abs(x1-x0),Math.abs(y1-y0)))+1;for(let i=0;i<=n;i++)put(x0+(x1-x0)*i/n,y0+(y1-y0)*i/n,c)};
+  ln(hx0-sp,hb,hx0-1,hb-hh,MNST[3]);ln(hx0+sp,hb,hx0+1,hb-hh,MNST[2]);if(big){ln(hx0-sp+1,hb,hx0,hb-hh,MNST[1]);for(let k=1;k<4;k++){const y=hb-hh*k/4,w=sp*(1-k/4);ln(hx0-w,y,hx0+w,y,MNST[2])}}
+  for(let a=-u-1;a<=u+1;a++)put(hx0+a,hb-hh-1,MNST[3]);const wr=Math.max(1,u+1);for(let a=0;a<12;a++)put(hx0+Math.cos(a/12*TAU)*wr,hb-hh-1-wr+Math.sin(a/12*TAU)*wr,MNST[2]);
+  const on=Math.floor(t*1.6)%2;put(hx0,hb-hh-2-wr*2,on?'#ff2a1a':'#4a0a06');if(big){put(hx0,hb-hh-3-wr*2,on?'#ffb0a0':'#4a0a06');for(let a=-sp-2;a<=sp+2;a++)put(hx0+a,hb,'#1a1410')}}
+ // moon: a hauled chunk of voidglass, hard-banded facets
+ const ma=-t*.7+1.2,m=Math.max(3,Math.round(W*.06)),mx=cx+Math.cos(ma)*R*1.48,my=cy+Math.sin(ma)*R*.72,back=Math.sin(ma)<0;
+ for(let yy=-m;yy<=m;yy++)for(let xx=-m;xx<=m;xx++){const ax=Math.abs(xx),ay=Math.abs(yy);if(ax*.8+ay>m||ax>m*.7)continue;const px=Math.round(mx+xx),py=Math.round(my+yy);
+  if(back&&Math.hypot(px+.5-cx,py+.5-cy)<R)continue;const edge=ax*.8+ay>m-1.2||ax>m*.7-1;put(px,py,edge?(xx<0?'#eab0ff':'#3c0a5c'):(xx<0?(yy<0?'#e4fff9':'#2fe2c8'):(yy<0?'#8f2fd6':'#5a1a8a')))}
+ S.g.putImageData(S.img,0,0)};
 P.setFlat=v=>{FLAT=v?1:0};P.setLight=v=>{CURL=v};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
 })();
