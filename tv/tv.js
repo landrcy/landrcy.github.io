@@ -14,7 +14,8 @@ const SITES=[
  ['lsu','Lsu','/lsu/'],
  ['escapeca','Escape CA','https://landrcy.github.io/escape-ca/'],
  ['terra','Terra','https://landrcy.github.io/terra/'],
- ['wam','W.A.M.','https://landrcy.github.io/wam/']];
+ ['wam','W.A.M.','https://landrcy.github.io/wam/'],
+ ['cast','CAST','https://landrcy.github.io/cast/']];
 const N=SITES.length,RM=matchMedia('(prefers-reduced-motion: reduce)'),$=id=>document.getElementById(id);
 const cv=$('tv'),g=cv.getContext('2d'),scr=$('scr'),dialEl=$('dial'),cap=$('cap'),capN=cap.querySelector('.n'),capT=cap.querySelector('.t');
 $('sites').innerHTML=SITES.map(s=>`<a href="${s[2]}">${s[1]}</a>`).join('');

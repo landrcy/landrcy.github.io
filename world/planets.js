@@ -684,6 +684,37 @@ P.mine=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,R=W*.34,cx=W/2,c
  for(let yy=-m;yy<=m;yy++)for(let xx=-m;xx<=m;xx++){const ax=Math.abs(xx),ay=Math.abs(yy);if(ax*.8+ay>m||ax>m*.7)continue;const px=Math.round(mx+xx),py=Math.round(my+yy);
   if(back&&Math.hypot(px+.5-cx,py+.5-cy)<R)continue;const edge=ax*.8+ay>m-1.2||ax>m*.7-1;put(px,py,edge?(xx<0?'#eab0ff':'#3c0a5c'):(xx<0?(yy<0?'#e4fff9':'#2fe2c8'):(yy<0?'#8f2fd6':'#5a1a8a')))}
  S.g.putImageData(S.img,0,0)};
+/* ---------- CAST: a bright fishing sea in hard wave bands (Sea of Thought teal and blue) with foam crests rolling across,
+   a tiny plank dock on the north rim with an angler casting a line to a red-and-white bobber, and a bobber moon ---------- */
+const CBL=['#021e5a','#0a4a8a','#1a7ac0','#48CAE4','#90E0EF'],CTL=['#03303a','#08606a','#119c9c','#3ad8c8','#a4f4e8'],CFM=['#90E0EF','#e6fbff','#ffffff'],
+ CWD=['#2a1608','#5a3418','#8a5a2c','#c08a4a'],CBR=['#5a0a0a','#c0281e','#ff6a4a'],CBW=['#6a7a88','#d8e4ea','#ffffff'];
+P.cast=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,R=W*.33,cx=W/2,cy=Hh/2+W*.05,big=W>=64,u=Math.max(1,Math.round(W/75)),FL=()=>.5;
+ sphere(S,R,cx,cy,t*.18,(lon,lat,lit,x,y)=>{
+  const wob=Math.sin(lon*3+t*.9)*.35+Math.sin(lon*7-t*1.4)*.12,ph=lat*6+wob-t*.9,fr=ph-Math.floor(ph),teal=Math.floor(ph)&1;
+  if(fr>.86&&H(Math.floor(lon*9+ph*.5)&1023,Math.floor(ph)&1023)>.35)return dq(CFM,lit+.25,x,y,FL);
+  if(fr<.12)return dq(teal?CTL:CBL,lit*.95+.22,x,y,FL);
+  return dq(teal?CTL:CBL,lit*.95,x,y,FL)},{w:Math.max(2,R*.06),r:['#0a4a8a','#48CAE4']});
+ const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const q=hx(c),o=(y*W+x)*4;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
+ const box=(x,y,w,h,c)=>{for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++)put(x+xx,y+yy,c)};
+ const surf=x=>cy-R*Math.sqrt(Math.max(0,1-Math.pow((x+.5-cx)/R,2)));
+ // dock on the north rim: plank deck on posts, an angler at the end, line out to a bobbing red-and-white bobber
+ if(W>=40){const x0=Math.round(cx-R*.5),x1=Math.round(cx+R*.12),dy=Math.round(cy-R-u*3);
+  for(let x=x0;x<=x1;x++){put(x,dy,CWD[3]);for(let k=1;k<u+1;k++)put(x,dy+k,(x-x0)%(u*3)===0?CWD[0]:CWD[2]);put(x,dy+u+1,CWD[0])}
+  for(let x=x0+u;x<=x1;x+=Math.max(3,u*4)){for(let y=dy+u+2;y<=surf(x)+u;y++)box(x,y,u,1,CWD[1])}
+  const bob=Math.round(Math.sin(t*2.4)*u*.8),bx=Math.round(cx+R*.52),by=Math.round(surf(bx))-u+bob,ax=x1-u*3,top=dy-u*7;
+  if(big){box(ax,top+u*4,u*2,u*3,'#2a3a5a');box(ax,top+u*2,u*2,u*2,'#d8783a');box(ax+u,top+u*2,u,u*2,'#a8501e');box(ax,top+u,u*2,u,'#f2c89a');box(ax-u,top,u*4,u,'#f4d23a');box(ax,top-u,u*2,u,'#f4d23a')}
+  const hx0=ax+u*2,hy0=top+u*3,rx=hx0+Math.round(R*.2),ry=hy0-Math.round(R*.26);
+  for(let i=0;i<=30;i++){const q=i/30;box(hx0+(rx-hx0)*q,hy0+(ry-hy0)*q,Math.max(1,u-1)||1,1,'#5a3418')}
+  for(let i=0;i<=50;i++){const q=i/50;put(rx+(bx-rx)*q,ry+(by-ry)*q-Math.sin(q*Math.PI)*R*.06+q*q*R*.05,'#e6fbff')}
+  const br=Math.max(1,u+ (big?1:0));for(let yy=-br-1;yy<=br+1;yy++)for(let xx=-br-1;xx<=br+1;xx++){const dd=Math.hypot(xx,yy);if(dd>br+.6)continue;put(bx+xx,by+yy,dd>br-.4?'#2a0606':yy<0?(xx<0?CBR[2]:CBR[1]):CBW[1])}
+  if(big){box(bx-br-u*2,by+br+1,u*2,1,CFM[2]);box(bx+br+1,by+br+1,u*2,1,CFM[2])}}
+ // moon: a red-and-white bobber with a little antenna
+ const ma=-t*.6+2.1,m=Math.max(3,Math.round(W*.055)),mx=cx+Math.cos(ma)*R*1.32,my=cy+Math.sin(ma)*R*.66,back=Math.sin(ma)<0;
+ for(let yy=-m-3;yy<=m;yy++)for(let xx=-m;xx<=m;xx++){const px=Math.round(mx+xx),py=Math.round(my+yy);if(back&&Math.hypot(px+.5-cx,py+.5-cy)<R)continue;
+  if(yy<-m){if(xx===0)put(px,py,yy===-m-3?CBW[2]:'#2a0606');continue}
+  const dd=Math.hypot(xx,yy);if(dd>m+.2)continue;let c;
+  if(dd>m-.9)c='#2a0606';else if(Math.abs(yy)<Math.max(.6,m*.12))c='#1a1a22';else if(yy<0)c=xx+yy<-m*.7?CBR[2]:xx>m*.3?CBR[0]:CBR[1];else c=xx<-m*.2?CBW[2]:xx>m*.35?CBW[0]:CBW[1];put(px,py,c)}
+ S.g.putImageData(S.img,0,0)};
 P.setFlat=v=>{FLAT=v?1:0};P.setLight=v=>{CURL=v};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
 })();

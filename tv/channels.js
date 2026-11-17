@@ -198,5 +198,23 @@ CH.wam=(cx,t)=>{c=cx;R(0,0,W,H,'#0c1020');stars(22,14,['#3a4466','#5c6890','#2a3
  if(f){P(x+1,y+7,cl);P(x+4,y+7,cl);P(x,y+8,cl);P(x+5,y+8,cl)}else{P(x+2,y+7,cl);P(x+3,y+7,cl);P(x+2,y+8,cl);P(x+3,y+8,cl)}
  line(x+5,y+3,x+7,y-1,'#9aa6c4')};
 
+// CAST: first person off the end of a dock at sunset sea; the bobber floats, dips on a bite, and a fish leaps out on the hook
+CH.cast=(cx,t)=>{c=cx;const SK=['#0a2a5a','#1a4a8a','#2a7ac0','#48CAE4','#90E0EF'];for(let i=0;i<5;i++)R(0,i*3,W,3,SK[i]);
+ R(52,4,6,6,'#ffe9a8');R(53,3,4,8,'#ffe9a8');R(54,5,2,2,'#ffffff');
+ const HZ=15,SEA=['#90E0EF','#48CAE4','#1a7ac0','#0a4a8a','#021e5a'];{let y=HZ;[2,3,4,6,8].forEach((h,i)=>{R(0,y,W,h,SEA[i]);y+=h});R(0,y,W,H-y,SEA[4])}
+ for(let k=0;k<14;k++){const y=HZ+2+Math.floor(hash(k,1,21)*26),sp=.6+y/30,x=((hash(k,2,21)*W+t*W*sp*(k%2?1:-1))%W+W)%W;R(x,y,2+Math.floor(y/10),1,y<HZ+10?'#e6fbff':'#90E0EF')}
+ // bobber: floats, gets nibbled, dips under, then the fish jumps
+ const bite=t>.45&&t<.62,dip=t>=.62&&t<.72,jump=t>=.72&&t<.92,bx=30,by=27+rnd(Math.sin(t*TAU*3))+(bite?rnd(Math.sin(t*90)):0)+(dip?2:0);
+ if(!jump){if(!dip){R(bx,by-3,3,2,'#ff6a4a');R(bx,by-1,3,1,'#c0281e');P(bx+1,by-4,'#ffffff')}R(bx-1,by,5,1,'#e6fbff');if(bite||dip){P(bx-3,by,'#e6fbff');P(bx+5,by,'#e6fbff')}}
+ let ex=bx+1,ey=by-3;
+ if(jump){const q=(t-.72)/.2,fx=bx+1-q*8,fy=by-2-Math.sin(q*Math.PI)*12;ex=fx;ey=fy;const fl=Math.floor(t*60)%2;
+  R(fx-3,fy,7,3,'#8ad0a0');R(fx-3,fy,7,1,'#d8fff0');R(fx-2,fy+2,5,1,'#3a8a6a');P(fx+3,fy+1,'#0a1a14');R(fx-5,fy+(fl?-1:1),2,2,'#3a8a6a');
+  if(q<.3||q>.7){const sy=by+1;for(let k=0;k<4;k++)P(bx-2+k*2,sy-1-((k+Math.floor(t*40))%2),'#ffffff')}}
+ // dock planks in perspective and the rod from the bottom right
+ for(let i=0;i<4;i++){const y=38+i*3;R(0,y,W,3,i%2?'#8a5a2c':'#a07038');R(0,y,W,1,'#c08a4a')}for(let x=6;x<W;x+=14)R(x,38,1,12,'#5a3418');
+ R(0,37,W,1,'#2a1608');const rx=60,ry=49,tx=44+rnd(Math.sin(t*TAU)*.5),ty=12+(bite?1:0)+(dip||jump?2:0);line(rx,ry,tx,ty,'#2a1608');line(rx+1,ry,tx+1,ty,'#5a3418');
+ for(let i=0;i<=20;i++){const q=i/20;P(tx+(ex-tx)*q,ty+(ey-ty)*q+Math.sin(q*Math.PI)*(jump?0:3),'#e6fbff')}
+ R(58,44,6,6,'#f2c89a');R(58,44,6,1,'#d8a070')};
+
 window.TVCH=CH;
 })();
