@@ -26,12 +26,29 @@ function sphere(S,R,cx,cy,rot,fn,atm,shp){const{img}=S,W=img.width,d=img.data;co
   const o=(y*W+x)*4;if(col){const c=typeof col==='string'?hx(col):col;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}else d[o+3]=0}
  S.g.putImageData(img,0,0)}
 const P={};
-/* ---------- LSU: minimalist rhythm planet, pink hit-circle with approach ring ---------- */
-P.lsu=(S,t)=>{const W=S.img.width,R=W*.3,cx=W/2,cy=W/2,d=S.img.data;d.fill(0);const beat=(t*140/60)%1,ar=R*(1+(1-beat)*1.1);
- for(let y=0;y<W;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=y+.5-cy,r=Math.hypot(dx,dy),o=(y*W+x)*4;let c=null;
-  if(Math.abs(r-ar)<Math.max(1,R*.05))c=hx('#ff3d7f');
-  if(r<R){const nz=Math.sqrt(1-(r/R)**2),l=Math.max(0,(dx*LX+dy*LY)/R+nz*LZ);c=r>R*.86?hx(dq(['#c8c8d0','#ffffff'],.4+l,x,y)):hx(dq(['#5a0a2a','#a01448','#e0286a','#ff5a96'],l*1.1,x,y));}
-  if(c){d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255}}
+/* ---------- LSU: rhythm planet. Pink hit-circle world pulsing at 140 bpm: shock-rings ripple across the face, an approach ring closes on every beat, three coloured hit-circles orbit with their own approach rings and pop into pixel sparks when hit ---------- */
+P.lsu=(S,t)=>{const W=S.img.width,d=S.img.data,cx=W/2,cy=W/2,bp=t*140/60,beat=bp%1,pul=Math.pow(1-beat,3),R=W*.27*(1+pul*.035);
+ const PK=['#3a0418','#5a0a2a','#a01448','#e0286a','#ff5a96','#ffb0cc'],WH=['#8a8a96','#c8c8d0','#ffffff'],OC=[['#0a3a4a','#1a90b8','#3dd6ff','#b0f2ff'],['#2a1450','#6a3ab8','#b37dff','#e2ccff'],['#4a3000','#b88a10','#ffcf4a','#fff0b0']];
+ sphere(S,R,cx,cy,t*.25,(lon,lat,lit,x,y,nz,dx,dy)=>{const rr=Math.hypot(dx,dy);if(rr>.84)return dq(WH,.25+lit*.9,x,y);
+  const w=(rr*2.6-beat*1.3)%1,ring=w>0&&w<.16; // shock-rings travelling outward each beat
+  const grv=(Math.abs(Math.sin(rr*22))<.12)?-.12:0; // fine vinyl grooves
+  let v=lit*.95+.08+grv+(ring?.5*(1.1-rr):0)+pul*.1;if(rr<.7&&rr>.62)v-=.18;return dq(PK,v,x,y)});
+ const put=(x,y,c)=>{x|=0;y|=0;if(x<0||y<0||x>=W||y>=W)return;const o=(y*W+x)*4,q=hx(c);d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
+ const inPl=(x,y)=>Math.hypot(x+.5-cx,y+.5-cy)<R+.5;
+ const ring=(x0,y0,r,c,th,back)=>{const n=Math.max(12,Math.ceil(r*7));for(let i=0;i<n;i++){const a=i/n*6.2832;for(let k=0;k<th;k++){const x=x0+Math.cos(a)*(r-k),y=y0+Math.sin(a)*(r-k);if(back&&inPl(x,y))continue;put(x,y,c)}}};
+ const disc=(x0,y0,r,ramp,back)=>{for(let y=Math.floor(y0-r);y<=y0+r;y++)for(let x=Math.floor(x0-r);x<=x0+r;x++){const dx=x+.5-x0,dy=y+.5-y0,q=Math.hypot(dx,dy)/r;if(q>1||back&&inPl(x,y))continue;
+  const l=.55-(dx+dy)/r*.35;put(x,y,q>.72?dq(WH,.4+l,x,y):dq(ramp,l,x,y))}};
+ // follow-point orbit: dotted tilted ellipse (front half only where it passes the planet)
+ const OR=R*1.62,TL=.42;for(let i=0;i<54;i++){const a=i/54*6.2832+t*.15,x=cx+Math.cos(a)*OR,y=cy+Math.sin(a)*OR*TL;if(i%2||(Math.sin(a)<0&&inPl(x,y)))continue;put(x,y,'#7a1a44')}
+ // main approach ring closes on each beat
+ if(beat<.92)ring(cx,cy,R*(1.04+(1-beat)*1.05),'#ff3d7f',Math.max(1,Math.round(W/70)),false);
+ // three orbiting hit-circles, back ones occluded by the planet
+ for(let i=0;i<3;i++){const a=t*.7+i*2.0944,x=cx+Math.cos(a)*OR,y=cy+Math.sin(a)*OR*TL,back=Math.sin(a)<0,sr=Math.max(2.5,R*.2*(back?.85:1)),ph=(bp+i/3)%1;
+  disc(x,y,sr,OC[i],back);
+  if(ph<.8)ring(x,y,sr*(1.1+(1-ph/.8)*1.2),OC[i][2],1,back);
+  else{const k=(ph-.8)/.2;for(let j=0;j<6;j++){const aa=j*1.047+i,rr=sr*(1.2+k*1.6);if(!(back&&inPl(x+Math.cos(aa)*rr,y+Math.sin(aa)*rr)))put(x+Math.cos(aa)*rr,y+Math.sin(aa)*rr,j%2?'#ffffff':OC[i][3])}}}
+ // beat sparkle on the rim
+ if(pul>.5)for(let j=0;j<4;j++){const aa=j*1.5708+bp*.37,rr=R+2+pul*W*.03;put(cx+Math.cos(aa)*rr,cy+Math.sin(aa)*rr,'#ffd0e0')}
  S.g.putImageData(S.img,0,0)};
 /* ---------- ESCAPE CA: night campus planet, purple dusk + red emergency glow ---------- */
 P.escapeca=(S,t)=>{const W=S.img.width,R=W*.4;
