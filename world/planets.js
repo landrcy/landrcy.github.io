@@ -732,6 +732,48 @@ P.cast=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,R=W*.33,cx=W/2,c
   const dd=Math.hypot(xx,yy);if(dd>m+.2)continue;let c;
   if(dd>m-.9)c='#2a0606';else if(Math.abs(yy)<Math.max(.6,m*.12))c='#1a1a22';else if(yy<0)c=xx+yy<-m*.7?CBR[2]:xx>m*.3?CBR[0]:CBR[1];else c=xx<-m*.2?CBW[2]:xx>m*.35?CBW[0]:CBW[1];put(px,py,c)}
  S.g.putImageData(S.img,0,0)};
+/* ---------- LLC CARDS: a black-and-white scribble world like the game's own doodles: white paper ground with a thick wobbly ink rim,
+   ink hatching for the night side, a spiral, a cat card critter and a four-point sparkle drawn on it, twinkles around it,
+   and three little cards (cat, spiral, star) orbiting as moons ---------- */
+P.llcc=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,R=W*.33,cx=W/2,cy=Hh/2,rot=t*.2,u=Math.max(1,Math.round(W/75)),INK=[0,0,0],PAP=[255,255,255];
+ d.fill(0);const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const o=(y*W+x)*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255};
+ const box=(x,y,w,h,c)=>{for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++)put(x+xx,y+yy,c)};
+ const wob=a=>1+.012*Math.sin(a*5+1.3)+.007*Math.sin(a*11+.4); // hand-drawn rim
+ const RIM=Math.max(1.5,u*1.6);
+ const tri=(px,py,ax,ay,bx,by,qx,qy)=>{const s1=(px-bx)*(ay-by)-(ax-bx)*(py-by),s2=(px-qx)*(by-qy)-(bx-qx)*(py-qy),s3=(px-ax)*(qy-ay)-(qx-ax)*(py-ay);return!((s1<0||s2<0||s3<0)&&(s1>0||s2>0||s3>0))};
+ for(let y=0;y<Hh;y++)for(let x=0;x<W;x++){const dx=x+.5-cx,dy=y+.5-cy,a=Math.atan2(dy,dx),rr=R*wob(a),r=Math.hypot(dx,dy);if(r>rr+u){continue}if(r>rr){put(x,y,PAP);continue}
+  if(r>rr-RIM){put(x,y,INK);continue}
+  const nx=dx/rr,ny=dy/rr,nz=Math.sqrt(Math.max(0,1-nx*nx-ny*ny)),lat=Math.asin(ny),lon=Math.atan2(nx,nz)+rot,lit=-.55*nx-.5*ny+.67*nz;
+  const px=1/(R*Math.max(.35,nz)),th=(W>=100?.75:.55)*px;let ink=false;
+  // doodles in surface coordinates (they turn with the planet)
+  const doo=(l0,b0)=>{let du=((lon-l0)%TAU+TAU*1.5)%TAU-Math.PI;return[du*Math.cos(lat),lat-b0]};
+  {const[q,v]=doo(0,-.15),r2=Math.hypot(q,v);if(r2<.25){const sp=(r2/.075-Math.atan2(v,q)/TAU),f=Math.abs(sp-Math.round(sp))*.075;if(f<th)ink=true}}
+  {const[q,v]=doo(2.1,.15),aq=Math.abs(q);if(Math.hypot(q,v)<.17||tri(aq,v,.04,-.08,.17,-.08,.16,-.31)){ink=true;if(Math.hypot(aq-.07,v+.01)<.032)ink=false}}
+  {const[q,v]=doo(4.2,-.2),aq=Math.abs(q),av=Math.abs(v);if(Math.sqrt(aq)+Math.sqrt(av)<Math.sqrt(.26)&&!(aq<.025&&av<.025))ink=true}
+  {const[q,v]=doo(3.2,.42);if((Math.abs(q)<th&&Math.abs(v)<.09)||(Math.abs(v)<th&&Math.abs(q)<.09))ink=true}
+  {const[q,v]=doo(5.4,.3);if(Math.hypot(q,v)<.05)ink=true}
+  {const[q,v]=doo(1.0,.5);if(Math.abs(Math.hypot(q,v*1.6)-.12)<th)ink=true}
+  // ink hatching on the night side, denser the darker
+  if(!ink&&lit<.42){const k=lit<.12?3:lit<.26?4:6;if(((x+y)%k)===0)ink=true;if(lit<.12&&((x-y+999)%k)===0)ink=true}
+  put(x,y,ink?INK:PAP)}
+ // twinkles around the planet, like the logo's sparkles
+ const TW=[[-1.15,-.95,0],[1.12,-.82,1.7],[1.2,.9,3.1],[-1.25,.7,4.4]];
+ for(const[ox,oy,ph]of TW){const on=Math.sin(t*2.2+ph),k=on>.3?2:on>-.4?1:0;if(!k)continue;const sx=Math.round(cx+ox*R),sy=Math.round(cy+oy*R),L=u*(k+1);
+  for(let i=-L-1;i<=L+1;i++)for(let j=-1;j<=1;j++){put(sx+i,sy+j,INK);put(sx+j,sy+i,INK)}
+  for(let i=-L;i<=L;i++){put(sx+i,sy,PAP);put(sx,sy+i,PAP)}}
+ // three card moons: white cards with ink borders and a tiny icon each
+ const cw=Math.max(4,Math.round(W*.09)),ch=Math.round(cw*1.35);
+ for(let i=0;i<3;i++){const ma=-t*.5+i*TAU/3+.4,mx=Math.round(cx+Math.cos(ma)*R*1.33-cw/2),my=Math.round(cy+Math.sin(ma)*R*.55-ch/2),back=Math.sin(ma)<0;
+  const hid=(x,y)=>back&&Math.hypot(x+.5-cx,y+.5-cy)<R*1.02;
+  for(let y=0;y<ch;y++)for(let x=0;x<cw;x++){const X=mx+x,Y=my+y;if(hid(X,Y))continue;const edge=x===0||y===0||x===cw-1||y===ch-1;let c=edge?INK:PAP;
+   if(!edge&&cw>=7){const ix=x-cw/2+.5,iy=y-ch/2+.5;
+    if(i===0&&(Math.hypot(ix,iy-.5)<cw*.22||(iy<-cw*.1&&iy>-cw*.38&&Math.abs(Math.abs(ix)-cw*.18)<(iy+cw*.38)*.5)))c=INK;
+    if(i===1&&Math.abs(Math.hypot(ix,iy)-cw*.22)<.7)c=INK;
+    if(i===2&&Math.sqrt(Math.abs(ix))+Math.sqrt(Math.abs(iy))<Math.sqrt(cw*.3))c=INK;
+    if(x===1||y===1||x===cw-2||y===ch-2)c=cw>=9?PAP:c}
+   put(X,Y,c)}
+  if(!back||cw<7)continue}
+ S.g.putImageData(S.img,0,0)};
 P.setFlat=v=>{FLAT=v?1:0};P.setLight=v=>{CURL=v};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
 })();

@@ -14,7 +14,7 @@ const stars=(n,seed,cols,ymax=H)=>{for(let i=0;i<n;i++){const x=Math.floor(hash(
 // 3x5 font
 const F={A:'010101111101101',B:'110101110101110',C:'011100100100011',D:'110101101101110',E:'111100110100111',F:'111100110100100',G:'011100101101011',H:'101101111101101',I:'111010010010111',J:'001001001101010',K:'101101110101101',L:'100100100100111',M:'101111111101101',N:'110101101101101',O:'010101101101010',P:'110101110100100',Q:'010101101110011',R:'110101110101101',S:'011100010001110',T:'111010010010010',U:'101101101101111',V:'101101101101010',W:'101101111111101',X:'101101010101101',Y:'101101010010010',Z:'111001010100111','!':'010010010000010','?':'111001010000010','.':'000000000000010'};
 function text(s,x,y,col,sc=1){for(const ch of s){if(ch===' '){x+=3*sc;continue}const f=F[ch];if(f)for(let i=0;i<15;i++)if(f[i]==='1')R(x+(i%3)*sc,y+Math.floor(i/3)*sc,sc,sc,col);x+=4*sc}}
-const tw=(s,sc=1)=>s.length*4*sc-sc;
+const tw=(s,sc=1)=>s.length*4*sc-sc,tw2=tw;
 const CH={};
 
 // 01 The Binding of Ashaad: Ashaad's sprite paces between flickering candles in the brick crypt
@@ -215,6 +215,23 @@ CH.cast=(cx,t)=>{c=cx;const SK=['#0a2a5a','#1a4a8a','#2a7ac0','#48CAE4','#90E0EF
  R(0,37,W,1,'#2a1608');const rx=60,ry=49,tx=44+rnd(Math.sin(t*TAU)*.5),ty=12+(bite?1:0)+(dip||jump?2:0);line(rx,ry,tx,ty,'#2a1608');line(rx+1,ry,tx+1,ty,'#5a3418');
  for(let i=0;i<=20;i++){const q=i/20;P(tx+(ex-tx)*q,ty+(ey-ty)*q+Math.sin(q*Math.PI)*(jump?0:3),'#e6fbff')}
  R(58,44,6,6,'#f2c89a');R(58,44,6,1,'#d8a070')};
+
+// LLC Cards: ink-on-paper; three cards fan up out of the deck (cat, spiral, star), the middle one flips, sparkles twinkle
+CH.llccards=(cx,t)=>{c=cx;const K='#000000',Wh='#ffffff';R(0,0,W,H,Wh);
+ const tw=(x,y,ph)=>{const k=Math.sin(t*TAU*2+ph);if(k<-.2)return;const L=k>.5?2:1;R(x-L,y,2*L+1,1,K);R(x,y-L,1,2*L+1,K)};
+ tw(6,8,0);tw(58,6,2);tw(60,30,4);tw(5,32,1.3);
+ text('LLC',W/2-tw2('LLC')/2,3,K);
+ const up=ease(clamp(t/.25)),out=ease(clamp((t-.86)/.14)),fl=clamp((t-.42)/.2),cw=14,chh=19,by=44;
+ const card=(x,y,ang,kind,sc=1)=>{const w=Math.max(1,rnd(cw*sc)),x0=rnd(x-w/2),y0=rnd(y);R(x0,y0,w,chh,K);if(w>2){R(x0+1,y0+1,w-2,chh-2,Wh);if(w>4)R(x0+2,y0+2,w-4,chh-4,K),R(x0+3,y0+3,w-6,chh-6,Wh)}
+  if(w<9)return;const mx=x0+w/2,my=y0+chh/2;
+  if(kind===0){R(mx-3,my-1,6,5,K);P(mx-3,my-3,K);P(mx-3,my-2,K);P(mx+2,my-3,K);P(mx+2,my-2,K);P(mx-2,my,Wh);P(mx+1,my,Wh)}
+  if(kind===1){ring(rnd(mx-.5),rnd(my),3,K);P(rnd(mx-.5),rnd(my),K);P(rnd(mx+.5),rnd(my-1),K)}
+  if(kind===2){R(mx-.5,my-4,1,9,K);R(mx-4,my,9,1,K);R(mx-1.5,my-1,3,3,K)}
+  if(kind===3){for(let k=0;k<3;k++)R(x0+4,y0+5+k*4,w-8,1,K)}};
+ const lift=(1-up)*30+out*30;
+ card(19,by-chh-6+lift+4,0,0);card(47,by-chh-6+lift+4,0,2);
+ const sc=Math.abs(Math.cos(fl*Math.PI)),face=fl<.5?3:1;card(33,by-chh-10+lift,0,face,Math.max(.08,sc));
+ R(0,by+1,W,H-by-1,Wh);for(let x=0;x<W;x+=3)P(x+(x%2),by+3,K)};
 
 window.TVCH=CH;
 })();
