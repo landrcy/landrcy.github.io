@@ -885,6 +885,84 @@ P.forge=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,R=W*.31,cx=W/2,
   else if(Math.hypot(lx,ly-.92)<.16)col=FGL[4];
   if(col)put(px,py,col)}
  S.g.putImageData(S.img,0,0)};
+/* ---------- DDOM (Daily Dose of Maggie): a warm photo-mosaic planet built out of colorful sunlit mini-photo tiles
+   arranged into Maggie's creamy-white face, dark button eyes and nose, crowned by two perky pointed Maggie ears
+   and orbited by three tiny cream-framed Polaroid photo moons ---------- */
+const DDCR=['#6a5240','#a88c72','#dcc8ae','#f4ead8','#fffcf5'],
+ DDTN=['#5a341c','#9c6036','#d48f58','#efc08e','#fce4c2'],
+ DDEY=['#0e0806','#221612','#3c2820','#604436'],
+ DDPK=['#5e2c2a','#a85c58','#e0948c','#f8c8c0'],
+ DDBG=[
+  ['#3c2418','#7a4426','#c46835','#e89b62','#fad0a4'],
+  ['#223c26','#447644','#74a864','#aed48c','#dcf2ba'],
+  ['#1e3650','#3c6a94','#6ea2cc','#a8d0ea','#dff2ff'],
+  ['#4e2e20','#8c5838','#c89262','#e8be8e','#fce2be']
+ ];
+P.ddom=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,R=W*.32,cx=W/2,cy=Hh/2+W*.07,rot=t*.16;
+ sphere(S,R,cx,cy,rot,(lon,lat,lit,x,y,nz,dx,dy)=>{
+  // Tile grid across the sphere (each cell = one tiny colorful photo tile with subtle hairline grout)
+  const gu=lon*7/Math.PI,gv=lat*7/Math.PI*1.1,iu=Math.floor(gu),iv=Math.floor(gv),fu=gu-iu,fv=gv-iv;
+  const grout=W>=48&&(fu<.065||fv<.065);
+  // Subtle tile-to-tile photo brightness & hue jitter so it clearly reads as a photo mosaic!
+  const j=(H(iu*13+7,iv*19+3)-.5)*.22,twk=Math.sin(t*2.4+H(iu,iv)*25)>.93?.18:0;
+  // Project Maggie's portrait onto the front & back faces (two repeating faces around longitude so she is always visible!)
+  let du=((lon+Math.PI/2)%Math.PI+Math.PI)%Math.PI-Math.PI/2;
+  const mx=du*1.18,my=lat+.06;
+  // Maggie's face silhouette: oval cheeks + lower muzzle + two glossy eyes + nose + cute smile
+  const inFace=Math.hypot(mx/.62,(my-.04)/.56)<1||Math.hypot(mx/.42,(my-.28)/.36)<1;
+  const eyeL=Math.hypot((mx+.22)/.11,(my+.06)/.12)<1,eyeR=Math.hypot((mx-.22)/.11,(my+.06)/.12)<1;
+  const eyeHi=(Math.hypot(mx+.25,my+.09)<.045||Math.hypot(mx-.19,my+.09)<.045);
+  const nose=Math.hypot(mx/.14,(my-.22)/.1)<1;
+  let pal,v=lit*.86+.12+j+twk;
+  if(eyeHi)return'#fffcf5';
+  if(eyeL||eyeR||nose){pal=DDEY;v=lit*.55+.08}
+  else if(inFace){pal=DDCR;v=lit*.88+.14+j*.55+twk}
+  else{const bi=Math.floor(H(iu+41,iv+17)*DDBG.length)%DDBG.length;pal=DDBG[bi];v=lit*.82+.12+j+twk}
+  if(grout)v-=.22;
+  return dq(pal,v,x,y)
+ },{w:Math.max(2,R*.08),r:['#7a3c1c','#c46835','#f4d6b4']});
+ const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const q=typeof c==='string'?hx(c):c,o=(y*W+x)*4;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
+ const inDisc=(x,y)=>Math.hypot(x+.5-cx,y+.5-cy)<R+.4;
+ // Two adorable perky pointed Maggie ears crowning the north rim (built out of mosaic tiles!)
+ if(W>=30){const eH=R*.58,eW=R*.34;
+  for(const sd of[-1,1]){
+   const bx=cx+sd*R*.46,by=cy-R*.82,tx=cx+sd*R*.74,ty=cy-R*1.42;
+   const x0=Math.max(0,Math.floor(Math.min(bx,tx)-eW)),x1=Math.min(W-1,Math.ceil(Math.max(bx,tx)+eW));
+   const y0=Math.max(0,Math.floor(ty-2)),y1=Math.min(Hh-1,Math.ceil(by+R*.15));
+   for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+    if(inDisc(x,y)&&y>by-R*.06)continue;
+    const f=(by-y)/(by-ty);if(f<0||f>1)continue;
+    const midX=bx+(tx-bx)*f,hw=eW*(1-f*.86);
+    const dx2=(x+.5-midX)/Math.max(1,hw);if(Math.abs(dx2)>1)continue;
+    const tileStep=Math.max(2,Math.round(R/7));
+    const ti=Math.floor(x/tileStep),tj=Math.floor(y/tileStep),jj=(H(ti*7,tj*11)-.5)*.16;
+    const edge=Math.abs(dx2)>.82||f>.9,inner=Math.abs(dx2)<.48&&f>.14&&f<.78;
+    const litE=.68-(x-cx)/R*.22-(y-cy)/R*.15+jj;
+    const col=edge?DDTN[0]:inner?dq(DDPK,litE+.1,x,y):dq(Math.abs(dx2)>.62?DDTN:DDCR,litE+.12,x,y);
+    put(x,y,col)}}}
+ // Three orbiting cream-framed Polaroid photo moons (mini snapshots of Maggie's sunny outdoor colors)
+ const pw=Math.max(4,Math.round(W*.092)),ph=Math.round(pw*1.22);
+ const pCols=[['#74a864','#aed48c','#f4ead8'],['#6ea2cc','#a8d0ea','#fffcf5'],['#c46835','#e89b62','#fce4c2']];
+ for(let i=0;i<3;i++){
+  const ma=t*.52+i*TAU/3+.5,mx=Math.round(cx+Math.cos(ma)*R*1.4-pw/2),my=Math.round(cy+Math.sin(ma)*R*.58-ph/2),back=Math.sin(ma)<0;
+  for(let yy=0;yy<ph;yy++)for(let xx=0;xx<pw;xx++){
+   const px=mx+xx,py=my+yy;if(back&&inDisc(px,py))continue;
+   const border=xx===0||yy===0||xx===pw-1||yy===ph-1;
+   const chin=yy>=ph-Math.max(2,Math.round(ph*.24));
+   let c=border?'#231a14':chin?'#f6f1e9':'#fffcf5';
+   if(!border&&!chin&&xx>0&&xx<pw-1&&yy>0){
+    const inside=xx>1&&xx<pw-2&&yy>1;
+    if(inside||pw<8){
+     const pc=pCols[i];
+     // tiny photo scene inside the Polaroid: sky/bg + little white Maggie dot in center!
+     const isMag=pw>=7&&Math.hypot((xx-pw/2)/(pw*.22),(yy-ph*.42)/(ph*.2))<1;
+     c=isMag?pc[2]:(yy<ph*.4?pc[1]:pc[0]);
+    }
+   }
+   put(px,py,c)
+  }
+ }
+ S.g.putImageData(S.img,0,0)};
 P.setFlat=v=>{FLAT=v?1:0};P.setLight=v=>{CURL=v};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
 })();
