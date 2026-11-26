@@ -963,6 +963,187 @@ P.ddom=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,R=W*.32,cx=W/2,c
   }
  }
  S.g.putImageData(S.img,0,0)};
+/* ---------- MOVIE (Next-Watch Cinema Recommender): midnight-velvet theater globe wrapped in diagonal 35mm celluloid
+   film-strip bands and golden marquee stars, encircled by a tilted scrolling perforated film-strip ring with glowing
+   mini movie frames, crowned by a vintage dual-reel 35mm film projector with spinning golden reels casting a flickering
+   cinema light beam into space, and orbited by a twinkling golden star ---------- */
+const MVBG=['#09080d','#15121d','#221e30','#342e46','#4c4362'],
+ MVGL=['#4d3110','#8c5a18','#c98828','#e6ad42','#f7d982','#fff8dc'],
+ MVCR=['#3a0d12','#741a22','#b43038','#df5448','#f79682'],
+ MVST=['#181822','#323242','#56586c','#868aa2','#c2c6dc'],
+ MVSC=[
+  ['#164462','#46a0d0','#bceeff'],
+  ['#6e2e14','#d87430','#ffe098'],
+  ['#5c1422','#ca3c48','#ffb8a8'],
+  ['#164830','#42a46a','#c2f2cc'],
+  ['#361c58','#8a4cd2','#e0c2ff']
+ ];
+P.movie=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,R=W*.29,cx=W/2,cy=Hh/2+W*.08,rot=t*.17;
+ sphere(S,R,cx,cy,rot,(lon,lat,lit,x,y,nz,dx,dy)=>{
+  // Diagonal 35mm celluloid film-strip band winding around the midnight-velvet globe
+  const band=Math.sin(lat*2.15-lon*1.12);
+  const ab=Math.abs(band);
+  if(ab<.24){
+   const uAlong=lon*2.6+lat*1.2;
+   // Perforated golden sprocket tracks along top & bottom edges of the film strip
+   if(ab>.155&&ab<.215){
+    const sp=((uAlong*3.2)%1+1)%1;
+    if(sp<.44)return dq(MVGL,.55+lit*.45,x,y);
+    return'#120f17';
+   }
+   // Dark celluloid outer rim
+   if(ab>=.215)return'#0a080d';
+   // Miniature backlit cinema frames inside the strip
+   const fpos=((uAlong*.8)%1+1)%1,fi=Math.abs(Math.floor(uAlong*.8));
+   if(fpos<.15)return'#100d15';
+   const sc=MVSC[fi%MVSC.length];
+   const hor=band>0?0:1;
+   const glint=(fpos>.45&&fpos<.62&&ab<.05)?2:hor;
+   return lit<.18?sc[0]:sc[glint];
+  }
+  // Subtle theater velvet pleats + twinkling golden cinema marquee stars
+  const pleat=Math.sin(lon*14)*.05;
+  const su=Math.floor(lon*6),sv=Math.floor(lat*6),sh=H(su*31+5,sv*17+11);
+  if(sh>.92){
+   const fu=lon*6-su-.5,fv=lat*6-sv-.5;
+   if(Math.hypot(fu,fv)<.18){
+    const tw=.55+.45*Math.sin(t*3.2+sh*40);
+    if(tw>.55)return dq(MVGL,.45+tw*.55,x,y);
+   }
+  }
+  // Velvet crimson polar curtains near top & bottom caps
+  if(Math.abs(lat)>.95)return dq(MVCR,lit*.85+.1+pleat,x,y);
+  return dq(MVBG,lit*.88+.1+pleat,x,y);
+ },{w:Math.max(2,R*.11),r:['#4d2810','#b44828','#e6ad42','#fff0b8']});
+ const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const q=typeof c==='string'?hx(c):c,o=(y*W+x)*4;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
+ const inDisc=(x,y)=>Math.hypot(x+.5-cx,y+.5-cy)<R+.4;
+ // Tilted scrolling 35mm perforated film-strip orbital ring (back arc behind sphere, front arc in front)
+ const rx=R*1.54,ry=R*.44,tilt=-.22,ct=Math.cos(tilt),st=Math.sin(tilt),rw=Math.max(3,Math.round(W*.064));
+ const rx0=Math.max(0,Math.floor(cx-rx-rw)),rx1=Math.min(W-1,Math.ceil(cx+rx+rw));
+ const ry0=Math.max(0,Math.floor(cy-rx*.45-rw)),ry1=Math.min(Hh-1,Math.ceil(cy+rx*.45+rw));
+ for(let y=ry0;y<=ry1;y++)for(let x=rx0;x<=rx1;x++){
+  const dx=x+.5-cx,dy=y+.5-cy;
+  const u=dx*ct+dy*st,v=-dx*st+dy*ct;
+  const er=Math.hypot(u/rx,v/ry);
+  if(er<.55||er>1.45)continue;
+  const grad=Math.hypot(u/(rx*rx),v/(ry*ry));
+  const sd=(er-1)*er/Math.max(1e-5,grad);
+  if(Math.abs(sd)>rw*.52)continue;
+  const back=v<0;
+  if(back&&inDisc(x,y))continue;
+  const nf=Math.abs(sd)/(rw*.52);
+  let col='#0b090e';
+  if(nf<.86){
+   const ang=Math.atan2(v/ry,u/rx)+t*.42;
+   const norm=((ang%TAU)+TAU)%TAU/TAU;
+   const shade=back?.62:1;
+   if(nf>.54){
+    // Top & bottom perforated golden sprocket tracks
+    const sp=(norm*36)%1;
+    col=sp<.46?(back?'#b6802c':'#f7d982'):'#18141e';
+   }else{
+    // 18 seamless scrolling mini-cinema frames around the ring
+    const fa=norm*18,fi=Math.floor(fa),ff=fa-fi;
+    if(ff<.16)col='#110e16';
+    else{
+     const sc=MVSC[fi%MVSC.length];
+     const hi=ff>.46&&ff<.66&&nf<.2;
+     col=hi?sc[2]:(sd>0?sc[0]:sc[1]);
+     if(shade<1){const q=hx(col);col=[Math.round(q[0]*.68),Math.round(q[1]*.66),Math.round(q[2]*.72)]}
+    }
+   }
+  }
+  put(x,y,col);
+ }
+ // North-pole landmark: vintage dual-reel 35mm cinema projector casting a flickering warm ivory-gold beam
+ if(W>=30){
+  const by=cy-R*.94,bw=Math.max(8,R*.54),bh=Math.max(5,R*.34);
+  const px0=cx-bw*.56,py0=by-bh;
+  const lensX=px0+bw+Math.max(2,R*.16),lensY=py0+bh*.46;
+  // Flickering projector light beam shooting up-right into space (drawn first so projector overlaps cleanly)
+  const bAng=-.48,bdx=Math.cos(bAng),bdy=Math.sin(bAng),bnx=-bdy,bny=bdx;
+  const bLen=R*1.32,flick=.86+.14*Math.sin(t*21)*Math.cos(t*13);
+  const bx0=Math.max(0,Math.floor(lensX-2)),bx1=Math.min(W-1,Math.ceil(lensX+bLen));
+  const by0=Math.max(0,Math.floor(lensY-bLen*.85)),by1=Math.min(Hh-1,Math.ceil(lensY+R*.22));
+  for(let y=by0;y<=by1;y++)for(let x=bx0;x<=bx1;x++){
+   if(inDisc(x,y))continue;
+   const vx=x+.5-lensX,vy=y+.5-lensY;
+   const al=vx*bdx+vy*bdy;if(al<0||al>bLen)continue;
+   const pe=Math.abs(vx*bnx+vy*bny);
+   const hw=R*.055+(al/bLen)*R*.28;if(pe>hw)continue;
+   const fall=(1-al/bLen)*(1-pe/hw*.72)*flick;
+   const mote=H(Math.floor(x*.6-t*4),Math.floor(y*.6+t*2))>.96?.35:0;
+   const inten=fall*1.15+mote;
+   if(inten>bay(x,y)*.88+.14){
+    // Only draw beam onto empty space or brighten softly
+    const o=(y*W+x)*4;
+    if(d[o+3]===0)put(x,y,dq(['#8c5a18','#e6ad42','#f7d982','#fff8dc'],Math.min(1,inten),x,y));
+   }
+  }
+  // Crimson velvet pedestal collar anchoring projector to the north pole
+  const pedW=bw*.66,pedH=Math.max(2,R*.12);
+  for(let y=Math.floor(by-1);y<=Math.ceil(by+pedH);y++)for(let x=Math.floor(cx-pedW*.5);x<=Math.ceil(cx+pedW*.5);x++){
+   const edge=x===Math.floor(cx-pedW*.5)||x===Math.ceil(cx+pedW*.5)||y===Math.ceil(by+pedH);
+   put(x,y,edge?'#14080a':dq(MVCR,.65-(x-cx)/pedW*.35,x,y));
+  }
+  // Projector gunmetal body + brass trim + blinking red recording LED
+  const ix0=Math.floor(px0),ix1=Math.ceil(px0+bw),iy0=Math.floor(py0),iy1=Math.ceil(by);
+  for(let y=iy0;y<=iy1;y++)for(let x=ix0;x<=ix1;x++){
+   const border=x===ix0||x===ix1||y===iy0||y===iy1;
+   const strip=y===iy0+1||y===iy1-1;
+   const litP=.66-(x-cx)/bw*.25-(y-py0)/bh*.22;
+   let col=border?'#0b0a10':strip?dq(MVGL,litP+.2,x,y):dq(MVST,litP,x,y);
+   // Subtle inner reel window + blinking crimson studio lamp
+   if(!border&&!strip&&Math.abs(x-(ix0+bw*.28))<=Math.max(1,R*.05)&&Math.abs(y-(iy0+bh*.52))<=Math.max(1,R*.05)){
+    col=(Math.sin(t*5.5)>0)?'#ff4646':'#741a22';
+   }
+   put(x,y,col);
+  }
+  // Flared brass projector lens pointing into the light beam
+  const lx0=ix1,lx1=Math.ceil(lensX);
+  for(let x=lx0;x<=lx1;x++){
+   const f=(x-lx0)/Math.max(1,lx1-lx0);
+   const lh=Math.max(1,R*(.07+f*.07)),lyc=lensY-f*R*.06;
+   for(let y=Math.floor(lyc-lh);y<=Math.ceil(lyc+lh);y++){
+    const edge=y===Math.floor(lyc-lh)||y===Math.ceil(lyc+lh);
+    const tip=x>=lx1-1;
+    put(x,y,tip?'#fff8dc':edge?'#221608':dq(MVGL,.65+f*.3,x,y));
+   }
+  }
+  // Two iconic spinning golden 35mm film reels mounted atop the projector!
+  const rr=Math.max(3,R*.245);
+  const reels=[[px0+bw*.22,py0-rr*.62,1],[px0+bw*.78,py0-rr*.68,1.15]];
+  for(const[rcx,rcy,spd]of reels){
+   for(let y=Math.floor(rcy-rr-1);y<=Math.ceil(rcy+rr+1);y++)for(let x=Math.floor(rcx-rr-1);x<=Math.ceil(rcx+rr+1);x++){
+    const dx=x+.5-rcx,dy=y+.5-rcy,dist=Math.hypot(dx,dy);
+    if(dist>rr+.6)continue;
+    if(dist>rr-.8){put(x,y,'#160e08');continue}
+    const litR=.68-(dx+dy)/(rr*2.2);
+    if(dist>rr*.72||dist<rr*.26){
+     put(x,y,dq(MVGL,litR+.15,x,y));
+    }else{
+     // 3 rotating spokes against dark wound celluloid reel core
+     const ang=Math.atan2(dy,dx)+t*2.4*spd;
+     const spk=Math.abs(Math.sin(ang*1.5))<.24;
+     put(x,y,spk?dq(MVGL,litR+.12,x,y):'#14101c');
+    }
+   }
+  }
+ }
+ // Orbiting golden cinema star moon (★) sweeping smoothly around the planet
+ const sa=-t*.58+1.1,sx=cx+Math.cos(sa)*R*1.46,sy=cy+Math.sin(sa)*R*.86-R*.12,sback=Math.sin(sa)<0;
+ const sr=Math.max(2,Math.round(W*.036)),twk=.78+.22*Math.sin(t*6);
+ for(let yy=-sr-1;yy<=sr+1;yy++)for(let xx=-sr-1;xx<=sr+1;xx++){
+  const px=Math.round(sx+xx),py=Math.round(sy+yy);
+  if(sback&&inDisc(px,py))continue;
+  const ax=Math.abs(xx),ay=Math.abs(yy);
+  // Crisp 4-point cinema diamond star + bright center core
+  const man=ax+ay,inStar=man<=sr||(ax===0&&ay<=sr+1)||(ay===0&&ax<=sr+1);
+  if(!inStar)continue;
+  const col=(ax<=1&&ay<=1)?'#fff8dc':(man<=sr*.7?dq(MVGL,.75*twk,px,py):'#c98828');
+  put(px,py,col);
+ }
+ S.g.putImageData(S.img,0,0)};
 P.setFlat=v=>{FLAT=v?1:0};P.setLight=v=>{CURL=v};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
 })();
