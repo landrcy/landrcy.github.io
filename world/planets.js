@@ -774,6 +774,117 @@ P.llcc=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,R=W*.33,cx=W/2,c
    put(X,Y,c)}
   if(!back||cw<7)continue}
  S.g.putImageData(S.img,0,0)};
+/* ---------- FORGE: a dark hammered-basalt runesmith world laced with pulsing molten magma rivers and carved teal arcane runes,
+   crowned on the north rim by a stone hearth arch, oak-stump anvil with a glowing blade, rhythmic swinging blacksmith hammer throwing sparks,
+   a glowing arcane rune crystal, a tilted ring of orbiting runestones, and a spinning enchanted runeblade moon ---------- */
+const FGB=['#100c14','#221a26','#382c3a','#564654','#7a6876'],
+ FGL=['#5a0e08','#b82410','#ef641a','#ffa82c','#ffe678','#fffce0'],
+ FGR=['#08303c','#187886','#38d0d4','#8efcf0','#e8ffff'],
+ FGI=['#14161e','#2c303e','#565e70','#8e98ac','#cbd4e2','#f4f8ff'],
+ FGW=['#1e0e08','#442412','#703e20','#9e6234'],
+ FRNS=[[0.55,-0.22],[1.65,0.26],[2.85,-0.16],[3.95,0.22],[5.05,-0.24],[5.9,0.28]];
+P.forge=(S,t)=>{const W=S.img.width,Hh=S.img.height,d=S.img.data,R=W*.31,cx=W/2,cy=Hh/2+W*.06,rot=t*.19,big=W>=60,u=Math.max(1,Math.round(W/88));
+ sphere(S,R,cx,cy,rot,(lon,lat,lit,x,y)=>{
+  const gu=lon*5/Math.PI,gv=lat*5/Math.PI*1.15,iv=Math.floor(gv),u2=gu+(iv&1)*.5,iu=Math.floor(u2),fu=u2-iu,fv=gv-iv;
+  if(fu<.065||fv<.08)return dq(FGB,lit*.42,x,y);
+  const rv=big&&Math.hypot(fu-.15,fv-.18)<.055;
+  const h=fbm(lon*3.2+4,lat*3.2+7);
+  return dq(FGB,lit*.82+.06+(h-.5)*.22+(H(iu,iv)-.5)*.12+(rv?.2:0),x,y)
+ },{w:Math.max(2,R*.09),r:['#4a1008','#c04014','#ff9428']});
+ const put=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=Hh)return;const q=typeof c==='string'?hx(c):c,o=(y*W+x)*4;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=255};
+ const box=(x,y,w,h,c)=>{for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++)put(x+xx,y+yy,c)};
+ const inDisc=(x,y)=>Math.hypot(x+.5-cx,y+.5-cy)<R+.4;
+ // self-lit molten forge fissures + glowing teal rune inlays across the dark basalt crust
+ const pw=1/R,sm=R<26,cw=Math.min(.038,Math.max(.011,pw*.62)),mw=sm?cw*1.9:Math.max(.026,pw*1.35),bw=pw*1.6+.012;
+ const y0s=Math.max(0,Math.floor(cy-R-1)),y1s=Math.min(Hh-1,Math.ceil(cy+R+1)),x0s=Math.max(0,Math.floor(cx-R-1)),x1s=Math.min(W-1,Math.ceil(cx+R+1));
+ for(let y=y0s;y<=y1s;y++)for(let x=x0s;x<=x1s;x++){
+  const dx=(x+.5-cx)/R,dy=(y+.5-cy)/R,r2=dx*dx+dy*dy;if(r2>1)continue;
+  const nz=Math.sqrt(1-r2),lat=Math.asin(dy),lon=Math.atan2(dx,nz)+rot;
+  const n1=Math.abs(fbm(lon*2.0+3.4,lat*2.1+1.1)-.5),n2=Math.abs(vn(lon*4.1+9.2,lat*3.9+5.7)-.5)+(fbm(lon*1.3+6,lat*1.3+2)>.53?0:1);
+  const cr=sm?n1:Math.min(n1,n2*1.15),pl=.65+.35*Math.sin(t*2.3+lon*3.1-lat*2.2);
+  if(cr<cw){put(x,y,dq(FGL,.74+pl*.26,x,y));continue}
+  if(cr<mw){put(x,y,dq(FGL,.26+pl*.38,x,y));continue}
+  if(!sm&&cr<mw+bw){const k=1-(cr-mw)/bw;if(bay(x,y)<k*.62){put(x,y,dq(FGL,.06+k*.24,x,y));continue}}
+  if(W>=38&&nz>.25){const th=Math.max(.016,pw*.68);
+   for(let ri=0;ri<FRNS.length;ri++){let du=((lon-FRNS[ri][0])%TAU+TAU*1.5)%TAU-Math.PI;const ru=du*Math.cos(lat),rv=lat-FRNS[ri][1];
+    if(Math.abs(ru)>.11||Math.abs(rv)>.15)continue;
+    const stem=Math.abs(ru)<th&&Math.abs(rv)<.11,bar=(ri%2===0)?(Math.abs(Math.abs(ru)+Math.abs(rv)-.075)<th):(Math.abs(rv+ru*.8)<th&&Math.abs(ru)<.075)||(Math.abs(rv-.05)<th&&Math.abs(ru)<.065);
+    if(stem||bar){const gp=.55+.45*Math.sin(t*2.7+ri*1.35);put(x,y,dq(FGR,.48+gp*.52,x,y));break}}}
+ }
+ // crowning north-pole forge workshop landmark: stone hearth arch + anvil on oak stump + hot blade + swinging hammer + sparks + arcane crystal
+ const surf=x=>cy-R*Math.sqrt(Math.max(0,1-Math.pow((x+.5-cx)/R,2)));
+ if(W>=36){const s=R/28,ax=cx,ay=Math.round(cy-R);
+  // 1) tiny stone hearth arch on the left shoulder with roaring hearth fire & rising embers
+  const hx0=Math.round(cx-R*.44),hy0=Math.round(surf(hx0)+s*.8),hw=Math.max(2,Math.round(3.6*s)),hh=Math.max(3,Math.round(5.4*s));
+  for(let yy=-hh;yy<=1;yy++)for(let xx=-hw;xx<=hw;xx++){const arc=yy<-hh*.4?Math.hypot(xx/hw,(yy+hh*.4)/(hh*.6))>1:false;if(arc)continue;
+   const inn=Math.abs(xx)<hw*.58&&yy>-hh*.72&&yy<=0;
+   if(inn){const fy=1-(-yy/(hh*.72)),fx=Math.abs(xx)/(hw*.58),fl=vn(xx*.55,yy*.55+t*7.5)*.45+fy*.72-fx*.45;
+    put(hx0+xx,hy0+yy,fl>.18?dq(FGL,fl+.25,hx0+xx,hy0+yy):'#1c0806')}
+   else put(hx0+xx,hy0+yy,dq(FGB,xx<0?.7:.32+(yy===-hh?.2:0),hx0+xx,hy0+yy))}
+  for(let e=0;e<3;e++){const ep=(t*.7+e*.33)%1,ex=hx0+Math.sin(t*3+e*2.4)*1.8*s,ey=hy0-hh-ep*6*s;put(ex,ey,ep<.5?FGL[4]:FGL[2])}
+  // 2) glowing arcane rune pedestal on the right shoulder
+  const rx0=Math.round(cx+R*.45),ry0=Math.round(surf(rx0)+s*.6),rw=Math.max(1,Math.round(2.4*s)),rh=Math.max(2,Math.round(3.4*s));
+  box(rx0-rw,ry0-rh,rw*2+1,rh+1,FGB[2]);box(rx0-rw,ry0-rh,rw*2+1,1,FGB[4]);
+  const bob=Math.round(Math.sin(t*2.8)*s*.7),crR=Math.max(1,Math.round(2.2*s)),cyC=ry0-rh-crR-1+bob;
+  for(let yy=-crR;yy<=crR;yy++)for(let xx=-crR;xx<=crR;xx++){if(Math.abs(xx)+Math.abs(yy)>crR)continue;
+   put(rx0+xx,cyC+yy,Math.abs(xx)+Math.abs(yy)<crR*.45?FGR[4]:(xx<0?FGR[3]:FGR[2]))}
+  // 3) oak stump + iron hoop + iconic horned blacksmith anvil at center north pole
+  const sw=Math.max(2,Math.round(4.6*s)),sh=Math.max(2,Math.round(4.2*s)),sy0=ay-sh+Math.round(s*1.2);
+  for(let yy=0;yy<sh+2;yy++)for(let xx=-sw;xx<=sw;xx++){const hoop=yy===Math.max(1,Math.round(sh*.45));put(ax+xx,sy0+yy,hoop?FGI[2]:dq(FGW,.75-(xx/sw)*.35+(H(xx+7,yy)-.5)*.12,ax+xx,sy0+yy))}
+  const ab=sy0; // anvil base y
+  const fw=Math.max(3,Math.round(5.4*s)),ww=Math.max(2,Math.round(2.8*s)),tw=Math.max(4,Math.round(6.2*s)),hl=Math.max(3,Math.round(4.8*s)),ah=Math.max(4,Math.round(5.8*s));
+  // anvil foot, waist, body, heel, tapered left horn
+  for(let yy=0;yy<ah;yy++){const f=yy/ah;let lx,rx;
+   if(f<.28){lx=-fw;rx=fw}
+   else if(f<.62){lx=-ww;rx=ww}
+   else{const hf=(f-.62)/.38;lx=-tw-hl*(.25+.75*hf);rx=tw+Math.round(1.4*s)}
+   for(let xx=Math.round(lx);xx<=Math.round(rx);xx++){const top=yy>=ah-Math.max(1,Math.round(s*.9)),edge=xx===Math.round(lx)||xx===Math.round(rx)||yy===0;
+    put(ax+xx,ab-yy,edge?FGI[0]:top?FGI[5]:dq(FGI,.65-(xx/(tw+hl))*.3+(f*.28),ax+xx,ab-yy))}}
+  // glowing molten steel blade resting across anvil top
+  const by=ab-ah,bl=Math.max(3,Math.round(5.2*s)),bh=Math.max(1,Math.round(1.2*s)),hp=.6+.4*Math.sin(t*4.2);
+  for(let xx=-bl;xx<=bl;xx++)for(let yy=0;yy<bh;yy++)put(ax+xx,by-yy,dq(FGL,.65+hp*.35-(Math.abs(xx)/bl)*.25,ax+xx,by-yy));
+  // 4) rhythmic swinging blacksmith hammer + impact sparks (lifts slowly, snaps down onto hot blade at cyc=0.70!)
+  const cyc=(t*.75)%1;
+  const lift=cyc<.56?(.35+.65*(cyc/.56)):cyc<.70?(1-(cyc-.56)/.14):(.35*Math.min(1,(cyc-.70)/.18));
+  const hang=.08-lift*1.02,pvx=ax+Math.round(6.6*s),pvy=by-Math.round(2.2*s),hlen=Math.max(4,Math.round(6.8*s));
+  const cH=Math.cos(hang),sH=Math.sin(hang);
+  for(let k=0;k<=hlen*2;k++){const q=k/2,hx1=pvx-cH*q,hy1=pvy+sH*q;box(hx1,hy1,Math.max(1,Math.round(s*.75)),Math.max(1,Math.round(s*.75)),FGW[2])}
+  const hcx=pvx-cH*hlen,hcy=pvy+sH*hlen,hbw=Math.max(1.3,2.3*s),hbh=Math.max(1.1,1.4*s),hr2=Math.ceil(Math.hypot(hbw,hbh)+1);
+  for(let dy2=-hr2;dy2<=hr2;dy2++)for(let dx2=-hr2;dx2<=hr2;dx2++){
+   const lx2=dx2*cH+dy2*sH,ly2=-dx2*sH+dy2*cH;
+   if(Math.abs(lx2)<=hbh&&Math.abs(ly2)<=hbw){const edge=Math.abs(lx2)>hbh-.8||Math.abs(ly2)>hbw-.8;
+    put(hcx+dx2,hcy+dy2,edge?FGI[0]:(ly2<0?FGI[5]:lx2<0?FGI[3]:FGI[2]))}}
+  // shower of forge sparks right as hammer strikes the hot blade
+  const spT=cyc>=.68?(cyc-.68)/.32:(cyc<.14?(cyc+.32)/.32:-1);
+  if(spT>=0&&spT<1){for(let k=0;k<9;k++){const sa=-2.7+k*.31+(H(k,Math.floor(t*.75))-.5)*.16,spd=(4.2+H(k,9)*5.8)*s;
+   const sx2=ax-s*.5+Math.cos(sa)*spd*spT,sy2=by-1+Math.sin(sa)*spd*spT+6.2*s*spT*spT;
+   put(sx2,sy2,spT<.35?FGL[5]:spT<.7?FGL[4]:FGL[2])}}
+ }
+ // tilted orbiting arcane rune ring + 6 glowing floating runestones (back half occluded behind planet)
+ const tl=-.22,cT=Math.cos(tl),sT=Math.sin(tl),orX=R*1.44,orY=R*.44;
+ const ringPt=a=>{const lx=Math.cos(a)*orX,ly=Math.sin(a)*orY;return[cx+lx*cT-ly*sT,cy+lx*sT+ly*cT,Math.sin(a)]};
+ const steps=Math.max(44,Math.round(R*3.4));
+ for(let i=0;i<steps;i++){const a=i/steps*TAU+t*.18,[rx,ry,rz]=ringPt(a);if(rz<0&&inDisc(rx,ry))continue;
+  if((i&1)===0&&bay(Math.round(rx),Math.round(ry))<.65)put(rx,ry,rz>0?FGR[2]:FGR[1])}
+ const sr=Math.max(1.4,W*.026);
+ for(let i=0;i<6;i++){const a=t*.55+i*TAU/6,[rx,ry,rz]=ringPt(a),back=rz<0,rad=Math.max(1,Math.round(sr*(back?.82:1.05)));
+  const hot=i%2===1;
+  for(let yy=-rad;yy<=rad;yy++)for(let xx=-rad;xx<=rad;xx++){if(Math.abs(xx)+Math.abs(yy)>rad+.2)continue;
+   const px=Math.round(rx+xx),py=Math.round(ry+yy);if(back&&inDisc(px,py))continue;
+   const core=Math.abs(xx)+Math.abs(yy)<rad*.5;
+   put(px,py,core?(hot?FGL[4]:FGR[4]):(xx+yy<0?(hot?FGL[3]:FGR[2]):FGB[1]))}}
+ // orbiting enchanted runeblade moon (mini spinning pixel sword with cyan arcane fuller)
+ const ma=-t*.62+1.1,mx=cx+Math.cos(ma)*R*1.38,my=cy+Math.sin(ma)*R*.72,mback=Math.sin(ma)<0;
+ const ml=Math.max(3.5,W*.068),sa=t*1.15,cs=Math.cos(sa),ss=Math.sin(sa),swR=Math.ceil(ml+2);
+ for(let yy=-swR;yy<=swR;yy++)for(let xx=-swR;xx<=swR;xx++){const px=Math.round(mx+xx),py=Math.round(my+yy);if(mback&&inDisc(px,py))continue;
+  const lx=(xx*cs+yy*ss)/ml,ly=(-xx*ss+yy*cs)/ml,ax2=Math.abs(lx);
+  let col=null;
+  if(ly>-.95&&ly<.28){const hw=.22*Math.min(1,(ly+.95)/.32);if(ax2<hw)col=ax2<.07&&ly>-.65&&ly<.18?FGR[3]:(lx<0?FGI[5]:FGI[3])}
+  else if(ly>=.28&&ly<.44&&ax2<.52)col=ly<.36?FGL[4]:FGL[2];
+  else if(ly>=.44&&ly<.85&&ax2<.13)col=FGW[2];
+  else if(Math.hypot(lx,ly-.92)<.16)col=FGL[4];
+  if(col)put(px,py,col)}
+ S.g.putImageData(S.img,0,0)};
 P.setFlat=v=>{FLAT=v?1:0};P.setLight=v=>{CURL=v};P.reduce=reduce;P.mk=mk;P.dq=dq;P.bay=bay;P.STAR=STAR;P.LINE=LINE;P.H=H;P.vn=vn;P.fbm=fbm;P.sphere=sphere;P.hx=hx;
 window.PLANETS=P;
 })();

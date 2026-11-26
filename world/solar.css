@@ -72,7 +72,7 @@ body.arch #back{z-index:40}
 #info.lg .lgtx.llcc{font:700 14cqw/1.05 'Silkscreen',monospace;color:#fff;letter-spacing:.08em;text-shadow:2px 0 0 #000,-2px 0 0 #000,0 2px 0 #000,0 -2px 0 #000,2px 2px 0 #000,-2px 2px 0 #000,2px -2px 0 #000,-2px -2px 0 #000,0 5px 0 #000}
 #info.lg .lgtx.cast{font:700 17cqw/1 'Silkscreen',monospace;color:#e6fbff;letter-spacing:.1em;text-shadow:0 2px 0 #1a7ac0,0 4px 0 #031428,0 0 10px #48CAE4}
 #info.lg .lgtx.mine{font:700 16cqw/1 'Silkscreen',monospace;color:#e8a860;letter-spacing:.08em;text-shadow:0 2px 0 #5a2c10,0 4px 0 #0a0608}
-#info.lg[data-p="mine"] .lgimg{filter:drop-shadow(0 3px 0 #0a0608)}
+#info.lg[data-p="mine"] .lgimg,#info.lg[data-p="forge"] .lgimg{filter:drop-shadow(0 3px 0 #0f0a14)}
 #info.lg .lgtx.aiq{font:700 15cqw/1 'Silkscreen',monospace;letter-spacing:.06em;color:#8af4ff;text-shadow:-2px 0 0 #ff5ad2,0 3px 0 #06223d,0 0 8px #000}
 #info.lg .lgtx.lsu{font:800 16cqw/1 ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.04em;color:#fff;text-shadow:0 0 18px #ff3d7f}
 #info.lg .lgtx.mo{font-size:13cqw;word-break:break-word}
