@@ -1,13 +1,48 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<link rel="icon" href="favicons/sun-L-16.png" type="image/png" sizes="16x16"><link rel="icon" href="favicons/sun-L-32.png" type="image/png" sizes="32x32"><link rel="icon" href="favicons/sun-L.ico" sizes="any"><link rel="apple-touch-icon" href="favicons/sun-L-180.png"><title>Laverse</title><meta name="description" content="Laverse: games and websites by Landry, as a pixel solar system."><meta property="og:type" content="website"><meta property="og:site_name" content="Laverse"><meta property="og:title" content="Laverse"><meta property="og:description" content="Games and websites by Landry, as a pixel solar system."><meta name="twitter:title" content="Laverse"><meta name="apple-mobile-web-app-title" content="Laverse"><meta name="theme-color" content="#010103">
-<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@400;600&family=VT323&family=Fredoka:wght@600&family=Roboto:wght@700&family=Anton&family=Allura&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="world/solar.css?v=76"></head><body>
-<canvas id="sky" aria-label="Laverse solar system: each planet is one of Landry's sites. Drag to pan, scroll or pinch to zoom, click a planet to fly to it."></canvas>
-<div id="info" aria-live="polite"></div><div id="tip" role="tooltip"></div>
-<button type="button" class="ui" id="home">⌂ overview</button>
-<button type="button" class="ui" id="back" hidden>fly home</button>
-<canvas id="sat" role="button" tabindex="0" title="Archive satellite"></canvas>
-<nav class="sr" aria-label="Sites"><a href="https://landrcy.github.io/binding-of-ashaad/">The Binding of Ashaad</a><a href="https://landrcy.github.io/sea-of-thought/">Sea of Thought</a><a href="https://landrcy.github.io/the-void/">The Void</a><a href="https://landrcy.github.io/pixel-museum/">Pixel Museum</a><a href="https://landrcy.github.io/ai-quiz/">AI Quiz</a><a href="https://landrcy.github.io/mine/">MINE</a><a href="/lsu/">Lsu</a><a href="https://landrcy.github.io/escape-ca/">Escape CA</a><a href="https://landrcy.github.io/wam/">W.A.M.</a><a href="https://landrcy.github.io/forge/">FORGE</a><a href="https://landrcy.github.io/ddom/">Daily Dose of Maggie</a><a href="https://landrcy.github.io/movie/">MOVIE</a><a href="https://landrcy.github.io/cast/">CAST</a><a href="https://landrcy.github.io/llccards/">LLC Cards</a><a href="https://landrcy.github.io/ttt/">Talk to Tung</a><a href="https://www.youtube.com/@Langrino">Langrino</a><a href="https://www.youtube.com/@clutchclipscrate">clutchclips</a><a href="https://www.youtube.com/@bowlfuloftrivia">bowlfuloftrivia</a><a href="https://www.youtube.com/channel/UCRegZeMyJ1B5B9n64rfgKAw">RedditStoryADay</a><a href="https://www.youtube.com/channel/UCfDhWTThokF3gKW03iEGijg">SAT in a Minute</a><a href="archive/">Archive</a></nav>
-<div id="hubver" aria-hidden="true"></div><script>/* Increment HUB_VERSION by 1 on every publish/update. */const HUB_VERSION=74;document.getElementById('hubver').textContent='V'+HUB_VERSION;</script>
-<script src="world/planets.js?v=76"></script><script src="world/solar.js?v=76"></script><script src="world/museum.js?v=76"></script><script src="world/audio.js?v=76"></script><script src="world/fishplanet.js?v=76"></script><script src="world/galaxy.js?v=76"></script>
-</body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>LLC</title>
+  <meta name="description" content="LLC — Games, projects, and tools by Landry." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="LLC" />
+  <meta property="og:description" content="Games, projects, and tools by Landry." />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23ffffff'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='Times New Roman,Times,serif' font-size='20' fill='%23111111'%3EL%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="llc.css?v=1" />
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <a class="brand-link" href="./"><h1 class="site-title">LLC</h1></a>
+      <nav class="site-nav" aria-label="Directory views">
+        <a class="nav-item active" id="nav-all" href="./" aria-current="page">All</a>
+        <span class="nav-sep" aria-hidden="true">&middot;</span>
+        <a class="nav-item" id="nav-newest" href="newest/">Newest</a>
+        <span class="nav-sep" aria-hidden="true">&middot;</span>
+        <a class="nav-item" id="nav-system" href="system/">Solar System</a>
+      </nav>
+    </header>
+
+    <main class="directory" id="directory">
+      <noscript>
+        <p>Enable JavaScript to view the interactive directory, or visit the <a href="system/">Solar System</a>.</p>
+      </noscript>
+    </main>
+
+    <footer class="site-footer">
+      <span id="total-count"></span>
+      <div class="footer-links">
+        <a href="newest/">Newest</a>
+        <a href="system/">Solar System</a>
+        <a href="archive/">Archive</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="llc-sites.js?v=1"></script>
+  <script src="llc-app.js?v=1"></script>
+  <script>window.initLLC('all');</script>
+</body>
+</html>
