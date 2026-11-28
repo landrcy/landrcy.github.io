@@ -1,6 +1,7 @@
 /* ==========================================================================
-   llc-app.js — LLC Themed Rift Directory Renderer (Categories & Newest)
-   Shared cleanly by /index.html (default categorized view) and /newest/.
+   llc-app.js — LLC Procedural Reality-Crack Directory Renderer
+   Mounts 23 unique dimensional fissures with radiating fracture veins,
+   recessed live mini-worlds, big authentic game titles & pop-out characters.
    ========================================================================== */
 
 (() => {
@@ -28,7 +29,7 @@
     }
 
     const isLight = site.scene === 'gallery' || site.scene === 'typefall' || site.scene === 'atlas';
-    const crackClass = site.pixel ? `crack-px-${site.crack % 6}` : `crack-sm-${site.crack % 4}`;
+    const geom = Rifts.buildCrackGeometry(site);
 
     const a = document.createElement('a');
     a.className =
@@ -43,13 +44,13 @@
 
     a.innerHTML = `
       <div class="rift-shell">
-        <div class="rift-rim ${crackClass}" aria-hidden="true"></div>
-        <div class="rift-portal ${crackClass}">
+        <div class="rift-portal" style="clip-path:${geom.clipPolygon}">
           <canvas class="rift-bg-canvas" aria-hidden="true"></canvas>
           <div class="rift-depth" aria-hidden="true"></div>
           <div class="rift-title-layer">${Rifts.buildTitleHTML(site, assetBase)}</div>
         </div>
       </div>
+      ${geom.svgMarkup}
       ${Rifts.buildPopoutsHTML(site, assetBase)}
     `;
 

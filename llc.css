@@ -1,8 +1,8 @@
 /* ==========================================================================
-   llc.css — Clean White Times New Roman LLC Outer Frame + Alive Themed Rifts
+   llc.css — Clean White Times New Roman LLC Outer Frame + Reality Cracks
    Pure #ffffff background, centered all-caps LLC header, 2-column grid of
-   torn pixelated & organic dimensional rifts with authentic game titles and
-   pop-out characters/props on hover.
+   23 unique cracks in reality with radiating fracture veins, detached shards,
+   BIG authentic in-game titles, and pop-out characters on hover.
    ========================================================================== */
 
 *, *::before, *::after {
@@ -29,6 +29,7 @@ html, body {
   font-family: var(--font);
   font-size: 16px;
   line-height: 1.5;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -48,13 +49,13 @@ a {
 
 .page {
   width: 100%;
-  max-width: 1260px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 54px 48px 92px;
+  padding: 54px 56px 96px;
 }
 
 /* ==========================================================================
-   Clean Centered All-Caps LLC Header (Times New Roman on Pure White)
+   Centered All-Caps LLC Header (Times New Roman on Pure White)
    ========================================================================== */
 
 .site-header {
@@ -71,7 +72,7 @@ a {
 .site-title {
   margin: 0;
   font-family: var(--font);
-  font-size: clamp(60px, 7.5vw, 94px);
+  font-size: clamp(62px, 7.5vw, 96px);
   font-weight: 400;
   line-height: 0.94;
   letter-spacing: 0.18em;
@@ -115,14 +116,14 @@ a {
 .nav-sep { color: #cccccc; user-select: none; }
 
 /* ==========================================================================
-   Category Sections & 2-Column Rift Grid
+   Category Sections & 2-Column Reality-Crack Grid
    ========================================================================== */
 
 .directory {
-  margin-top: 46px;
+  margin-top: 48px;
   display: flex;
   flex-direction: column;
-  gap: 54px;
+  gap: 60px;
 }
 
 .category-block {
@@ -136,7 +137,7 @@ a {
   justify-content: space-between;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--rule);
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .category-title {
@@ -161,28 +162,28 @@ a {
   padding: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 30px 36px;
+  gap: 44px 52px;
 }
 
 .rift-cell {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .rift-meta-strip {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 0 10px;
+  padding: 0 18px;
   font-family: var(--font);
-  font-size: 13px;
+  font-size: 13.5px;
   font-style: italic;
   color: var(--ink-3);
 }
 
 /* ==========================================================================
-   Individual Torn Rift Card (Cracks Open in the White Page)
+   Individual Reality-Crack Rift (Unique Fracture Silhouette + Radiating Veins)
    ========================================================================== */
 
 .rift-card {
@@ -190,7 +191,7 @@ a {
   --rift-bg: #18181c;
   position: relative;
   display: block;
-  height: 144px;
+  height: 172px;
   overflow: visible;
   cursor: pointer;
   transition: transform 0.24s var(--ease);
@@ -202,36 +203,24 @@ a {
   outline: none;
 }
 
-/* Outer drop-shadow follows the exact jagged tear polygon */
+/* Outer drop-shadow follows the exact unique jagged crack silhouette */
 .rift-shell {
   position: relative;
+  z-index: 2;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 6px 14px rgba(17, 17, 17, 0.13));
-  transition: filter 0.24s var(--ease);
+  filter: drop-shadow(0 7px 14px rgba(14, 14, 18, 0.15));
+  transition: filter 0.26s var(--ease);
 }
 
 .rift-card:hover .rift-shell,
 .rift-card:focus-visible .rift-shell {
   filter:
-    drop-shadow(0 12px 22px rgba(17, 17, 17, 0.19))
-    drop-shadow(0 0 10px color-mix(in srgb, var(--rim) 34%, transparent));
+    drop-shadow(0 12px 22px rgba(14, 14, 18, 0.22))
+    drop-shadow(0 0 14px color-mix(in srgb, var(--rim) 42%, transparent));
 }
 
-/* Fracture rim layer (sits 2.5px wider than the inner portal to form a cracked lip) */
-.rift-rim {
-  position: absolute;
-  inset: -2.5px;
-  background: color-mix(in srgb, var(--rim) 72%, #111111);
-  transition: background-color 0.22s ease;
-}
-
-.rift-card:hover .rift-rim,
-.rift-card:focus-visible .rift-rim {
-  background: var(--rim);
-}
-
-/* Inner recessed world clipped to the same crack shape */
+/* Inner recessed world clipped to the unique crack polygon */
 .rift-portal {
   position: relative;
   width: 100%;
@@ -253,117 +242,107 @@ a {
   image-rendering: crisp-edges;
 }
 
-/* Recessed depth shading right inside the torn white page lip */
+/* 3D Recessed Underside Shadow (Makes the white page look cracked open over a deep world!) */
 .rift-depth {
   position: absolute;
   inset: 0;
   pointer-events: none;
   box-shadow:
-    inset 0 10px 18px rgba(0, 0, 0, 0.42),
-    inset 0 -8px 16px rgba(0, 0, 0, 0.34),
-    inset 10px 0 18px rgba(0, 0, 0, 0.22),
-    inset -10px 0 18px rgba(0, 0, 0, 0.22);
+    inset 0 14px 22px rgba(0, 0, 0, 0.56),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.38),
+    inset 14px 0 20px rgba(0, 0, 0, 0.28),
+    inset -14px 0 20px rgba(0, 0, 0, 0.28);
 }
 
 .rift-card.is-light .rift-depth {
   box-shadow:
-    inset 0 6px 14px rgba(24, 20, 14, 0.16),
-    inset 0 -6px 12px rgba(24, 20, 14, 0.12);
+    inset 0 8px 16px rgba(24, 20, 14, 0.20),
+    inset 0 -6px 12px rgba(24, 20, 14, 0.14);
 }
 
-/* Stepped 90-degree PIXELATED Crack Shapes (6 distinct fracture patterns) */
-.crack-px-0 {
-  clip-path: polygon(
-    0% 18%, 2% 18%, 2% 10%, 6% 10%, 6% 5%, 14% 5%, 14% 11%, 20% 11%, 20% 4%,
-    32% 4%, 32% 9%, 40% 9%, 40% 3%, 55% 3%, 55% 8%, 64% 8%, 64% 4%, 78% 4%,
-    78% 10%, 86% 10%, 86% 5%, 94% 5%, 94% 12%, 98% 12%, 98% 22%, 100% 22%,
-    100% 76%, 97% 76%, 97% 86%, 93% 86%, 93% 93%, 84% 93%, 84% 88%, 75% 88%,
-    75% 96%, 62% 96%, 62% 90%, 50% 90%, 50% 96%, 36% 96%, 36% 91%, 24% 91%,
-    24% 96%, 12% 96%, 12% 89%, 5% 89%, 5% 82%, 1% 82%, 1% 70%, 0% 70%
-  );
+/* Radiating Reality Fracture SVG Overlay (Extends OUT into the white margin!) */
+.rift-fracture-svg {
+  position: absolute;
+  /* Matches viewBox="-48 -32 696 264" relative to portal 600x200 */
+  left: -8%;
+  top: -16%;
+  width: 116%;
+  height: 132%;
+  z-index: 4;
+  pointer-events: none;
+  overflow: visible;
 }
 
-.crack-px-1 {
-  clip-path: polygon(
-    1% 22%, 4% 22%, 4% 12%, 10% 12%, 10% 4%, 22% 4%, 22% 10%, 30% 10%, 30% 5%,
-    44% 5%, 44% 11%, 54% 11%, 54% 4%, 68% 4%, 68% 9%, 79% 9%, 79% 3%, 91% 3%,
-    91% 11%, 97% 11%, 97% 20%, 100% 20%, 100% 80%, 96% 80%, 96% 90%, 88% 90%,
-    88% 96%, 74% 96%, 74% 90%, 60% 90%, 60% 96%, 46% 96%, 46% 89%, 32% 89%,
-    32% 96%, 18% 96%, 18% 91%, 8% 91%, 8% 84%, 2% 84%, 2% 72%, 0% 72%, 0% 34%, 1% 34%
-  );
+.crack-veins-dark path {
+  stroke: #1d1c20;
+  opacity: 0.72;
+  transition: opacity 0.22s ease;
 }
 
-.crack-px-2 {
-  clip-path: polygon(
-    0% 14%, 5% 14%, 5% 6%, 15% 6%, 15% 12%, 25% 12%, 25% 4%, 38% 4%, 38% 9%,
-    48% 9%, 48% 3%, 63% 3%, 63% 10%, 73% 10%, 73% 5%, 86% 5%, 86% 12%, 95% 12%,
-    95% 19%, 100% 19%, 100% 72%, 98% 72%, 98% 85%, 92% 85%, 92% 95%, 80% 95%,
-    80% 89%, 66% 89%, 66% 96%, 52% 96%, 52% 91%, 38% 91%, 38% 97%, 22% 97%,
-    22% 89%, 11% 89%, 11% 94%, 4% 94%, 4% 82%, 0% 82%
-  );
+.crack-veins-glow path {
+  stroke: var(--rim);
+  opacity: 0.42;
+  filter: drop-shadow(0 0 3px var(--rim));
+  transition: opacity 0.24s ease;
 }
 
-.crack-px-3 {
-  clip-path: polygon(
-    2% 20%, 6% 20%, 6% 9%, 16% 9%, 16% 4%, 29% 4%, 29% 11%, 41% 11%, 41% 4%,
-    56% 4%, 56% 9%, 69% 9%, 69% 3%, 82% 3%, 82% 10%, 92% 10%, 92% 16%, 99% 16%,
-    99% 28%, 100% 28%, 100% 78%, 96% 78%, 96% 89%, 86% 89%, 86% 96%, 72% 96%,
-    72% 90%, 58% 90%, 58% 97%, 42% 97%, 42% 91%, 28% 91%, 28% 96%, 14% 96%,
-    14% 88%, 6% 88%, 6% 79%, 0% 79%, 0% 30%, 2% 30%
-  );
+.crack-outline-dark {
+  stroke: #141316;
+  opacity: 0.92;
 }
 
-.crack-px-4 {
-  clip-path: polygon(
-    0% 18%, 3% 18%, 3% 8%, 12% 8%, 12% 4%, 24% 4%, 24% 9%, 35% 9%, 35% 3%,
-    50% 3%, 50% 11%, 62% 11%, 62% 5%, 76% 5%, 76% 11%, 88% 11%, 88% 6%, 96% 6%,
-    96% 16%, 100% 16%, 100% 82%, 95% 82%, 95% 92%, 84% 92%, 84% 96%, 68% 96%,
-    68% 89%, 54% 89%, 54% 95%, 39% 95%, 39% 90%, 25% 90%, 25% 96%, 10% 96%,
-    10% 89%, 3% 89%, 3% 76%, 0% 76%
-  );
+.crack-outline-glow {
+  stroke: var(--rim);
+  opacity: 0.65;
+  transition: opacity 0.24s ease, filter 0.24s ease;
 }
 
-.crack-px-5 {
-  clip-path: polygon(
-    1% 16%, 5% 16%, 5% 7%, 18% 7%, 18% 12%, 28% 12%, 28% 4%, 43% 4%, 43% 10%,
-    57% 10%, 57% 3%, 72% 3%, 72% 9%, 84% 9%, 84% 4%, 94% 4%, 94% 14%, 99% 14%,
-    99% 26%, 100% 26%, 100% 75%, 97% 75%, 97% 88%, 89% 88%, 89% 95%, 76% 95%,
-    76% 88%, 62% 88%, 62% 96%, 48% 96%, 48% 90%, 34% 90%, 34% 96%, 18% 96%,
-    18% 90%, 7% 90%, 7% 82%, 0% 82%, 0% 28%, 1% 28%
-  );
+.rift-shard {
+  transition: transform 0.34s var(--spring), opacity 0.24s ease;
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
-/* Smooth Hand-Torn Paper / Dimensional Shard Cracks (4 distinct organic shapes) */
-.crack-sm-0 {
-  clip-path: polygon(
-    1.5% 14%, 7% 5%, 18% 8%, 31% 3%, 46% 7%, 61% 2.5%, 76% 7%, 89% 4%, 98% 13%,
-    99.5% 52%, 97.5% 88%, 87% 95%, 73% 91%, 58% 96.5%, 42% 92%, 26% 96%, 11% 91%, 2% 86%, 0.5% 48%
-  );
+.rift-shard.is-dark {
+  fill: #1f1e24;
+  opacity: 0.75;
 }
 
-.crack-sm-1 {
-  clip-path: polygon(
-    2% 18%, 10% 6%, 24% 4%, 39% 9%, 54% 3%, 69% 8%, 84% 3.5%, 96% 11%, 99.5% 44%,
-    98% 84%, 90% 94%, 75% 96%, 61% 90%, 45% 96%, 30% 91%, 15% 95%, 3% 88%, 0.5% 56%
-  );
+.rift-shard.is-accent {
+  fill: var(--rim);
+  opacity: 0.85;
 }
 
-.crack-sm-2 {
-  clip-path: polygon(
-    1% 12%, 12% 4%, 27% 8%, 43% 2.5%, 59% 7%, 75% 3%, 91% 8%, 99% 17%, 99.5% 60%,
-    97% 90%, 84% 96%, 68% 91%, 51% 97%, 35% 92%, 19% 96%, 5% 89%, 0.5% 50%
-  );
+.rift-card:hover .crack-veins-dark path,
+.rift-card:focus-visible .crack-veins-dark path {
+  opacity: 0.95;
 }
 
-.crack-sm-3 {
-  clip-path: polygon(
-    2.5% 16%, 14% 5%, 29% 9%, 45% 3%, 63% 8%, 79% 3.5%, 93% 10%, 99% 20%, 99.5% 54%,
-    97.5% 86%, 86% 95%, 71% 90%, 55% 96.5%, 38% 91%, 21% 95.5%, 7% 90%, 1% 82%, 0.5% 44%
-  );
+.rift-card:hover .crack-veins-glow path,
+.rift-card:focus-visible .crack-veins-glow path {
+  opacity: 0.95;
+}
+
+.rift-card:hover .crack-outline-glow,
+.rift-card:focus-visible .crack-outline-glow {
+  opacity: 1;
+  filter: drop-shadow(0 0 4px var(--rim));
+}
+
+.rift-card:hover .rift-shard:nth-child(odd),
+.rift-card:focus-visible .rift-shard:nth-child(odd) {
+  transform: translate(-4px, -4px) rotate(-14deg) scale(1.18);
+  opacity: 1;
+}
+
+.rift-card:hover .rift-shard:nth-child(even),
+.rift-card:focus-visible .rift-shard:nth-child(even) {
+  transform: translate(4px, 4px) rotate(14deg) scale(1.18);
+  opacity: 1;
 }
 
 /* ==========================================================================
-   Authentic In-Game Title Layer (No Descriptions — Pure Title Identity)
+   BIG Authentic In-Game Title Layer (No Descriptions)
    ========================================================================== */
 
 .rift-title-layer {
@@ -374,7 +353,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 56px;
+  padding: 16px 52px;
   text-align: center;
   pointer-events: none;
   transition: transform 0.24s var(--ease);
@@ -382,300 +361,256 @@ a {
 
 .rift-card:hover .rift-title-layer,
 .rift-card:focus-visible .rift-title-layer {
-  transform: scale(1.045);
+  transform: scale(1.05);
 }
 
 .rift-title-img {
   display: block;
-  max-width: 78%;
-  max-height: 62px;
+  max-width: 82%;
+  max-height: 82px;
   width: auto;
   height: auto;
   object-fit: contain;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.65));
+  filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.72));
 }
 
 .rift-title-img.tall {
-  max-height: 92px;
+  max-height: 118px;
 }
 
 .rift-card[data-site-id="mine"] .rift-title-img {
-  filter: drop-shadow(0 0 10px rgba(255, 200, 95, 0.55)) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.85));
+  max-height: 76px;
+  filter: drop-shadow(0 0 12px rgba(255, 200, 95, 0.65)) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.9));
 }
 
 .rift-card[data-site-id="terra"] .rift-title-img {
-  filter: drop-shadow(0 0 12px rgba(135, 215, 130, 0.45)) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.9));
+  max-height: 78px;
+  filter: drop-shadow(0 0 14px rgba(135, 220, 130, 0.55)) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.9));
+}
+
+.rift-card[data-site-id="the-void"] .rift-title-img {
+  max-height: 118px;
+  filter: drop-shadow(0 0 18px rgba(192, 77, 240, 0.55));
+}
+
+.rift-card[data-site-id="binding-of-ashaad"] .rift-title-img {
+  max-height: 108px;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.85));
 }
 
 .title-wam-svg {
-  height: 44px;
+  height: 58px;
   width: auto;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.65));
 }
 
-/* Per-Site Authentic Typography */
-.rt-ashaad {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1;
-  gap: 4px;
-}
-.rt-ash-top {
-  font-family: 'Silkscreen', monospace;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #f3d299;
-  text-shadow: 0 2px 0 #7a1414, 2px 2px 0 #000, -1px -1px 0 #000;
-}
-.rt-ash-bot {
-  font-family: 'Silkscreen', monospace;
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000, 0 4px 0 #000;
-}
-
-.rt-void {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 0.96;
-  font-family: 'Silkscreen', monospace;
-  font-weight: 700;
-}
-.rt-void-top {
-  font-size: 14px;
-  letter-spacing: 0.34em;
-  color: #e4d2ff;
-  text-shadow: 0 2px 0 #2a104a, 0 0 10px #c04df0;
-}
-.rt-void-bot {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-size: 34px;
-  letter-spacing: 0.1em;
-  color: #f5ecff;
-  text-shadow: 0 3px 0 #35115c, 0 0 14px #c04df0;
-}
-.rt-void-o {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  margin: 0 3px 0 1px;
-  border-radius: 50%;
-  background: #040108;
-  border: 2.5px solid #e6a8ff;
-  box-shadow: 0 0 10px #c04df0, 0 0 18px rgba(192, 77, 240, 0.75);
-}
-
+/* Bigger Authentic Per-Site Typography */
 .rt-roguelike {
   font-family: 'Cinzel', Georgia, serif;
-  font-size: 27px;
+  font-size: 36px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #f5d88a;
-  text-shadow: 0 2px 0 #260d12, 0 0 14px rgba(245, 200, 90, 0.45);
+  letter-spacing: 0.07em;
+  color: #f8dd90;
+  text-shadow: 0 3px 0 #260d12, 0 0 16px rgba(245, 200, 90, 0.5);
 }
 .rt-roguelike span { color: #7af0cc; }
 
 .rt-llccards {
   font-family: 'Silkscreen', monospace;
-  font-size: 29px;
+  font-size: 38px;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: #ffffff;
-  text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000, 0 5px 0 #000;
+  text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000, 0 6px 0 #000;
 }
 
 .rt-cast {
   font-family: 'Silkscreen', monospace;
-  font-size: 38px;
+  font-size: 50px;
   font-weight: 700;
   letter-spacing: 0.14em;
   color: #e6fbff;
-  text-shadow: 0 3px 0 #1a7ac0, 0 6px 0 #031428, 0 0 14px rgba(72, 202, 228, 0.65);
+  text-shadow: 0 3px 0 #1a7ac0, 0 7px 0 #031428, 0 0 16px rgba(72, 202, 228, 0.72);
 }
 
 .rt-lsu {
   font-family: 'Inter', -apple-system, sans-serif;
-  font-size: 46px;
+  font-size: 58px;
   font-weight: 800;
   letter-spacing: 0.06em;
   color: #ffffff;
-  text-shadow: 0 0 18px #ff3d7f, 0 0 34px rgba(255, 61, 127, 0.65);
+  text-shadow: 0 0 20px #ff3d7f, 0 0 38px rgba(255, 61, 127, 0.72);
 }
 
 .rt-aiquiz {
   font-family: 'Silkscreen', monospace;
-  font-size: 34px;
+  font-size: 44px;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: #8af4ff;
-  text-shadow: -3px 0 0 #ff5ad2, 0 3px 0 #06223d, 0 0 14px rgba(87, 240, 255, 0.45);
+  text-shadow: -3px 0 0 #ff5ad2, 0 4px 0 #06223d, 0 0 16px rgba(87, 240, 255, 0.52);
 }
 
 .rt-escapeca {
   font-family: 'Anton', Impact, sans-serif;
-  font-size: 40px;
+  font-size: 52px;
   font-weight: 400;
   letter-spacing: 0.08em;
   color: #f6eaef;
-  text-shadow: 0 0 12px #ff1a3a, 0 4px 0 #3a0418, 0 0 26px #7a2ac0;
+  text-shadow: 0 0 14px #ff1a3a, 0 5px 0 #3a0418, 0 0 28px #7a2ac0;
 }
 
 .rt-tung {
   font-family: 'Pixelify Sans', monospace;
-  font-size: 32px;
+  font-size: 42px;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: #ffe2b0;
-  text-shadow: 0 3px 0 #3a1f0a, 2px 2px 0 #1a0c04, 0 0 10px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 4px 0 #3a1f0a, 2px 2px 0 #1a0c04, 0 0 12px rgba(0, 0, 0, 0.65);
 }
 
 .rt-gallery {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 34px;
+  font-size: 40px;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: #1b1a1d;
-  padding: 5px 18px 6px;
-  background: rgba(255, 255, 255, 0.86);
+  padding: 6px 22px 7px;
+  background: rgba(255, 255, 255, 0.90);
   border: 1px solid rgba(27, 26, 29, 0.14);
   border-radius: 999px;
-  box-shadow: 0 4px 14px rgba(34, 24, 14, 0.12);
+  box-shadow: 0 4px 16px rgba(34, 24, 14, 0.14);
 }
 
 .rt-typefall {
   font-family: 'Times New Roman', Times, serif;
   font-style: italic;
-  font-size: 42px;
+  font-size: 54px;
   font-weight: 400;
   letter-spacing: 0.01em;
   color: #111111;
 }
 
+/* Authentic lan4drcy Russo One title (exact font from lan4drcy/style.css!) */
 .rt-shaders {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 30px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  color: #e8fdff;
-  text-shadow: -2px 0 10px #3ad0f0, 2px 0 12px #d03af0;
+  font-family: 'Russo One', sans-serif;
+  font-size: 46px;
+  font-weight: 400;
+  letter-spacing: 0.07em;
+  color: #ffffff;
+  text-shadow: 0 0 18px rgba(102, 240, 255, 0.78), 3px 0 14px rgba(255, 92, 240, 0.55);
 }
 
 .rt-atlas {
   font-family: 'Inter', -apple-system, sans-serif;
-  font-size: 36px;
+  font-size: 48px;
   font-weight: 500;
   letter-spacing: 0.16em;
   color: #162436;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 .rt-terrain {
   font-family: 'Inter', -apple-system, sans-serif;
-  font-size: 25px;
+  font-size: 31px;
   font-weight: 600;
   letter-spacing: -0.015em;
   color: #f4fbf6;
-  text-shadow: 0 2px 12px rgba(8, 28, 22, 0.72);
+  text-shadow: 0 2px 14px rgba(8, 28, 22, 0.78);
 }
 
 .rt-recommend {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 40px;
+  font-size: 50px;
   font-weight: 600;
   letter-spacing: 0.04em;
   color: #f5d68e;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.75);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8);
 }
 
 .rt-channels {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-family: 'Roboto', -apple-system, sans-serif;
-  font-size: 21px;
+  font-size: 27px;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: #ffffff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
 }
 .yt-play-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 24px;
-  border-radius: 6px;
+  width: 40px;
+  height: 28px;
+  border-radius: 7px;
   background: #ff0033;
   color: #ffffff;
-  font-size: 12px;
+  font-size: 14px;
   flex-shrink: 0;
-  box-shadow: 0 2px 10px rgba(255, 0, 51, 0.5);
+  box-shadow: 0 2px 12px rgba(255, 0, 51, 0.55);
 }
 
 /* ==========================================================================
-   Pop-Out Characters & Props (Sit outside clip-path — spring out on hover!)
+   Pop-Out Characters & Props (Sit outside crack — spring out on hover!)
    ========================================================================== */
 
 .pop-el {
   position: absolute;
   z-index: 6;
   pointer-events: none;
-  filter: drop-shadow(0 4px 7px rgba(0, 0, 0, 0.28));
-  transition: transform 0.34s var(--spring), opacity 0.24s ease;
+  filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.30));
+  transition: transform 0.36s var(--spring), opacity 0.24s ease;
 }
 
 .pop-left {
-  left: 14px;
-  top: -11px;
-  transform: translate(0, 6px) scale(0.88) rotate(-5deg);
-  opacity: 0.92;
+  left: 22px;
+  top: -12px;
+  transform: translate(0, 6px) scale(0.90) rotate(-6deg);
+  opacity: 0.94;
 }
 
 .pop-right {
-  right: 16px;
-  bottom: -11px;
-  transform: translate(0, -5px) scale(0.86) rotate(5deg);
-  opacity: 0.92;
+  right: 24px;
+  bottom: -12px;
+  transform: translate(0, -6px) scale(0.88) rotate(6deg);
+  opacity: 0.94;
 }
 
 .rift-card:hover .pop-left,
 .rift-card:focus-visible .pop-left {
-  transform: translate(-6px, -11px) scale(1.14) rotate(-10deg);
+  transform: translate(-8px, -12px) scale(1.18) rotate(-12deg);
   opacity: 1;
 }
 
 .rift-card:hover .pop-right,
 .rift-card:focus-visible .pop-right {
-  transform: translate(6px, 9px) scale(1.14) rotate(10deg);
+  transform: translate(8px, 11px) scale(1.18) rotate(12deg);
   opacity: 1;
 }
 
 .pop-pix svg {
   display: block;
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
 
 .pop-vec svg {
   display: block;
-  width: 32px;
-  height: 32px;
+  width: 35px;
+  height: 35px;
 }
 
 .pop-sprite {
   display: block;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
@@ -686,7 +621,7 @@ a {
    ========================================================================== */
 
 .site-footer {
-  margin-top: 68px;
+  margin-top: 72px;
   padding-top: 20px;
   border-top: 1px solid var(--rule);
   display: flex;
@@ -715,50 +650,53 @@ a {
    Tablet & Mobile Responsive
    ========================================================================== */
 
-@media (max-width: 860px) {
+@media (max-width: 880px) {
   .page {
-    padding: 44px 24px 72px;
+    padding: 44px 32px 72px;
   }
 
   .rift-grid {
     grid-template-columns: 1fr;
-    gap: 26px;
+    gap: 38px;
   }
 }
 
 @media (max-width: 540px) {
   .page {
-    padding: 34px 18px 64px;
+    padding: 34px 28px 64px;
   }
 
   .site-header { padding-bottom: 18px; }
   .site-nav { margin-top: 14px; gap: 6px 16px; font-size: 15.5px; }
-  .directory { margin-top: 34px; gap: 40px; }
+  .directory { margin-top: 34px; gap: 44px; }
 
-  .rift-card { height: 124px; }
-  .rift-title-layer { padding: 12px 36px; }
-  .rift-title-img { max-height: 50px; }
-  .rift-title-img.tall { max-height: 76px; }
-  .rt-ash-bot { font-size: 25px; }
-  .rt-void-bot { font-size: 28px; }
-  .rt-cast { font-size: 32px; }
-  .rt-lsu { font-size: 38px; }
-  .rt-aiquiz { font-size: 28px; }
-  .rt-escapeca { font-size: 32px; }
-  .rt-tung { font-size: 25px; }
-  .rt-gallery { font-size: 26px; padding: 4px 14px; }
-  .rt-typefall { font-size: 34px; }
-  .rt-atlas { font-size: 30px; }
-  .rt-terrain { font-size: 20px; }
-  .rt-recommend { font-size: 34px; }
-  .rt-channels { font-size: 17px; }
-  .rt-roguelike { font-size: 22px; }
-  .rt-llccards { font-size: 24px; }
+  .rift-card { height: 142px; }
+  .rift-title-layer { padding: 12px 30px; }
+  .rift-title-img { max-height: 62px; }
+  .rift-title-img.tall,
+  .rift-card[data-site-id="the-void"] .rift-title-img,
+  .rift-card[data-site-id="binding-of-ashaad"] .rift-title-img { max-height: 92px; }
+  .title-wam-svg { height: 42px; }
 
-  .pop-pix svg, .pop-vec svg { width: 28px; height: 28px; }
-  .pop-sprite { width: 36px; height: 36px; }
+  .rt-roguelike { font-size: 25px; }
+  .rt-llccards { font-size: 28px; }
+  .rt-cast { font-size: 38px; }
+  .rt-lsu { font-size: 46px; }
+  .rt-aiquiz { font-size: 34px; }
+  .rt-escapeca { font-size: 38px; }
+  .rt-tung { font-size: 30px; }
+  .rt-gallery { font-size: 28px; padding: 4px 14px; }
+  .rt-typefall { font-size: 40px; }
+  .rt-shaders { font-size: 34px; }
+  .rt-atlas { font-size: 36px; }
+  .rt-terrain { font-size: 22px; }
+  .rt-recommend { font-size: 38px; }
+  .rt-channels { font-size: 19px; }
+
+  .pop-pix svg, .pop-vec svg { width: 30px; height: 30px; }
+  .pop-sprite { width: 38px; height: 38px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rift-card, .pop-el, .rift-title-layer { transition: none !important; }
+  .rift-card, .pop-el, .rift-title-layer, .rift-shard { transition: none !important; }
 }
