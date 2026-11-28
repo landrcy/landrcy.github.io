@@ -1,11 +1,13 @@
 /* ==========================================================================
-   llc-app.js — LLC Procedural Reality-Crack Directory Renderer
-   Mounts 23 unique dimensional fissures with radiating fracture veins,
-   recessed live mini-worlds, big authentic game titles & pop-out characters.
+   llc-app.js — LLC Blocky Rift Directory Renderer + Secret Bottom Vault
+   Filters hidden sites out of main categories & /newest/, and unlocks them
+   as a minimal dimmed list via a tiny faint "···" trigger at the bottom.
    ========================================================================== */
 
 (() => {
-  const SITES = window.LLC_SITES || [];
+  const ALL_SITES = window.LLC_SITES || [];
+  const VISIBLE_SITES = ALL_SITES.filter((s) => !s.hidden);
+  const HIDDEN_SITES = ALL_SITES.filter((s) => s.hidden);
   const CATEGORIES = window.LLC_CATEGORIES || [];
   const Rifts = window.LLCRifts;
   const catTitles = Object.fromEntries(CATEGORIES.map((c) => [c.id, c.title]));
@@ -28,7 +30,7 @@
       li.appendChild(strip);
     }
 
-    const isLight = site.scene === 'gallery' || site.scene === 'typefall' || site.scene === 'atlas';
+    const isLight = !!site.light;
     const geom = Rifts.buildCrackGeometry(site);
 
     const a = document.createElement('a');
@@ -40,6 +42,7 @@
     a.dataset.siteId = site.id;
     a.setAttribute('aria-label', site.title);
     a.style.setProperty('--rim', site.rim || '#111111');
+    a.style.setProperty('--glow', site.glow || site.rim || '#3b82f6');
     a.style.setProperty('--rift-bg', site.bg || '#18181c');
 
     a.innerHTML = `
@@ -55,7 +58,7 @@
     `;
 
     const canvas = a.querySelector('.rift-bg-canvas');
-    Rifts.register(a, canvas, site);
+    Rifts.register(a, canvas, site, assetBase);
 
     li.appendChild(a);
     return li;
@@ -66,7 +69,7 @@
     container.innerHTML = '';
 
     for (const cat of CATEGORIES) {
-      const items = SITES.filter((s) => s.category === cat.id);
+      const items = VISIBLE_SITES.filter((s) => s.category === cat.id);
       if (!items.length) continue;
 
       const sec = document.createElement('section');
@@ -92,7 +95,7 @@
     Rifts.reset();
     container.innerHTML = '';
 
-    const sorted = SITES.slice().sort((a, b) => {
+    const sorted = VISIBLE_SITES.slice().sort((a, b) => {
       if (a.added !== b.added) return (b.added || '').localeCompare(a.added || '');
       return 0;
     });
@@ -113,6 +116,67 @@
     container.appendChild(sec);
   }
 
+  function mountSecretVault() {
+    if (!HIDDEN_SITES.length) return;
+    const page = document.querySelector('.page');
+    if (!page || document.getElementById('hidden-vault-wrap')) return;
+
+    const wrap = document.createElement('div');
+    wrap.id = 'hidden-vault-wrap';
+    wrap.className = 'hidden-vault-wrap';
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'hidden-vault-trigger';
+    btn.className = 'hidden-vault-trigger';
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-controls', 'hidden-vault-panel');
+    btn.setAttribute('title', 'More');
+    btn.textContent = '···';
+
+    const panel = document.createElement('section');
+    panel.id = 'hidden-vault-panel';
+    panel.className = 'hidden-vault-panel';
+    panel.hidden = true;
+    panel.setAttribute('aria-label', 'Hidden archive');
+
+    const head = document.createElement('div');
+    head.className = 'vault-head';
+    head.innerHTML = `<span class="vault-title">Hidden</span><span class="vault-count">${HIDDEN_SITES.length}</span>`;
+    panel.appendChild(head);
+
+    const list = document.createElement('ul');
+    list.className = 'vault-list';
+    for (const site of HIDDEN_SITES) {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.className = 'vault-card';
+      a.href = site.url;
+      a.innerHTML = `
+        <span class="vault-card-title"></span>
+        <span class="vault-card-meta">${catTitles[site.category] || site.category}</span>
+      `;
+      a.querySelector('.vault-card-title').textContent = site.title;
+      li.appendChild(a);
+      list.appendChild(li);
+    }
+    panel.appendChild(list);
+
+    btn.addEventListener('click', () => {
+      const open = panel.hidden;
+      panel.hidden = !open;
+      btn.setAttribute('aria-expanded', String(open));
+      btn.classList.toggle('is-open', open);
+      if (open) {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+
+    wrap.appendChild(btn);
+    wrap.appendChild(panel);
+    page.appendChild(wrap);
+  }
+
   window.initLLC = function initLLC(defaultMode, assetBase = '') {
     const dir = document.getElementById('directory');
     const navAll = document.getElementById('nav-all');
@@ -120,7 +184,7 @@
     const countEl = document.getElementById('total-count');
     if (!dir) return;
 
-    if (countEl) countEl.textContent = `${SITES.length} websites`;
+    if (countEl) countEl.textContent = `${VISIBLE_SITES.length} websites`;
 
     function setMode(mode, updateHash) {
       const isNewest = mode === 'newest';
@@ -145,6 +209,7 @@
         ? 'newest'
         : 'all';
     setMode(startMode, false);
+    mountSecretVault();
 
     if (defaultMode === 'all') {
       if (navAll) {

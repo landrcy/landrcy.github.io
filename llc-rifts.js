@@ -1,15 +1,16 @@
 /* ==========================================================================
-   llc-rifts.js — Procedural Reality-Crack Geometry, Authentic Game Titles,
-   23 Site-Specific Alive Animations & Pop-Out Characters
+   llc-rifts.js — Bold Blocky Rift Silhouettes (Zero Thin Cracks),
+   Authentic Site-Matched Live Mini-Worlds, Real Satellite Earth,
+   2.5D Smooth Terrain, Animated Fractal, Street Museum, Cozy Couch Living Room,
+   Animated THE VOID Logo & Site-Inspired Pop-Out Icons
    ========================================================================== */
 
 window.LLCRifts = (() => {
   /* ------------------------------------------------------------------------
-     Deterministic PRNG & Procedural Reality-Crack Geometry Engine
-     Generates 23 completely unique crack silhouettes (zero repeated shapes),
-     radiating hairline fracture veins extending into the white page, and
-     detached pixel blocks / reality shards around each tear.
-     Coordinate space: 600 x 200 (portal), SVG overflows [-48..648] x [-34..234]
+     Deterministic PRNG & Bold Blocky / Angular Rift Geometry
+     Clean, chunky blocky pixel-stepped cracks (for pixel sites) and bold
+     angular torn rifts (for smooth sites) — ZERO spindly thin hairline veins!
+     Coordinate space: 600 x 200 (portal), SVG overflows [-24..624] x [-20..220]
      ------------------------------------------------------------------------ */
   function mkRng(seed) {
     let s = (seed * 16807) % 2147483647;
@@ -24,8 +25,8 @@ window.LLCRifts = (() => {
     return Math.round(v / step) * step;
   }
 
-  // Convert a polyline into crisp 90-degree pixel staircase segments
-  function stepify(pts, stepX = 8, stepY = 7) {
+  // Convert polyline to crisp chunky 90-degree pixel staircase segments
+  function stepify(pts, stepX = 12, stepY = 10) {
     const out = [];
     for (let i = 0; i < pts.length; i++) {
       const p = [quant(pts[i][0], stepX), quant(pts[i][1], stepY)];
@@ -35,7 +36,6 @@ window.LLCRifts = (() => {
       }
       const prev = out[out.length - 1];
       if (prev[0] === p[0] && prev[1] === p[1]) continue;
-      // Insert crisp orthogonal corner between prev and p
       if (prev[0] !== p[0] && prev[1] !== p[1]) {
         const midX = quant((prev[0] + p[0]) * 0.5, stepX);
         if (midX !== prev[0] && midX !== p[0]) {
@@ -53,205 +53,116 @@ window.LLCRifts = (() => {
     const W = 600;
     const H = 200;
     const r = mkRng(site.seed || 42);
-    const arch = site.archetype || 'tapered';
     const isPx = !!site.pixel;
 
-    // Tapered left & right fissure tips (makes it look like a REAL crack, not a box!)
-    let leftTipY = 100 + (r() - 0.5) * 44;
-    let rightTipY = 100 + (r() - 0.5) * 44;
-    let leftX = 12 + r() * 14;
-    let rightX = W - 12 - r() * 14;
+    let poly;
 
-    if (arch === 'lightning') {
-      leftTipY = 58 + r() * 18;
-      rightTipY = 132 + r() * 20;
-    } else if (arch === 'reverse-slash') {
-      leftTipY = 136 + r() * 18;
-      rightTipY = 56 + r() * 20;
-    } else if (arch === 'asymmetric-left') {
-      leftX = 8 + r() * 10;
-      rightX = W - 6 - r() * 8;
-      leftTipY = 86 + r() * 28;
-      rightTipY = 96 + r() * 14;
-    } else if (arch === 'asymmetric-right') {
-      leftX = 6 + r() * 8;
-      rightX = W - 8 - r() * 10;
-      leftTipY = 98 + r() * 14;
-      rightTipY = 86 + r() * 28;
-    }
+    if (isPx) {
+      // Chunky, bold blocky pixel-stepped rift (inspired by the beloved blocky style,
+      // with bigger bold notched corners & deep pixel bites — zero thin hairlines!)
+      const topNotch = 2 + Math.floor(r() * 4); // index of a bigger top crack notch
+      const botNotch = 2 + Math.floor(r() * 4);
+      const segs = 9;
+      const topPts = [];
+      const botPts = [];
 
-    // Profile envelope for top and bottom edge (keeps center 115..485 comfortably open for BIG titles!)
-    function envelope(u, side) {
-      // u in [0..1] along X; side = -1 (top) or +1 (bottom)
-      let base = 16; // margin from outer box edge
-      // Taper sharply near left/right tips
-      const endL = Math.max(0, 1 - u / 0.17);
-      const endR = Math.max(0, 1 - (1 - u) / 0.17);
-      let taper = (endL * endL * 54) + (endR * endR * 54);
+      const leftIn = 12 + Math.floor(r() * 2) * 12;
+      const rightIn = W - 12 - Math.floor(r() * 2) * 12;
+      const leftMidY = 70 + Math.floor(r() * 5) * 10;
+      const rightMidY = 70 + Math.floor(r() * 5) * 10;
 
-      if (arch === 'lightning') {
-        const tilt = (u - 0.5) * 34;
-        base += side < 0 ? Math.max(-6, tilt) : Math.max(-6, -tilt);
-      } else if (arch === 'reverse-slash') {
-        const tilt = (0.5 - u) * 34;
-        base += side < 0 ? Math.max(-6, tilt) : Math.max(-6, -tilt);
-      } else if (arch === 'asymmetric-left') {
-        taper = (endL * endL * 32) + Math.pow(Math.max(0, (u - 0.58) / 0.42), 1.9) * 58;
-      } else if (arch === 'asymmetric-right') {
-        taper = Math.pow(Math.max(0, (0.42 - u) / 0.42), 1.9) * 58 + (endR * endR * 32);
-      } else if (arch === 'twin-bite') {
-        const bite = Math.exp(-Math.pow((u - (side < 0 ? 0.34 : 0.66)) / 0.08, 2)) * 22;
-        base += bite;
-      } else if (arch === 'seismic') {
-        base += Math.sin(u * Math.PI * 2.2 + (side < 0 ? 0 : 0.6)) * 12;
-      } else if (arch === 'shattered') {
-        taper = (endL * endL * 42) + (endR * endR * 42);
+      for (let i = 1; i < segs; i++) {
+        const u = i / segs;
+        const x = leftIn + u * (rightIn - leftIn);
+        let y = 10 + Math.floor(r() * 2) * 10;
+        if (i === 1 || i === segs - 1) y += 10;
+        if (i === topNotch) y = 30; // bigger bold blocky crack notch!
+        topPts.push([x, y]);
+      }
+      for (let i = segs - 1; i >= 1; i--) {
+        const u = i / segs;
+        const x = leftIn + u * (rightIn - leftIn);
+        let y = H - 10 - Math.floor(r() * 2) * 10;
+        if (i === 1 || i === segs - 1) y -= 10;
+        if (i === botNotch) y = H - 30; // bigger bold blocky crack notch!
+        botPts.push([x, y]);
       }
 
-      // Jagged crack tooth variance
-      const jag = (r() - 0.45) * (isPx ? 22 : 24);
-      let y = side < 0
-        ? Math.max(6, Math.min(82, base + taper + jag))
-        : Math.min(H - 6, Math.max(H - 82, H - (base + taper + jag)));
+      const raw = [
+        [0, leftMidY],
+        [leftIn, Math.max(20, leftMidY - 40)],
+        ...topPts,
+        [rightIn, Math.max(20, rightMidY - 40)],
+        [W, rightMidY],
+        [rightIn, Math.min(H - 20, rightMidY + 40)],
+        ...botPts,
+        [leftIn, Math.min(H - 20, leftMidY + 40)],
+      ];
+      poly = stepify(raw, 12, 10);
+    } else {
+      // Bold, clean angular torn rift (strong geometric facets + 1-2 big wide crack notches)
+      const segs = 10;
+      const leftY = 82 + r() * 36;
+      const rightY = 82 + r() * 36;
+      const topBite = 2 + Math.floor(r() * 5);
+      const botBite = 2 + Math.floor(r() * 5);
 
-      // Protect center band so big real logos are never clipped by an aggressive tooth
-      if (u > 0.20 && u < 0.80) {
-        if (side < 0) y = Math.min(y, 26);
-        else y = Math.max(y, H - 26);
+      const topPts = [];
+      const botPts = [];
+      for (let i = 1; i < segs; i++) {
+        const u = i / segs + (r() - 0.5) * 0.035;
+        const x = 18 + u * (W - 36);
+        let y = 10 + r() * 12;
+        if (i === 1 || i === segs - 1) y += 10;
+        if (i === topBite) y = 29 + r() * 5;
+        topPts.push([x, y]);
       }
-      return y;
+      for (let i = segs - 1; i >= 1; i--) {
+        const u = i / segs + (r() - 0.5) * 0.035;
+        const x = 18 + u * (W - 36);
+        let y = H - 10 - r() * 12;
+        if (i === 1 || i === segs - 1) y -= 10;
+        if (i === botBite) y = H - 29 - r() * 5;
+        botPts.push([x, y]);
+      }
+
+      poly = [
+        [4, leftY],
+        [24, Math.max(18, leftY - 44)],
+        ...topPts,
+        [W - 24, Math.max(18, rightY - 44)],
+        [W - 4, rightY],
+        [W - 24, Math.min(H - 18, rightY + 44)],
+        ...botPts,
+        [24, Math.min(H - 18, leftY + 44)],
+      ].map(([x, y]) => [Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
     }
 
-    const segs = isPx ? 13 : 15;
-    const topPts = [];
-    const botPts = [];
-
-    for (let i = 1; i < segs; i++) {
-      const u = i / segs + (r() - 0.5) * (0.45 / segs);
-      const x = leftX + u * (rightX - leftX);
-      topPts.push([x, envelope(u, -1)]);
-    }
-    for (let i = segs - 1; i >= 1; i--) {
-      const u = i / segs + (r() - 0.5) * (0.45 / segs);
-      const x = leftX + u * (rightX - leftX);
-      botPts.push([x, envelope(u, +1)]);
-    }
-
-    // Add dramatic side jaw vertices near left & right tips
-    const rawPoly = [
-      [leftX, leftTipY],
-      [leftX + 16 + r() * 14, Math.max(16, leftTipY - 28 - r() * 18)],
-      ...topPts,
-      [rightX - 16 - r() * 14, Math.max(16, rightTipY - 28 - r() * 18)],
-      [rightX, rightTipY],
-      [rightX - 16 - r() * 14, Math.min(H - 16, rightTipY + 28 + r() * 18)],
-      ...botPts,
-      [leftX + 16 + r() * 14, Math.min(H - 16, leftTipY + 28 + r() * 18)],
-    ];
-
-    const poly = isPx ? stepify(rawPoly, 8, 7) : rawPoly.map(([x, y]) => [Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
-
-    // CSS percentage polygon for clip-path
     const clipPolygon =
       'polygon(' +
       poly.map(([x, y]) => `${((x / W) * 100).toFixed(2)}% ${((y / H) * 100).toFixed(2)}%`).join(', ') +
       ')';
 
-    // Exact SVG path for fracture rim + recessed cast shadow
     const polyPath =
       'M ' + poly.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(' L ') + ' Z';
 
-    // Generate 7-9 radiating hairline fracture cracks shooting outward into the white paper!
-    const veins = [];
-    const glowVeins = [];
-
-    function makeVein(sx, sy, angle, len, depth) {
-      const pts = [[sx, sy]];
-      let cx = sx;
-      let cy = sy;
-      let a = angle;
-      const steps = isPx ? 3 : 4;
-      const sl = len / steps;
-      for (let k = 0; k < steps; k++) {
-        a += (r() - 0.5) * 0.65;
-        if (isPx) {
-          const dx = Math.cos(a) * sl;
-          const dy = Math.sin(a) * sl;
-          if (Math.abs(dx) >= Math.abs(dy)) {
-            cx = quant(cx + dx, 6);
-            pts.push([cx, cy]);
-            cy = quant(cy + dy, 6);
-            pts.push([cx, cy]);
-          } else {
-            cy = quant(cy + dy, 6);
-            pts.push([cx, cy]);
-            cx = quant(cx + dx, 6);
-            pts.push([cx, cy]);
-          }
-        } else {
-          cx += Math.cos(a) * sl;
-          cy += Math.sin(a) * sl;
-          pts.push([cx, cy]);
-        }
-        // Fork a tiny hairline sub-crack midway
-        if (depth === 0 && k === 1 && r() < 0.72) {
-          makeVein(cx, cy, a + (r() < 0.5 ? 0.65 : -0.65), len * 0.52, 1);
-        }
-      }
-      const d = 'M ' + pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(' L ');
-      const sw = depth === 0 ? (isPx ? 2.1 : 1.7) : (isPx ? 1.3 : 1.0);
-      veins.push(`<path d="${d}" stroke-width="${sw}" />`);
-      // Dimensional energy bleed near the crack mouth (first half of primary vein)
-      if (depth === 0) {
-        const half = pts.slice(0, Math.max(2, Math.ceil(pts.length * 0.55)));
-        const dg = 'M ' + half.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(' L ');
-        glowVeins.push(`<path d="${dg}" stroke-width="${sw + 0.8}" />`);
-      }
-    }
-
-    // Primary cracks shoot out from the left tip, right tip, and 4-5 sharp top/bottom fracture teeth!
-    makeVein(poly[0][0], poly[0][1], Math.PI + (r() - 0.5) * 0.55, 36 + r() * 14, 0);
-    // Find rightmost vertex
-    let rightIdx = 0;
-    for (let i = 1; i < poly.length; i++) if (poly[i][0] > poly[rightIdx][0]) rightIdx = i;
-    makeVein(poly[rightIdx][0], poly[rightIdx][1], (r() - 0.5) * 0.55, 36 + r() * 14, 0);
-
-    // Top & bottom hairline fissures radiating into the clean white page
-    const pickCount = 5;
-    for (let k = 0; k < pickCount; k++) {
-      const idx = Math.floor(((k + 0.4 + r() * 0.4) / pickCount) * poly.length) % poly.length;
-      const [vx, vy] = poly[idx];
-      if (vx < 45 || vx > W - 45) continue;
-      const outAngle = vy < H * 0.5
-        ? -Math.PI * 0.5 + (r() - 0.5) * 1.1
-        : Math.PI * 0.5 + (r() - 0.5) * 1.1;
-      makeVein(vx, vy, outAngle, 20 + r() * 16, 0);
-    }
-
-    // Detached floating shards / chipped pixel blocks hovering just outside the fracture
+    // 4 chunky detached floating corner blocks/shards (bigger & cleaner, zero thin lines!)
     const shards = [];
-    for (let k = 0; k < 6; k++) {
-      const onLeft = k === 0;
-      const onRight = k === 1;
-      let sx, sy;
-      if (onLeft) {
-        sx = poly[0][0] - 12 - r() * 20;
-        sy = poly[0][1] + (r() - 0.5) * 44;
-      } else if (onRight) {
-        sx = poly[rightIdx][0] + 10 + r() * 20;
-        sy = poly[rightIdx][1] + (r() - 0.5) * 44;
-      } else {
-        sx = 70 + r() * (W - 140);
-        sy = k % 2 === 0 ? 4 - r() * 18 : H - 4 + r() * 18;
-      }
-      const colored = k % 2 === 0;
-      const cls = colored ? 'rift-shard is-accent' : 'rift-shard is-dark';
+    const shardSpots = [
+      [12 + r() * 18, 6 - r() * 12],
+      [W - 22 - r() * 18, 6 - r() * 12],
+      [16 + r() * 20, H - 6 + r() * 12],
+      [W - 26 - r() * 20, H - 6 + r() * 12],
+    ];
+    for (let k = 0; k < shardSpots.length; k++) {
+      const [sx, sy] = shardSpots[k];
+      const cls = k % 2 === 0 ? 'rift-shard is-accent' : 'rift-shard is-dark';
       if (isPx) {
-        const sz = 4 + Math.floor(r() * 5);
+        const sz = 7 + Math.floor(r() * 5);
         shards.push(`<rect class="${cls}" x="${quant(sx, 2)}" y="${quant(sy, 2)}" width="${sz}" height="${sz}" />`);
       } else {
-        const s1 = 4 + r() * 5;
-        const s2 = 3 + r() * 5;
+        const s1 = 6 + r() * 5;
+        const s2 = 5 + r() * 5;
         const a1 = r() * Math.PI * 2;
         const p1 = [sx + Math.cos(a1) * s1, sy + Math.sin(a1) * s1];
         const p2 = [sx + Math.cos(a1 + 2.2) * s2, sy + Math.sin(a1 + 2.2) * s2];
@@ -261,18 +172,10 @@ window.LLCRifts = (() => {
     }
 
     const svgMarkup = `
-      <svg class="rift-fracture-svg" viewBox="-48 -32 696 264" preserveAspectRatio="none" aria-hidden="true">
-        <g class="crack-veins-dark" fill="none" stroke-linecap="${isPx ? 'square' : 'round'}" stroke-linejoin="${isPx ? 'miter' : 'round'}">
-          ${veins.join('')}
-        </g>
-        <g class="crack-veins-glow" fill="none" stroke-linecap="${isPx ? 'square' : 'round'}" stroke-linejoin="${isPx ? 'miter' : 'round'}">
-          ${glowVeins.join('')}
-        </g>
-        <g class="crack-shards">
-          ${shards.join('')}
-        </g>
-        <path class="crack-outline-dark" d="${polyPath}" fill="none" stroke-width="${isPx ? 3.2 : 2.6}" stroke-linejoin="${isPx ? 'miter' : 'round'}" />
-        <path class="crack-outline-glow" d="${polyPath}" fill="none" stroke-width="${isPx ? 2.2 : 1.8}" stroke-linejoin="${isPx ? 'miter' : 'round'}" />
+      <svg class="rift-fracture-svg" viewBox="-24 -20 648 240" preserveAspectRatio="none" aria-hidden="true">
+        <g class="crack-shards">${shards.join('')}</g>
+        <path class="crack-outline-dark" d="${polyPath}" fill="none" stroke-width="${isPx ? 5 : 4}" stroke-linejoin="${isPx ? 'miter' : 'round'}" />
+        <path class="crack-outline-glow" d="${polyPath}" fill="none" stroke-width="${isPx ? 3.2 : 2.6}" stroke-linejoin="${isPx ? 'miter' : 'round'}" />
       </svg>
     `;
 
@@ -313,9 +216,17 @@ window.LLCRifts = (() => {
   }
 
   /* ------------------------------------------------------------------------
-     Authentic Big In-Game Titles (Zero Descriptions)
+     Equalized BIG Authentic In-Game Titles (Zero Descriptions)
      ------------------------------------------------------------------------ */
   function buildTitleHTML(site, assetBase) {
+    if (site.titleStyle === 'void-anim' && site.titleImg) {
+      return `
+        <div class="void-title-anim">
+          <div class="void-title-aura" aria-hidden="true"></div>
+          <img class="rift-title-img tall void-logo-img" src="${assetBase}${site.titleImg}" alt="${site.title}" draggable="false" />
+        </div>
+      `;
+    }
     if (site.titleImg) {
       const cls = site.titleStyle === 'img-tall' ? 'rift-title-img tall' : 'rift-title-img';
       return `<img class="${cls}" src="${assetBase}${site.titleImg}" alt="${site.title}" draggable="false" />`;
@@ -327,16 +238,8 @@ window.LLCRifts = (() => {
         return `<div class="rt-roguelike">ROGUELIKE <span>QUIZ</span></div>`;
       case 'llccards':
         return `<div class="rt-llccards">LLC CARDS</div>`;
-      case 'cast':
-        return `<div class="rt-cast">CAST</div>`;
-      case 'lsu':
-        return `<div class="rt-lsu">LSU</div>`;
       case 'aiquiz':
         return `<div class="rt-aiquiz">AI QUIZ</div>`;
-      case 'escapeca':
-        return `<div class="rt-escapeca">ESCAPE CA</div>`;
-      case 'tung':
-        return `<div class="rt-tung">TALK TO TUNG</div>`;
       case 'gallery':
         return `<div class="rt-gallery">Pixel Art Gallery</div>`;
       case 'typefall':
@@ -357,7 +260,7 @@ window.LLCRifts = (() => {
   }
 
   /* ------------------------------------------------------------------------
-     Pop-Out Characters & Props (Spring Out Past the Crack on Hover)
+     Site-Inspired Pop-Out Pixel & Vector Characters/Props
      ------------------------------------------------------------------------ */
   function pxSvg(rows, pal, w, h) {
     let rects = '';
@@ -381,79 +284,57 @@ window.LLCRifts = (() => {
     }
 
     const PIX_POPS = {
-      forge: {
-        left: pxSvg([
-          '........oo', '.......oGG', '......oGGo', '.....oGGo.', '....oGGo..',
-          '..ooGGo...', '.oMMoo....', '..oBo.....', '.oBBo.....', 'oBBo......',
-        ], { o: '#160a08', G: '#ffcf5c', M: '#ff7b24', B: '#8c5328' }, 10, 10),
-        right: pxSvg([
-          '....oo....', '...oCCo...', '..oCWWCo..', '.oCCWWCCo.',
-          '.oCCCCCCo.', '..oCCCCo..', '...oCCo...', '....oo....',
-        ], { o: '#0b2229', C: '#3ed4d8', W: '#d8ffff' }, 10, 8),
-      },
-      cast: {
-        left: pxSvg([
-          '....oooo....', '..ooTTTTto..', '.oTTWTTTTTo.', 'oTTBTTTTTTTo',
-          '.oTTTTTTTTo.', '..ooTTTTto..', '....oooo....',
-        ], { o: '#03182e', T: '#48cae4', t: '#1b8ab0', W: '#ffffff', B: '#04121f' }, 12, 7),
-        right: pxSvg([
-          '...oo...', '..oRRo..', '.oRRRRo.', '.oWWWWo.', '..oWWo..', '...oo...', '...o....', '...o....',
-        ], { o: '#101820', R: '#e84848', W: '#ffffff' }, 8, 8),
-      },
-      mine: {
-        left: pxSvg([
-          '..oooooo..', '.oYYYYYYo.', '.oYBYBYBo.', '.oYYYYYYo.',
-          '..oGGGGoo.', '.oGGGGGGGo', '.oGGYYGGGo', '..oo..oo..',
-        ], { o: '#1a0e06', Y: '#ffd23a', B: '#0e1620', G: '#7a8a9c' }, 10, 8),
-        right: pxSvg([
-          '..ooooo...', '.oGGGGGoo.', 'oGGo..oBBo', 'oo....oBo.', '.....oBo..', '....oBo...', '...oBo....',
-        ], { o: '#1a0e06', G: '#ffd23a', B: '#9a6234' }, 10, 7),
-      },
       roguelike: {
+        // Isaac golden crown & Slay the Spire emerald energy orb
         left: pxSvg([
-          '....oo....', '...oCCo...', '..oCWWCo..', '.oCCCCCCo.',
-          '.oCCBBCCo.', '.oCCCCCCo.', '..oCCCCo..', '...oooo...',
-        ], { o: '#141a2b', C: '#7bc6ff', W: '#ffffff', B: '#2c5da8' }, 10, 8),
-        right: pxSvg([
           '.oo....oo.', 'oYYo..oYYo', 'oYYYoYYYYo', 'oYRYRYRYRo', 'oYYYYYYYYo', '.oooooooo.',
-        ], { o: '#261408', Y: '#ffd24c', R: '#e63946' }, 10, 6),
+        ], { o: '#1f1208', Y: '#e4ab49', R: '#d85042' }, 10, 6),
+        right: pxSvg([
+          '...oooo...', '.ooGGGGoo.', 'oGGWWWWGGo', 'oGWWGGWWGo', 'oGGGGGGGGo', '.ooGGGGoo.', '...oooo...',
+        ], { o: '#0d2618', G: '#5fc27c', W: '#e4ffe8' }, 10, 7),
       },
       llccards: {
+        // Hand-inked black-and-white LLC Cards deck with crimson #e01b1b emblem
         left: pxSvg([
-          'ooooooo...', 'oWWWWWo...', 'oWBBBWoooo', 'oWBBBWooWo',
-          'oWWWWWoBWo', 'oWWWWWoWWo', 'oooooooWWo', '....oooooo',
-        ], { o: '#000000', W: '#ffffff', B: '#111111' }, 10, 8),
+          'ooooooo...', 'oWWWWWo...', 'oWWRWWoooo', 'oWRRRWooWo',
+          'oWWRWWoRWo', 'oWWWWWoWWo', 'oooooooWWo', '....oooooo',
+        ], { o: '#000000', W: '#ffffff', R: '#e01b1b' }, 10, 8),
         right: pxSvg([
-          '...oo...', '..oWWo..', '.oWWWWo.', 'oWWWWWWo', '.oWWWWo.', '..oWWo..', '...oo...',
-        ], { o: '#000000', W: '#ffffff' }, 8, 7),
+          '...oo...', '..oRRo..', '.oRRRRo.', 'oRRWWRRo', '.oRRRRo.', '..oRRo..', '...oo...',
+        ], { o: '#000000', R: '#e01b1b', W: '#ffffff' }, 8, 7),
+      },
+      mine: {
+        // Mining headlamp robot & gold pickaxe
+        left: pxSvg([
+          '..oooooo..', '.oYYYYYYo.', '.oYBYBYBo.', '.oYYYYYYo.',
+          '..oPPPPoo.', '.oPPPPPPPo', '.oPPYYPPPo', '..oo..oo..',
+        ], { o: '#0c0910', Y: '#ffd23a', B: '#100e12', P: '#7a7288' }, 10, 8),
+        right: pxSvg([
+          '..ooooo...', '.oCCCCCoo.', 'oCCo..oBBo', 'oo....oBo.', '.....oBo..', '....oBo...', '...oBo....',
+        ], { o: '#0c0910', C: '#7fd0ff', B: '#9a6234' }, 10, 7),
       },
       aiquiz: {
+        // Cyan/magenta pixel bot & glitch question mark
         left: pxSvg([
           '....oo....', '.oooooooo.', 'oCCCCCCCCo', 'oCBBCCBBCo',
           'oCCCCCCCCo', 'oCCMMMMCCo', '.oooooooo.',
-        ], { o: '#061428', C: '#7ef3ff', B: '#0a1430', M: '#ff5ad2' }, 10, 7),
+        ], { o: '#05060f', C: '#57f0ff', B: '#080a18', M: '#ff5ad2' }, 10, 7),
         right: pxSvg([
-          '..oooo..', '.oMMMMo.', 'oMMooMMo', '....oMMo', '...oMMo.', '........', '...oCCo.',
-        ], { o: '#061428', M: '#ff5ad2', C: '#7ef3ff' }, 8, 7),
-      },
-      escapeca: {
-        left: pxSvg([
-          '..oooooo..', '.oWWWWWWo.', 'oWWWRRWWWo', 'oWWRRRRWWo', '.oWWWWWWo.', '..oooooo..',
-        ], { o: '#14040a', W: '#f4e8ee', R: '#ff1a3a' }, 10, 6),
-        right: pxSvg([
-          '...oo...', '..oRRo..', '..oRRo..', '..oRRo..', '...oo...', '........', '..oRRo..',
-        ], { o: '#1a040c', R: '#ff2840' }, 8, 7),
+          '..oooo..', '.oMMMMo.', 'oMMooMMo', '....oMMo', '...oMMo.', '........', '...oGGo.',
+        ], { o: '#05060f', M: '#ff5ad2', G: '#7dff8f' }, 8, 7),
       },
       wam: {
+        // Pixel sword & archery target shield
         left: pxSvg([
           '.......oo', '......oWW', '.....oWWo', '....oWWo.', '...oWWo..',
           '.ooWWo...', 'oGGo.....', '.oBo.....', 'oBo......',
-        ], { o: '#111914', W: '#eef6f0', G: '#ffd24c', B: '#8c5630' }, 9, 9),
+        ], { o: '#0a140f', W: '#eef6f0', G: '#ffd24c', B: '#8c5630' }, 9, 9),
         right: pxSvg([
           '..oooo..', '.oGGGGo.', 'oGWWWWGo', '.oGGGGo.', '...oBo..', '...oBo..', '...oBo..', '...oBo..',
-        ], { o: '#111914', G: '#48c774', W: '#d8ffe4', B: '#7d4a26' }, 8, 8),
+        ], { o: '#0a140f', G: '#48c774', W: '#d8ffe4', B: '#7d4a26' }, 8, 8),
       },
       void: {
+        // Void starship & violet event-horizon star
         left: pxSvg([
           '..oooo..', '.oWWWWo.', '.oWCCWo.', '.oWWWWo.', 'ooWWWWoo', '.oWWWWo.', '.oo..oo.',
         ], { o: '#140826', W: '#f4eeff', C: '#62d4ff' }, 8, 7),
@@ -462,6 +343,7 @@ window.LLCRifts = (() => {
         ], { o: '#280d4a', P: '#c04df0', W: '#ffffff' }, 8, 5),
       },
       sea: {
+        // Message bottle & turquoise wave crest
         left: pxSvg([
           '...oo...', '...oCo..', '..oBBo..', '.oBWWBo.', '.oBPPBo.', '.oBPPBo.', '.oBBBBo.', '..oooo..',
         ], { o: '#031e4d', C: '#b87a44', B: '#7ae2f2', W: '#ffffff', P: '#f3dfae' }, 8, 8),
@@ -470,37 +352,31 @@ window.LLCRifts = (() => {
         ], { o: '#031e4d', W: '#e6fbff', B: '#48cae4' }, 10, 4),
       },
       terra: {
+        // Sunlit pixel grass-earth sandbox block & sparkling crystal
         left: pxSvg([
-          '....oooo....', '..ooGGGGoo..', '.oGGBBGGGGo.', 'oBBBGGBBBBBo',
-          'oBBBBGGGGBBo', '.oBBBBGGGGo.', '..ooBBBBoo..', '....oooo....',
-        ], { o: '#121826', G: '#6ab04c', B: '#3b82c4' }, 12, 8),
+          'oooooooo', 'oGGGGGG0', 'oGggggGo', 'oBBgBBBo', 'oBBCBBBo', 'oBBBBYBo', 'oBBBBbBo', 'oooooooo',
+        ], { o: '#1b140c', G: '#62d95c', g: '#3ea83e', B: '#b87644', b: '#875029', C: '#7ff2ff', Y: '#ffd55a', 0: '#1b140c' }, 8, 8),
         right: pxSvg([
-          '..o..', '.oYo.', 'oYWYo', '.oYo.', '..o..',
-        ], { o: '#2b2010', Y: '#ffd55a', W: '#ffffff' }, 5, 5),
-      },
-      tung: {
-        left: pxSvg([
-          '.oooooo.', 'oBBBBBB.', 'oBWBWBB.', 'oBBBBBB.', 'oBooooB.', 'oBBBBBB.', '.oooooo.',
-        ], { o: '#241206', B: '#c68a50', W: '#fff5e0' }, 8, 7),
-        right: pxSvg([
-          'o......o', 'oo.oo.oo', 'oooooooo', '.oooooo.', '..oooo..',
-        ], { o: '#4a2a14' }, 8, 5),
+          '...oo...', '..oCCo..', '.oCWWCo.', 'oCCCCCCo', '.oCCCCo.', '..oCCo..', '...oo...',
+        ], { o: '#0e2838', C: '#66f0ff', W: '#ffffff' }, 8, 7),
       },
       pmuseum: {
+        // Classical stone museum column & golden framed pixel painting (NO robot!)
         left: pxSvg([
-          '...oo...', '..oCCo..', '.oCWWCo.', 'oCCCCCCo', '.oCCCCo.', '..oCCo..', '...oo...',
-        ], { o: '#05222c', C: '#3ad8e0', W: '#d8ffff' }, 8, 7),
+          'oooooooo', 'oSSSSSSo', '.oSwSwo.', '.oSwSwo.', '.oSwSwo.', '.oSwSwo.', 'oSSSSSSo', 'oooooooo',
+        ], { o: '#111d30', S: '#d8e4f0', w: '#9fb4cc' }, 8, 8),
         right: pxSvg([
-          'oYYYYo', '.oYYo.', '.oYYo.', 'oYYYYo', 'oooooo',
-        ], { o: '#241806', Y: '#ffd24c' }, 6, 5),
+          'oooooooo', 'oGGGGGG0', 'oGBBBbGo', 'oGBYYbGo', 'oGCCCCGo', 'oGGGGGG0', 'oooooooo',
+        ], { o: '#1a140c', G: '#ffd24c', B: '#3a7bd5', b: '#2b5ca8', Y: '#fff08a', C: '#58e2ec', 0: '#1a140c' }, 8, 7),
       },
       ddom: {
+        // Warm terracotta Maggie paw & heart photo frame
         left: pxSvg([
           '.oo..oo.', 'oPPooPPo', '.oooooo.', '..oPPo..', '.oPPPPo.', '.oPPPPo.', '..oooo..',
         ], { o: '#2b1a10', P: '#e89b62' }, 8, 7),
         right: pxSvg([
-          'oo..oo', 'oP..Po', '.oooo.', 'oPPPPo', '.oooo.',
-        ], { o: '#2b1a10', P: '#f4c794' }, 6, 5),
+          'oooooooo', 'oWWWWWWo', 'oWPWWPWo', 'oWPPPPWo', 'oWWPPWWo', 'oWWWWWWo', 'oooooooo',
+        ], { o: '#2b1a10', W: '#fdfaf5', P: '#c46835' }, 8, 7),
       },
     };
 
@@ -517,32 +393,29 @@ window.LLCRifts = (() => {
         right: '<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 4l8 4.5v9L14 22l-8-4.5v-9L14 4z" fill="#ece7dc" stroke="#8c7a62" stroke-width="1.4"/><path d="M14 4v9l8-4.5M14 13l-8-4.5" stroke="#b5a58d" stroke-width="1.2"/></svg>',
       },
       atlas: {
-        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 3c-4.4 0-8 3.5-8 7.8 0 5.8 8 14.2 8 14.2s8-8.4 8-14.2C22 6.5 18.4 3 14 3z" fill="#d64538" stroke="#ffffff" stroke-width="1.6"/><circle cx="14" cy="10.8" r="2.8" fill="#ffffff"/></svg>',
-        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="10" fill="#2b6cb0" stroke="#ffffff" stroke-width="1.5"/><path d="M8 11c2-2 5-1 6 1s3 3 6 1M9 17c2-1 4 0 5 2" stroke="#9ae6b4" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>',
+        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 3c-4.4 0-8 3.5-8 7.8 0 5.8 8 14.2 8 14.2s8-8.4 8-14.2C22 6.5 18.4 3 14 3z" fill="#d94f30" stroke="#ffffff" stroke-width="1.6"/><circle cx="14" cy="10.8" r="2.8" fill="#ffffff"/></svg>',
+        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="10" fill="#1d5b96" stroke="#ffffff" stroke-width="1.5"/><path d="M8 11c2-2 5-1 6 1s3 3 6 1M9 17c2-1 4 0 5 2" stroke="#76c47e" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>',
       },
       terrain: {
-        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M3 22L11 8l5 7 3-4 6 11H3z" fill="#3a9d6e" stroke="#ffffff" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 11.5l2-3.5 2.4 3.4-2.2 1.2z" fill="#ffffff"/></svg>',
-        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="9" fill="#68d391" stroke="#ffffff" stroke-width="1.5"/><circle cx="11" cy="11" r="2.5" fill="#d4fce4"/></svg>',
+        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M3 20l7-11 5 6 4-5 6 10H3z" fill="#78a363" stroke="#ffffff" stroke-width="1.4" stroke-linejoin="round"/><path d="M3 20h22v4H3z" fill="#986b47"/></svg>',
+        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><ellipse cx="14" cy="17" rx="10" ry="6" fill="#565452" stroke="#ffffff" stroke-width="1.4"/><ellipse cx="14" cy="13" rx="10" ry="6" fill="#888684" stroke="#ffffff" stroke-width="1.2"/></svg>',
       },
       recommend: {
-        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><polygon points="14,3 17.2,10.2 25,11 19,16.2 20.8,24 14,19.8 7.2,24 9,16.2 3,11 10.8,10.2" fill="#f5c654" stroke="#523712" stroke-width="1.2"/></svg>',
-        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><rect x="4" y="8" width="20" height="14" rx="2" fill="#231f1b" stroke="#e09f3e" stroke-width="1.5"/><path d="M4 12h20M8 8l2 4M14 8l2 4M20 8l2 4" stroke="#e09f3e" stroke-width="1.4"/></svg>',
+        // Midnight-indigo movie clapper & cozy open book
+        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><rect x="4" y="8" width="20" height="14" rx="2" fill="#182a54" stroke="#7aa4ff" stroke-width="1.5"/><path d="M4 12h20M8 8l2 4M14 8l2 4M20 8l2 4" stroke="#ffd875" stroke-width="1.5"/></svg>',
+        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 8c3.5-1.5 7-1.5 10 0 3-1.5 6.5-1.5 10 0v13c-3.5-1.5-7-1.5-10 0-3-1.5-6.5-1.5-10 0V8z" fill="#eef4ff" stroke="#4c6fc4" stroke-width="1.5"/><path d="M14 8v13" stroke="#4c6fc4" stroke-width="1.4"/></svg>',
       },
       typefall: {
         left: '<svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11" fill="#f7f2e7" stroke="#222" stroke-width="1.3"/><text x="14" y="19" text-anchor="middle" font-family="Times New Roman,serif" font-style="italic" font-size="16" fill="#111">a</text></svg>',
         right: '<svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11" fill="#f7f2e7" stroke="#222" stroke-width="1.3"/><text x="14" y="19" text-anchor="middle" font-family="Times New Roman,serif" font-style="italic" font-size="15" fill="#111">g</text></svg>',
       },
       shaders: {
-        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><polygon points="14,2 25,14 14,26 3,14" fill="#081626" stroke="#3ad0f0" stroke-width="1.6"/><polygon points="14,7 20,14 14,21 8,14" fill="none" stroke="#d03af0" stroke-width="1.4"/></svg>',
-        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><rect x="5" y="5" width="12" height="12" fill="none" stroke="#3ad0f0" stroke-width="1.5"/><rect x="11" y="11" width="12" height="12" fill="none" stroke="#ff7cf0" stroke-width="1.5"/></svg>',
-      },
-      lsu: {
-        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="10.5" fill="#ff3d7f" stroke="#ffffff" stroke-width="2"/><text x="14" y="19" text-anchor="middle" font-family="Inter,sans-serif" font-weight="800" font-size="13" fill="#ffffff">1</text></svg>',
-        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="10" fill="none" stroke="#ff3d7f" stroke-width="2.2"/><circle cx="14" cy="14" r="4" fill="#ffffff"/></svg>',
+        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><polygon points="14,2 25,14 14,26 3,14" fill="#060c1c" stroke="#66f0ff" stroke-width="1.6"/><polygon points="14,7 20,14 14,21 8,14" fill="none" stroke="#ff5cf0" stroke-width="1.5"/><polygon points="14,11 17,14 14,17 11,14" fill="#66f0ff"/></svg>',
+        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><polygon points="14,3 24,22 4,22" fill="none" stroke="#66f0ff" stroke-width="1.6"/><polygon points="14,11 19,20 9,20" fill="none" stroke="#ff5cf0" stroke-width="1.4"/></svg>',
       },
       channels: {
         left: '<svg viewBox="0 0 28 24" aria-hidden="true"><rect x="2" y="3" width="24" height="18" rx="5" fill="#ff0033" stroke="#ffffff" stroke-width="1.4"/><polygon points="11.5,8.2 18.5,12 11.5,15.8" fill="#ffffff"/></svg>',
-        right: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="#ff0033" stroke="#ffffff" stroke-width="1.5"/><circle cx="12" cy="12" r="2.8" fill="#ffffff"/></svg>',
+        right: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="#38e1d0" stroke="#ffffff" stroke-width="1.5"/><circle cx="12" cy="12" r="2.8" fill="#07050f"/></svg>',
       },
     };
 
@@ -555,7 +428,220 @@ window.LLCRifts = (() => {
   }
 
   /* ------------------------------------------------------------------------
-     23 Deeply Authentic, Site-Specific Live Mini-World Animations
+     Real Satellite Earth Texture Loader (for Atlas) & Fractal Offscreen Buffer
+     ------------------------------------------------------------------------ */
+  let earthTexData = null;
+  let earthTexW = 0;
+  let earthTexH = 0;
+  let earthLoadedBase = null;
+  let globeBuf = null;
+  let globeCtx = null;
+  let globeImg = null;
+  const GLOBE_SZ = 112;
+
+  function ensureEarthTexture(assetBase) {
+    if (earthLoadedBase === assetBase) return;
+    earthLoadedBase = assetBase;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth || 360;
+      c.height = img.naturalHeight || 180;
+      const g = c.getContext('2d');
+      g.drawImage(img, 0, 0, c.width, c.height);
+      try {
+        const id = g.getImageData(0, 0, c.width, c.height);
+        earthTexData = id.data;
+        earthTexW = c.width;
+        earthTexH = c.height;
+      } catch (_) {}
+    };
+    img.src = `${assetBase}world/titles/earth-tex.jpg`;
+  }
+
+  function renderRealisticGlobe(t) {
+    if (!globeBuf) {
+      globeBuf = document.createElement('canvas');
+      globeBuf.width = GLOBE_SZ;
+      globeBuf.height = GLOBE_SZ;
+      globeCtx = globeBuf.getContext('2d');
+      globeImg = globeCtx.createImageData(GLOBE_SZ, GLOBE_SZ);
+    }
+    const out = globeImg.data;
+    const half = GLOBE_SZ * 0.5;
+    const invR = 1 / (half - 2);
+    const rot = t * 0.28;
+    // Directional sunlight from upper-left-front
+    const lx = -0.45, ly = -0.35, lz = 0.82;
+
+    for (let py = 0; py < GLOBE_SZ; py++) {
+      const ny = (py + 0.5 - half) * invR;
+      const ny2 = ny * ny;
+      for (let px = 0; px < GLOBE_SZ; px++) {
+        const nx = (px + 0.5 - half) * invR;
+        const r2 = nx * nx + ny2;
+        const idx = (py * GLOBE_SZ + px) * 4;
+        if (r2 >= 1) {
+          out[idx + 3] = 0;
+          continue;
+        }
+        const nz = Math.sqrt(1 - r2);
+        // Spherical coordinates (tilt slightly ~16 deg so northern continents show clearly)
+        const tilt = 0.26;
+        const ty = ny * Math.cos(tilt) - nz * Math.sin(tilt);
+        const tz = ny * Math.sin(tilt) + nz * Math.cos(tilt);
+        const lat = Math.asin(Math.max(-1, Math.min(1, -ty)));
+        const lon = Math.atan2(nx, tz) + rot;
+
+        let sr = 32, sg = 92, sb = 158;
+        if (earthTexData) {
+          let u = (lon / (Math.PI * 2) + 0.5) % 1;
+          if (u < 0) u += 1;
+          const v = 0.5 - lat / Math.PI;
+          const tx = Math.min(earthTexW - 1, Math.max(0, (u * earthTexW) | 0));
+          const tyi = Math.min(earthTexH - 1, Math.max(0, (v * earthTexH) | 0));
+          const tidx = (tyi * earthTexW + tx) * 4;
+          sr = earthTexData[tidx];
+          sg = earthTexData[tidx + 1];
+          sb = earthTexData[tidx + 2];
+        }
+
+        // Subtle animated drifting cloud wisps
+        const cloudN = Math.sin(lon * 3.4 - t * 0.14 + Math.cos(lat * 5.2) * 1.4) * Math.cos(lat * 4.3 + lon * 2.1);
+        const cloud = cloudN > 0.52 ? Math.min(0.46, (cloudN - 0.52) * 1.1) : 0;
+        sr = sr * (1 - cloud) + 245 * cloud;
+        sg = sg * (1 - cloud) + 250 * cloud;
+        sb = sb * (1 - cloud) + 255 * cloud;
+
+        // Soft Lambertian daylight shading + subtle atmospheric blue Fresnel rim
+        const ndotl = Math.max(0, nx * lx + ny * ly + nz * lz);
+        const shade = 0.42 + 0.72 * ndotl;
+        const rim = Math.pow(1 - nz, 2.6);
+
+        let fr = sr * shade + 76 * rim;
+        let fg = sg * shade + 158 * rim;
+        let fb = sb * shade + 242 * rim;
+
+        // Crisp anti-aliased sphere edge
+        const edgeA = r2 > 0.94 ? Math.max(0, Math.min(1, (1 - Math.sqrt(r2)) / 0.03)) : 1;
+        out[idx] = Math.min(255, fr) | 0;
+        out[idx + 1] = Math.min(255, fg) | 0;
+        out[idx + 2] = Math.min(255, fb) | 0;
+        out[idx + 3] = (edgeA * 255) | 0;
+      }
+    }
+    globeCtx.putImageData(globeImg, 0, 0);
+    return globeBuf;
+  }
+
+  // Real-time animated Julia Set Fractal buffer (for lan4drcy)
+  let fracBuf = null;
+  let fracCtx = null;
+  let fracImg = null;
+  const FRAC_W = 132;
+  const FRAC_H = 52;
+
+  function renderFractalBuffer(t) {
+    if (!fracBuf) {
+      fracBuf = document.createElement('canvas');
+      fracBuf.width = FRAC_W;
+      fracBuf.height = FRAC_H;
+      fracCtx = fracBuf.getContext('2d');
+      fracImg = fracCtx.createImageData(FRAC_W, FRAC_H);
+    }
+    const data = fracImg.data;
+    // Smoothly orbit classic electric Julia fractal parameter
+    const ang = t * 0.42;
+    const cr = -0.745 + 0.095 * Math.cos(ang);
+    const ci = 0.185 + 0.095 * Math.sin(ang * 1.15);
+    const scale = 1.48 + 0.18 * Math.sin(t * 0.55);
+    const maxIter = 26;
+
+    for (let py = 0; py < FRAC_H; py++) {
+      const zy0 = ((py / FRAC_H) - 0.5) * 2.0 * scale;
+      for (let px = 0; px < FRAC_W; px++) {
+        const zx0 = ((px / FRAC_W) - 0.5) * 3.4 * scale;
+        let zx = zx0;
+        let zy = zy0;
+        let iter = 0;
+        let zx2 = zx * zx;
+        let zy2 = zy * zy;
+        while (zx2 + zy2 < 4.0 && iter < maxIter) {
+          zy = 2 * zx * zy + ci;
+          zx = zx2 - zy2 + cr;
+          zx2 = zx * zx;
+          zy2 = zy * zy;
+          iter++;
+        }
+        const idx = (py * FRAC_W + px) * 4;
+        if (iter === maxIter) {
+          // Deep lan4drcy void core
+          data[idx] = 4;
+          data[idx + 1] = 8;
+          data[idx + 2] = 20;
+          data[idx + 3] = 255;
+        } else {
+          // Smooth escape-time neon palette: #03060c -> deep violet -> #66f0ff cyan -> #ff5cf0 magenta
+          const mu = (iter + 1 - Math.log2(Math.log2(zx2 + zy2 + 1e-6))) / maxIter;
+          const phase = mu * 6.28318 + t * 0.7;
+          const c1 = 0.5 + 0.5 * Math.sin(phase);
+          const c2 = 0.5 + 0.5 * Math.cos(phase * 1.35 + 1.1);
+          const glow = Math.pow(mu, 0.72);
+          data[idx] = Math.min(255, (14 + glow * (220 * c2 + 40 * c1))) | 0;
+          data[idx + 1] = Math.min(255, (16 + glow * (235 * c1 + 45 * c2))) | 0;
+          data[idx + 2] = Math.min(255, (38 + glow * (245))) | 0;
+          data[idx + 3] = 255;
+        }
+      }
+    }
+    fracCtx.putImageData(fracImg, 0, 0);
+    return fracBuf;
+  }
+
+  /* ------------------------------------------------------------------------
+     2.5D Smooth Sculpted Plateau Helper (for Smooth Terrain Studio)
+     ------------------------------------------------------------------------ */
+  function drawBlobPath(ctx, cx, cy, rx, ry, lobes, phase) {
+    ctx.beginPath();
+    const steps = 40;
+    for (let i = 0; i <= steps; i++) {
+      const a = (i / steps) * Math.PI * 2;
+      const w = 1 + 0.14 * Math.sin(a * lobes + phase) + 0.08 * Math.cos(a * (lobes + 2) - phase * 0.7);
+      const x = cx + Math.cos(a) * rx * w;
+      const y = cy + Math.sin(a) * ry * w;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+  }
+
+  function draw25DPlateau(ctx, cx, cy, rx, ry, lobes, phase, cliffH, topColor, wallColor, lipColor) {
+    // Soft ambient contact shadow
+    ctx.save();
+    ctx.fillStyle = 'rgba(42, 34, 24, 0.18)';
+    drawBlobPath(ctx, cx + 3, cy + cliffH + 5, rx * 1.03, ry * 1.03, lobes, phase);
+    ctx.fill();
+    // Vertical 2.5D cliff wall
+    ctx.fillStyle = wallColor;
+    drawBlobPath(ctx, cx, cy + cliffH, rx, ry, lobes, phase);
+    ctx.fill();
+    // Mid cliff fill for seamless vertical extrusion
+    drawBlobPath(ctx, cx, cy + cliffH * 0.5, rx, ry, lobes, phase);
+    ctx.fill();
+    // Top sculpted terrain surface
+    ctx.fillStyle = topColor;
+    drawBlobPath(ctx, cx, cy, rx, ry, lobes, phase);
+    ctx.fill();
+    // Sunlit top bevel rim
+    ctx.strokeStyle = lipColor;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ------------------------------------------------------------------------
+     18 Authentic, Site-Matched Live Mini-World Animations
      ------------------------------------------------------------------------ */
   function hash(n) {
     const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
@@ -569,8 +655,224 @@ window.LLCRifts = (() => {
     ctx.imageSmoothingEnabled = !isPixel;
 
     switch (scene) {
+      case 'roguelike': {
+        // Real roguelike-quiz palette (#14100d / #1d1612 warm dark parchment-dungeon + #d85042 crimson + #e4ab49 gold + #5fc27c emerald)
+        ctx.fillStyle = '#17110d';
+        ctx.fillRect(0, 0, W, H);
+        // Subtle dungeon stone floor tiles
+        ctx.fillStyle = '#201813';
+        for (let y = 0; y < H; y += 10) {
+          for (let x = 0; x < W; x += 14) {
+            if (((x / 14 + y / 10) | 0) % 2 === 0) ctx.fillRect(x, y, 13, 9);
+          }
+        }
+        // Warm crimson-gold Isaac pedestal glow on left
+        const fl = 0.82 + 0.18 * Math.sin(t * 7);
+        ctx.fillStyle = `rgba(216, 80, 66, ${0.22 * fl})`;
+        ctx.fillRect(6, 8, 34, H - 16);
+        // Pixel Isaac item pedestal on left
+        const py = H - 13;
+        ctx.fillStyle = '#78685c';
+        ctx.fillRect(16, py, 12, 8);
+        ctx.fillStyle = '#a89688';
+        ctx.fillRect(15, py - 2, 14, 3);
+        // Bobbing golden relic/item above pedestal
+        const bob = Math.round(Math.sin(t * 3.4) * 2);
+        ctx.fillStyle = '#e4ab49';
+        ctx.fillRect(19, py - 10 + bob, 6, 5);
+        ctx.fillStyle = '#fff3b8';
+        ctx.fillRect(21, py - 9 + bob, 2, 2);
+
+        // Slay the Spire emerald aura & floating fanned cards on right
+        ctx.fillStyle = `rgba(95, 194, 124, ${0.18 * fl})`;
+        ctx.fillRect(W - 44, 8, 38, H - 16);
+        for (let i = 0; i < 3; i++) {
+          const cx = W - 36 + i * 9;
+          const cy = Math.floor(H * 0.34 + Math.sin(t * 2.8 + i * 1.2) * 3 + (i % 2) * 4);
+          ctx.fillStyle = i === 1 ? '#5fc27c' : '#e4ab49';
+          ctx.fillRect(cx, cy, 7, 10);
+          ctx.fillStyle = '#1d1612';
+          ctx.fillRect(cx + 1, cy + 1, 5, 8);
+          ctx.fillStyle = i === 0 ? '#d85042' : '#5fc27c';
+          ctx.fillRect(cx + 2, cy + 3, 3, 3);
+        }
+        // Subtle drifting gold dust motes
+        for (let i = 0; i < 10; i++) {
+          const mx = Math.floor(hash(i * 3) * W);
+          const my = Math.floor(H - ((t * 8 + hash(i) * H) % H));
+          ctx.fillStyle = i % 2 === 0 ? 'rgba(228,171,73,0.75)' : 'rgba(95,194,124,0.65)';
+          ctx.fillRect(mx, my, 1, 1);
+        }
+        break;
+      }
+
+      case 'llccards': {
+        // Authentic LLC Cards stark black-and-white hand-inked table + crimson #e01b1b card accents
+        ctx.fillStyle = '#141418';
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = '#202028';
+        for (let x = -H; x < W + H; x += 10) {
+          for (let y = 0; y < H; y += 2) ctx.fillRect(x + (y >> 1), y, 1, 1);
+        }
+        // Fanned monochrome + crimson cards framing outer left & right flanks
+        for (let i = 0; i < 4; i++) {
+          const side = i < 2 ? 10 + i * 10 : W - 29 + (i - 2) * 10;
+          const bob = Math.round(Math.sin(t * 2.8 + i * 1.3) * 4);
+          const cy = Math.floor(H * 0.30 + (i % 2) * 10 + bob);
+          ctx.fillStyle = '#f4f4f8';
+          ctx.fillRect(side, cy, 8, 11);
+          ctx.fillStyle = '#141418';
+          ctx.fillRect(side + 1, cy + 1, 6, 9);
+          ctx.fillStyle = i % 2 === 0 ? '#e01b1b' : '#ffffff';
+          ctx.fillRect(side + 3, cy + 4, 2, 3);
+        }
+        break;
+      }
+
+      case 'mine': {
+        // Real MINE palette: deep slate-purple cavern rock (#100e12 / #1a161e / #2e2834) + gold #ffd23a + cyan #7fd0ff ore + headlamp bots
+        ctx.fillStyle = '#100e12';
+        ctx.fillRect(0, 0, W, H);
+        for (let y = 0; y < H; y += 9) {
+          ctx.fillStyle = y < H * 0.35 ? '#1a161e' : y < H * 0.7 ? '#241e2b' : '#2e2834';
+          ctx.fillRect(0, y, W, 8);
+          ctx.fillStyle = '#07060a';
+          ctx.fillRect(0, y + 8, W, 1);
+        }
+        // Gleaming gold & cyan diamond ore flecks
+        for (let i = 0; i < 16; i++) {
+          const ox = Math.floor(hash(i + 2) * (W - 4)) + 2;
+          const oy = Math.floor(hash(i + 15) * (H - 4)) + 2;
+          const gl = Math.sin(t * 4.5 + i * 1.4) > 0.45;
+          ctx.fillStyle = i % 3 === 0 ? (gl ? '#ffffff' : '#7fd0ff') : (gl ? '#fff2a6' : '#ffd23a');
+          ctx.fillRect(ox, oy, 2, 2);
+        }
+        // Two pixel mining robots cruising tunnels with golden headlamp cones
+        for (let r = 0; r < 2; r++) {
+          const dir = r === 0 ? 1 : -1;
+          const ry = r === 0 ? Math.floor(H * 0.30) : Math.floor(H * 0.74);
+          const prog = (t * (0.22 + r * 0.05) + r * 0.5) % 1;
+          const rx = Math.floor(dir > 0 ? prog * (W + 16) - 8 : W + 8 - prog * (W + 16));
+          ctx.fillStyle = 'rgba(255, 210, 58, 0.22)';
+          ctx.fillRect(dir > 0 ? rx + 4 : rx - 14, ry - 2, 14, 7);
+          ctx.fillStyle = '#ffd23a';
+          ctx.fillRect(rx, ry, 4, 4);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(dir > 0 ? rx + 3 : rx, ry + 1, 1, 1);
+        }
+        break;
+      }
+
+      case 'aiquiz': {
+        // Real AI Quiz palette (#080a18 / #10142c + #57f0ff cyan + #ff5ad2 magenta + #7dff8f mint)
+        const split = Math.floor(W * 0.5 + Math.sin(t * 1.4) * (W * 0.16));
+        ctx.fillStyle = '#080a18';
+        ctx.fillRect(0, 0, W, H);
+        // Left: pixel-art landscape side
+        ctx.fillStyle = '#122244';
+        ctx.fillRect(0, 0, split, H);
+        ctx.fillStyle = '#1c5c52';
+        ctx.fillRect(0, Math.floor(H * 0.65), split, H);
+        ctx.fillStyle = '#7dff8f';
+        ctx.fillRect(0, Math.floor(H * 0.65), split, 2);
+        ctx.fillStyle = '#ffd866';
+        ctx.fillRect(14, 10, 6, 6);
+        // Right: neon AI neural grid
+        ctx.fillStyle = '#150d2b';
+        ctx.fillRect(split, 0, W - split, H);
+        ctx.fillStyle = 'rgba(255, 90, 210, 0.24)';
+        for (let x = split; x < W; x += 8) ctx.fillRect(x, 0, 1, H);
+        for (let y = 0; y < H; y += 8) ctx.fillRect(split, y, W - split, 1);
+        for (let i = 0; i < 6; i++) {
+          const nx = split + 6 + Math.floor(hash(i + 4) * Math.max(8, W - split - 10));
+          const ny = Math.floor(hash(i + 12) * (H - 6)) + 3;
+          ctx.fillStyle = i % 2 === 0 ? '#57f0ff' : '#ff5ad2';
+          ctx.fillRect(nx, ny, 2, 2);
+        }
+        // Sweeping cyan-white scanner beam
+        ctx.fillStyle = '#57f0ff';
+        ctx.fillRect(split - 1, 0, 2, H);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(split, 0, 1, H);
+        break;
+      }
+
+      case 'wam': {
+        // Real W.A.M. dark arcade forest arena with timing bar & zipping pixel arrow
+        ctx.fillStyle = '#0d1c15';
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = '#142b1f';
+        for (let y = 0; y < H; y += 10) for (let x = 0; x < W; x += 12) {
+          if (((x / 12 + y / 10) | 0) % 2 === 0) ctx.fillRect(x, y, 12, 10);
+        }
+        // Retro arcade timing bar at bottom
+        const barY = H - 9;
+        const barW = Math.floor(W * 0.56);
+        const barX = Math.floor((W - barW) * 0.5);
+        ctx.fillStyle = '#060f0a';
+        ctx.fillRect(barX, barY, barW, 5);
+        ctx.fillStyle = '#48c774';
+        ctx.fillRect(barX + Math.floor(barW * 0.36), barY + 1, Math.floor(barW * 0.28), 3);
+        ctx.fillStyle = '#ffd24c';
+        ctx.fillRect(barX + Math.floor(barW * 0.46), barY + 1, Math.floor(barW * 0.08), 3);
+        const curX = barX + Math.floor((0.5 + 0.46 * Math.sin(t * 3.8)) * barW);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(curX, barY - 1, 2, 7);
+        // Zipping pixel arrow across top
+        const ax = Math.floor(((t * 62) % (W + 24)) - 12);
+        const ay = 10;
+        ctx.fillStyle = '#e8f5ec';
+        ctx.fillRect(ax, ay, 8, 1);
+        ctx.fillStyle = '#ffd24c';
+        ctx.fillRect(ax + 7, ay - 1, 2, 3);
+        break;
+      }
+
+      case 'void': {
+        // Deep cosmic space + swirling violet-cyan accretion ring particles orbiting right behind THE VOID's black hole O!
+        ctx.fillStyle = '#05020d';
+        ctx.fillRect(0, 0, W, H);
+        const cx = Math.floor(W * 0.5);
+        const cy = Math.floor(H * 0.54);
+        // Subtle pulsing purple nebula glow
+        const p = 0.5 + 0.5 * Math.sin(t * 2.4);
+        const ng = ctx.createRadialGradient(cx, cy, 4, cx, cy, W * 0.45);
+        ng.addColorStop(0, `rgba(192, 77, 240, ${0.28 + 0.12 * p})`);
+        ng.addColorStop(0.55, 'rgba(72, 22, 130, 0.16)');
+        ng.addColorStop(1, 'rgba(5, 2, 13, 0)');
+        ctx.fillStyle = ng;
+        ctx.fillRect(0, 0, W, H);
+
+        // Swirling accretion-disk stars spiraling around the Void black hole!
+        for (let i = 0; i < 24; i++) {
+          const orbit = 14 + (i % 6) * 8;
+          const ang = t * (1.25 - (i % 5) * 0.14) + i * 0.85;
+          const sx = Math.floor(cx + Math.cos(ang) * orbit * 1.8);
+          const sy = Math.floor(cy + Math.sin(ang) * orbit * 0.62);
+          ctx.fillStyle = i % 3 === 0 ? '#c04df0' : i % 3 === 1 ? '#62d4ff' : '#ffffff';
+          ctx.fillRect(sx, sy, i % 4 === 0 ? 2 : 1, 1);
+        }
+        // Distant twinkling starfield
+        for (let i = 0; i < 20; i++) {
+          const sx = Math.floor(hash(i + 3) * W);
+          const sy = Math.floor(hash(i + 21) * H);
+          const tw = 0.35 + 0.65 * Math.abs(Math.sin(t * 2.8 + i));
+          ctx.fillStyle = `rgba(220, 200, 255, ${tw})`;
+          ctx.fillRect(sx, sy, 1, 1);
+        }
+        // Gliding Void pixel spaceship
+        const shx = Math.floor(((t * 24) % (W + 20)) - 10);
+        const shy = Math.floor(11 + Math.sin(t * 3) * 3);
+        ctx.fillStyle = '#62d4ff';
+        ctx.fillRect(shx - 4, shy + 1, 4, 1);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(shx, shy, 5, 3);
+        ctx.fillRect(shx + 5, shy + 1, 2, 1);
+        break;
+      }
+
       case 'ashaad': {
-        // Real basement dungeon room + flickering corner torches + horizontal flying Isaac tears & splashes!
+        // Real basement dungeon bricks + flickering corner torches + horizontal flying blue tears!
         ctx.fillStyle = '#3b200f';
         ctx.fillRect(0, 0, W, H);
         ctx.fillStyle = '#2a1409';
@@ -579,11 +881,10 @@ window.LLCRifts = (() => {
           const off = ((y / 11) | 0) % 2 === 0 ? 0 : 8;
           for (let x = off; x < W; x += 16) ctx.fillRect(x, y, 1, 11);
         }
-        // Flickering corner basement torches
         const fl = 0.8 + 0.2 * Math.sin(t * 11);
         for (const cx of [18, W - 20]) {
-          const cy = H - 15;
-          ctx.fillStyle = `rgba(255, 160, 48, ${0.26 * fl})`;
+          const cy = H - 14;
+          ctx.fillStyle = `rgba(255, 160, 48, ${0.28 * fl})`;
           ctx.fillRect(cx - 12, cy - 11, 24, 22);
           ctx.fillStyle = '#e8dcc0';
           ctx.fillRect(cx - 1, cy + 2, 3, 7);
@@ -592,780 +893,565 @@ window.LLCRifts = (() => {
           ctx.fillStyle = '#fff19c';
           ctx.fillRect(cx, cy - 2 - (((t * 7) | 0) % 2), 1, 2);
         }
-        // Horizontal flying blue tears shooting across the dungeon & splashing!
         for (let i = 0; i < 4; i++) {
           const prog = (t * 0.55 + i * 0.27) % 1;
           const dir = i % 2 === 0 ? 1 : -1;
           const tx = Math.floor(dir > 0 ? 12 + prog * (W - 24) : W - 12 - prog * (W - 24));
           const ty = Math.floor(14 + (i * 11) % (H - 26) + Math.sin(prog * Math.PI) * -5);
-          if (prog > 0.9) {
-            ctx.fillStyle = '#a8ebff';
-            ctx.fillRect(tx - 2, ty - 2, 1, 1);
-            ctx.fillRect(tx + 2, ty - 1, 1, 1);
-            ctx.fillRect(tx - 1, ty + 2, 1, 1);
-          } else {
-            ctx.fillStyle = '#48a8e8';
-            ctx.fillRect(tx - 2, ty - 1, 4, 3);
-            ctx.fillStyle = '#d8f6ff';
-            ctx.fillRect(tx - 1, ty - 1, 2, 1);
-          }
+          ctx.fillStyle = '#48a8e8';
+          ctx.fillRect(tx - 2, ty - 1, 4, 3);
+          ctx.fillStyle = '#d8f6ff';
+          ctx.fillRect(tx - 1, ty - 1, 2, 1);
         }
-        break;
-      }
-
-      case 'forge': {
-        // Volcanic smithy hearth + glowing anvil + periodic hammer strike spark burst + cyan rune pulse!
-        const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, '#160b10');
-        g.addColorStop(0.55, '#3b1510');
-        g.addColorStop(1, '#8c2d0e');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, W, H);
-        ctx.fillStyle = 'rgba(0,0,0,0.22)';
-        for (let y = 0; y < H; y += 8) ctx.fillRect(0, y, W, 1);
-        // Hammer strike burst cadence every 1.4s on the left anvil
-        const strike = (t * 0.72) % 1;
-        const ax = 28, ay = H - 11;
-        ctx.fillStyle = '#241a1d';
-        ctx.fillRect(ax - 7, ay, 14, 4);
-        ctx.fillRect(ax - 4, ay + 4, 8, 5);
-        // Hot glowing ingot
-        ctx.fillStyle = strike < 0.25 ? '#ffffff' : '#ff9830';
-        ctx.fillRect(ax - 4, ay - 2, 8, 2);
-        // Explosive sparks flying outward right after hammer strike
-        if (strike < 0.65) {
-          for (let i = 0; i < 10; i++) {
-            const ang = -Math.PI * (0.15 + hash(i + 2) * 0.7);
-            const spd = 16 + hash(i + 8) * 26;
-            const sx = Math.floor(ax + Math.cos(ang) * spd * strike);
-            const sy = Math.floor(ay - 2 + Math.sin(ang) * spd * strike + 26 * strike * strike);
-            ctx.fillStyle = i % 3 === 0 ? '#ffffff' : '#ffbe42';
-            ctx.fillRect(sx, sy, 2, 2);
-          }
-        }
-        // Pulsing cyan enchantment rune on right
-        const rp = 0.4 + 0.6 * Math.sin(t * 3.5);
-        ctx.fillStyle = `rgba(62, 212, 216, ${rp * 0.5})`;
-        ctx.fillRect(W - 34, Math.floor(H * 0.35), 14, 14);
-        ctx.fillStyle = '#a8ffff';
-        ctx.fillRect(W - 29, Math.floor(H * 0.35) + 5, 4, 4);
-        // Rising forge embers
-        for (let i = 0; i < 12; i++) {
-          const x = Math.floor(hash(i * 3) * W + Math.sin(t * 2 + i) * 3);
-          const y = Math.floor(H - ((t * (11 + (i % 4) * 3) + hash(i) * H) % (H + 4)));
-          ctx.fillStyle = i % 2 === 0 ? '#ffd85c' : '#ff6b1a';
-          ctx.fillRect(x, y, 2, 2);
-        }
-        break;
-      }
-
-      case 'roguelike': {
-        // Left: flickering crimson Isaac basement + blue tears | Right: Slay the Spire emerald energy & drifting relic cards!
-        const g = ctx.createLinearGradient(0, 0, W, 0);
-        g.addColorStop(0, '#301018');
-        g.addColorStop(0.5, '#191124');
-        g.addColorStop(1, '#0d2b24');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, W, H);
-        ctx.fillStyle = 'rgba(255,255,255,0.04)';
-        for (let y = 0; y < H; y += 9) for (let x = 0; x < W; x += 12) {
-          if (((x + y) / 3) % 2 === 0) ctx.fillRect(x, y, 11, 8);
-        }
-        // Left side flying Isaac tears
-        for (let i = 0; i < 4; i++) {
-          const tx = Math.floor(10 + ((t * 26 + i * 22) % (W * 0.44)));
-          const ty = Math.floor(12 + (i * 13) % (H - 22));
-          ctx.fillStyle = '#78ceff';
-          ctx.fillRect(tx, ty, 3, 2);
-        }
-        // Right side drifting Spire relic cards & emerald lightning sparks
-        for (let i = 0; i < 4; i++) {
-          const cx = Math.floor(W * 0.56 + hash(i + 3) * (W * 0.36));
-          const cy = Math.floor(10 + hash(i + 7) * (H - 22) + Math.sin(t * 2.5 + i) * 3);
-          ctx.fillStyle = '#4ae3b5';
-          ctx.fillRect(cx, cy, 5, 7);
-          ctx.fillStyle = '#122e28';
-          ctx.fillRect(cx + 1, cy + 1, 3, 5);
-          ctx.fillStyle = '#ffd24c';
-          ctx.fillRect(cx + 2, cy + 3, 1, 1);
-        }
-        break;
-      }
-
-      case 'llccards': {
-        // Hand-inked stark black-and-white TCG table with animated fanning & flipping monochrome cards!
-        ctx.fillStyle = '#141418';
-        ctx.fillRect(0, 0, W, H);
-        ctx.fillStyle = '#222229';
-        for (let x = -H; x < W + H; x += 10) {
-          for (let y = 0; y < H; y += 2) ctx.fillRect(x + (y >> 1), y, 1, 1);
-        }
-        // Fanned flipping monochrome cards framing the outer left & right flanks
-        for (let i = 0; i < 4; i++) {
-          const side = i < 2 ? 9 + i * 9 : W - 27 + (i - 2) * 9;
-          const bob = Math.round(Math.sin(t * 2.8 + i * 1.3) * 4);
-          const cy = Math.floor(H * 0.30 + (i % 2) * 11 + bob);
-          ctx.fillStyle = 'rgba(235, 235, 242, 0.68)';
-          ctx.fillRect(side, cy, 7, 10);
-          ctx.fillStyle = '#141418';
-          ctx.fillRect(side + 1, cy + 1, 5, 8);
-          ctx.fillStyle = 'rgba(235, 235, 242, 0.68)';
-          ctx.fillRect(side + 3, cy + 3, 1, 4);
-        }
-        break;
-      }
-
-      case 'cast': {
-        // Real dock fishing scene: dock planks, taut diagonal fishing line to bobbing red/white bobber, expanding ripples & darting fish!
-        ctx.fillStyle = '#072240';
-        ctx.fillRect(0, 0, W, Math.floor(H * 0.42));
-        ctx.fillStyle = '#0d4772';
-        ctx.fillRect(0, Math.floor(H * 0.42), W, H);
-        // Twinkling twilight stars
-        ctx.fillStyle = '#d8f6ff';
-        for (let i = 0; i < 10; i++) ctx.fillRect(Math.floor(hash(i + 5) * W), Math.floor(hash(i + 12) * H * 0.35), 1, 1);
-        // Wooden dock left
-        ctx.fillStyle = '#734824';
-        ctx.fillRect(0, Math.floor(H * 0.44), 26, 6);
-        ctx.fillStyle = '#4e2e14';
-        ctx.fillRect(6, Math.floor(H * 0.5), 3, H);
-        ctx.fillRect(19, Math.floor(H * 0.5), 3, H);
-        // Fishing rod tip + bobbing red-and-white bobber on the right!
-        const bx = W - 34;
-        const bite = Math.sin(t * 5.2) > 0.72 ? 2 : Math.round(Math.sin(t * 2.4));
-        const by = Math.floor(H * 0.58) + bite;
-        ctx.strokeStyle = 'rgba(220, 248, 255, 0.55)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(25, Math.floor(H * 0.34));
-        ctx.quadraticCurveTo(W * 0.46, Math.floor(H * 0.48), bx, by);
-        ctx.stroke();
-        // Expanding water ripple around bobber
-        const rr = 3 + ((t * 10) % 10);
-        ctx.fillStyle = 'rgba(130, 232, 248, 0.55)';
-        ctx.fillRect(Math.floor(bx - rr), by + 2, Math.floor(rr * 2), 1);
-        ctx.fillStyle = '#e84848';
-        ctx.fillRect(bx - 1, by - 2, 3, 2);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(bx - 1, by, 3, 2);
-        // Swimming fish silhouette gliding below surface
-        const fx = Math.floor((t * 18) % (W + 16)) - 8;
-        const fy = Math.floor(H * 0.78 + Math.sin(t * 3) * 2);
-        ctx.fillStyle = '#2da8cc';
-        ctx.fillRect(fx, fy, 7, 3);
-        ctx.fillRect(fx - 2, fy - 1, 2, 5);
-        break;
-      }
-
-      case 'mine': {
-        // Active robot excavation shaft: yellow pixel robots rolling through tunnels with sweeping headlamp beams & sparkling ore!
-        const bands = ['#3b2414', '#2e1b0f', '#23140b', '#190e07'];
-        const bh = Math.ceil(H / bands.length);
-        bands.forEach((c, idx) => { ctx.fillStyle = c; ctx.fillRect(0, idx * bh, W, bh); });
-        // Two carved mine shafts
-        const y1 = Math.floor(H * 0.24), y2 = Math.floor(H * 0.68);
-        ctx.fillStyle = '#100805';
-        ctx.fillRect(6, y1, W - 12, 11);
-        ctx.fillRect(10, y2, W - 20, 11);
-        // Tiny yellow mining robots driving back & forth with warm headlamp cones!
-        const r1x = Math.floor(14 + ((t * 22) % (W - 32)));
-        ctx.fillStyle = 'rgba(255, 236, 130, 0.25)';
-        ctx.fillRect(r1x + 5, y1 + 1, 14, 8);
-        ctx.fillStyle = '#ffd23a';
-        ctx.fillRect(r1x, y1 + 3, 5, 5);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(r1x + 4, y1 + 4, 2, 2);
-
-        const r2x = Math.floor(W - 18 - ((t * 17 + 40) % (W - 34)));
-        ctx.fillStyle = 'rgba(255, 236, 130, 0.25)';
-        ctx.fillRect(r2x - 14, y2 + 1, 14, 8);
-        ctx.fillStyle = '#e89b38';
-        ctx.fillRect(r2x, y2 + 3, 5, 5);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(r2x - 1, y2 + 4, 2, 2);
-        // Sparkling ore veins
-        for (let i = 0; i < 14; i++) {
-          const ox = Math.floor(hash(i + 2) * (W - 8) + 4);
-          const oy = Math.floor(hash(i + 15) * (H - 6) + 3);
-          ctx.fillStyle = i % 4 === 0 ? '#4ad4a8' : Math.sin(t * 5 + i) > 0.4 ? '#fff2a6' : '#e6a832';
-          ctx.fillRect(ox, oy, 2, 2);
-        }
-        break;
-      }
-
-      case 'lsu': {
-        // Real LSU rhythm gameplay: pink hit circles with shrinking white approach rings & snapping hit flashes!
-        const g = ctx.createRadialGradient(W * 0.5, H * 0.5, 10, W * 0.5, H * 0.5, W * 0.65);
-        g.addColorStop(0, '#2e0824');
-        g.addColorStop(1, '#0c030c');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, W, H);
-        const spots = [[0.14, 0.36], [0.24, 0.72], [0.76, 0.34], [0.86, 0.68]];
-        spots.forEach(([fx, fy], i) => {
-          const cx = W * fx, cy = H * fy;
-          const ph = (t * 1.15 + i * 0.27) % 1;
-          const ar = 12 + (1 - ph) * 28;
-          // Hit flash when approach ring reaches the inner circle
-          if (ph > 0.88) {
-            ctx.fillStyle = `rgba(255, 180, 210, ${(1 - ph) * 6})`;
-            ctx.beginPath();
-            ctx.arc(cx, cy, 22, 0, Math.PI * 2);
-            ctx.fill();
-          }
-          ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 + ph * 0.75})`;
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(cx, cy, ar, 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.fillStyle = 'rgba(255, 61, 127, 0.35)';
-          ctx.strokeStyle = '#ff3d7f';
-          ctx.lineWidth = 2.2;
-          ctx.beginPath();
-          ctx.arc(cx, cy, 12, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-        });
-        break;
-      }
-
-      case 'aiquiz': {
-        // Real AI vs Human split: crisp hand-crafted pixel landscape left vs. glitching neon neural grid right with sweeping scanner bar!
-        const scanX = Math.floor(W * (0.5 + 0.34 * Math.sin(t * 1.15)));
-        // Left: crisp handmade pixel sky & hills
-        ctx.fillStyle = '#0e2846';
-        ctx.fillRect(0, 0, scanX, H);
-        ctx.fillStyle = '#1e5c4e';
-        ctx.fillRect(0, Math.floor(H * 0.64), scanX, H);
-        ctx.fillStyle = '#ffd85c';
-        ctx.fillRect(18, 12, 6, 6);
-        // Right: glitching magenta/cyan neural mesh
-        ctx.fillStyle = '#1a0928';
-        ctx.fillRect(scanX, 0, W - scanX, H);
-        ctx.fillStyle = 'rgba(255, 90, 210, 0.14)';
-        for (let x = scanX; x < W; x += 8) ctx.fillRect(x, 0, 1, H);
-        for (let y = 0; y < H; y += 8) ctx.fillRect(scanX, y, W - scanX, 1);
-        for (let i = 0; i < 10; i++) {
-          const gx = scanX + Math.floor(hash(i + ((t * 4) | 0)) * Math.max(4, W - scanX - 4));
-          const gy = Math.floor(hash(i + 9) * H);
-          ctx.fillStyle = i % 2 === 0 ? '#ff5ad2' : '#57f0ff';
-          ctx.fillRect(gx, gy, 5, 2);
-        }
-        // Bright glowing scanner bar separating Real vs AI
-        ctx.fillStyle = '#8af4ff';
-        ctx.fillRect(scanX - 1, 0, 2, H);
-        break;
-      }
-
-      case 'escapeca': {
-        // Real horror chase hallway: sweeping flashlight cone searching dark school lockers + flickering red alarm!
-        ctx.fillStyle = '#100308';
-        ctx.fillRect(0, 0, W, H);
-        // School lockers lining both sides
-        ctx.fillStyle = '#220b14';
-        for (let x = 6; x < W - 6; x += 12) {
-          ctx.fillRect(x, 10, 9, H - 16);
-          ctx.fillStyle = '#14050b';
-          ctx.fillRect(x + 2, 13, 5, 2);
-          ctx.fillStyle = '#220b14';
-        }
-        // Sweeping flashlight beam moving back & forth down the corridor
-        const lx = W * (0.5 + 0.34 * Math.sin(t * 1.4));
-        const lg = ctx.createRadialGradient(lx, H * 0.5, 4, lx, H * 0.5, 42);
-        lg.addColorStop(0, 'rgba(255, 236, 196, 0.32)');
-        lg.addColorStop(0.6, 'rgba(255, 40, 70, 0.16)');
-        lg.addColorStop(1, 'rgba(255, 40, 70, 0)');
-        ctx.fillStyle = lg;
-        ctx.fillRect(0, 0, W, H);
-        // Red emergency light blink
-        if (Math.sin(t * 9) > 0.3) {
-          ctx.fillStyle = 'rgba(255, 24, 58, 0.22)';
-          ctx.fillRect(0, 0, W, 6);
-        }
-        break;
-      }
-
-      case 'wam': {
-        // Real W.A.M. pixel RPG battle: moving precision timing bar + warrior/archer/mage attack flashes!
-        const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, '#0a1914');
-        g.addColorStop(0.68, '#163626');
-        g.addColorStop(1, '#224f34');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, W, H);
-        // Flying pixel archer arrow across upper field
-        const arX = Math.floor((t * 48) % (W + 20)) - 10;
-        ctx.fillStyle = '#f2e8cf';
-        ctx.fillRect(arX, 14, 7, 1);
-        ctx.fillStyle = '#48c774';
-        ctx.fillRect(arX + 6, 13, 2, 3);
-        // Timing bar along bottom with golden sweet-spot crit zone
-        ctx.fillStyle = '#09120d';
-        ctx.fillRect(20, H - 11, W - 40, 5);
-        ctx.fillStyle = '#48c774';
-        ctx.fillRect(Math.floor(W * 0.42), H - 11, Math.floor(W * 0.16), 5);
-        ctx.fillStyle = '#ffd24c';
-        ctx.fillRect(Math.floor(W * 0.48), H - 11, Math.floor(W * 0.04), 5);
-        const curX = Math.floor(22 + ((Math.sin(t * 3.1) + 1) * 0.5) * (W - 46));
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(curX, H - 12, 2, 7);
-        break;
-      }
-
-      case 'void': {
-        // Real Void galaxy: deep starfield, glowing purple gravity streams pulling pixels inward, and a tiny pixel spaceship gliding past!
-        ctx.fillStyle = '#070212';
-        ctx.fillRect(0, 0, W, H);
-        for (let i = 0; i < 28; i++) {
-          const tw = Math.sin(t * 3 + i * 2) > 0.3;
-          ctx.fillStyle = i % 3 === 0 ? '#d8a6ff' : tw ? '#ffffff' : '#8a7ab0';
-          ctx.fillRect(Math.floor(hash(i + 1) * W), Math.floor(hash(i + 17) * H), 1, 1);
-        }
-        // Spiraling gravity particles getting pulled into center black hole
-        const cx = W * 0.5, cy = H * 0.56;
-        for (let i = 0; i < 24; i++) {
-          const pull = (t * 0.45 + hash(i + 4)) % 1;
-          const dist = (1 - pull) * 76 + 10;
-          const ang = pull * 4.5 + i * 1.1;
-          ctx.fillStyle = i % 2 === 0 ? '#c04df0' : '#ff9cf0';
-          ctx.fillRect(Math.floor(cx + Math.cos(ang) * dist), Math.floor(cy + Math.sin(ang) * dist * 0.36), 2, 2);
-        }
-        // Tiny pixel spaceship with cyan thruster gliding left-to-right near top!
-        const sx = Math.floor((t * 22) % (W + 24)) - 12;
-        const sy = Math.floor(12 + Math.sin(t * 2.5) * 3);
-        ctx.fillStyle = '#57f0ff';
-        ctx.fillRect(sx - 5, sy + 1, 5, 1);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(sx, sy, 4, 3);
-        ctx.fillRect(sx + 4, sy + 1, 2, 1);
         break;
       }
 
       case 'gallery': {
-        // Real sunlit walkable Pixel Art Gallery: skylight rail, spotlight cones, framed wall painting, tiny easel, marble pedestal & strolling visitor!
-        const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, '#ede7da');
-        g.addColorStop(0.14, '#f8f4ec');
-        g.addColorStop(0.75, '#efe8da');
-        g.addColorStop(0.75, '#c9ae85');
-        g.addColorStop(1, '#bda074');
-        ctx.fillStyle = g;
+        // Real Pixel Art Gallery sunlit museum hall (#f4efe6 plaster, #d6be9a oak floor, skylight beams, frames, easel, strolling visitor)
+        ctx.fillStyle = '#f4efe6';
         ctx.fillRect(0, 0, W, H);
-        ctx.fillStyle = '#3c3630';
-        ctx.fillRect(0, H * 0.11, W, 2.5);
-        for (const frac of [0.2, 0.5, 0.8]) {
-          const sx = W * frac;
-          const cg = ctx.createRadialGradient(sx, H * 0.13, 2, sx, H * 0.58, H * 0.56);
-          cg.addColorStop(0, 'rgba(255, 250, 224, 0.72)');
-          cg.addColorStop(1, 'rgba(255, 250, 224, 0)');
-          ctx.fillStyle = cg;
+        ctx.fillStyle = '#d6be9a';
+        ctx.fillRect(0, H * 0.72, W, H * 0.28);
+        ctx.strokeStyle = 'rgba(130, 96, 56, 0.22)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < W; x += 28) {
           ctx.beginPath();
-          ctx.moveTo(sx - 6, H * 0.12);
-          ctx.lineTo(sx + 6, H * 0.12);
-          ctx.lineTo(sx + 68, H * 0.78);
-          ctx.lineTo(sx - 68, H * 0.78);
+          ctx.moveTo(x, H * 0.72);
+          ctx.lineTo(x - 16, H);
+          ctx.stroke();
+        }
+        // Skylight warm sunbeams
+        for (let i = 0; i < 3; i++) {
+          const bx = W * (0.16 + i * 0.34) + Math.sin(t * 0.7 + i) * 6;
+          const sg = ctx.createLinearGradient(bx, 0, bx + 42, H * 0.78);
+          sg.addColorStop(0, 'rgba(255, 248, 224, 0.55)');
+          sg.addColorStop(1, 'rgba(255, 248, 224, 0)');
+          ctx.fillStyle = sg;
+          ctx.beginPath();
+          ctx.moveTo(bx - 16, 0);
+          ctx.lineTo(bx + 26, 0);
+          ctx.lineTo(bx + 54, H * 0.78);
+          ctx.lineTo(bx - 6, H * 0.78);
           ctx.closePath();
           ctx.fill();
         }
-        // Left: framed mini painting on wall
-        ctx.fillStyle = '#8c5a32';
-        ctx.fillRect(W * 0.09, H * 0.28, 34, 34);
-        ctx.fillStyle = '#faf7f0';
-        ctx.fillRect(W * 0.09 + 4, H * 0.28 + 4, 26, 26);
-        ctx.fillStyle = '#c84b31';
-        ctx.fillRect(W * 0.09 + 8, H * 0.28 + 8, 9, 9);
-        ctx.fillStyle = '#388697';
-        ctx.fillRect(W * 0.09 + 8, H * 0.28 + 17, 18, 9);
-        // Right: mini marble pedestal with golden voxel sculpture
-        const px = W * 0.84;
-        ctx.fillStyle = '#ebe4d6';
-        ctx.fillRect(px - 12, H * 0.56, 24, H * 0.26);
-        ctx.fillStyle = '#dfb44b';
-        ctx.fillRect(px - 7, H * 0.42 + Math.sin(t * 2) * 1.5, 14, 14);
-        // Tiny strolling visitor walking peacefully along the oak floor!
-        const vx = W * (0.14 + ((t * 0.06) % 0.72));
-        const vy = H * 0.72;
-        ctx.fillStyle = '#2c2826';
+        // Hung framed artworks on left & right walls
+        const frames = [
+          [W * 0.08, H * 0.20, 34, 28, '#c84b31', '#f6d55c'],
+          [W * 0.80, H * 0.18, 36, 30, '#388697', '#e8a87c'],
+        ];
+        for (const [fx, fy, fw, fh, c1, c2] of frames) {
+          ctx.fillStyle = '#8c5a32';
+          ctx.fillRect(fx, fy, fw, fh);
+          ctx.fillStyle = '#fbf9f4';
+          ctx.fillRect(fx + 3, fy + 3, fw - 6, fh - 6);
+          ctx.fillStyle = c1;
+          ctx.fillRect(fx + 6, fy + 6, (fw - 12) * 0.55, fh - 12);
+          ctx.fillStyle = c2;
+          ctx.fillRect(fx + 6 + (fw - 12) * 0.55, fy + 6, (fw - 12) * 0.45, fh - 12);
+        }
+        // Tiny strolling museum visitor walking across the oak floor
+        const vx = ((t * 28) % (W + 40)) - 20;
+        const vy = H * 0.74;
+        ctx.fillStyle = '#2c3a47';
         ctx.beginPath();
-        ctx.arc(vx, vy, 3.5, 0, Math.PI * 2);
+        ctx.arc(vx, vy - 16, 4.5, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = '#3b4d5e';
-        ctx.fillRect(vx - 3, vy + 4, 6, 10);
-        const leg = Math.sin(t * 8) * 2.5;
-        ctx.strokeStyle = '#1b1a1d';
-        ctx.lineWidth = 1.6;
+        ctx.fillRect(vx - 3.5, vy - 11, 7, 11);
+        const leg = Math.sin(t * 7) * 3;
+        ctx.strokeStyle = '#2c3a47';
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(vx - 1, vy + 14); ctx.lineTo(vx - 1 + leg, vy + 22);
-        ctx.moveTo(vx + 1, vy + 14); ctx.lineTo(vx + 1 - leg, vy + 22);
+        ctx.moveTo(vx - 1, vy); ctx.lineTo(vx - 1 - leg, vy + 8);
+        ctx.moveTo(vx + 1, vy); ctx.lineTo(vx + 1 + leg, vy + 8);
         ctx.stroke();
         break;
       }
 
       case 'ddom': {
-        // Real Maggie photo mosaic actively locking warm golden/caramel/espresso tiles into place with shimmering wave!
-        const pal = ['#3a2518', '#5c3b24', '#8c5a36', '#b87a48', '#d99c64', '#f0cfa0', '#faf2e1', '#70492c'];
-        const tile = 7;
-        const waveX = ((t * 48) % (W + 40)) - 20;
-        for (let y = 0; y < H; y += tile) {
-          for (let x = 0; x < W; x += tile) {
-            const idx = Math.floor(hash(x * 0.37 + y * 0.71) * pal.length);
-            const near = Math.abs(x - waveX) < 14;
-            ctx.fillStyle = near ? pal[Math.min(pal.length - 1, idx + 2)] : pal[idx];
-            ctx.fillRect(x, y, tile - 1, tile - 1);
+        // Real DDOM warm terracotta/cream/golden photo mosaic wave (#f6f1e9, #c46835, #231a14, #ffd3b3)
+        const cols = 14, rows = 6;
+        const cw = Math.ceil(W / cols), ch = Math.ceil(H / rows);
+        const pal = ['#3d2a1d', '#5c3c26', '#8a5532', '#c46835', '#d98a52', '#e8b382', '#6e4930'];
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const wave = Math.sin(t * 1.9 + c * 0.48 + r * 0.65);
+            const idx = Math.floor(hash(c * 13 + r * 29) * pal.length);
+            ctx.fillStyle = pal[idx];
+            ctx.fillRect(c * cw, r * ch, cw - 1, ch - 1);
+            if (wave > 0.78) {
+              ctx.fillStyle = 'rgba(255, 224, 182, 0.34)';
+              ctx.fillRect(c * cw, r * ch, cw - 1, ch - 1);
+            }
           }
         }
-        ctx.fillStyle = 'rgba(26, 16, 10, 0.38)';
-        ctx.fillRect(0, 0, W, H);
         break;
       }
 
       case 'typefall': {
-        // Real falling-letter physics: cream paper with Times New Roman letters tumbling & gently bouncing at bottom!
+        // Real typefall warm book-paper #f7f2e7 + tumbling Times New Roman serif letters
         ctx.fillStyle = '#f7f2e7';
         ctx.fillRect(0, 0, W, H);
-        ctx.fillStyle = 'rgba(20, 18, 16, 0.26)';
-        ctx.font = 'italic 17px "Times New Roman", Times, serif';
-        const chars = 'thequickbrownfoxjumpsoverthelazydog';
-        for (let i = 0; i < 28; i++) {
-          const x = hash(i + 3) * (W - 24) + 12;
-          const fall = (t * (0.28 + (i % 5) * 0.08) + hash(i + 11)) % 1;
-          const y = fall < 0.85
-            ? (fall / 0.85) * (H - 18)
-            : (H - 18) - Math.sin(((fall - 0.85) / 0.15) * Math.PI) * 9;
+        ctx.fillStyle = 'rgba(17, 17, 17, 0.08)';
+        for (let y = 26; y < H; y += 26) ctx.fillRect(16, y, W - 32, 1);
+        const letters = 'typefallabcdefghijklmnopqrstuvwxyz';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i < 16; i++) {
+          const x = 22 + hash(i * 7 + 1) * (W - 44);
+          const fall = (t * (28 + (i % 4) * 9) + hash(i * 11) * (H + 40)) % (H + 40) - 20;
+          const rot = Math.sin(t * 1.6 + i) * 0.5;
           ctx.save();
-          ctx.translate(x, y);
-          ctx.rotate(Math.sin(t * 1.5 + i) * 0.35);
-          ctx.fillText(chars[i % chars.length], 0, 0);
+          ctx.translate(x, fall);
+          ctx.rotate(rot);
+          ctx.font = `italic ${18 + (i % 3) * 5}px "Times New Roman", Georgia, serif`;
+          ctx.fillStyle = `rgba(24, 20, 16, ${0.14 + (i % 3) * 0.07})`;
+          ctx.fillText(letters[i % letters.length], 0, 0);
           ctx.restore();
         }
         break;
       }
 
       case 'shaders': {
-        // Real lan4drcy WebGL aesthetic: rotating 4D wireframe tesseract + cyan/magenta undulating shader wave contours!
-        const g = ctx.createRadialGradient(W * 0.5, H * 0.5, 8, W * 0.5, H * 0.5, W * 0.65);
-        g.addColorStop(0, '#0c2038');
-        g.addColorStop(1, '#040812');
-        ctx.fillStyle = g;
+        // Real lan4drcy animated Julia Set fractal in electric cyan (#66f0ff), violet & neon magenta (#ff5cf0) on #03060c!
+        const fb = renderFractalBuffer(t);
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(fb, 0, 0, W, H);
+        // Subtle dark center vignette so big crisp "lan4drcy" Russo One title pops cleanly
+        const vg = ctx.createRadialGradient(W * 0.5, H * 0.5, 10, W * 0.5, H * 0.5, W * 0.55);
+        vg.addColorStop(0, 'rgba(3, 6, 14, 0.38)');
+        vg.addColorStop(1, 'rgba(3, 6, 14, 0.06)');
+        ctx.fillStyle = vg;
         ctx.fillRect(0, 0, W, H);
-        // Glowing interference contour waves
-        for (let l = 0; l < 4; l++) {
-          ctx.strokeStyle = l % 2 === 0 ? 'rgba(102, 240, 255, 0.18)' : 'rgba(255, 92, 240, 0.16)';
-          ctx.lineWidth = 1.4;
-          ctx.beginPath();
-          for (let x = 0; x <= W; x += 10) {
-            const y = H * (0.25 + l * 0.17) + Math.sin(x * 0.02 + t * (1.4 + l * 0.3) + l) * 14;
-            if (x === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
-        }
-        // Rotating 4D tesseract centered cleanly
-        const a = t * 0.8, b = t * 0.5;
-        const verts = [];
-        for (let i = 0; i < 16; i++) {
-          let x = i & 1 ? 1 : -1, y = i & 2 ? 1 : -1, z = i & 4 ? 1 : -1, w = i & 8 ? 1 : -1;
-          const nx = x * Math.cos(a) - w * Math.sin(a);
-          const nw = x * Math.sin(a) + w * Math.cos(a);
-          const nz = z * Math.cos(b) - nw * Math.sin(b);
-          const w2 = z * Math.sin(b) + nw * Math.cos(b);
-          const k = 1 / (2.5 - w2 * 0.72);
-          const rx = nx * k * Math.cos(b) + nz * k * Math.sin(b);
-          const ry = y * k;
-          verts.push([W * 0.5 + rx * 52, H * 0.5 + ry * 46, (w2 + 1) * 0.5]);
-        }
-        ctx.lineWidth = 1.4;
-        for (let i = 0; i < 16; i++) {
-          for (let bit = 0; bit < 4; bit++) {
-            const j = i ^ (1 << bit);
-            if (j <= i) continue;
-            ctx.strokeStyle = verts[i][2] > 0.5 ? 'rgba(102, 240, 255, 0.48)' : 'rgba(255, 92, 240, 0.42)';
-            ctx.beginPath();
-            ctx.moveTo(verts[i][0], verts[i][1]);
-            ctx.lineTo(verts[j][0], verts[j][1]);
-            ctx.stroke();
-          }
-        }
         break;
       }
 
       case 'terra': {
-        // Shared pixel solar system: twinkling starfield + glowing orbit rings + custom pixel planets!
-        ctx.fillStyle = '#090e1a';
+        // Real sunlit Terra pixel sandbox: blue sky, drifting clouds, rolling emerald grass hills, terracotta underground & glowing ores!
+        const sg = ctx.createLinearGradient(0, 0, 0, H * 0.62);
+        sg.addColorStop(0, '#398fd6');
+        sg.addColorStop(1, '#84cef5');
+        ctx.fillStyle = sg;
         ctx.fillRect(0, 0, W, H);
-        for (let i = 0; i < 26; i++) {
-          ctx.fillStyle = i % 3 === 0 ? '#ffe59c' : '#d6e4ff';
-          ctx.fillRect(Math.floor(hash(i + 2) * W), Math.floor(hash(i + 13) * H), 1, 1);
+        // Drifting pixel clouds
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+        for (let i = 0; i < 4; i++) {
+          const cx = Math.floor(((t * (5 + i * 1.8) + i * 48) % (W + 26)) - 14);
+          const cy = 6 + (i % 2) * 8;
+          ctx.fillRect(cx, cy, 14, 4);
+          ctx.fillRect(cx + 3, cy - 2, 8, 2);
         }
-        ctx.strokeStyle = 'rgba(255, 232, 180, 0.14)';
-        ctx.lineWidth = 1;
-        for (const r of [34, 52, 68]) {
-          ctx.beginPath();
-          ctx.ellipse(W * 0.5, H * 0.52, r, r * 0.34, 0, 0, Math.PI * 2);
-          ctx.stroke();
+        // Rolling pixel hills & sandstone/terracotta underground strata
+        for (let x = 0; x < W; x += 2) {
+          const hill = Math.floor(H * 0.58 + Math.sin(x * 0.055) * 6 + Math.cos(x * 0.11) * 3);
+          ctx.fillStyle = '#52c456';
+          ctx.fillRect(x, hill, 2, 4);
+          ctx.fillStyle = '#38993c';
+          ctx.fillRect(x, hill + 4, 2, 3);
+          ctx.fillStyle = '#a86f3e';
+          ctx.fillRect(x, hill + 7, 2, 12);
+          ctx.fillStyle = '#754925';
+          ctx.fillRect(x, hill + 19, 2, H - hill);
         }
-        const orbs = [
-          { r: 52, sp: 0.7, c1: '#6ab04c', c2: '#3b82c4', sz: 7 },
-          { r: 34, sp: -1.1, c1: '#e87a4a', c2: '#ffd25c', sz: 6 },
-          { r: 68, sp: 0.5, c1: '#a27cf0', c2: '#5ad0e6', sz: 6 },
-        ];
-        orbs.forEach((o, i) => {
-          const px = Math.floor(W * 0.5 + Math.cos(t * o.sp + i * 2) * o.r);
-          const py = Math.floor(H * 0.52 + Math.sin(t * o.sp + i * 2) * (o.r * 0.34));
-          ctx.fillStyle = o.c2;
-          ctx.fillRect(px - 3, py - 3, o.sz, o.sz);
-          ctx.fillStyle = o.c1;
-          ctx.fillRect(px - 2, py - 3, o.sz - 2, o.sz - 2);
-        });
-        break;
-      }
-
-      case 'tung': {
-        // Night woodland silhouette + pulsing wooden drum shockwaves + fluttering tiny pixel bats!
-        ctx.fillStyle = '#241208';
-        ctx.fillRect(0, 0, W, H);
-        // Expanding rhythmic drum shockwaves
-        const beat = (t * 1.4) % 1;
-        const cx = W * 0.5, cy = H * 0.52;
-        for (let r = 82; r > 8; r -= 11) {
-          ctx.strokeStyle = (r / 11 | 0) % 2 === 0 ? '#6e3f1c' : '#4a260e';
-          ctx.lineWidth = 4;
-          ctx.beginPath();
-          ctx.ellipse(cx, cy, r, r * 0.52, 0, 0, Math.PI * 2);
-          ctx.stroke();
+        // Tiny pixel trees on the left & right flanks
+        for (const tx of [18, W - 24]) {
+          const ty = Math.floor(H * 0.56);
+          ctx.fillStyle = '#6b4222';
+          ctx.fillRect(tx + 2, ty - 4, 2, 6);
+          ctx.fillStyle = '#2d8c36';
+          ctx.fillRect(tx, ty - 10, 6, 6);
+          ctx.fillStyle = '#5cd663';
+          ctx.fillRect(tx + 1, ty - 12, 4, 3);
         }
-        ctx.strokeStyle = `rgba(255, 224, 168, ${(1 - beat) * 0.55})`;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, 12 + beat * 70, (12 + beat * 70) * 0.48, 0, 0, Math.PI * 2);
-        ctx.stroke();
-        // Fluttering tiny pixel bats
-        for (let i = 0; i < 3; i++) {
-          const bx = Math.floor((t * (20 + i * 6) + i * 50) % (W + 14)) - 7;
-          const by = Math.floor(10 + i * 14 + Math.sin(t * 7 + i) * 3);
-          const up = Math.sin(t * 12 + i) > 0;
-          ctx.fillStyle = '#120804';
-          ctx.fillRect(bx, by, 2, 2);
-          ctx.fillRect(bx - 2, up ? by - 1 : by + 1, 2, 1);
-          ctx.fillRect(bx + 2, up ? by - 1 : by + 1, 2, 1);
+        // Sparkling underground gem ores
+        for (let i = 0; i < 8; i++) {
+          const gx = Math.floor(10 + hash(i + 4) * (W - 20));
+          const gy = Math.floor(H * 0.76 + hash(i + 9) * (H * 0.20));
+          const tw = Math.sin(t * 4 + i * 1.5) > 0.3;
+          ctx.fillStyle = i % 2 === 0 ? (tw ? '#ffffff' : '#66f0ff') : (tw ? '#fff4a8' : '#ffd55a');
+          ctx.fillRect(gx, gy, 2, 2);
         }
         break;
       }
 
       case 'pmuseum': {
-        // Illuminated dark-teal museum vault columns with floating glowing cyan crystal relics!
-        const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, '#05141e');
-        g.addColorStop(1, '#0c2d3a');
-        ctx.fillStyle = g;
+        // Pixel Museum: Twilight pixel city street WITH the grand classical Pixel Museum building, streetlamps, pedestrians & passing cars!
+        const sg = ctx.createLinearGradient(0, 0, 0, H * 0.74);
+        sg.addColorStop(0, '#0f1730');
+        sg.addColorStop(1, '#223562');
+        ctx.fillStyle = sg;
         ctx.fillRect(0, 0, W, H);
-        ctx.fillStyle = 'rgba(58, 216, 224, 0.13)';
-        for (let x = 14; x < W; x += 28) ctx.fillRect(x, 0, 5, H);
-        // Pedestals & bobbing glowing relics on flanks
-        for (const rx of [22, W - 28]) {
-          ctx.fillStyle = '#1c4f5e';
-          ctx.fillRect(rx - 2, H - 14, 10, 14);
-          const ry = Math.floor(H - 24 + Math.sin(t * 3 + rx) * 3);
-          ctx.fillStyle = '#5cf6ff';
-          ctx.fillRect(rx + 1, ry, 4, 6);
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(rx + 2, ry + 1, 2, 2);
+        // Twinkling twilight stars
+        for (let i = 0; i < 12; i++) {
+          const sx = Math.floor(hash(i + 3) * W);
+          const sy = Math.floor(hash(i + 17) * H * 0.34);
+          ctx.fillStyle = Math.sin(t * 3 + i) > 0.2 ? '#d8f4ff' : '#6a82b0';
+          ctx.fillRect(sx, sy, 1, 1);
         }
-        for (let i = 0; i < 10; i++) {
-          ctx.fillStyle = i % 3 === 0 ? '#ffd24c' : '#7ef8ff';
-          ctx.fillRect(Math.floor(hash(i + 5) * W), Math.floor((H - (t * 8 + hash(i) * H) % H)), 2, 2);
+        // Flanking pixel town buildings (left & right)
+        const sideY = Math.floor(H * 0.34);
+        const roadY = Math.floor(H * 0.78);
+        ctx.fillStyle = '#2d3756';
+        ctx.fillRect(2, sideY + 6, 30, roadY - sideY - 6);
+        ctx.fillRect(W - 34, sideY + 4, 32, roadY - sideY - 4);
+        // Warm glowing apartment windows on flanking buildings
+        ctx.fillStyle = '#ffd97a';
+        for (let wx = 7; wx <= 23; wx += 8) {
+          ctx.fillRect(wx, sideY + 12, 4, 5);
+          ctx.fillRect(wx, sideY + 22, 4, 5);
         }
+        for (let wx = W - 29; wx <= W - 11; wx += 8) {
+          ctx.fillRect(wx, sideY + 10, 4, 5);
+          ctx.fillRect(wx, sideY + 20, 4, 5);
+        }
+
+        // Grand Classical PIXEL MUSEUM Building in center!
+        const mx = Math.floor(W * 0.24);
+        const mw = Math.floor(W * 0.52);
+        const my = Math.floor(H * 0.26);
+        const mh = roadY - my;
+        // Triangular pediment roof
+        ctx.fillStyle = '#8fa4c2';
+        for (let step = 0; step < 7; step++) {
+          ctx.fillRect(mx - 4 + step * 5, my - step, mw + 8 - step * 10, 2);
+        }
+        // Limestone facade
+        ctx.fillStyle = '#c4d2e4';
+        ctx.fillRect(mx, my + 1, mw, mh);
+        ctx.fillStyle = '#334668';
+        ctx.fillRect(mx + 4, my + 6, mw - 8, mh - 10);
+        // Warm glowing museum gallery windows & grand arched doorway
+        ctx.fillStyle = '#ffe28a';
+        ctx.fillRect(Math.floor(W * 0.5) - 6, roadY - 14, 12, 14);
+        ctx.fillStyle = 'rgba(255, 226, 138, 0.72)';
+        ctx.fillRect(mx + 10, my + 11, 12, 12);
+        ctx.fillRect(mx + mw - 22, my + 11, 12, 12);
+        // 6 classical stone columns across the front of the museum
+        ctx.fillStyle = '#dce8f5';
+        const colCount = 6;
+        for (let i = 0; i < colCount; i++) {
+          const cx = Math.floor(mx + 4 + (i / (colCount - 1)) * (mw - 12));
+          ctx.fillRect(cx, my + 5, 4, mh - 8);
+        }
+        // Museum front steps
+        ctx.fillStyle = '#aebfd4';
+        ctx.fillRect(mx - 4, roadY - 3, mw + 8, 3);
+
+        // Sidewalk + asphalt street + dashed yellow lane line
+        ctx.fillStyle = '#7c8596';
+        ctx.fillRect(0, roadY, W, 4);
+        ctx.fillStyle = '#1b1f2c';
+        ctx.fillRect(0, roadY + 4, W, H - roadY - 4);
+        ctx.fillStyle = '#f2c94c';
+        for (let x = 4; x < W; x += 14) ctx.fillRect(x, roadY + 9, 7, 1);
+
+        // Glowing pixel streetlamps flanking the museum
+        for (const lx of [mx - 10, mx + mw + 8]) {
+          ctx.fillStyle = '#4a556e';
+          ctx.fillRect(lx, roadY - 14, 2, 14);
+          ctx.fillStyle = 'rgba(255, 230, 140, 0.25)';
+          ctx.fillRect(lx - 4, roadY - 18, 10, 8);
+          ctx.fillStyle = '#fff3b0';
+          ctx.fillRect(lx - 1, roadY - 15, 4, 2);
+        }
+
+        // Tiny passing pixel cars cruising down the street!
+        const car1 = Math.floor(((t * 34) % (W + 24)) - 12);
+        ctx.fillStyle = '#ff5a6e';
+        ctx.fillRect(car1, roadY + 5, 10, 4);
+        ctx.fillStyle = '#fff5b8';
+        ctx.fillRect(car1 + 9, roadY + 6, 2, 2);
+        const car2 = Math.floor(W + 12 - ((t * 26 + 40) % (W + 24)));
+        ctx.fillStyle = '#58e2ec';
+        ctx.fillRect(car2, roadY + 10, 10, 4);
+        ctx.fillStyle = '#fff5b8';
+        ctx.fillRect(car2 - 1, roadY + 11, 2, 2);
         break;
       }
 
       case 'sea': {
-        // Starry pixel night sky + rolling turquoise ocean waves + bobbing pixel glass message bottles!
-        ctx.fillStyle = '#031b4a';
-        ctx.fillRect(0, 0, W, Math.floor(H * 0.44));
-        ctx.fillStyle = '#073b7a';
-        ctx.fillRect(0, Math.floor(H * 0.44), W, H);
-        ctx.fillStyle = '#d8f4ff';
-        for (let i = 0; i < 16; i++) ctx.fillRect(Math.floor(hash(i + 1) * W), Math.floor(hash(i + 8) * H * 0.36), 1, 1);
-        // Bobbing message-in-a-bottle floating on the waves!
-        for (const [bx0, ph] of [[24, 0], [W - 30, 2.2]]) {
-          const by = Math.floor(H * 0.48 + Math.sin(t * 2.4 + ph) * 3);
-          ctx.fillStyle = '#b87a44';
-          ctx.fillRect(bx0 + 1, by - 2, 2, 2);
-          ctx.fillStyle = '#8ef0ff';
-          ctx.fillRect(bx0, by, 4, 6);
-          ctx.fillStyle = '#f3dfae';
-          ctx.fillRect(bx0 + 1, by + 2, 2, 3);
-        }
-        // Layered rolling waves
-        for (let row = 0; row < 4; row++) {
-          const baseY = Math.floor(H * 0.48 + row * 8);
-          ctx.fillStyle = row === 0 ? '#7ae4f5' : row === 1 ? '#36a4d4' : '#1b6eb0';
-          for (let x = 0; x < W; x += 4) {
-            const wy = baseY + Math.round(Math.sin(x * 0.12 + t * (1.8 + row * 0.4) + row) * 2);
-            ctx.fillRect(x, wy, 4, 2);
+        // Real Sea of Thought cerulean ocean (#0096c7 / #48cae4 / #031e4d) with rolling waves & bobbing message bottles!
+        const sg = ctx.createLinearGradient(0, 0, 0, H);
+        sg.addColorStop(0, '#0077b6');
+        sg.addColorStop(0.45, '#0096c7');
+        sg.addColorStop(1, '#032056');
+        ctx.fillStyle = sg;
+        ctx.fillRect(0, 0, W, H);
+        for (let layer = 0; layer < 4; layer++) {
+          const baseY = Math.floor(H * (0.34 + layer * 0.17));
+          ctx.fillStyle = layer % 2 === 0 ? 'rgba(72, 202, 228, 0.35)' : 'rgba(3, 30, 77, 0.38)';
+          for (let x = 0; x < W; x += 2) {
+            const wy = Math.floor(baseY + Math.sin(x * 0.08 + t * (1.8 + layer * 0.4) + layer * 2) * 3);
+            ctx.fillRect(x, wy, 2, H - wy);
+            if (layer < 2 && ((x + ((t * 14) | 0)) % 14 === 0)) {
+              ctx.fillStyle = 'rgba(230, 251, 255, 0.65)';
+              ctx.fillRect(x, wy, 4, 1);
+              ctx.fillStyle = layer % 2 === 0 ? 'rgba(72, 202, 228, 0.35)' : 'rgba(3, 30, 77, 0.38)';
+            }
           }
+        }
+        // Bobbing corked glass message bottles
+        for (let i = 0; i < 2; i++) {
+          const bx = Math.floor(((t * 11 + i * (W * 0.55)) % (W + 14)) - 7);
+          const by = Math.floor(H * (0.56 + i * 0.18) + Math.sin(t * 2.8 + i * 2) * 2);
+          ctx.fillStyle = '#90e0ef';
+          ctx.fillRect(bx, by, 5, 3);
+          ctx.fillStyle = '#f3dfae';
+          ctx.fillRect(bx + 1, by + 1, 3, 1);
+          ctx.fillStyle = '#b87a44';
+          ctx.fillRect(bx + 5, by + 1, 2, 1);
         }
         break;
       }
 
       case 'atlas': {
-        // Real spinning 3D Earth with back-side occluded red travel pins & connecting route arc!
-        const g = ctx.createLinearGradient(0, 0, W, H);
-        g.addColorStop(0, '#f7fbff');
-        g.addColorStop(1, '#dcebf9');
-        ctx.fillStyle = g;
+        // Real Atlas studio white canvas + 100% REALISTIC spinning satellite Earth (Esri World Imagery) + front-hemisphere red travel pins & flight arc!
+        ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, W, H);
-        ctx.strokeStyle = 'rgba(37, 99, 168, 0.08)';
+        // Ultra-subtle studio coordinate ticks
+        ctx.strokeStyle = 'rgba(20, 40, 70, 0.05)';
         ctx.lineWidth = 1;
-        for (let x = 28; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-        for (let y = 22; y < H; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
-        const gx = W * 0.8, gy = H * 0.52, gr = Math.min(H * 0.37, W * 0.14);
-        const og = ctx.createRadialGradient(gx - gr * 0.32, gy - gr * 0.32, 3, gx, gy, gr);
-        og.addColorStop(0, '#62aef0');
-        og.addColorStop(0.7, '#2a6cb5');
-        og.addColorStop(1, '#184273');
-        ctx.fillStyle = og;
+        for (let x = 32; x < W; x += 36) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+        }
+        const gx = W * 0.5;
+        const gy = H * 0.5;
+        const R = Math.min(W, H) * 0.43;
+
+        // Soft studio drop shadow beneath the floating Earth
+        const sh = ctx.createRadialGradient(gx, gy + R * 0.14, R * 0.6, gx, gy + R * 0.14, R * 1.18);
+        sh.addColorStop(0, 'rgba(18, 42, 74, 0.14)');
+        sh.addColorStop(1, 'rgba(18, 42, 74, 0)');
+        ctx.fillStyle = sh;
         ctx.beginPath();
-        ctx.arc(gx, gy, gr, 0, Math.PI * 2);
+        ctx.arc(gx, gy + R * 0.14, R * 1.18, 0, Math.PI * 2);
         ctx.fill();
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(gx, gy, gr, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.fillStyle = '#6ec488';
-        const span = gr * 3.4;
-        const shift = (t * 15) % span;
-        const lands = [
-          [-0.9, -0.25, 0.45, 0.32, 0.2],
-          [-0.55, 0.32, 0.28, 0.38, -0.15],
-          [0.35, -0.28, 0.58, 0.34, 0.1],
-          [0.48, 0.24, 0.34, 0.38, 0.25],
-          [1.25, 0.28, 0.32, 0.22, -0.1],
+
+        // Draw realistic raycast satellite globe
+        const gbuf = renderRealisticGlobe(t);
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(gbuf, gx - R, gy - R, R * 2, R * 2);
+
+        // Front-hemisphere red travel pins & connecting route arc (hidden when rotated to back of globe!)
+        const rot = t * 0.28;
+        const tilt = 0.26;
+        const rawPins = [
+          [-1.35, 0.62], // North America
+          [-0.08, 0.85], // Europe
+          [0.52, 0.48],  // Mediterranean / Cairo
+          [2.42, 0.62],  // Tokyo
         ];
-        for (const wrap of [-span, 0, span]) {
-          for (const [ox, oy, rw, rh, rot] of lands) {
-            ctx.beginPath();
-            ctx.ellipse(gx + ox * gr - shift + wrap + gr, gy + oy * gr, rw * gr, rh * gr, rot, 0, Math.PI * 2);
-            ctx.fill();
+        const vis = [];
+        for (const [lon0, lat0] of rawPins) {
+          const lon = lon0 - rot;
+          const x3 = Math.cos(lat0) * Math.sin(lon);
+          const y3 = -Math.sin(lat0);
+          const z3 = Math.cos(lat0) * Math.cos(lon);
+          // Apply inverse tilt for screen space
+          const sy3 = y3 * Math.cos(tilt) + z3 * Math.sin(tilt);
+          const sz3 = -y3 * Math.sin(tilt) + z3 * Math.cos(tilt);
+          if (sz3 > 0.14) {
+            vis.push([gx + x3 * R * 0.94, gy + sy3 * R * 0.94]);
           }
         }
-        ctx.restore();
-        // Rotating travel pins that ONLY appear on the front hemisphere (just like the real Atlas site!)
-        const pins = [[0.2, -0.25], [1.4, 0.15], [2.7, -0.1], [4.1, 0.22]];
-        const visPts = [];
-        for (const [lon0, lat] of pins) {
-          const lon = lon0 + t * 0.65;
-          const cz = Math.cos(lon);
-          if (cz > 0.08) {
-            const px = gx + Math.sin(lon) * gr * 0.85;
-            const py = gy + lat * gr * 0.85;
-            visPts.push([px, py]);
-          }
-        }
-        if (visPts.length >= 2) {
-          ctx.strokeStyle = 'rgba(214, 69, 56, 0.85)';
-          ctx.lineWidth = 1.6;
+        if (vis.length >= 2) {
+          ctx.strokeStyle = 'rgba(217, 79, 48, 0.9)';
+          ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.moveTo(visPts[0][0], visPts[0][1]);
-          ctx.quadraticCurveTo((visPts[0][0] + visPts[1][0]) * 0.5, Math.min(visPts[0][1], visPts[1][1]) - 14, visPts[1][0], visPts[1][1]);
+          for (let i = 0; i < vis.length - 1; i++) {
+            const [x1, y1] = vis[i];
+            const [x2, y2] = vis[i + 1];
+            ctx.moveTo(x1, y1);
+            ctx.quadraticCurveTo((x1 + x2) * 0.5, (y1 + y2) * 0.5 - 14, x2, y2);
+          }
           ctx.stroke();
         }
-        for (const [px, py] of visPts) {
-          ctx.fillStyle = '#d64538';
+        for (const [px, py] of vis) {
+          ctx.fillStyle = '#d94f30';
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.6;
           ctx.beginPath();
-          ctx.arc(px, py, 3.6, 0, Math.PI * 2);
+          ctx.arc(px, py, 4.2, 0, Math.PI * 2);
           ctx.fill();
-          ctx.fillStyle = '#ffffff';
-          ctx.beginPath();
-          ctx.arc(px, py, 1.3, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.stroke();
         }
-        // Subtle dashed flight route leading from left margin into the globe
-        ctx.strokeStyle = 'rgba(214, 69, 56, 0.42)';
-        ctx.setLineDash([4, 4]);
-        ctx.lineWidth = 1.4;
-        ctx.beginPath();
-        ctx.moveTo(W * 0.12, H * 0.72);
-        ctx.quadraticCurveTo(W * 0.45, H * 0.15, gx - gr * 0.8, gy);
-        ctx.stroke();
-        ctx.setLineDash([]);
         break;
       }
 
       case 'terrain': {
-        // Real 2.5D metaball terrain sculpting: smooth elevation bands gently sculpted by an invisible brush!
-        const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, '#12292d');
-        g.addColorStop(1, '#1d493e');
-        ctx.fillStyle = g;
+        // Real Smooth Terrain Studio generated 2.5D layered SDF cliff terrain!
+        // Warm parchment/sand studio base (#efe7dc) + alpine water basin + raised organic 2.5D grass, stone & mesa plateaus
+        ctx.fillStyle = '#efe7dc';
         ctx.fillRect(0, 0, W, H);
-        const brushX = W * (0.5 + 0.34 * Math.sin(t * 0.85));
-        const layers = [
-          { y: 0.42, amp: 14, freq: 0.012, col: '#286452' },
-          { y: 0.58, amp: 12, freq: 0.016, col: '#358565' },
-          { y: 0.74, amp: 10, freq: 0.02, col: '#4fa87c' },
-          { y: 0.88, amp: 7, freq: 0.024, col: '#84d9a3' },
-        ];
-        layers.forEach((L, idx) => {
-          ctx.fillStyle = L.col;
-          ctx.beginPath();
-          ctx.moveTo(0, H);
-          for (let x = 0; x <= W; x += 8) {
-            const bulge = Math.exp(-Math.pow((x - brushX) / 72, 2)) * (16 - idx * 2.5);
-            const yy = H * L.y - bulge + Math.sin(x * L.freq + idx * 1.4) * L.amp;
-            ctx.lineTo(x, yy);
-          }
-          ctx.lineTo(W, H);
-          ctx.closePath();
-          ctx.fill();
-        });
+        // Subtle sand/parchment contour wash
+        const bg = ctx.createLinearGradient(0, 0, W, H);
+        bg.addColorStop(0, '#f3ece1');
+        bg.addColorStop(1, '#e0d2bc');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        const p1 = t * 0.45;
+        // Alpine smooth water pond on right-center
+        ctx.fillStyle = '#9ecbe0';
+        drawBlobPath(ctx, W * 0.72, H * 0.58, W * 0.24, H * 0.36, 3, -p1 * 0.6);
+        ctx.fill();
+        ctx.fillStyle = '#5287a6';
+        drawBlobPath(ctx, W * 0.73, H * 0.60, W * 0.16, H * 0.24, 3, -p1 * 0.6 + 0.4);
+        ctx.fill();
+
+        // Tier 1: Wide lush 2.5D Grass Plateau (left & lower-center)
+        draw25DPlateau(ctx, W * 0.24, H * 0.56, W * 0.26, H * 0.38, 4, p1 * 0.5, 11, '#78a363', '#537544', '#9bc786');
+        // Tier 2: Raised 2.5D Stone Ridge (upper-left)
+        draw25DPlateau(ctx, W * 0.16, H * 0.34, W * 0.15, H * 0.22, 5, p1 * 0.7 + 1.2, 13, '#888684', '#565452', '#aba9a6');
+        // Tier 1b: Raised 2.5D Terracotta Mesa Plateau (upper-right)
+        draw25DPlateau(ctx, W * 0.84, H * 0.28, W * 0.17, H * 0.24, 3, -p1 * 0.5 + 0.8, 12, '#cda97e', '#986b47', '#e6c8a3');
+        // Tier 2b: Small grass hillock on lower-right
+        draw25DPlateau(ctx, W * 0.50, H * 0.84, W * 0.18, H * 0.20, 4, p1 * 0.4 + 2.1, 9, '#78a363', '#537544', '#9bc786');
         break;
       }
 
       case 'recommend': {
-        // Real cinema screening room: dual sweeping warm golden projector cones + scrolling film sprocket edges + dust motes!
-        const g = ctx.createLinearGradient(0, 0, W, H);
-        g.addColorStop(0, '#171411');
-        g.addColorStop(0.5, '#221a12');
-        g.addColorStop(1, '#120f0d');
-        ctx.fillStyle = g;
+        // Cozy midnight blue / indigo living room (ZERO brown!) with someone sitting on a couch
+        // wondering what they should watch or read!
+        const wg = ctx.createLinearGradient(0, 0, 0, H);
+        wg.addColorStop(0, '#0c152d');
+        wg.addColorStop(0.74, '#16264b');
+        wg.addColorStop(1, '#101b36');
+        ctx.fillStyle = wg;
         ctx.fillRect(0, 0, W, H);
-        // Dual sweeping warm projector spotlights
-        for (const [phase, base] of [[0, 0.35], [2.4, 0.65]]) {
-          const bx = W * (base + 0.16 * Math.sin(t * 0.75 + phase));
-          const bg = ctx.createRadialGradient(bx, H * 0.25, 4, bx, H * 0.55, W * 0.35);
-          bg.addColorStop(0, 'rgba(245, 200, 100, 0.26)');
-          bg.addColorStop(1, 'rgba(245, 200, 100, 0)');
-          ctx.fillStyle = bg;
-          ctx.fillRect(0, 0, W, H);
-        }
-        // Scrolling vintage filmstrip sprockets top & bottom
-        const spOff = (t * 22) % 24;
-        ctx.fillStyle = 'rgba(245, 214, 142, 0.18)';
-        for (let x = -24 + spOff; x < W + 24; x += 24) {
-          ctx.fillRect(x, 8, 11, 5);
-          ctx.fillRect(x, H - 13, 11, 5);
+
+        // Floor plane
+        ctx.fillStyle = '#0d162e';
+        ctx.fillRect(0, H * 0.76, W, H * 0.24);
+
+        // Starry twilight window on far right
+        const winX = W * 0.78, winY = H * 0.14, winW = 54, winH = 44;
+        ctx.fillStyle = '#070e20';
+        ctx.fillRect(winX, winY, winW, winH);
+        ctx.strokeStyle = '#334d82';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(winX, winY, winW, winH);
+        ctx.beginPath();
+        ctx.moveTo(winX + winW * 0.5, winY); ctx.lineTo(winX + winW * 0.5, winY + winH);
+        ctx.moveTo(winX, winY + winH * 0.5); ctx.lineTo(winX + winW, winY + winH * 0.5);
+        ctx.stroke();
+        // Little crescent moon & stars in window
+        ctx.fillStyle = '#d8e6ff';
+        ctx.beginPath(); ctx.arc(winX + 14, winY + 12, 3.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillRect(winX + 36, winY + 10, 2, 2);
+        ctx.fillRect(winX + 42, winY + 28, 2, 2);
+
+        // Soft flickering TV screen glow on the left wall
+        const tvPulse = 0.72 + 0.28 * Math.sin(t * 3.1) * Math.cos(t * 1.7);
+        const tvGlow = ctx.createRadialGradient(28, H * 0.54, 4, 46, H * 0.56, 130);
+        tvGlow.addColorStop(0, `rgba(110, 178, 255, ${0.34 * tvPulse})`);
+        tvGlow.addColorStop(0.6, `rgba(130, 118, 255, ${0.12 * tvPulse})`);
+        tvGlow.addColorStop(1, 'rgba(16, 28, 56, 0)');
+        ctx.fillStyle = tvGlow;
+        ctx.fillRect(0, 0, W * 0.5, H);
+        // Sleek glowing TV on left stand
+        ctx.fillStyle = '#253966';
+        ctx.fillRect(14, H * 0.44, 14, 34);
+        ctx.fillStyle = `rgba(148, 210, 255, ${0.85 * tvPulse})`;
+        ctx.fillRect(24, H * 0.46, 5, 30);
+
+        // Cozy standing floor lamp on right casting warm soft golden-amber accent glow
+        const lampX = W * 0.87;
+        const lg = ctx.createRadialGradient(lampX, H * 0.40, 4, lampX, H * 0.44, 68);
+        lg.addColorStop(0, 'rgba(255, 224, 145, 0.30)');
+        lg.addColorStop(1, 'rgba(255, 224, 145, 0)');
+        ctx.fillStyle = lg;
+        ctx.fillRect(W * 0.65, 0, W * 0.35, H);
+        ctx.strokeStyle = '#6077a8';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(lampX, H * 0.44); ctx.lineTo(lampX, H * 0.80); ctx.stroke();
+        ctx.fillStyle = '#ffe599';
+        ctx.beginPath();
+        ctx.moveTo(lampX - 10, H * 0.44);
+        ctx.lineTo(lampX + 10, H * 0.44);
+        ctx.lineTo(lampX + 6, H * 0.34);
+        ctx.lineTo(lampX - 6, H * 0.34);
+        ctx.closePath();
+        ctx.fill();
+
+        // Cozy plush midnight-slate couch on lower-left
+        const cx = W * 0.17;
+        const cy = H * 0.63;
+        ctx.fillStyle = '#243a6b';
+        ctx.beginPath(); ctx.roundRect(cx - 42, cy - 6, 84, 24, 6); ctx.fill();
+        ctx.fillStyle = '#324e8c';
+        ctx.beginPath(); ctx.roundRect(cx - 48, cy + 4, 12, 20, 4); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(cx + 36, cy + 4, 12, 20, 4); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(cx - 38, cy + 8, 76, 16, 4); ctx.fill();
+
+        // Person sitting comfortably on the couch thinking about what to watch or read!
+        const px = cx - 4;
+        const py = cy + 6;
+        // Torso & head
+        ctx.fillStyle = '#9bb8f5';
+        ctx.beginPath(); ctx.roundRect(px - 8, py - 14, 16, 18, 6); ctx.fill();
+        ctx.fillStyle = '#dce8ff';
+        ctx.beginPath(); ctx.arc(px, py - 21, 7.5, 0, Math.PI * 2); ctx.fill();
+        // Little thought bubble floating above person cycling smoothly between Movie & Book!
+        const bBob = Math.sin(t * 2.2) * 3;
+        const bx = px + 26;
+        const by = py - 44 + bBob;
+        ctx.fillStyle = 'rgba(226, 238, 255, 0.88)';
+        ctx.beginPath(); ctx.arc(px + 9, py - 30, 2.2, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(px + 15, py - 36, 3.2, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(bx - 16, by - 12, 32, 22, 10); ctx.fill();
+
+        // Cycle between film/play icon ("watch") and open book icon ("read")
+        const showBook = Math.sin(t * 1.1) > 0;
+        if (showBook) {
+          // Open book inside thought bubble
+          ctx.strokeStyle = '#243a6b';
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.moveTo(bx - 9, by - 4);
+          ctx.quadraticCurveTo(bx - 4, by - 6, bx, by - 3);
+          ctx.quadraticCurveTo(bx + 4, by - 6, bx + 9, by - 4);
+          ctx.lineTo(bx + 9, by + 5);
+          ctx.quadraticCurveTo(bx + 4, by + 3, bx, by + 6);
+          ctx.quadraticCurveTo(bx - 4, by + 3, bx - 9, by + 5);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(bx, by - 3); ctx.lineTo(bx, by + 6); ctx.stroke();
+        } else {
+          // Film / Play icon inside thought bubble
+          ctx.fillStyle = '#3b66d4';
+          ctx.beginPath(); ctx.roundRect(bx - 9, by - 6, 18, 12, 3); ctx.fill();
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.moveTo(bx - 2, by - 3.2);
+          ctx.lineTo(bx + 4.5, by);
+          ctx.lineTo(bx - 2, by + 3.2);
+          ctx.closePath();
+          ctx.fill();
         }
         break;
       }
 
       case 'channels': {
-        // Real live YouTube stats broadcast studio: live pulsing crimson equalizer + climbing view-count sparkline!
-        ctx.fillStyle = '#141114';
+        // Real LLC Powered Channels dark studio (#07050f / #120c1e) + YouTube red #ff0033 + #38e1d0 cyan analytics sparkline!
+        const bg = ctx.createLinearGradient(0, 0, W, H);
+        bg.addColorStop(0, '#07050f');
+        bg.addColorStop(1, '#181028');
+        ctx.fillStyle = bg;
         ctx.fillRect(0, 0, W, H);
-        const bars = 28;
-        const bw = W / bars;
-        for (let i = 0; i < bars; i++) {
-          const h = 10 + (Math.sin(t * 3.6 + i * 0.75) * 0.5 + 0.5) * (H * 0.42);
-          ctx.fillStyle = i % 3 === 0 ? 'rgba(255, 0, 51, 0.32)' : 'rgba(255, 80, 105, 0.16)';
-          ctx.fillRect(i * bw + 2, H - h, bw - 4, h);
+        // Subtle equalizer bars across bottom
+        for (let i = 0; i < 22; i++) {
+          const bh = 8 + Math.abs(Math.sin(t * 3.2 + i * 0.55)) * (H * 0.30);
+          ctx.fillStyle = i % 4 === 0 ? 'rgba(56, 225, 208, 0.22)' : 'rgba(255, 0, 51, 0.20)';
+          ctx.fillRect(10 + i * ((W - 20) / 22), H - bh, 6, bh);
         }
-        // Climbing live view sparkline
-        ctx.strokeStyle = 'rgba(255, 58, 92, 0.65)';
-        ctx.lineWidth = 2;
+        // Climbing red view-count sparkline
+        ctx.strokeStyle = 'rgba(255, 52, 84, 0.85)';
+        ctx.lineWidth = 2.4;
         ctx.beginPath();
-        for (let x = 0; x <= W; x += 14) {
+        for (let x = 0; x <= W; x += 8) {
           const u = x / W;
-          const y = H * (0.76 - u * 0.42) + Math.sin(u * 10 - t * 2.5) * 6;
+          const y = H * 0.78 - u * H * 0.42 + Math.sin(u * 10 - t * 2.4) * 7;
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
@@ -1380,65 +1466,81 @@ window.LLCRifts = (() => {
   }
 
   /* ------------------------------------------------------------------------
-     Viewport-Culled Animation Manager
+     Viewport-Aware Animation Loop (Pauses Offscreen Rifts Automatically)
      ------------------------------------------------------------------------ */
-  let activeCanvases = [];
+  const entries = [];
   let rafId = null;
-  let lastPaint = 0;
+  let observer = null;
   const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function sizeCanvas(item) {
-    if (item.isPixel) {
-      if (item.canvas.width !== 160) {
-        item.canvas.width = 160;
-        item.canvas.height = 60;
+  function ensureObserver() {
+    if (observer || !('IntersectionObserver' in window)) return;
+    observer = new IntersectionObserver(
+      (list) => {
+        for (const item of list) {
+          const e = entries.find((x) => x.el === item.target);
+          if (e) e.visible = item.isIntersecting;
+        }
+      },
+      { rootMargin: '120px' }
+    );
+  }
+
+  function sizeCanvas(entry) {
+    if (entry.pixel) {
+      entry.canvas.width = 160;
+      entry.canvas.height = 60;
+    } else {
+      const rect = entry.canvas.getBoundingClientRect();
+      const w = Math.max(240, Math.min(480, Math.round(rect.width || 360)));
+      const h = Math.max(96, Math.min(200, Math.round(rect.height || 140)));
+      if (entry.canvas.width !== w || entry.canvas.height !== h) {
+        entry.canvas.width = w;
+        entry.canvas.height = h;
       }
-      return;
-    }
-    const r = item.el.getBoundingClientRect();
-    const tw = Math.max(240, Math.round(r.width || 560));
-    const th = Math.max(110, Math.round(r.height || 170));
-    if (Math.abs(item.canvas.width - tw) > 4 || Math.abs(item.canvas.height - th) > 4) {
-      item.canvas.width = tw;
-      item.canvas.height = th;
     }
   }
 
   function tick(now) {
-    if (!document.hidden && now - lastPaint >= 50) {
-      lastPaint = now;
-      const t = now / 1000;
-      const vh = window.innerHeight;
-      for (const item of activeCanvases) {
-        const r = item.el.getBoundingClientRect();
-        if (r.bottom < -60 || r.top > vh + 60) continue;
-        sizeCanvas(item);
-        paintScene(item.canvas, item.scene, t, item.isPixel);
-      }
+    const t = now * 0.001;
+    for (const e of entries) {
+      if (!e.visible) continue;
+      if (!e.pixel) sizeCanvas(e);
+      paintScene(e.canvas, e.scene, t, e.pixel);
     }
-    rafId = requestAnimationFrame(tick);
+    if (!reducedMotion && entries.length) {
+      rafId = requestAnimationFrame(tick);
+    }
   }
 
   function reset() {
-    activeCanvases = [];
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
+    entries.length = 0;
   }
 
-  function register(cardEl, canvas, site) {
-    const item = { el: cardEl, canvas, scene: site.scene, isPixel: site.pixel };
-    if (site.pixel) {
-      canvas.width = 160;
-      canvas.height = 60;
-    } else {
-      canvas.width = 560;
-      canvas.height = 170;
-    }
-    requestAnimationFrame(() => {
-      sizeCanvas(item);
-      paintScene(canvas, site.scene, 0.4, site.pixel);
-    });
-    if (!reducedMotion) {
-      activeCanvases.push(item);
-      if (!rafId) rafId = requestAnimationFrame(tick);
+  function register(el, canvas, site, assetBase = '') {
+    ensureObserver();
+    if (site.scene === 'atlas') ensureEarthTexture(assetBase);
+    const entry = {
+      el,
+      canvas,
+      scene: site.scene,
+      pixel: !!site.pixel,
+      visible: true,
+    };
+    sizeCanvas(entry);
+    entries.push(entry);
+    if (observer) observer.observe(el);
+    paintScene(canvas, site.scene, 1.2, entry.pixel);
+    if (!reducedMotion && !rafId) {
+      rafId = requestAnimationFrame(tick);
     }
   }
 
@@ -1446,7 +1548,7 @@ window.LLCRifts = (() => {
     buildCrackGeometry,
     buildTitleHTML,
     buildPopoutsHTML,
-    reset,
     register,
+    reset,
   };
 })();
