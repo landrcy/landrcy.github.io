@@ -663,6 +663,26 @@ a {
   box-shadow: 0 2px 12px rgba(255, 0, 51, 0.55);
 }
 
+.rt-mimic {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 46px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #f4f7ff;
+  text-shadow: 0 0 18px rgba(56, 232, 255, 0.72), 0 3px 12px rgba(0, 0, 0, 0.9);
+}
+
+.mimic-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ff4d6a;
+  box-shadow: 0 0 12px #ff4d6a;
+}
+
 /* ==========================================================================
    Pop-Out Characters & Props (Spring Out Past the Rift on Hover)
    ========================================================================== */

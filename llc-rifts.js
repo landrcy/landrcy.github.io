@@ -256,6 +256,8 @@ window.LLCRifts = (() => {
         return `<div class="rt-recommend">Recommend</div>`;
       case 'channels':
         return `<div class="rt-channels"><span class="yt-play-pill">&#9654;</span>LLC Powered Channels</div>`;
+      case 'mimic':
+        return `<div class="rt-mimic"><span class="mimic-dot"></span>MIMIC</div>`;
       default:
         return `<div class="rt-default">${site.title}</div>`;
     }
@@ -1367,6 +1369,46 @@ window.LLCRifts = (() => {
         for (let x = 0; x <= W; x += 8) {
           const u = x / W;
           const y = H * 0.78 - u * H * 0.42 + Math.sin(u * 10 - t * 2.4) * 7;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        break;
+      }
+
+      case 'mimic': {
+        // Dark recording-studio obsidian backdrop + live glowing dual-channel cyan/indigo acoustic waveform!
+        const bg = ctx.createLinearGradient(0, 0, W, H);
+        bg.addColorStop(0, '#090a0d');
+        bg.addColorStop(0.5, '#101420');
+        bg.addColorStop(1, '#090a0d');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+        // Subtle acoustic grid lines
+        ctx.strokeStyle = 'rgba(56, 232, 255, 0.07)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, H * 0.5); ctx.lineTo(W, H * 0.5);
+        ctx.stroke();
+        // Glowing symmetric spectrum bars
+        const barCount = 34;
+        const step = W / barCount;
+        for (let i = 0; i < barCount; i++) {
+          const u = i / (barCount - 1);
+          const env = Math.sin(u * Math.PI);
+          const amp = (0.18 + 0.82 * Math.abs(Math.sin(t * 3.4 + i * 0.45) * Math.cos(t * 1.9 - i * 0.25))) * env;
+          const bh = Math.max(4, amp * H * 0.62);
+          ctx.fillStyle = i % 3 === 0 ? 'rgba(99, 102, 241, 0.32)' : 'rgba(56, 232, 255, 0.28)';
+          ctx.fillRect(i * step + 2, (H - bh) * 0.5, Math.max(2, step - 4), bh);
+        }
+        // Crisp glowing cyan oscilloscope sine wave sweeping across
+        ctx.strokeStyle = '#38e8ff';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        for (let x = 0; x <= W; x += 4) {
+          const u = x / W;
+          const env = Math.sin(u * Math.PI);
+          const y = H * 0.5 + Math.sin(u * 18 - t * 5.2) * Math.cos(u * 7 + t * 2.1) * (H * 0.30) * env;
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }

@@ -5,8 +5,8 @@
    of Games); /newest/ sorts newest-first automatically.
    ========================================================================== */
 
-// Carried over from Laverse solar system (HUB_VERSION = 74 -> V75). Increment on publish.
-window.LLC_VERSION = 77;
+// Carried over from Laverse solar system (HUB_VERSION = 74 -> V75+). Increment on publish.
+window.LLC_VERSION = 78;
 
 window.LLC_CATEGORIES = [
   { id: 'games', title: 'Games' },
@@ -15,6 +15,20 @@ window.LLC_CATEGORIES = [
 ];
 
 window.LLC_SITES = [
+  {
+    id: 'mimic',
+    title: 'MIMIC',
+    url: 'https://landrcy.github.io/mimic/',
+    category: 'tools',
+    added: '2026-11-28',
+    pixel: false,
+    seed: 2424,
+    scene: 'mimic',
+    titleStyle: 'mimic',
+    rim: '#38e8ff',
+    glow: '#38e8ff',
+    bg: '#090a0d',
+  },
   {
     id: 'pixel-art-gallery',
     title: 'Pixel Art Gallery',
