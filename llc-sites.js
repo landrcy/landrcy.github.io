@@ -6,7 +6,7 @@
    ========================================================================== */
 
 // Carried over from Laverse solar system (HUB_VERSION = 74 -> V75). Increment on publish.
-window.LLC_VERSION = 75;
+window.LLC_VERSION = 76;
 
 window.LLC_CATEGORIES = [
   { id: 'games', title: 'Games' },

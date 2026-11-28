@@ -364,7 +364,8 @@ a {
 }
 
 .rift-card[data-site-id="mine"] .rift-title-img {
-  max-height: 78px;
+  height: 92px;
+  max-height: 102px;
   filter: drop-shadow(0 0 12px rgba(255, 210, 58, 0.70)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.92));
 }
 
@@ -380,9 +381,9 @@ a {
 }
 
 .rift-card[data-site-id="sea-of-thought"] .rift-title-img {
-  height: 64px;
-  max-width: 90%;
-  max-height: 112px;
+  height: 86px;
+  max-width: 92%;
+  max-height: 118px;
   filter: drop-shadow(0 4px 10px rgba(3, 18, 56, 0.88));
 }
 
@@ -434,10 +435,10 @@ a {
   filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.68));
 }
 
-/* TBOI (Isaac basement blood-cream style) & STS2 (Slay the Spire metallic gold-emerald style) QUIZ */
+/* TBOI (Isaac Rebirth chunky pixel purple->olive style) & STS2 (Slay the Spire II gold + turquoise style) QUIZ */
 .rt-tboi-sts2 {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 8px 11px;
@@ -445,39 +446,63 @@ a {
 }
 
 .tboi-word {
-  font-family: 'Anton', Impact, sans-serif;
-  font-size: 46px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 31px;
   font-weight: 400;
-  letter-spacing: 0.06em;
-  color: #f4dfc4;
-  -webkit-text-stroke: 2px #4a0d0d;
+  letter-spacing: 0.02em;
+  background: linear-gradient(180deg, #a796c6 0%, #7d739e 44%, #8d8c4a 58%, #686632 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 1.5px #120d10;
   paint-order: stroke fill;
-  text-shadow: 0 4px 0 #7a1414, 0 7px 12px rgba(0, 0, 0, 0.85);
+  filter: drop-shadow(0 3px 0 #120d10) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.85));
 }
 
 .quiz-amp {
   font-family: 'Cinzel', Georgia, serif;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   color: #b7a792;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
 }
 
-.sts2-word {
-  font-family: 'Cinzel', Georgia, serif;
-  font-size: 46px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  background: linear-gradient(180deg, #fff2b8 0%, #e4ab49 48%, #5fc27c 100%);
+.sts-wrap {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.sts-word {
+  font-family: 'Cinzel Decorative', Georgia, serif;
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  background: linear-gradient(180deg, #fff24a 0%, #ffd51a 52%, #f09c08 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 3px 0 #14281c) drop-shadow(0 0 12px rgba(95, 194, 124, 0.52));
+  -webkit-text-stroke: 1.5px #3a3630;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 3px 0 #26221c) drop-shadow(0 5px 10px rgba(0, 0, 0, 0.78));
+}
+
+.sts-two {
+  font-family: 'Cinzel Decorative', Georgia, serif;
+  font-size: 46px;
+  font-weight: 900;
+  background: linear-gradient(180deg, #78f8ff 0%, #34dae6 52%, #1496b0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 1.5px #22383e;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 3px 0 #122428) drop-shadow(0 0 12px rgba(72, 232, 240, 0.52));
 }
 
 .quiz-word {
   font-family: 'Cinzel', Georgia, serif;
-  font-size: 26px;
+  font-size: 23px;
   font-weight: 700;
   letter-spacing: 0.14em;
   color: #f3eadc;
@@ -538,7 +563,7 @@ a {
 
 .rt-aiquiz {
   font-family: 'Silkscreen', monospace;
-  font-size: 46px;
+  font-size: 56px;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: #8af4ff;
@@ -561,7 +586,7 @@ a {
 .rt-typefall {
   font-family: 'Times New Roman', Times, serif;
   font-style: italic;
-  font-size: 54px;
+  font-size: 64px;
   font-weight: 400;
   letter-spacing: 0.01em;
   color: #111111;
@@ -868,16 +893,20 @@ a {
   .void-logo-img,
   .rift-card[data-site-id="binding-of-ashaad"] .rift-title-img { max-height: 92px; }
   .rift-card[data-site-id="pixel-museum"] .rift-title-img { max-height: 44px; }
+  .rift-card[data-site-id="sea-of-thought"] .rift-title-img { height: 64px; }
+  .rift-card[data-site-id="mine"] .rift-title-img { height: 68px; }
   .title-wam-svg { height: 42px; }
 
-  .tboi-word, .sts2-word { font-size: 32px; }
-  .quiz-amp, .quiz-word { font-size: 19px; }
+  .tboi-word { font-size: 21px; }
+  .sts-word { font-size: 28px; }
+  .sts-two { font-size: 31px; }
+  .quiz-amp, .quiz-word { font-size: 16px; }
   .rt-llccards { font-size: 30px; }
   .rt-ddom { font-size: 38px; }
   .ddom-maggie { width: 64px; height: 64px; border-width: 3px; }
-  .rt-aiquiz { font-size: 34px; }
+  .rt-aiquiz { font-size: 40px; }
   .rt-gallery { font-size: 28px; padding: 4px 14px; }
-  .rt-typefall { font-size: 40px; }
+  .rt-typefall { font-size: 46px; }
   .rt-shaders { font-size: 34px; }
   .rt-atlas { font-size: 36px; }
   .rt-terrain { font-size: 22px; padding: 4px 14px; }

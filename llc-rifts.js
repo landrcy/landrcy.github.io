@@ -235,7 +235,7 @@ window.LLCRifts = (() => {
       case 'wam':
         return `<span class="sr-only">${site.title}</span>${wamSVG('W.A.M.')}`;
       case 'roguelike':
-        return `<div class="rt-tboi-sts2"><span class="tboi-word">TBOI</span><span class="quiz-amp">&amp;</span><span class="sts2-word">STS2</span><span class="quiz-word">QUIZ</span></div>`;
+        return `<div class="rt-tboi-sts2"><span class="tboi-word">TBOI</span><span class="quiz-amp">&amp;</span><span class="sts-wrap"><span class="sts-word">STS</span><span class="sts-two">2</span></span><span class="quiz-word">QUIZ</span></div>`;
       case 'ddom':
         return `<div class="rt-ddom-wrap"><img class="ddom-maggie is-left" src="${assetBase}world/titles/maggie-1.jpg" alt="" aria-hidden="true" /><span class="rt-ddom">DDOM</span><img class="ddom-maggie is-right" src="${assetBase}world/titles/maggie-2.jpg" alt="" aria-hidden="true" /></div>`;
       case 'llccards':
