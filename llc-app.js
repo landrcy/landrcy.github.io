@@ -1,13 +1,12 @@
 /* ==========================================================================
-   llc-app.js — Minimalist LLC Directory Renderer (Categories & Newest Views)
-   Shared by /index.html (default categorized view) and /newest/index.html.
+   llc-app.js — LLC Themed Rift Directory Renderer (Categories & Newest)
+   Shared cleanly by /index.html (default categorized view) and /newest/.
    ========================================================================== */
 
 (() => {
   const SITES = window.LLC_SITES || [];
   const CATEGORIES = window.LLC_CATEGORIES || [];
-  const ICONS = window.LLC_ICONS || {};
-
+  const Rifts = window.LLCRifts;
   const catTitles = Object.fromEntries(CATEGORIES.map((c) => [c.id, c.title]));
 
   function formatDate(iso) {
@@ -17,48 +16,54 @@
     return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
-  function makeIcon(iconKey) {
-    const body =
-      ICONS[iconKey] ||
-      '<circle cx="10" cy="10" r="6"/><circle cx="10" cy="10" r="1.5" fill="currentColor" stroke="none"/>';
-    return (
-      '<span class="site-icon" aria-hidden="true">' +
-      '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">' +
-      body +
-      '</svg></span>'
-    );
-  }
-
-  function buildRow(site, showMeta) {
+  function buildRiftCell(site, showMeta, assetBase) {
     const li = document.createElement('li');
+    li.className = 'rift-cell';
+
+    if (showMeta) {
+      const strip = document.createElement('div');
+      strip.className = 'rift-meta-strip';
+      strip.innerHTML = `<span>${catTitles[site.category] || site.category}</span><span>${formatDate(site.added)}</span>`;
+      li.appendChild(strip);
+    }
+
+    const isLight = site.scene === 'gallery' || site.scene === 'typefall' || site.scene === 'atlas';
+    const crackClass = site.pixel ? `crack-px-${site.crack % 6}` : `crack-sm-${site.crack % 4}`;
+
     const a = document.createElement('a');
-    a.className = 'site-row';
+    a.className =
+      'rift-card' +
+      (site.pixel ? ' is-pixel' : ' is-smooth') +
+      (isLight ? ' is-light' : '');
     a.href = site.url;
-    if (site.color) a.style.setProperty('--accent', site.color);
+    a.dataset.siteId = site.id;
+    a.setAttribute('aria-label', site.title);
+    a.style.setProperty('--rim', site.rim || '#111111');
+    a.style.setProperty('--rift-bg', site.bg || '#18181c');
 
-    const catTag = showMeta
-      ? `<span class="site-cat-note">(${catTitles[site.category] || site.category})</span>`
-      : '';
-    const dateHtml = showMeta && site.added
-      ? `<span class="site-date">${formatDate(site.added)}</span>`
-      : '';
+    a.innerHTML = `
+      <div class="rift-shell">
+        <div class="rift-rim ${crackClass}" aria-hidden="true"></div>
+        <div class="rift-portal ${crackClass}">
+          <canvas class="rift-bg-canvas" aria-hidden="true"></canvas>
+          <div class="rift-depth" aria-hidden="true"></div>
+          <div class="rift-title-layer">${Rifts.buildTitleHTML(site, assetBase)}</div>
+        </div>
+      </div>
+      ${Rifts.buildPopoutsHTML(site, assetBase)}
+    `;
 
-    a.innerHTML =
-      makeIcon(site.icon) +
-      '<div class="site-text">' +
-      `<div class="site-name-line"><span class="site-name"></span>${catTag}</div>` +
-      '<p class="site-desc"></p>' +
-      '</div>' +
-      `<div class="site-right">${dateHtml}<span class="site-arrow" aria-hidden="true">&rarr;</span></div>`;
+    const canvas = a.querySelector('.rift-bg-canvas');
+    Rifts.register(a, canvas, site);
 
-    a.querySelector('.site-name').textContent = site.title;
-    a.querySelector('.site-desc').textContent = site.desc;
     li.appendChild(a);
     return li;
   }
 
-  function renderCategorized(container) {
+  function renderCategorized(container, assetBase) {
+    Rifts.reset();
     container.innerHTML = '';
+
     for (const cat of CATEGORIES) {
       const items = SITES.filter((s) => s.category === cat.id);
       if (!items.length) continue;
@@ -75,18 +80,20 @@
       sec.appendChild(head);
 
       const ul = document.createElement('ul');
-      ul.className = 'site-list';
-      for (const site of items) ul.appendChild(buildRow(site, false));
+      ul.className = 'rift-grid';
+      for (const site of items) ul.appendChild(buildRiftCell(site, false, assetBase));
       sec.appendChild(ul);
       container.appendChild(sec);
     }
   }
 
-  function renderNewest(container) {
+  function renderNewest(container, assetBase) {
+    Rifts.reset();
     container.innerHTML = '';
+
     const sorted = SITES.slice().sort((a, b) => {
       if (a.added !== b.added) return (b.added || '').localeCompare(a.added || '');
-      return 0; // preserve explicit newest-first ordering in llc-sites.js
+      return 0;
     });
 
     const sec = document.createElement('section');
@@ -99,13 +106,13 @@
     sec.appendChild(head);
 
     const ul = document.createElement('ul');
-    ul.className = 'site-list';
-    for (const site of sorted) ul.appendChild(buildRow(site, true));
+    ul.className = 'rift-grid';
+    for (const site of sorted) ul.appendChild(buildRiftCell(site, true, assetBase));
     sec.appendChild(ul);
     container.appendChild(sec);
   }
 
-  window.initLLC = function initLLC(defaultMode) {
+  window.initLLC = function initLLC(defaultMode, assetBase = '') {
     const dir = document.getElementById('directory');
     const navAll = document.getElementById('nav-all');
     const navNewest = document.getElementById('nav-newest');
@@ -116,8 +123,8 @@
 
     function setMode(mode, updateHash) {
       const isNewest = mode === 'newest';
-      if (isNewest) renderNewest(dir);
-      else renderCategorized(dir);
+      if (isNewest) renderNewest(dir, assetBase);
+      else renderCategorized(dir, assetBase);
 
       if (navAll) {
         navAll.classList.toggle('active', !isNewest);
@@ -138,7 +145,6 @@
         : 'all';
     setMode(startMode, false);
 
-    // On the main page (/), switch instantaneously in-place between All and Newest
     if (defaultMode === 'all') {
       if (navAll) {
         navAll.addEventListener('click', (e) => {
