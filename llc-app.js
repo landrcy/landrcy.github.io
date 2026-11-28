@@ -34,6 +34,7 @@
     const a = document.createElement('a');
     a.className = 'site-row';
     a.href = site.url;
+    if (site.color) a.style.setProperty('--accent', site.color);
 
     const catTag = showMeta
       ? `<span class="site-cat-note">(${catTitles[site.category] || site.category})</span>`

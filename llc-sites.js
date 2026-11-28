@@ -70,15 +70,17 @@ window.LLC_SITES = [
     category: 'projects',
     added: '2026-11-28',
     icon: 'gallery',
+    color: '#b84a31',
   },
   {
     id: 'atlas',
-    title: 'atlas',
+    title: 'Atlas',
     desc: 'Spinning 3D Earth travel tracker for pinning places you have visited with photos, dates, and notes.',
     url: 'https://landrcy.github.io/atlas/',
     category: 'tools',
     added: '2026-11-28',
     icon: 'atlas',
+    color: '#2563a8',
   },
   {
     id: 'terrain',
@@ -88,33 +90,37 @@ window.LLC_SITES = [
     category: 'tools',
     added: '2026-11-27',
     icon: 'terrain',
+    color: '#2d7a56',
   },
   {
     id: 'recommend',
-    title: 'recommend',
+    title: 'Recommend',
     desc: 'Find your next movie, TV show, book, or video game with streaming lookup.',
     url: 'https://landrcy.github.io/movie/',
     category: 'tools',
     added: '2026-11-27',
     icon: 'recommend',
+    color: '#c47b1c',
   },
   {
     id: 'roguelike-quiz',
-    title: 'Spire & Basement',
+    title: 'Roguelike Quiz',
     desc: 'Trivia quiz for The Binding of Isaac and Slay the Spire 2.',
     url: 'https://landrcy.github.io/roguelike-quiz/',
     category: 'games',
     added: '2026-11-26',
     icon: 'quiz_roguelike',
+    color: '#a33244',
   },
   {
     id: 'ddom',
-    title: 'ddom',
+    title: 'DDOM',
     desc: 'Daily Dose of Maggie — an interactive mosaic built from photos of Maggie.',
     url: 'https://landrcy.github.io/ddom/',
     category: 'projects',
     added: '2026-11-26',
     icon: 'ddom',
+    color: '#c96f32',
   },
   {
     id: 'forge',
@@ -124,6 +130,7 @@ window.LLC_SITES = [
     category: 'games',
     added: '2026-11-26',
     icon: 'forge',
+    color: '#d45a1e',
   },
   {
     id: 'typefall',
@@ -133,6 +140,7 @@ window.LLC_SITES = [
     category: 'projects',
     added: '2026-11-25',
     icon: 'typefall',
+    color: '#7a5a3a',
   },
   {
     id: 'lan4drcy',
@@ -142,6 +150,7 @@ window.LLC_SITES = [
     category: 'projects',
     added: '2026-11-25',
     icon: 'shaders',
+    color: '#0f7f99',
   },
   {
     id: 'youtube',
@@ -151,6 +160,7 @@ window.LLC_SITES = [
     category: 'tools',
     added: '2026-11-25',
     icon: 'channels',
+    color: '#c22929',
   },
   {
     id: 'llccards',
@@ -160,6 +170,7 @@ window.LLC_SITES = [
     category: 'games',
     added: '2026-11-20',
     icon: 'cards',
+    color: '#2b2b30',
   },
   {
     id: 'cast',
@@ -169,6 +180,7 @@ window.LLC_SITES = [
     category: 'games',
     added: '2026-11-17',
     icon: 'cast',
+    color: '#1b7f9c',
   },
   {
     id: 'mine',
@@ -178,15 +190,17 @@ window.LLC_SITES = [
     category: 'games',
     added: '2026-11-17',
     icon: 'mine',
+    color: '#b07f0e',
   },
   {
     id: 'lsu',
-    title: 'Lsu',
+    title: 'LSU',
     desc: 'Minimalist aim-and-click rhythm game.',
     url: '/lsu/',
     category: 'games',
     added: '2026-11-14',
     icon: 'rhythm',
+    color: '#cf2762',
   },
   {
     id: 'terra',
@@ -196,6 +210,7 @@ window.LLC_SITES = [
     category: 'projects',
     added: '2026-11-10',
     icon: 'terra',
+    color: '#9e7432',
   },
   {
     id: 'ai-quiz',
@@ -205,6 +220,7 @@ window.LLC_SITES = [
     category: 'games',
     added: '2026-11-10',
     icon: 'aiquiz',
+    color: '#168096',
   },
   {
     id: 'escape-ca',
@@ -214,6 +230,7 @@ window.LLC_SITES = [
     category: 'games',
     added: '2026-11-02',
     icon: 'escape',
+    color: '#bd2632',
   },
   {
     id: 'ttt',
@@ -223,6 +240,7 @@ window.LLC_SITES = [
     category: 'projects',
     added: '2026-10-28',
     icon: 'tung',
+    color: '#8c5228',
   },
   {
     id: 'pixel-museum',
@@ -232,6 +250,7 @@ window.LLC_SITES = [
     category: 'projects',
     added: '2026-10-27',
     icon: 'museum',
+    color: '#5a4a8f',
   },
   {
     id: 'wam',
@@ -241,6 +260,7 @@ window.LLC_SITES = [
     category: 'games',
     added: '2026-10-27',
     icon: 'wam',
+    color: '#2b7849',
   },
   {
     id: 'the-void',
@@ -250,6 +270,7 @@ window.LLC_SITES = [
     category: 'games',
     added: '2026-10-23',
     icon: 'void_game',
+    color: '#7538bd',
   },
   {
     id: 'sea-of-thought',
@@ -259,6 +280,7 @@ window.LLC_SITES = [
     category: 'projects',
     added: '2026-10-23',
     icon: 'sea',
+    color: '#226994',
   },
   {
     id: 'binding-of-ashaad',
@@ -268,5 +290,6 @@ window.LLC_SITES = [
     category: 'games',
     added: '2026-10-22',
     icon: 'ashaad',
+    color: '#3d6999',
   },
 ];
