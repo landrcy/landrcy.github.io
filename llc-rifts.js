@@ -258,6 +258,8 @@ window.LLCRifts = (() => {
         return `<div class="rt-channels"><span class="yt-play-pill">&#9654;</span>LLC Powered Channels</div>`;
       case 'mimic':
         return `<div class="rt-mimic"><span class="mimic-dot"></span>MIMIC</div>`;
+      case 'aivillage':
+        return `<div class="rt-aivillage">AI Village</div>`;
       default:
         return `<div class="rt-default">${site.title}</div>`;
     }
@@ -1413,6 +1415,67 @@ window.LLCRifts = (() => {
           else ctx.lineTo(x, y);
         }
         ctx.stroke();
+        break;
+      }
+
+      case 'aivillage': {
+        // Warm minimalist cream sky, sage rolling hills, cottage, central fountain & R.E.P.O. stickmen!
+        const sky = ctx.createLinearGradient(0, 0, 0, H);
+        sky.addColorStop(0, '#f3ede0');
+        sky.addColorStop(0.55, '#f6f2e9');
+        sky.addColorStop(1, '#c5d3b5');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, W, H);
+        // Rolling sage hills
+        ctx.fillStyle = '#c5d3b5';
+        ctx.beginPath();
+        ctx.moveTo(0, H * 0.56);
+        ctx.quadraticCurveTo(W * 0.35, H * 0.42, W * 0.7, H * 0.54);
+        ctx.quadraticCurveTo(W * 0.88, H * 0.50, W, H * 0.58);
+        ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+        ctx.fill();
+        // Little terracotta cottage on left
+        ctx.fillStyle = '#faf7f0'; ctx.strokeStyle = '#2c2a26'; ctx.lineWidth = 1.6;
+        ctx.fillRect(W * 0.11, H * 0.48, 34, 24); ctx.strokeRect(W * 0.11, H * 0.48, 34, 24);
+        ctx.fillStyle = '#c96d51';
+        ctx.beginPath();
+        ctx.moveTo(W * 0.11 - 5, H * 0.49); ctx.lineTo(W * 0.11 + 17, H * 0.33); ctx.lineTo(W * 0.11 + 39, H * 0.49);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        // Central fountain on right-center
+        const fx = W * 0.80, fy = H * 0.74;
+        ctx.fillStyle = '#dcd3c1';
+        ctx.beginPath(); ctx.ellipse(fx, fy, 26, 12, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#8fb3c2';
+        ctx.beginPath(); ctx.ellipse(fx, fy - 1, 20, 8, 0, 0, Math.PI * 2); ctx.fill();
+        const fp = Math.sin(t * 4.5) * 2;
+        ctx.strokeStyle = 'rgba(250,247,240,0.9)'; ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(fx, fy - 12); ctx.quadraticCurveTo(fx - 9, fy - 24 - fp, fx - 13, fy - 2);
+        ctx.moveTo(fx, fy - 12); ctx.quadraticCurveTo(fx + 9, fy - 24 - fp, fx + 13, fy - 2);
+        ctx.stroke();
+        // Two animated R.E.P.O.-head stickmen chatting!
+        const drawMini = (sx, sy, dir, accent, phase) => {
+          const flap = Math.max(0, Math.sin(t * 6.5 + phase)) * 0.65;
+          ctx.save(); ctx.translate(sx, sy);
+          ctx.strokeStyle = '#22211e'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(0, -10); ctx.lineTo(-4, 0); ctx.moveTo(0, -10); ctx.lineTo(4, 0);
+          ctx.moveTo(0, -10); ctx.lineTo(0, -21);
+          ctx.moveTo(0, -19); ctx.lineTo(-6, -12); ctx.moveTo(0, -19); ctx.lineTo(6, -12);
+          ctx.stroke();
+          ctx.translate(0, -29);
+          ctx.fillStyle = '#faf7f0'; ctx.lineWidth = 1.8;
+          ctx.beginPath(); ctx.arc(0, 0, 8, 0.08, Math.PI - 0.08); ctx.closePath(); ctx.fill(); ctx.stroke();
+          ctx.save();
+          ctx.translate(-7 * dir, 1); ctx.rotate(-flap * dir); ctx.translate(7 * dir, -1);
+          ctx.beginPath(); ctx.arc(0, 0, 8, Math.PI - 0.08, 0.08); ctx.closePath(); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = accent;
+          ctx.beginPath(); ctx.arc(0, -2, 7.6, Math.PI * 1.05, Math.PI * 1.95); ctx.closePath(); ctx.fill(); ctx.stroke();
+          ctx.restore();
+          ctx.restore();
+        };
+        drawMini(W * 0.25, H * 0.84, 1, '#c96d51', 0);
+        drawMini(W * 0.64, H * 0.84, -1, '#6f8a6e', 2.2);
         break;
       }
 

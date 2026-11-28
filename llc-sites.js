@@ -6,7 +6,7 @@
    ========================================================================== */
 
 // Carried over from Laverse solar system (HUB_VERSION = 74 -> V75+). Increment on publish.
-window.LLC_VERSION = 78;
+window.LLC_VERSION = 79;
 
 window.LLC_CATEGORIES = [
   { id: 'games', title: 'Games' },
@@ -15,6 +15,21 @@ window.LLC_CATEGORIES = [
 ];
 
 window.LLC_SITES = [
+  {
+    id: 'ai-village',
+    title: 'AI Village',
+    url: 'https://landrcy.github.io/ai-village/',
+    category: 'projects',
+    added: '2026-11-28',
+    pixel: false,
+    seed: 2525,
+    scene: 'aivillage',
+    titleStyle: 'aivillage',
+    rim: '#6f8a6e',
+    glow: '#7fa87d',
+    bg: '#f6f2e9',
+    light: true,
+  },
   {
     id: 'mimic',
     title: 'MIMIC',

@@ -683,6 +683,15 @@ a {
   box-shadow: 0 0 12px #ff4d6a;
 }
 
+.rt-aivillage {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 46px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #22211e;
+  text-shadow: 0 2px 14px rgba(246, 242, 233, 0.98), 0 0 24px rgba(246, 242, 233, 0.92);
+}
+
 /* ==========================================================================
    Pop-Out Characters & Props (Spring Out Past the Rift on Hover)
    ========================================================================== */
