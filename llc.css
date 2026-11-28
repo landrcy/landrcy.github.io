@@ -380,9 +380,10 @@ a {
 }
 
 .rift-card[data-site-id="sea-of-thought"] .rift-title-img {
-  max-width: 86%;
-  max-height: 98px;
-  filter: drop-shadow(0 4px 10px rgba(3, 24, 62, 0.85));
+  height: 64px;
+  max-width: 90%;
+  max-height: 112px;
+  filter: drop-shadow(0 4px 10px rgba(3, 18, 56, 0.88));
 }
 
 .rift-card[data-site-id="binding-of-ashaad"] .rift-title-img {
@@ -433,24 +434,106 @@ a {
   filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.68));
 }
 
-/* Equalized BIG Authentic Per-Site Typography */
-.rt-roguelike {
-  font-family: 'Cinzel', Georgia, serif;
-  font-size: 38px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: #f3eadc;
-  text-shadow: 0 3px 0 #1f1208, 0 0 16px rgba(228, 171, 73, 0.55);
+/* TBOI (Isaac basement blood-cream style) & STS2 (Slay the Spire metallic gold-emerald style) QUIZ */
+.rt-tboi-sts2 {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 11px;
+  line-height: 1;
 }
-.rt-roguelike span { color: #5fc27c; }
 
+.tboi-word {
+  font-family: 'Anton', Impact, sans-serif;
+  font-size: 46px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: #f4dfc4;
+  -webkit-text-stroke: 2px #4a0d0d;
+  paint-order: stroke fill;
+  text-shadow: 0 4px 0 #7a1414, 0 7px 12px rgba(0, 0, 0, 0.85);
+}
+
+.quiz-amp {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #b7a792;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.sts2-word {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 46px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: linear-gradient(180deg, #fff2b8 0%, #e4ab49 48%, #5fc27c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 3px 0 #14281c) drop-shadow(0 0 12px rgba(95, 194, 124, 0.52));
+}
+
+.quiz-word {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #f3eadc;
+  text-shadow: 0 3px 0 #1f1208, 0 0 10px rgba(228, 171, 73, 0.45);
+}
+
+/* Pure Black & White LLC Cards title */
 .rt-llccards {
   font-family: 'Silkscreen', monospace;
   font-size: 42px;
   font-weight: 700;
   letter-spacing: 0.07em;
-  color: #ffffff;
-  text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000, 0 5px 0 #e01b1b;
+  color: #111111;
+  text-shadow:
+    2px 0 0 #ffffff,
+    -2px 0 0 #ffffff,
+    0 2px 0 #ffffff,
+    0 -2px 0 #ffffff,
+    0 5px 0 rgba(17, 17, 17, 0.18);
+}
+
+/* DDOM: Two Maggie portraits flanking exact blackish-brown serif title (#231a14) */
+.rt-ddom-wrap {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 6px;
+}
+
+.rt-ddom {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 56px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #231a14;
+  line-height: 1;
+}
+
+.ddom-maggie {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 4px solid #ffffff;
+  box-shadow: 0 5px 14px rgba(35, 26, 20, 0.24);
+  flex-shrink: 0;
+}
+
+.ddom-maggie.is-left {
+  transform: rotate(-5deg);
+}
+
+.ddom-maggie.is-right {
+  transform: rotate(5deg);
 }
 
 .rt-aiquiz {
@@ -493,17 +576,18 @@ a {
   text-shadow: 0 0 18px rgba(102, 240, 255, 0.85), 3px 0 14px rgba(255, 92, 240, 0.65), 0 3px 8px rgba(3, 6, 12, 0.9);
 }
 
+/* Atlas: No white bubble — crisp clean white outline directly over the realistic Earth */
 .rt-atlas {
   font-family: 'Inter', -apple-system, sans-serif;
-  font-size: 48px;
-  font-weight: 600;
+  font-size: 50px;
+  font-weight: 700;
   letter-spacing: 0.14em;
-  color: #112236;
-  padding: 2px 18px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(2px);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.95);
+  color: #0e1d30;
+  -webkit-text-stroke: 4px rgba(255, 255, 255, 0.94);
+  paint-order: stroke fill;
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.95),
+    0 2px 6px rgba(255, 255, 255, 0.85);
 }
 
 .rt-terrain {
@@ -786,8 +870,11 @@ a {
   .rift-card[data-site-id="pixel-museum"] .rift-title-img { max-height: 44px; }
   .title-wam-svg { height: 42px; }
 
-  .rt-roguelike { font-size: 26px; }
+  .tboi-word, .sts2-word { font-size: 32px; }
+  .quiz-amp, .quiz-word { font-size: 19px; }
   .rt-llccards { font-size: 30px; }
+  .rt-ddom { font-size: 38px; }
+  .ddom-maggie { width: 64px; height: 64px; border-width: 3px; }
   .rt-aiquiz { font-size: 34px; }
   .rt-gallery { font-size: 28px; padding: 4px 14px; }
   .rt-typefall { font-size: 40px; }

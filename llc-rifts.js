@@ -235,7 +235,9 @@ window.LLCRifts = (() => {
       case 'wam':
         return `<span class="sr-only">${site.title}</span>${wamSVG('W.A.M.')}`;
       case 'roguelike':
-        return `<div class="rt-roguelike">ROGUELIKE <span>QUIZ</span></div>`;
+        return `<div class="rt-tboi-sts2"><span class="tboi-word">TBOI</span><span class="quiz-amp">&amp;</span><span class="sts2-word">STS2</span><span class="quiz-word">QUIZ</span></div>`;
+      case 'ddom':
+        return `<div class="rt-ddom-wrap"><img class="ddom-maggie is-left" src="${assetBase}world/titles/maggie-1.jpg" alt="" aria-hidden="true" /><span class="rt-ddom">DDOM</span><img class="ddom-maggie is-right" src="${assetBase}world/titles/maggie-2.jpg" alt="" aria-hidden="true" /></div>`;
       case 'llccards':
         return `<div class="rt-llccards">LLC CARDS</div>`;
       case 'aiquiz':
@@ -260,20 +262,8 @@ window.LLCRifts = (() => {
   }
 
   /* ------------------------------------------------------------------------
-     Site-Inspired Pop-Out Pixel & Vector Characters/Props
+     Authentic Game Character Sprites on Sides (Ashaad & W.A.M. only)
      ------------------------------------------------------------------------ */
-  function pxSvg(rows, pal, w, h) {
-    let rects = '';
-    for (let y = 0; y < rows.length; y++) {
-      const r = rows[y];
-      for (let x = 0; x < r.length; x++) {
-        const c = pal[r[x]];
-        if (c) rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${c}"/>`;
-      }
-    }
-    return `<svg viewBox="0 0 ${w} ${h}" shape-rendering="crispEdges" aria-hidden="true">${rects}</svg>`;
-  }
-
   function buildPopoutsHTML(site, assetBase) {
     const k = site.pop;
     if (k === 'ashaad') {
@@ -282,149 +272,13 @@ window.LLCRifts = (() => {
         <img class="pop-el pop-right pop-sprite" src="${assetBase}games/ashaad/finley.png" alt="" aria-hidden="true" />
       `;
     }
-
-    const PIX_POPS = {
-      roguelike: {
-        // Isaac golden crown & Slay the Spire emerald energy orb
-        left: pxSvg([
-          '.oo....oo.', 'oYYo..oYYo', 'oYYYoYYYYo', 'oYRYRYRYRo', 'oYYYYYYYYo', '.oooooooo.',
-        ], { o: '#1f1208', Y: '#e4ab49', R: '#d85042' }, 10, 6),
-        right: pxSvg([
-          '...oooo...', '.ooGGGGoo.', 'oGGWWWWGGo', 'oGWWGGWWGo', 'oGGGGGGGGo', '.ooGGGGoo.', '...oooo...',
-        ], { o: '#0d2618', G: '#5fc27c', W: '#e4ffe8' }, 10, 7),
-      },
-      llccards: {
-        // Hand-inked black-and-white LLC Cards deck with crimson #e01b1b emblem
-        left: pxSvg([
-          'ooooooo...', 'oWWWWWo...', 'oWWRWWoooo', 'oWRRRWooWo',
-          'oWWRWWoRWo', 'oWWWWWoWWo', 'oooooooWWo', '....oooooo',
-        ], { o: '#000000', W: '#ffffff', R: '#e01b1b' }, 10, 8),
-        right: pxSvg([
-          '...oo...', '..oRRo..', '.oRRRRo.', 'oRRWWRRo', '.oRRRRo.', '..oRRo..', '...oo...',
-        ], { o: '#000000', R: '#e01b1b', W: '#ffffff' }, 8, 7),
-      },
-      mine: {
-        // Mining headlamp robot & gold pickaxe
-        left: pxSvg([
-          '..oooooo..', '.oYYYYYYo.', '.oYBYBYBo.', '.oYYYYYYo.',
-          '..oPPPPoo.', '.oPPPPPPPo', '.oPPYYPPPo', '..oo..oo..',
-        ], { o: '#0c0910', Y: '#ffd23a', B: '#100e12', P: '#7a7288' }, 10, 8),
-        right: pxSvg([
-          '..ooooo...', '.oCCCCCoo.', 'oCCo..oBBo', 'oo....oBo.', '.....oBo..', '....oBo...', '...oBo....',
-        ], { o: '#0c0910', C: '#7fd0ff', B: '#9a6234' }, 10, 7),
-      },
-      aiquiz: {
-        // Cyan/magenta pixel bot & glitch question mark
-        left: pxSvg([
-          '....oo....', '.oooooooo.', 'oCCCCCCCCo', 'oCBBCCBBCo',
-          'oCCCCCCCCo', 'oCCMMMMCCo', '.oooooooo.',
-        ], { o: '#05060f', C: '#57f0ff', B: '#080a18', M: '#ff5ad2' }, 10, 7),
-        right: pxSvg([
-          '..oooo..', '.oMMMMo.', 'oMMooMMo', '....oMMo', '...oMMo.', '........', '...oGGo.',
-        ], { o: '#05060f', M: '#ff5ad2', G: '#7dff8f' }, 8, 7),
-      },
-      wam: {
-        // Pixel sword & archery target shield
-        left: pxSvg([
-          '.......oo', '......oWW', '.....oWWo', '....oWWo.', '...oWWo..',
-          '.ooWWo...', 'oGGo.....', '.oBo.....', 'oBo......',
-        ], { o: '#0a140f', W: '#eef6f0', G: '#ffd24c', B: '#8c5630' }, 9, 9),
-        right: pxSvg([
-          '..oooo..', '.oGGGGo.', 'oGWWWWGo', '.oGGGGo.', '...oBo..', '...oBo..', '...oBo..', '...oBo..',
-        ], { o: '#0a140f', G: '#48c774', W: '#d8ffe4', B: '#7d4a26' }, 8, 8),
-      },
-      void: {
-        // Void starship & violet event-horizon star
-        left: pxSvg([
-          '..oooo..', '.oWWWWo.', '.oWCCWo.', '.oWWWWo.', 'ooWWWWoo', '.oWWWWo.', '.oo..oo.',
-        ], { o: '#140826', W: '#f4eeff', C: '#62d4ff' }, 8, 7),
-        right: pxSvg([
-          '...o....', '..oPo...', 'ooPWPoo.', '..oPo...', '...o....',
-        ], { o: '#280d4a', P: '#c04df0', W: '#ffffff' }, 8, 5),
-      },
-      sea: {
-        // Message bottle & turquoise wave crest
-        left: pxSvg([
-          '...oo...', '...oCo..', '..oBBo..', '.oBWWBo.', '.oBPPBo.', '.oBPPBo.', '.oBBBBo.', '..oooo..',
-        ], { o: '#031e4d', C: '#b87a44', B: '#7ae2f2', W: '#ffffff', P: '#f3dfae' }, 8, 8),
-        right: pxSvg([
-          '....oo....', '..ooWWoo..', '.oWWBBBBoo', 'oBBBBBBBB.',
-        ], { o: '#031e4d', W: '#e6fbff', B: '#48cae4' }, 10, 4),
-      },
-      terra: {
-        // Sunlit pixel grass-earth sandbox block & sparkling crystal
-        left: pxSvg([
-          'oooooooo', 'oGGGGGG0', 'oGggggGo', 'oBBgBBBo', 'oBBCBBBo', 'oBBBBYBo', 'oBBBBbBo', 'oooooooo',
-        ], { o: '#1b140c', G: '#62d95c', g: '#3ea83e', B: '#b87644', b: '#875029', C: '#7ff2ff', Y: '#ffd55a', 0: '#1b140c' }, 8, 8),
-        right: pxSvg([
-          '...oo...', '..oCCo..', '.oCWWCo.', 'oCCCCCCo', '.oCCCCo.', '..oCCo..', '...oo...',
-        ], { o: '#0e2838', C: '#66f0ff', W: '#ffffff' }, 8, 7),
-      },
-      pmuseum: {
-        // Classical stone museum column & golden framed pixel painting (NO robot!)
-        left: pxSvg([
-          'oooooooo', 'oSSSSSSo', '.oSwSwo.', '.oSwSwo.', '.oSwSwo.', '.oSwSwo.', 'oSSSSSSo', 'oooooooo',
-        ], { o: '#111d30', S: '#d8e4f0', w: '#9fb4cc' }, 8, 8),
-        right: pxSvg([
-          'oooooooo', 'oGGGGGG0', 'oGBBBbGo', 'oGBYYbGo', 'oGCCCCGo', 'oGGGGGG0', 'oooooooo',
-        ], { o: '#1a140c', G: '#ffd24c', B: '#3a7bd5', b: '#2b5ca8', Y: '#fff08a', C: '#58e2ec', 0: '#1a140c' }, 8, 7),
-      },
-      ddom: {
-        // Warm terracotta Maggie paw & heart photo frame
-        left: pxSvg([
-          '.oo..oo.', 'oPPooPPo', '.oooooo.', '..oPPo..', '.oPPPPo.', '.oPPPPo.', '..oooo..',
-        ], { o: '#2b1a10', P: '#e89b62' }, 8, 7),
-        right: pxSvg([
-          'oooooooo', 'oWWWWWWo', 'oWPWWPWo', 'oWPPPPWo', 'oWWPPWWo', 'oWWWWWWo', 'oooooooo',
-        ], { o: '#2b1a10', W: '#fdfaf5', P: '#c46835' }, 8, 7),
-      },
-    };
-
-    if (PIX_POPS[k]) {
+    if (k === 'wam') {
       return `
-        <span class="pop-el pop-left pop-pix">${PIX_POPS[k].left}</span>
-        <span class="pop-el pop-right pop-pix">${PIX_POPS[k].right}</span>
+        <img class="pop-el pop-left pop-sprite" src="${assetBase}world/titles/wam-warrior.png" alt="" aria-hidden="true" />
+        <img class="pop-el pop-right pop-sprite" src="${assetBase}world/titles/wam-mage.png" alt="" aria-hidden="true" />
       `;
     }
-
-    const VEC_POPS = {
-      gallery: {
-        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><rect x="3" y="4" width="22" height="20" rx="2" fill="#8c5a32" stroke="#5c381c" stroke-width="1.5"/><rect x="6.5" y="7.5" width="15" height="13" fill="#faf7f0"/><rect x="9" y="10" width="5" height="5" fill="#c84b31"/><rect x="14" y="10" width="5" height="5" fill="#f6d55c"/><rect x="9" y="15" width="10" height="4" fill="#388697"/></svg>',
-        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 4l8 4.5v9L14 22l-8-4.5v-9L14 4z" fill="#ece7dc" stroke="#8c7a62" stroke-width="1.4"/><path d="M14 4v9l8-4.5M14 13l-8-4.5" stroke="#b5a58d" stroke-width="1.2"/></svg>',
-      },
-      atlas: {
-        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 3c-4.4 0-8 3.5-8 7.8 0 5.8 8 14.2 8 14.2s8-8.4 8-14.2C22 6.5 18.4 3 14 3z" fill="#d94f30" stroke="#ffffff" stroke-width="1.6"/><circle cx="14" cy="10.8" r="2.8" fill="#ffffff"/></svg>',
-        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="10" fill="#1d5b96" stroke="#ffffff" stroke-width="1.5"/><path d="M8 11c2-2 5-1 6 1s3 3 6 1M9 17c2-1 4 0 5 2" stroke="#76c47e" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>',
-      },
-      terrain: {
-        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M3 20l7-11 5 6 4-5 6 10H3z" fill="#78a363" stroke="#ffffff" stroke-width="1.4" stroke-linejoin="round"/><path d="M3 20h22v4H3z" fill="#986b47"/></svg>',
-        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><ellipse cx="14" cy="17" rx="10" ry="6" fill="#565452" stroke="#ffffff" stroke-width="1.4"/><ellipse cx="14" cy="13" rx="10" ry="6" fill="#888684" stroke="#ffffff" stroke-width="1.2"/></svg>',
-      },
-      recommend: {
-        // Midnight-indigo movie clapper & cozy open book
-        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><rect x="4" y="8" width="20" height="14" rx="2" fill="#182a54" stroke="#7aa4ff" stroke-width="1.5"/><path d="M4 12h20M8 8l2 4M14 8l2 4M20 8l2 4" stroke="#ffd875" stroke-width="1.5"/></svg>',
-        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 8c3.5-1.5 7-1.5 10 0 3-1.5 6.5-1.5 10 0v13c-3.5-1.5-7-1.5-10 0-3-1.5-6.5-1.5-10 0V8z" fill="#eef4ff" stroke="#4c6fc4" stroke-width="1.5"/><path d="M14 8v13" stroke="#4c6fc4" stroke-width="1.4"/></svg>',
-      },
-      typefall: {
-        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11" fill="#f7f2e7" stroke="#222" stroke-width="1.3"/><text x="14" y="19" text-anchor="middle" font-family="Times New Roman,serif" font-style="italic" font-size="16" fill="#111">a</text></svg>',
-        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11" fill="#f7f2e7" stroke="#222" stroke-width="1.3"/><text x="14" y="19" text-anchor="middle" font-family="Times New Roman,serif" font-style="italic" font-size="15" fill="#111">g</text></svg>',
-      },
-      shaders: {
-        left: '<svg viewBox="0 0 28 28" aria-hidden="true"><polygon points="14,2 25,14 14,26 3,14" fill="#060c1c" stroke="#66f0ff" stroke-width="1.6"/><polygon points="14,7 20,14 14,21 8,14" fill="none" stroke="#ff5cf0" stroke-width="1.5"/><polygon points="14,11 17,14 14,17 11,14" fill="#66f0ff"/></svg>',
-        right: '<svg viewBox="0 0 28 28" aria-hidden="true"><polygon points="14,3 24,22 4,22" fill="none" stroke="#66f0ff" stroke-width="1.6"/><polygon points="14,11 19,20 9,20" fill="none" stroke="#ff5cf0" stroke-width="1.4"/></svg>',
-      },
-      channels: {
-        left: '<svg viewBox="0 0 28 24" aria-hidden="true"><rect x="2" y="3" width="24" height="18" rx="5" fill="#ff0033" stroke="#ffffff" stroke-width="1.4"/><polygon points="11.5,8.2 18.5,12 11.5,15.8" fill="#ffffff"/></svg>',
-        right: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="#38e1d0" stroke="#ffffff" stroke-width="1.5"/><circle cx="12" cy="12" r="2.8" fill="#07050f"/></svg>',
-      },
-    };
-
-    const v = VEC_POPS[k];
-    if (!v) return '';
-    return `
-      <span class="pop-el pop-left pop-vec">${v.left}</span>
-      <span class="pop-el pop-right pop-vec">${v.right}</span>
-    `;
+    return '';
   }
 
   /* ------------------------------------------------------------------------
@@ -551,17 +405,20 @@ window.LLCRifts = (() => {
       fracImg = fracCtx.createImageData(FRAC_W, FRAC_H);
     }
     const data = fracImg.data;
-    // Smoothly orbit classic electric Julia fractal parameter
-    const ang = t * 0.42;
-    const cr = -0.745 + 0.095 * Math.cos(ang);
-    const ci = 0.185 + 0.095 * Math.sin(ang * 1.15);
-    const scale = 1.48 + 0.18 * Math.sin(t * 0.55);
-    const maxIter = 26;
+    // Smoothly orbit classic electric Julia fractal parameter AND dramatically zoom in & out!
+    const ang = t * 0.38;
+    const cr = -0.745 + 0.085 * Math.cos(ang);
+    const ci = 0.185 + 0.085 * Math.sin(ang * 1.15);
+    const zoomPhase = 0.5 + 0.5 * Math.sin(t * 0.62);
+    const scale = 2.35 * Math.pow(0.16, zoomPhase); // zooms from 2.35 deep into 0.38 and back out!
+    const offX = 0.18 * Math.sin(t * 0.31) * (1 - scale * 0.25);
+    const offY = 0.12 * Math.cos(t * 0.27) * (1 - scale * 0.25);
+    const maxIter = 30;
 
     for (let py = 0; py < FRAC_H; py++) {
-      const zy0 = ((py / FRAC_H) - 0.5) * 2.0 * scale;
+      const zy0 = ((py / FRAC_H) - 0.5) * 2.0 * scale + offY;
       for (let px = 0; px < FRAC_W; px++) {
-        const zx0 = ((px / FRAC_W) - 0.5) * 3.4 * scale;
+        const zx0 = ((px / FRAC_W) - 0.5) * 3.4 * scale + offX;
         let zx = zx0;
         let zy = zy0;
         let iter = 0;
@@ -707,24 +564,25 @@ window.LLCRifts = (() => {
       }
 
       case 'llccards': {
-        // Authentic LLC Cards stark black-and-white hand-inked table + crimson #e01b1b card accents
-        ctx.fillStyle = '#141418';
+        // Pure Black & White hand-drawn LLC Cards duel table (zero color, just like the real game!)
+        ctx.fillStyle = '#f7f7f7';
         ctx.fillRect(0, 0, W, H);
-        ctx.fillStyle = '#202028';
+        // Subtle hand-drawn black ink diagonal sketch lines
+        ctx.fillStyle = '#e5e5e5';
         for (let x = -H; x < W + H; x += 10) {
           for (let y = 0; y < H; y += 2) ctx.fillRect(x + (y >> 1), y, 1, 1);
         }
-        // Fanned monochrome + crimson cards framing outer left & right flanks
+        // Fanned pure black-and-white hand-inked playing cards on outer left & right flanks
         for (let i = 0; i < 4; i++) {
           const side = i < 2 ? 10 + i * 10 : W - 29 + (i - 2) * 10;
           const bob = Math.round(Math.sin(t * 2.8 + i * 1.3) * 4);
-          const cy = Math.floor(H * 0.30 + (i % 2) * 10 + bob);
-          ctx.fillStyle = '#f4f4f8';
-          ctx.fillRect(side, cy, 8, 11);
-          ctx.fillStyle = '#141418';
-          ctx.fillRect(side + 1, cy + 1, 6, 9);
-          ctx.fillStyle = i % 2 === 0 ? '#e01b1b' : '#ffffff';
-          ctx.fillRect(side + 3, cy + 4, 2, 3);
+          const cy = Math.floor(H * 0.28 + (i % 2) * 10 + bob);
+          ctx.fillStyle = '#111111';
+          ctx.fillRect(side, cy, 9, 12);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(side + 1, cy + 1, 7, 10);
+          ctx.fillStyle = '#111111';
+          ctx.fillRect(side + 3, cy + 4, 3, 4);
         }
         break;
       }
@@ -969,21 +827,21 @@ window.LLCRifts = (() => {
       }
 
       case 'ddom': {
-        // Real DDOM warm terracotta/cream/golden photo mosaic wave (#f6f1e9, #c46835, #231a14, #ffd3b3)
-        const cols = 14, rows = 6;
-        const cw = Math.ceil(W / cols), ch = Math.ceil(H / rows);
-        const pal = ['#3d2a1d', '#5c3c26', '#8a5532', '#c46835', '#d98a52', '#e8b382', '#6e4930'];
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            const wave = Math.sin(t * 1.9 + c * 0.48 + r * 0.65);
-            const idx = Math.floor(hash(c * 13 + r * 29) * pal.length);
-            ctx.fillStyle = pal[idx];
-            ctx.fillRect(c * cw, r * ch, cw - 1, ch - 1);
-            if (wave > 0.78) {
-              ctx.fillStyle = 'rgba(255, 224, 182, 0.34)';
-              ctx.fillRect(c * cw, r * ch, cw - 1, ch - 1);
-            }
-          }
+        // Real DDOM warm cream paper (#f6f1e9 -> #ece4d6) matching ddom's actual website
+        const bg = ctx.createLinearGradient(0, 0, W, H);
+        bg.addColorStop(0, '#fdfaf5');
+        bg.addColorStop(0.5, '#f6f1e9');
+        bg.addColorStop(1, '#ece4d6');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+        // Subtle warm golden drifting light motes
+        for (let i = 0; i < 8; i++) {
+          const sx = (hash(i + 2) * W + Math.sin(t * 0.7 + i) * 10) % W;
+          const sy = (hash(i + 11) * H + Math.cos(t * 0.6 + i) * 6) % H;
+          ctx.fillStyle = 'rgba(196, 104, 53, 0.14)';
+          ctx.beginPath();
+          ctx.arc(sx, sy, 2.2 + (i % 2), 0, Math.PI * 2);
+          ctx.fill();
         }
         break;
       }
@@ -1170,36 +1028,93 @@ window.LLCRifts = (() => {
       }
 
       case 'sea': {
-        // Real Sea of Thought cerulean ocean (#0096c7 / #48cae4 / #031e4d) with rolling waves & bobbing message bottles!
-        const sg = ctx.createLinearGradient(0, 0, 0, H);
-        sg.addColorStop(0, '#0077b6');
-        sg.addColorStop(0.45, '#0096c7');
-        sg.addColorStop(1, '#032056');
-        ctx.fillStyle = sg;
-        ctx.fillRect(0, 0, W, H);
-        for (let layer = 0; layer < 4; layer++) {
-          const baseY = Math.floor(H * (0.34 + layer * 0.17));
-          ctx.fillStyle = layer % 2 === 0 ? 'rgba(72, 202, 228, 0.35)' : 'rgba(3, 30, 77, 0.38)';
-          for (let x = 0; x < W; x += 2) {
-            const wy = Math.floor(baseY + Math.sin(x * 0.08 + t * (1.8 + layer * 0.4) + layer * 2) * 3);
-            ctx.fillRect(x, wy, 2, H - wy);
-            if (layer < 2 && ((x + ((t * 14) | 0)) % 14 === 0)) {
-              ctx.fillStyle = 'rgba(230, 251, 255, 0.65)';
-              ctx.fillRect(x, wy, 4, 1);
-              ctx.fillStyle = layer % 2 === 0 ? 'rgba(72, 202, 228, 0.35)' : 'rgba(3, 30, 77, 0.38)';
-            }
+        // Real Sea of Thought ocean (from sea-of-thought/assets/ocean.js):
+        // Sunlit sky horizon, choppy pixel surface line, deep turquoise->cobalt->indigo water,
+        // angled underwater caustic shafts, swaying teal kelp, seabed & glass bottles FALLING DOWN!
+        const surfBase = Math.floor(H * 0.22);
+        // 1. Bright sunlit pixel sky above the water
+        const skyG = ctx.createLinearGradient(0, 0, 0, surfBase);
+        skyG.addColorStop(0, '#90E0EF');
+        skyG.addColorStop(1, '#CAF0F8');
+        ctx.fillStyle = skyG;
+        ctx.fillRect(0, 0, W, surfBase + 2);
+        // Sun glint on horizon
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(Math.floor(W * 0.78), 3, 7, 4);
+
+        // 2. Real Sea of Thought underwater depth gradient (#0096C7 -> #0055A4 -> #03045E)
+        const seaG = ctx.createLinearGradient(0, surfBase, 0, H);
+        seaG.addColorStop(0, '#0096C7');
+        seaG.addColorStop(0.42, '#0062AD');
+        seaG.addColorStop(0.78, '#083282');
+        seaG.addColorStop(1, '#03045E');
+        ctx.fillStyle = seaG;
+        ctx.fillRect(0, surfBase, W, H - surfBase);
+
+        // 3. Angled sunlit underwater caustic rays descending from the surface
+        ctx.fillStyle = 'rgba(202, 240, 248, 0.12)';
+        for (let r = 0; r < 5; r++) {
+          const rx = Math.floor(14 + r * 32 + Math.sin(t * 0.8 + r) * 5);
+          for (let y = surfBase; y < H - 8; y += 2) {
+            const shift = Math.floor((y - surfBase) * 0.22);
+            ctx.fillRect(rx - shift, y, 7, 2);
           }
         }
-        // Bobbing corked glass message bottles
-        for (let i = 0; i < 2; i++) {
-          const bx = Math.floor(((t * 11 + i * (W * 0.55)) % (W + 14)) - 7);
-          const by = Math.floor(H * (0.56 + i * 0.18) + Math.sin(t * 2.8 + i * 2) * 2);
-          ctx.fillStyle = '#90e0ef';
-          ctx.fillRect(bx, by, 5, 3);
-          ctx.fillStyle = '#f3dfae';
-          ctx.fillRect(bx + 1, by + 1, 3, 1);
+
+        // 4. Choppy pixel surface wave crest (#ADE8F4 + white sun sparkles)
+        for (let x = 0; x < W; x++) {
+          const sy = surfBase + Math.round(1.4 * Math.sin(x * 0.09 + t * 1.4) + 0.7 * Math.sin(x * 0.19 - t * 1.9));
+          ctx.fillStyle = '#CAF0F8';
+          ctx.fillRect(x, 0, 1, sy);
+          ctx.fillStyle = '#ADE8F4';
+          ctx.fillRect(x, sy, 1, 2);
+          if (((x + ((t * 10) | 0)) % 17 === 0)) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(x, sy, 2, 1);
+          }
+        }
+
+        // 5. Swaying teal kelp & hazy seabed ridges along bottom (exact ocean.js colors)
+        for (let x = 0; x < W; x += 2) {
+          const fh = Math.floor(5 + 2.5 * Math.sin(x * 0.08) + 1.5 * Math.cos(x * 0.15));
+          ctx.fillStyle = '#0e2c66';
+          ctx.fillRect(x, H - fh, 2, fh);
+          ctx.fillStyle = '#3a74b8';
+          ctx.fillRect(x, H - fh, 2, 1);
+        }
+        const kelpX = [14, 28, W - 32, W - 16];
+        for (let k = 0; k < kelpX.length; k++) {
+          const kx = kelpX[k];
+          const kh = 14 + (k % 2) * 6;
+          for (let q = 0; q < kh; q++) {
+            const sway = Math.round(Math.sin(t * 1.6 + k * 1.7 + q * 0.28) * 1.8);
+            ctx.fillStyle = q < 6 ? '#165e64' : '#1f7a68';
+            ctx.fillRect(kx + sway, H - 4 - q, 2, 1);
+          }
+        }
+
+        // 6. Glass message bottles FALLING / SINKING DOWN through the ocean with tiny bubbles!
+        for (let i = 0; i < 6; i++) {
+          const bx = Math.floor(14 + hash(i * 7 + 3) * (W - 28) + Math.sin(t * 1.5 + i * 2) * 3);
+          const prog = (t * (0.18 + (i % 3) * 0.05) + hash(i * 13 + 1)) % 1;
+          const by = Math.floor(surfBase - 4 + prog * (H - surfBase + 8));
+          // Cork on top
           ctx.fillStyle = '#b87a44';
-          ctx.fillRect(bx + 5, by + 1, 2, 1);
+          ctx.fillRect(bx + 1, by - 1, 2, 1);
+          // Glass bottle body
+          ctx.fillStyle = '#90E0EF';
+          ctx.fillRect(bx, by, 4, 6);
+          // Parchment scroll inside
+          ctx.fillStyle = '#f3dfae';
+          ctx.fillRect(bx + 1, by + 2, 2, 3);
+          // Glass highlight
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(bx, by + 1, 1, 2);
+          // Rising bubble trailing above sinking bottle
+          if (by > surfBase + 5) {
+            ctx.fillStyle = 'rgba(214, 242, 255, 0.8)';
+            ctx.fillRect(bx + 1 + ((i + ((t * 4) | 0)) % 2), by - 4, 1, 1);
+          }
         }
         break;
       }

@@ -69,7 +69,17 @@
     container.innerHTML = '';
 
     for (const cat of CATEGORIES) {
-      const items = VISIBLE_SITES.filter((s) => s.category === cat.id);
+      const items = VISIBLE_SITES
+        .filter((s) => s.category === cat.id)
+        .sort((a, b) => {
+          // Pin quizzes to the bottom of Games
+          const qa = a.quiz ? 1 : 0;
+          const qb = b.quiz ? 1 : 0;
+          if (qa !== qb) return qa - qb;
+          // Chronological order (oldest -> newest)
+          if (a.added !== b.added) return (a.added || '').localeCompare(b.added || '');
+          return 0;
+        });
       if (!items.length) continue;
 
       const sec = document.createElement('section');
@@ -184,7 +194,7 @@
     const countEl = document.getElementById('total-count');
     if (!dir) return;
 
-    if (countEl) countEl.textContent = `${VISIBLE_SITES.length} websites`;
+    if (countEl) countEl.textContent = `V${window.LLC_VERSION || 75}`;
 
     function setMode(mode, updateHash) {
       const isNewest = mode === 'newest';

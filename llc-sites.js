@@ -1,10 +1,12 @@
 /* ==========================================================================
    llc-sites.js — Master Website Directory for LLC (landrcy.github.io)
-   Add new websites to the TOP of window.LLC_SITES with an ISO date (`added`)
-   so both the categorized home page and the Newest view update automatically.
-   Sites marked `hidden: true` are moved out of the main hub & /newest/ into
-   the secret bottom-of-page archive unlocked via the faint "···" trigger.
+   Add new websites to window.LLC_SITES with an ISO date (`added`).
+   Main categories sort chronologically (oldest -> newest, quizzes at bottom
+   of Games); /newest/ sorts newest-first automatically.
    ========================================================================== */
+
+// Carried over from Laverse solar system (HUB_VERSION = 74 -> V75). Increment on publish.
+window.LLC_VERSION = 75;
 
 window.LLC_CATEGORIES = [
   { id: 'games', title: 'Games' },
@@ -12,7 +14,6 @@ window.LLC_CATEGORIES = [
   { id: 'tools', title: 'Tools' },
 ];
 
-// Ordered newest-first!
 window.LLC_SITES = [
   {
     id: 'pixel-art-gallery',
@@ -24,7 +25,6 @@ window.LLC_SITES = [
     seed: 101,
     scene: 'gallery',
     titleStyle: 'gallery',
-    pop: 'gallery',
     rim: '#c84b31',
     glow: '#e06342',
     bg: '#f4efe6',
@@ -40,10 +40,9 @@ window.LLC_SITES = [
     seed: 202,
     scene: 'atlas',
     titleStyle: 'atlas',
-    pop: 'atlas',
     rim: '#2b6cb0',
     glow: '#3b92e8',
-    bg: '#f8fafd',
+    bg: '#ffffff',
     light: true,
   },
   {
@@ -56,7 +55,6 @@ window.LLC_SITES = [
     seed: 303,
     scene: 'terrain',
     titleStyle: 'terrain',
-    pop: 'terrain',
     rim: '#5c8f4c',
     glow: '#78b863',
     bg: '#e8decb',
@@ -72,22 +70,21 @@ window.LLC_SITES = [
     seed: 404,
     scene: 'recommend',
     titleStyle: 'recommend',
-    pop: 'recommend',
     rim: '#6b93ff',
     glow: '#7aa4ff',
     bg: '#0f1933',
   },
   {
     id: 'roguelike-quiz',
-    title: 'Roguelike Quiz',
+    title: 'TBOI & STS2 Quiz',
     url: 'https://landrcy.github.io/roguelike-quiz/',
     category: 'games',
     added: '2026-11-26',
+    quiz: true,
     pixel: true,
     seed: 505,
     scene: 'roguelike',
     titleStyle: 'roguelike',
-    pop: 'roguelike',
     rim: '#e4ab49',
     glow: '#f2be5c',
     bg: '#16110e',
@@ -98,15 +95,14 @@ window.LLC_SITES = [
     url: 'https://landrcy.github.io/ddom/',
     category: 'projects',
     added: '2026-11-26',
-    pixel: true,
+    pixel: false,
     seed: 606,
     scene: 'ddom',
-    titleImg: 'world/titles/ddom.png',
-    titleStyle: 'img',
-    pop: 'ddom',
-    rim: '#c46835',
-    glow: '#e68449',
-    bg: '#2b1e16',
+    titleStyle: 'ddom',
+    rim: '#231a14',
+    glow: '#b88358',
+    bg: '#f6f1e9',
+    light: true,
   },
   {
     id: 'forge',
@@ -120,7 +116,6 @@ window.LLC_SITES = [
     scene: 'forge',
     titleImg: 'world/titles/forge.png',
     titleStyle: 'img',
-    pop: 'forge',
     rim: '#ff7b24',
     glow: '#ff8a36',
     bg: '#1c0f10',
@@ -135,7 +130,6 @@ window.LLC_SITES = [
     seed: 808,
     scene: 'typefall',
     titleStyle: 'typefall',
-    pop: 'typefall',
     rim: '#8a7356',
     glow: '#b89668',
     bg: '#f7f2e7',
@@ -151,7 +145,6 @@ window.LLC_SITES = [
     seed: 909,
     scene: 'shaders',
     titleStyle: 'shaders',
-    pop: 'shaders',
     rim: '#66f0ff',
     glow: '#66f0ff',
     bg: '#03060c',
@@ -166,7 +159,6 @@ window.LLC_SITES = [
     seed: 1010,
     scene: 'channels',
     titleStyle: 'channels',
-    pop: 'channels',
     rim: '#ff0033',
     glow: '#ff2b55',
     bg: '#0d0917',
@@ -181,10 +173,10 @@ window.LLC_SITES = [
     seed: 1111,
     scene: 'llccards',
     titleStyle: 'llccards',
-    pop: 'llccards',
-    rim: '#e01b1b',
-    glow: '#ff3838',
-    bg: '#141418',
+    rim: '#111111',
+    glow: '#9ca3af',
+    bg: '#f7f7f7',
+    light: true,
   },
   {
     id: 'cast',
@@ -197,7 +189,6 @@ window.LLC_SITES = [
     seed: 1212,
     scene: 'cast',
     titleStyle: 'cast',
-    pop: 'cast',
     rim: '#48cae4',
     glow: '#5cd8f0',
     bg: '#06203a',
@@ -213,7 +204,6 @@ window.LLC_SITES = [
     scene: 'mine',
     titleImg: 'world/titles/mine.png',
     titleStyle: 'img',
-    pop: 'mine',
     rim: '#ffd23a',
     glow: '#ffd23a',
     bg: '#16121b',
@@ -229,7 +219,6 @@ window.LLC_SITES = [
     seed: 1414,
     scene: 'lsu',
     titleStyle: 'lsu',
-    pop: 'lsu',
     rim: '#ff3d7f',
     glow: '#ff5290',
     bg: '#140612',
@@ -245,7 +234,6 @@ window.LLC_SITES = [
     scene: 'terra',
     titleImg: 'world/titles/terra-logo.png',
     titleStyle: 'img',
-    pop: 'terra',
     rim: '#5ec962',
     glow: '#6ce070',
     bg: '#3f96da',
@@ -256,11 +244,11 @@ window.LLC_SITES = [
     url: 'https://landrcy.github.io/ai-quiz/',
     category: 'games',
     added: '2026-11-10',
+    quiz: true,
     pixel: true,
     seed: 1616,
     scene: 'aiquiz',
     titleStyle: 'aiquiz',
-    pop: 'aiquiz',
     rim: '#57f0ff',
     glow: '#57f0ff',
     bg: '#080a18',
@@ -276,7 +264,6 @@ window.LLC_SITES = [
     seed: 1717,
     scene: 'escapeca',
     titleStyle: 'escapeca',
-    pop: 'escapeca',
     rim: '#ff2840',
     glow: '#ff3850',
     bg: '#14050c',
@@ -292,7 +279,6 @@ window.LLC_SITES = [
     seed: 1818,
     scene: 'tung',
     titleStyle: 'tung',
-    pop: 'tung',
     rim: '#c88a4b',
     glow: '#dfa05e',
     bg: '#2b160a',
@@ -308,7 +294,6 @@ window.LLC_SITES = [
     scene: 'pmuseum',
     titleImg: 'world/titles/pmuseum-logo.png',
     titleStyle: 'img',
-    pop: 'pmuseum',
     rim: '#58e2ec',
     glow: '#68eef8',
     bg: '#131d38',
@@ -339,7 +324,6 @@ window.LLC_SITES = [
     scene: 'void',
     titleImg: 'world/titles/void-logo.png',
     titleStyle: 'void-anim',
-    pop: 'void',
     rim: '#c04df0',
     glow: '#d066ff',
     bg: '#05020d',
@@ -355,10 +339,9 @@ window.LLC_SITES = [
     scene: 'sea',
     titleImg: 'world/titles/sea.png',
     titleStyle: 'img',
-    pop: 'sea',
     rim: '#48cae4',
     glow: '#5ad8f2',
-    bg: '#032056',
+    bg: '#0077b6',
   },
   {
     id: 'binding-of-ashaad',
